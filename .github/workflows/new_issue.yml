@@ -1,0 +1,23 @@
+# This is the workflow for what to do when a new issue is opened in the repo.
+# The issue shoule be added to the project and the "todo" label should be added.
+
+name: New Issue Created
+on:
+  issues:
+    types: [opened, reopened]
+
+jobs:
+  add-todo-label:
+    runs-on: ubuntu-latest
+    steps:
+      # add the todo label
+      - name: Add todo Label
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['todo']
+            })
