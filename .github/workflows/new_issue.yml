@@ -8,7 +8,7 @@ on:
 
 jobs:
   add-todo-label:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       # add the todo label
       - name: Add todo Label
