@@ -1,0 +1,18 @@
+.GraphViewer {
+    width: 600px;
+    height: 600px;
+    background-color:white;
+    border: 5px;
+    border-color: black;
+    border-style: solid;
+}
+
+.GraphViewer>div {
+    width: 600px;
+    height: 600px;
+    text-align: left;
+}
+
+node {
+    background-color: green;
+}
