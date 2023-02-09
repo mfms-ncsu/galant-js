@@ -1,7 +1,4 @@
 import './App.css';
-
-import GraphViewer from './frontend/GraphViewer/GraphViewer';
-
 import React , {Component} from 'react'
 
 class App extends Component {
@@ -24,7 +21,6 @@ class App extends Component {
         <p>Galant<br/></p>
         <input type='file' onChange={(e) => this.showFile(e)} />
         <textarea disabled></textarea>
-        <GraphViewer></GraphViewer>
       </div>
     );
   }

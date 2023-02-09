@@ -1,0 +1,8 @@
+.GraphViewerDemo {
+	text-align: center;
+}
+
+.GraphViewerDemo>* {
+	margin-left: auto;
+	margin-right: auto;
+}

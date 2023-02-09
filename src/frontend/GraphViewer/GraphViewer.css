@@ -1,18 +1,29 @@
+/* Set the style of the graph viewer window. */
 .GraphViewer {
-    width: 600px;
-    height: 600px;
     background-color:white;
+
     border: 5px;
-    border-color: black;
     border-style: solid;
+    border-color: black;
+
+    position: relative;
 }
 
-.GraphViewer>div {
+/* Position the controls in the top left, above the window. */
+.GraphViewer>.GraphViewerControls {
+    position:absolute;
+    z-index: 1;
+}
+
+/* Set the margins between each button. */
+.GraphViewer>.GraphViewerControls>button {
+    margin-top: 5px;
+    margin-left: 5px;
+}
+
+/* Set the size of the graph viewer. TODO this should be dynamic */
+.GraphViewer, .GraphViewer>.__________cytoscape_container {
     width: 600px;
     height: 600px;
     text-align: left;
-}
-
-node {
-    background-color: green;
 }
