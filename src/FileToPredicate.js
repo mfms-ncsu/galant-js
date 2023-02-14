@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 //parse the text into predicates. This function returns a dictionary object with keys called nodes, directed_edges, and undirected_edges
-function parseText(e) {
+export function parseText(e) {
 
     //ids and dictionaries to store nodes and edges
     var node_map = {}
@@ -197,7 +197,10 @@ function parseText(e) {
 
   function GraphInput() { 
     var [textValue, setTextValue] = useState("");
+    var [fileName, setFileName] = useState("");
     function handleChange(e) {
+
+      setFileName(e.target.files[0].name);
       var file = e.target.files[0];
   
       let reader = new FileReader();
@@ -205,6 +208,7 @@ function parseText(e) {
       reader.onload = (e) => {
         var file = e.target.result;
         setTextValue(file);
+        setFileName(e.target.files[0].name);
         //parse it into graph components
         parseText(file)
       };
@@ -218,7 +222,8 @@ function parseText(e) {
           Upload Graph
         </label>
         <input id="filePicker" style={{ visibility: "hidden" }} type={"file"} onChange={handleChange} />
-  
+        <div
+        >{fileName}</div>
         <textarea
           cols={60}
           rows={15}
