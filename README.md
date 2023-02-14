@@ -7,7 +7,7 @@ Clone repo, run 'npm install' in repo directory
 run 'npm start' to run app to develop
 
 **Production**  
-*Do everything with sudo cmd*
+*Do everything with sudo cmd*  
 on the vm, in /var/www/web-based-galant,  
 pull changes from the main branch  
 run 'npm run build'  
