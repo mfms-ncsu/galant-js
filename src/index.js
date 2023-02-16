@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.less';
 import App from './App';
-import GraphInput from './FileToPredicate';
+import GraphInput from './frontend/GraphInput';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
