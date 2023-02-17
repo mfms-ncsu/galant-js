@@ -76,7 +76,6 @@ export function predicateConverter(predicate) {
         for (let key in undirect) {
             //If the predicate for an edge has a weight add it to the label to be displayed
             if (key === 'weight' || key === 'label') {
-                //element.data.label = undirect[key] + '\n';
                 //do nothing
             }
             //Transfer all other key value pairs to the edge
@@ -85,6 +84,8 @@ export function predicateConverter(predicate) {
             }
         }
 
+        //Addes the weight and labeled combined in the labeled field
+        //If there is only one or the other then that is only added
         if (undirect.weight && undirect.label) {
             element.data.label = undirect.weight + '\n' + undirect.label;
         }
@@ -107,6 +108,7 @@ export function predicateConverter(predicate) {
         //Specifies the format for a graph object to display edges
         let element = {
             data: {
+                id: id,
                 label: ''
             },
             //Specifies a style class for formatting directed edges
@@ -116,13 +118,25 @@ export function predicateConverter(predicate) {
         //Loops through all keys inside of the edge
         for (let key in direct) {
             //If the predicate for an edge has a weight add it to the label to be displayed
-            if (key === 'weight') {
-                element.data.label = direct[key] + '\n';
+            if (key === 'weight' || key === 'label') {
+                //do nothing
             }
             //Transfer all other key value pairs to the edge
             else {
                 element.data[key] = direct[key];
             }
+        }
+
+        //Addes the weight and labeled combined in the labeled field
+        //If there is only one or the other then that is only added
+        if (direct.weight && direct.label) {
+            element.data.label = direct.weight + '\n' + direct.label;
+        }
+        else if (direct.weight) {
+            element.data.label = String(direct.weight);
+        }
+        else if (direct.label) {
+            element.data.label = undirect.label;
         }
          //Add the edge to the list of elements
         elements.push(element);
