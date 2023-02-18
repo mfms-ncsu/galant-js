@@ -21,7 +21,6 @@ function convertEdges(elements, edges, isDirected) {
                 destination: '',
                 label: '',
                 highlighted: false,
-                weight: null,
                 color: 'black'
             }
         }
