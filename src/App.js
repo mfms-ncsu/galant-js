@@ -3,7 +3,7 @@ import './App.less';
 function App() {
   return (
     <div className="App">
-      Test
+      Galant
     </div>
   );
 }
