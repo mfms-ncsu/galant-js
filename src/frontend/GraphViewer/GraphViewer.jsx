@@ -5,7 +5,7 @@ import { renderToString } from 'react-dom/server';
 import CytoscapeComponent from 'react-cytoscapejs';
 
 // TODO import the actual Predicate converter function.
-import convertPredicates from '../../backend/PredicateConverter';
+import predicateConverter from '../../backend/PredicateConverter';
 
 // Enable the cose-bilkent layout which automatically lays out the graph in a reasonable configuration.
 import cytoscape from 'cytoscape';
@@ -21,20 +21,20 @@ nodeHtmlLabel( cytoscape );
  * This component recieves a graph in the form of Predicates and displays it using Cytoscape.
  * It handles the ability to move the camera, move nodes, and automatically lay out the graph.
  * 
- * @param props: Object - The React properties of the component include:
- * @property predicates: Predicates - The representation of the graph to display.
+ * @param {Object} props - The React properties of the component include:
+ * @property {Predicates} predicates - The representation of the graph to display.
  * 
- * @returns HTML - The HTML representation of the component.
+ * @returns {HTML} - The HTML representation of the component.
  * 
  * @author Art Schell
  */
 function GraphViewer(props) {
-	/** string - The currently enabled layout. Begins as 'preset' which keeps the nodes in the specified positions. */
+	/** @var {string} - The currently enabled layout. Begins as 'preset' which keeps the nodes in the specified positions. */
 	let [layout, setLayout] = React.useState("preset");
-	/** cytoscape.ElementDefinition[] - The currently displayed elements, converted from the Predicates into Cytoscape form. */
-	let [elements, setElements] = React.useState(convertPredicates(props.predicates));
-	/** cytoscape.Core - The saved Cytoscape object. This is used to make direct calls to Cytoscape such as cytoscape.fit(). */
-	let [cytoscape, setCytoscape] = React.useState(null);
+	/** @var {cytoscape.ElementDefinition[]} - The currently displayed elements, converted from the Predicates into Cytoscape form. */
+	let [elements, ] = React.useState(predicateConverter(props.predicates));
+	/** @var {cytoscape.Core} - The saved Cytoscape object. This is used to make direct calls to Cytoscape such as cytoscape.fit(). */
+	let [cytoscape, ] = React.useState(null);
 
 	// Save the current positions of nodes so they can be preserved after an update.
 	let positions = {};
@@ -45,7 +45,7 @@ function GraphViewer(props) {
 	}
 
 	// Convert the updated set of Predicates into Cytoscape form.
-	elements = convertPredicates(props.predicates);
+	elements = predicateConverter(props.predicates);
 
 	// Ensure the positions of nodes are preserved in the new list of elements.
 	for (let element of elements) {
@@ -107,7 +107,7 @@ function GraphViewer(props) {
 	</div>;
 }
 
-/** cytoscape.Stylesheet[] - The stylesheet for Cytoscape, defining the default visual appearance of elements. */
+/** @const {cytoscape.Stylesheet[]} - The stylesheet for Cytoscape, defining the default visual appearance of elements. */
 const stylesheet = [
 	{
 		selector: 'node',
