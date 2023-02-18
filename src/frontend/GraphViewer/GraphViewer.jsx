@@ -1,15 +1,19 @@
 import './GraphViewer.css';
 
 import React from 'react';
+import { renderToString } from 'react-dom/server';
 import CytoscapeComponent from 'react-cytoscapejs';
 
 // TODO import the actual Predicate converter function.
 import convertPredicates from '../../backend/PredicateConverter';
 
 // Enable the cose-bilkent layout which automatically lays out the graph in a reasonable configuration.
-import cytoscape from 'cytoscape'
+import cytoscape from 'cytoscape';
+
+import nodeHtmlLabel from 'cytoscape-node-html-label';
 import coseBilkent from 'cytoscape-cose-bilkent';
 cytoscape.use( coseBilkent );
+nodeHtmlLabel( cytoscape );
 
 /**
  * A React component that displays a graph.
@@ -68,10 +72,37 @@ function GraphViewer(props) {
 			}}>{"Auto-Camera"}</button>
 		</div>
 		<CytoscapeComponent elements={elements}
-			layout={{ name: layout }}
+			layout={{
+				name: layout,
+				idealEdgeLength: 100,
+			}}
 			stylesheet={stylesheet}
 			autounselectify={true}
-			cy={(cy) => { cytoscape = cy }}
+			cy={(cy) => {
+				cy.nodeHtmlLabel([
+					{
+						query: 'node',
+						valign: "top",
+						valignBox: "top",
+						tpl: (data) => {
+							if (data.weight) {
+								return renderToString(
+									<div>
+										<p class="GraphViewerLabel">{data.weight}<br></br>{data.label}</p>
+									</div>
+								);
+							} else if (data.label) {
+								return renderToString(
+									<div>
+										<p class="GraphViewerLabel">{data.label}</p>
+									</div>
+								);
+							}
+						}
+					},
+				]);
+				cytoscape = cy
+			}}
 		/>
 	</div>;
 }
@@ -87,10 +118,11 @@ const stylesheet = [
 			borderWidth: '5px',
 			borderStyle: 'solid',
 			borderColor: 'black',
-			label: 'data(label)',
+			label: 'data(id)',
 			textValign: 'center',
 		}
 	},	
+	// Marked nodes
 	{
 		selector: 'node[!marked]',
 		style: {
@@ -102,7 +134,8 @@ const stylesheet = [
 		style: {
 			backgroundColor: 'orange',
 		}
-	},	
+	},
+	// Highlighted nodes
 	{
 		selector: 'node[!highlighted]',
 		style: {
@@ -115,38 +148,58 @@ const stylesheet = [
 			borderWidth: '10px',
 		}
 	},
+	// Highlighted edges
 	{
 		selector: 'edge[!highlighted]',
 		style: {
-			borderWidth: '5px',
+			width: '5px',
 		}
 	},
 	{
 		selector: 'edge[?highlighted]',
 		style: {
-			borderWidth: '10px',
+			width: '10px',
 		}
 	},
+	// Colored nodes
 	{
-		selector: 'node.label',
+		selector: 'node[color]',
 		style: {
-			borderWidth: '0px',
-			textValign: 'top',
-		}
-	},		
-	{
-		selector: 'edge',
-		style: {
-			width: '5px',
-			lineColor: 'black',
-			targetArrowShape: 'none',
-			targetArrowColor: 'black',
-			curveStyle: 'straight',
+			borderColor: 'data(color)',
 		}
 	},
+	// Colored edges
+	{
+		selector: 'edge[color]',
+		style: {
+			lineColor: 'data(color)',
+			targetArrowColor: 'data(color)',
+		}
+	},
+	// Labeled edges
+	{
+		selector: 'edge[label]',
+		style: {
+			label: 'data(label)',
+
+			textWrap: 'wrap',
+
+			textBackgroundColor: 'white',
+			textBackgroundOpacity: '1.0',
+			textBackgroundPadding: '2px',
+
+			textBorderOpacity: '1.0',
+			textBorderStyle: 'solid',
+			textBorderWidth: '1.5px',
+			textBorderColor: 'black',
+		}
+	},
+	// Directed edges
 	{
 		selector: 'edge.directed',
 		style: {
+			curveStyle: 'straight',
+
 			targetArrowShape: 'triangle',
 		}
 	},
