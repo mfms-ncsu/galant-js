@@ -2,9 +2,13 @@
 
 A web implementation of [Galant](https://github.com/mfms-ncsu/galant), a **g**raph **al**gorithm **an**imation **t**ool.
 
+**Development**  
+Clone repo, run 'npm install' in repo directory  
+run 'npm start' to run app to develop
 
-You must have node installed to run.
-
-To run the test development server, run `npm start` from the root folder.
-
-To run tests, run `nmp test`.
+**Production**  
+*Do everything with sudo cmd*  
+on the vm, in /var/www/web-based-galant,  
+pull changes from the main branch  
+run 'npm run build'  
+restart apache
