@@ -10,41 +10,69 @@ export default graph
  */
 export function parseText(graphText) {
 
+  //remove any previous values that the graph may have
+  graph = {}
+
   //ids and dictionaries to store nodes and edges
   var node_map = {}
   var directed_edge_map = {}
-  var directed_edge_id = 0
   var undirected_edge_map = {}
-  var undirected_edge_id = 0
+  var edge_id = 0
 
   var lines = graphText.split('\n')
   for (var line = 0; line < lines.length; line++) {
 
     //this is a node
-    if (lines[line][0] == 'n') {
+    if (lines[line][0] === 'n') {
       nodeParser(lines[line], node_map)
     }
 
     //this is an undirected edge
-    else if (lines[line][0] == 'e') {
-      undirectedEdgeParser(lines[line], undirected_edge_map, undirected_edge_id)
+    else if (lines[line][0] === 'e') {
+      edge_id += 1
+      edgeParser(lines[line], undirected_edge_map, edge_id)
     }
 
     //this is a directed edge
-    else if (lines[line][0] == 'd') {
-      directedEdgeParser(lines[line], directed_edge_map, directed_edge_id)
+    else if (lines[line][0] === 'd') {
+      edge_id += 1
+      edgeParser(lines[line], directed_edge_map, edge_id)
     }
 
     //if the user had a new line character at the end of the file
-    else if (lines[line][0] != '\n') {
+    else if (lines[line][0] !== '\n') {
+      /**
+       * TODO: Change console.log error messages to alerts with a more meaningful message and add functionality to reprompt for a file 
+       */
       console.log("Incorrect file format")
     }
   }
 
+  //ensure that all entered source and destinations for edges are valid node ids
+  /**
+   * TODO: Change console.log error messages to alerts with a more meaningful message and add functionality to reprompt for a file 
+   */
+  for (var key in directed_edge_map) {
+    if (!(directed_edge_map[key].source in node_map)) {
+      console.log("Source does not match a node ID")
+    }
+    if (!(directed_edge_map[key].destination in node_map)) {
+      console.log("Destination does not match a node ID")
+    }
+  }
+  for (var key in undirected_edge_map) {
+    if (!(undirected_edge_map[key].source in node_map)) {
+      console.log("Source does not match a node ID")
+    }
+    if (!(undirected_edge_map[key].destination in node_map)) {
+      console.log("Destination does not match a node ID")
+    }
+  }
+
   //combine everything into one object and return it
-  graph['node'] = node_map
-  graph['directed'] = directed_edge_map
-  graph['undirected'] = undirected_edge_map
+  graph.node = node_map
+  graph.directed = directed_edge_map
+  graph.undirected = undirected_edge_map
   console.log(graph)
   return graph
 
@@ -57,50 +85,52 @@ export function parseText(graphText) {
  * @param {dictionary} node_map - the map of all the current nodes
  */
 function nodeParser(node_string, node_map) {
+  //the id of the node
   var node_id = false
-  var x = false
-  var y = false
-  var weight = null
   //trim the end whitespace
   var trimmed = node_string.trimEnd()
   //split values to an array in the string by removing whitespace in middle
   var all_values = trimmed.substring(2).split(" ")
+  //keys and values of all values of the node
   var keys = ['weight', 'x', 'y']
   var values = [null]
+
   for (var i = 0; i < all_values.length; i++) {
     //id value
-    if (node_id == false) {
+    if (node_id === false) {
       node_id = all_values[i]
     }
     //x value
-    else if (x == false && isNumeric(all_values[i])) {
-      x = true
+    else if (values.length == 1 && isNumeric(all_values[i])) {
       values.push(parseFloat(all_values[i]))
     }
     //y value
-    else if (y == false && isNumeric(all_values[i])) {
-      y = true
+    else if (values.length == 2 && isNumeric(all_values[i])) {
       values.push(parseFloat(all_values[i]))
     }
     //the weight field was entered
-    else if (x == true && y == true && weight == null && isNumeric(all_values[i])) {
-      weight = true
+    else if (values.length == 3 && isNumeric(all_values[i])) {
       values[0] = parseFloat(all_values[i])
     }
     //the weight field was not entered
-    else if (x == true && y == true && all_values[i].includes(":")) {
+    else if (values.length >= 3  && all_values[i].includes(":")) {
       var key_val = all_values[i].split(":")
       keys.push(key_val[0])
       values.push(key_val[1])
     }
     //the key value pairs were not created correctly or the x, y fields were not set
     else {
-      // handleChange()
+      /**
+       * TODO: Change console.log error messages to alerts with a more meaningful message and add functionality to reprompt for a file
+       */
       console.log("Incorrect node format")
     }
   }
-  //one last error check
-  if (x != true || y != true) {
+  //one last error check: values needs weight, x and y and the minimum
+  if (values.length < 3) {
+    /**
+     * TODO: Change console.log error messages to alerts with a more meaningful message and add functionality to reprompt for a file
+     */
     console.log("Incorrect node format")
   }
   //set the node map of the id equal to dictionary
@@ -114,114 +144,59 @@ function nodeParser(node_string, node_map) {
 /**
  * This function parses a given string for an undirected edge predicate
  * @author rskarwa
- * @param {string} undirected_edge_string - the line of the undirected edge predicate
- * @param {dictionary} undirected_edge_map - the map of all the current undirected edges
- * @param {int} undirected_edge_id - the current id of the undirected edge
+ * @param {string} edge_string - the line of the undirected edge predicate
+ * @param {dictionary} edge_map - the map of all the current undirected edges
+ * @param {int} edge_id - the current id of the undirected edge
  */
-function undirectedEdgeParser(undirected_edge_string, undirected_edge_map, undirected_edge_id) {
-  var id = undirected_edge_id + 1
-  undirected_edge_map[id] = {}
-  undirected_edge_id += 1
-  var source = false
-  var destination = false
-  var weight = null
+function edgeParser(edge_string, edge_map, edge_id) {
   //trim the end whitespace
-  var trimmed = undirected_edge_string.trimEnd()
+  var trimmed = edge_string.trimEnd()
   //split values to an array in the string by removing whitespace in middle
   var all_values = trimmed.substring(2).split(" ")
+  //keys and values of all values of the edge
   var keys = ['weight', 'source', 'destination']
   var values = [null]
+
   for (var i = 0; i < all_values.length; i++) {
     //source value
-    if (source == false && isNumeric(all_values[i])) {
-      source = true
-      values.push(parseFloat(all_values[i]))
+    if (values.length == 1) {
+      values.push(all_values[i])
     }
     //destination value
-    else if (destination == false && isNumeric(all_values[i])) {
-      destination = true
-      values.push(parseFloat(all_values[i]))
+    else if (values.length == 2) {
+      values.push(all_values[i])
     }
     //the weight field was entered
-    else if (source == true && destination == true && weight == null && isNumeric(all_values[i])) {
-      weight = true
+    else if (values.length == 3 && isNumeric(all_values[i])) {
       values[0] = parseFloat(all_values[i])
     }
     //the weight field was not entered
-    else if (source == true && destination == true && all_values[i].includes(":")) {
+    else if (values.length >= 3 && all_values[i].includes(":")) {
       var key_val = all_values[i].split(":")
       keys.push(key_val[0])
       values.push(key_val[1])
     }
     //the key value pairs were not created correctly or the source, destination fields were not set
     else {
+      /**
+       * TODO: Change console.log error messages to alerts with a more meaningful message and add functionality to reprompt for a file
+       */
       console.log("Incorrect edge format")
     }
   }
-  //one last error check
-  if (source != true || destination != true) {
+   //one last error check: values needs weight, source and destination and the minimum
+  if (values.length < 3) {
+    /**
+     * TODO: Change console.log error messages to alerts with a more meaningful message and add functionality to reprompt for a file
+     */
     console.log("Incorrect edge format")
   }
+
+  //the edge map of the edge id is a dictionary
+  edge_map[edge_id] = {}
   //go ahead store this edge predicate among all edges in the undirected_edge_map
   for (var j = 0; j < keys.length; j++) {
-    undirected_edge_map[id][keys[j]] = values[j];
-  }
-}
-
-/**
- * This function parses a given string for an directed edge predicate
- * @author rskarwa
- * @param {string} directed_edge_string - the line of the directed edge predicate
- * @param {dictionary} directed_edge_map - the map of all the current directed edges
- * @param {int} directed_edge_id - the current id of the directed edge
- */
-function directedEdgeParser(directed_edge_string, directed_edge_map, directed_edge_id) {
-  var id = directed_edge_id + 1
-  directed_edge_map[id] = {}
-  directed_edge_id += 1
-  var source = false
-  var destination = false
-  var weight = null
-  //trim the end whitespace
-  var trimmed = directed_edge_string.trimEnd()
-  //split values to an array in the string by removing whitespace in middle
-  var all_values = trimmed.substring(2).split(" ")
-  var keys = ['weight', 'source', 'destination']
-  var values = [null]
-  for (var i = 0; i < all_values.length; i++) {
-    //source value
-    if (source == false && isNumeric(all_values[i])) {
-      source = true
-      values.push(parseFloat(all_values[i]))
-    }
-    //destination value
-    else if (destination == false && isNumeric(all_values[i])) {
-      destination = true
-      values.push(parseFloat(all_values[i]))
-    }
-    //the weight field was entered
-    else if (source == true && destination == true && weight == null && isNumeric(all_values[i])) {
-      weight = true
-      values[0] = parseFloat(all_values[i])
-    }
-    //the weight field was not entered
-    else if (source == true && destination == true && all_values[i].includes(":")) {
-      var key_val = all_values[i].split(":")
-      keys.push(key_val[0])
-      values.push(key_val[1])
-    }
-    //the key value pairs were not created correctly or the source, destination fields were not set
-    else {
-      console.log("Incorrect edge format")
-    }
-  }
-  //one last error check
-  if (source != true || destination != true) {
-    console.log("Incorrect edge format")
-  }
-  //go ahead store this node predicate among all nodes in the node_map
-  for (var j = 0; j < keys.length; j++) {
-    directed_edge_map[id][keys[j]] = values[j];
+    edge_map[edge_id][keys[j]] = values[j];
   }
 }
 
