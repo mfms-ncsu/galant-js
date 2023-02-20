@@ -17,10 +17,11 @@ function convertEdges(elements, edges, isDirected) {
         //Specifies the format for a graph object to display edges
         let element = {
             data: {
-                id: id,
-                label: '',
                 source: '',
                 destination: '',
+                label: '',
+                highlighted: false,
+                color: 'black'
             }
         }
 
@@ -63,7 +64,7 @@ function convertEdges(elements, edges, isDirected) {
  * @param {Object} predicate - the predicates that had been converted from a test file
  * @returns returns a graph object in the cytoscape format
  */
-export function predicateConverter(predicate) {
+export default function predicateConverter(predicate) {
     //A predicate will have up to three objects, nodes, undirected edges, and directed edges
     let nodes = predicate['node'];
     let undirected = predicate['undirected'];
