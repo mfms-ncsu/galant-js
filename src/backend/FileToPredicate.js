@@ -48,7 +48,7 @@ export function parseText(graphText) {
     }
   }
 
-  //ensure that all entered source and destinations for edges are valid node ids
+  //ensure that all entered source and targets for edges are valid node ids
   /**
    * TODO: Change console.log error messages to alerts with a more meaningful message and add functionality to reprompt for a file 
    */
@@ -56,16 +56,16 @@ export function parseText(graphText) {
     if (!(directed_edge_map[key].source in node_map)) {
       console.log("Source does not match a node ID")
     }
-    if (!(directed_edge_map[key].destination in node_map)) {
-      console.log("Destination does not match a node ID")
+    if (!(directed_edge_map[key].target in node_map)) {
+      console.log("Target does not match a node ID")
     }
   }
   for (var key in undirected_edge_map) {
     if (!(undirected_edge_map[key].source in node_map)) {
       console.log("Source does not match a node ID")
     }
-    if (!(undirected_edge_map[key].destination in node_map)) {
-      console.log("Destination does not match a node ID")
+    if (!(undirected_edge_map[key].target in node_map)) {
+      console.log("Target does not match a node ID")
     }
   }
 
@@ -155,7 +155,7 @@ function edgeParser(edge_string, edge_map, edge_id) {
   //split values to an array in the string by removing whitespace in middle
   var all_values = trimmed.substring(2).split(" ")
   //keys and values of all values of the edge
-  var keys = ['weight', 'source', 'destination']
+  var keys = ['weight', 'source', 'target']
   var values = [null]
 
   for (var i = 0; i < all_values.length; i++) {
@@ -163,7 +163,7 @@ function edgeParser(edge_string, edge_map, edge_id) {
     if (values.length == 1) {
       values.push(all_values[i])
     }
-    //destination value
+    //target value
     else if (values.length == 2) {
       values.push(all_values[i])
     }
@@ -177,7 +177,7 @@ function edgeParser(edge_string, edge_map, edge_id) {
       keys.push(key_val[0])
       values.push(key_val[1])
     }
-    //the key value pairs were not created correctly or the source, destination fields were not set
+    //the key value pairs were not created correctly or the source, target fields were not set
     else {
       /**
        * TODO: Change console.log error messages to alerts with a more meaningful message and add functionality to reprompt for a file
@@ -185,7 +185,7 @@ function edgeParser(edge_string, edge_map, edge_id) {
       console.log("Incorrect edge format")
     }
   }
-   //one last error check: values needs weight, source and destination and the minimum
+   //one last error check: values needs weight, source and target and the minimum
   if (values.length < 3) {
     /**
      * TODO: Change console.log error messages to alerts with a more meaningful message and add functionality to reprompt for a file

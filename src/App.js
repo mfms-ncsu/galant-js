@@ -3,7 +3,7 @@ import GraphViewer from './frontend/GraphViewer/GraphViewer';
 import { useState } from "react";
 import GraphInput from './frontend/GraphInput/GraphInput';
 
-var graph = null;
+var graph = {};
 
 function App() {
   const [renderGraph, setRenderGraph] = useState(false);
@@ -17,7 +17,7 @@ function App() {
     <div className="App">
       <div className="GraphSide">
         <GraphInput />
-        {renderGraph && <GraphViewer predicates={graph}/>}
+        <GraphViewer predicates={graph}/>
       </div>
     </div>
   );

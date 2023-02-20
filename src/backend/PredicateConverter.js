@@ -18,7 +18,7 @@ function convertEdges(elements, edges, isDirected) {
         let element = {
             data: {
                 source: '',
-                destination: '',
+                target: '',
                 label: '',
                 highlighted: false,
                 color: 'black'
