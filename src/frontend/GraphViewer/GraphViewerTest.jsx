@@ -1,4 +1,4 @@
-import './GraphViewerTest.css';
+import './GraphViewerTest.scss';
 
 import GraphViewer from './GraphViewer';
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { parseText } from '../backend/FileToPredicate';
+import './GraphInput.scss'
+import graph, { parseText } from '../../backend/FileToPredicate';
 
 /**
  * This function loads an upload graph button and parses the graph input into a text area on the bottom right of the screen
@@ -33,14 +34,13 @@ function GraphInput() {
         //parse it into graph components
         return parseText(file)
       };
-  
     };
     return (
-      <div style={{ display: "block" }}>
-        <label htmlFor="filePicker" style={{ position: "absolute", top: 0, left: 0, background: "grey", padding: "1px 7px 2pxx", appearance: "button", color: "buttontext" }}>
+      <div className="GraphInput">
+        <label htmlFor="filePicker" >
           Upload Graph
         </label>
-        <input id="filePicker" style={{ visibility: "hidden" }} type={"file"} onChange={handleChange} />
+        <input id="filePicker" type={"file"} onChange={handleChange} />
         <div
         >{fileName}</div>
         <textarea
@@ -48,7 +48,7 @@ function GraphInput() {
           rows={15}
           value={textValue}
           onChange={setTextValue}
-          style={{ marginTop: 15, position: "absolute", bottom: 30, right: 30 }}
+          disabled
         ></textarea>
       </div>
     );

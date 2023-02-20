@@ -1,4 +1,4 @@
-import './GraphViewer.css';
+import './GraphViewer.scss';
 
 import React from 'react';
 import { renderToString } from 'react-dom/server';
@@ -32,10 +32,10 @@ function GraphViewer(props) {
 	/** @var {string} - The currently enabled layout. Begins as 'preset' which keeps the nodes in the specified positions. */
 	let [layout, setLayout] = React.useState("preset");
 	/** @var {cytoscape.ElementDefinition[]} - The currently displayed elements, converted from the Predicates into Cytoscape form. */
+	console.log('made it here', props)
 	let [elements, ] = React.useState(predicateConverter(props.predicates));
 	/** @var {cytoscape.Core} - The saved Cytoscape object. This is used to make direct calls to Cytoscape such as cytoscape.fit(). */
 	let [cytoscape, ] = React.useState(null);
-
 	// Save the current positions of nodes so they can be preserved after an update.
 	let positions = {};
 	for (let element of elements) {

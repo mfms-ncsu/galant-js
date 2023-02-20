@@ -1,5 +1,5 @@
 //this graph that contains the nodes and edges can be imported into another javscript file 
-var graph = {}
+var graph = null
 export default graph
 
 /**
@@ -74,8 +74,9 @@ export function parseText(graphText) {
   graph.directed = directed_edge_map
   graph.undirected = undirected_edge_map
   console.log(graph)
+  const event = new CustomEvent('graphUpdated', {detail: graph});
+  document.dispatchEvent(event);
   return graph
-
 }
 
 /**
