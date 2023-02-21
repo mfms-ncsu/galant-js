@@ -2,21 +2,17 @@ import './App.scss';
 import GraphViewer from './frontend/GraphViewer/GraphViewer';
 import { useState } from "react";
 import GraphInput from './frontend/GraphInput/GraphInput';
+//import graph from './backend/FileToPredicate';
 
-var graph = {};
 
 function App() {
   const [renderGraph, setRenderGraph] = useState(false);
-
-  document.addEventListener("graphUpdated", function( e ) {
-    graph = e.detail
-    setRenderGraph(true);
-  });
+  const [graph, setGraph] = useState({});
 
   return (
     <div className="App">
       <div className="GraphSide">
-        <GraphInput />
+        <GraphInput handleChange={setGraph}/>
         <GraphViewer predicates={graph}/>
       </div>
     </div>

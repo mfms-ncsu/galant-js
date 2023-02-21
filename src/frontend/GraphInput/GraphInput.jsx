@@ -7,7 +7,7 @@ import graph, { parseText } from '../../backend/FileToPredicate';
  * @author rskarwa
  * @returns a dynamically rendered HTML page with an upload graph button and text area
  */
-function GraphInput() {
+function GraphInput(props) {
 
     //use state allows a field to dynamically change upon an event
     var [textValue, setTextValue] = useState("");
@@ -32,7 +32,8 @@ function GraphInput() {
         var file = e.target.result;
         setTextValue(file);
         //parse it into graph components
-        return parseText(file)
+        console.log(props)
+        props.handleChange(parseText(file));
       };
     };
     return (

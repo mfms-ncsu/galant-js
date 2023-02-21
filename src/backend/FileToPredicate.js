@@ -74,8 +74,6 @@ export function parseText(graphText) {
   graph.directed = directed_edge_map
   graph.undirected = undirected_edge_map
   console.log(graph)
-  const event = new CustomEvent('graphUpdated', {detail: graph});
-  document.dispatchEvent(event);
   return graph
 }
 
