@@ -1,12 +1,14 @@
 /**
  * Helper function for predicateConverter which handles the directed and undirected objects.
  * 
- * @author Andrew Watson awatson5
- * @author Noah Alexander ngalexa2
- * 
  * @param elements - the elements list to push newly created graph objects to.
  * @param edges - the list of directed or undirected.
  * @param isDirected - boolean True or False telling the function whether to include a `classes: ['directed']` clause in the graph object.
+ *
+ * @returns - The converted elements
+ * 
+ * @author Andrew Watson
+ * @author Noah Alexander
  */
 function convertEdges(elements, edges, isDirected) {
     //Loops through all keys inside of the edges

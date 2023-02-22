@@ -1,0 +1,50 @@
+// @author Art Schell
+
+.GraphViewer {
+    // The component should take up the maximum available space
+    width: 100%;
+    height: 100%;
+
+    // Style the graph window and its border
+    background-color:white;
+    border: 5px;
+    border-style: solid;
+    border-color: black;
+    box-sizing: border-box;
+
+
+    // Style the camera / layout control buttons
+    position: relative;
+
+    &>.GraphViewerControls {
+        position:absolute;
+        z-index: 1;
+
+        &>button {
+            margin-top: 5px;
+            margin-left: 5px;
+        }
+    }
+
+    // Set the size of the canvas. Ideally this should be dynamic somehow, there is a bug where the canvas cannot shrink
+    &>.__________cytoscape_container {
+        text-align: left;
+        width: 100%;
+        height: 100%;
+    }
+
+    // Style the HTML labels
+    & .GraphViewerLabel {
+        background-color: white;
+        border-style: solid;
+        border-width: 2px;
+        border-color: black;
+    
+        line-height: 1;
+    
+        margin: 0;
+        padding: 2px;
+    
+        text-align: center;
+    }
+}
