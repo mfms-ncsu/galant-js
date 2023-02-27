@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import App from 'frontend/App';
+import App from 'src/frontend/App';
 import '@testing-library/jest-dom'
 
 test('App renders without failing.', () => {
