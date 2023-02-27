@@ -13,6 +13,7 @@ export default graph
  */
 export function parseText(graphText) {
 
+    var error = false;
     //remove any previous values that the graph may have
     graph = {}
 
@@ -29,25 +30,20 @@ export function parseText(graphText) {
         if (lines[line][0] === 'n') {
             nodeParser(lines[line], node_map)
         }
-
         //this is an undirected edge
         else if (lines[line][0] === 'e') {
             edge_id += 1
             edgeParser(lines[line], undirected_edge_map, edge_id)
         }
-
         //this is a directed edge
         else if (lines[line][0] === 'd') {
             edge_id += 1
             edgeParser(lines[line], directed_edge_map, edge_id)
         }
-
         //if the user had a new line character at the end of the file
         else if (lines[line][0] !== '\n') {
-            /**
-             * TODO: Change console.log error messages to alerts with a more meaningful message and add functionality to reprompt for a file 
-             */
             console.log("Incorrect file format")
+            error = true
         }
     }
 
@@ -58,17 +54,21 @@ export function parseText(graphText) {
     for (var key in directed_edge_map) {
         if (!(directed_edge_map[key].source in node_map)) {
             console.log("Source does not match a node ID")
+            error = true
         }
         if (!(directed_edge_map[key].target in node_map)) {
             console.log("Target does not match a node ID")
+            error = true
         }
     }
     for (var key in undirected_edge_map) {
         if (!(undirected_edge_map[key].source in node_map)) {
             console.log("Source does not match a node ID")
+            error = true
         }
         if (!(undirected_edge_map[key].target in node_map)) {
             console.log("Target does not match a node ID")
+            error = true
         }
     }
 
@@ -76,9 +76,12 @@ export function parseText(graphText) {
     graph.node = node_map
     graph.directed = directed_edge_map
     graph.undirected = undirected_edge_map
-    console.log(graph)
     
-    return graph
+    if (!error) {
+        return graph
+    } else {
+        return null
+    }
 }
 
 /**
@@ -104,15 +107,15 @@ function nodeParser(node_string, node_map) {
             node_id = all_values[i]
         }
         //x value
-        else if (values.length == 1 && isNumeric(all_values[i])) {
+        else if (values.length === 1 && isNumeric(all_values[i])) {
             values.push(parseFloat(all_values[i]))
         }
         //y value
-        else if (values.length == 2 && isNumeric(all_values[i])) {
+        else if (values.length === 2 && isNumeric(all_values[i])) {
             values.push(parseFloat(all_values[i]))
         }
         //the weight field was entered
-        else if (values.length == 3 && isNumeric(all_values[i])) {
+        else if (values.length === 3 && isNumeric(all_values[i])) {
             values[0] = parseFloat(all_values[i])
         }
         //the weight field was not entered
@@ -162,15 +165,15 @@ function edgeParser(edge_string, edge_map, edge_id) {
 
     for (var i = 0; i < all_values.length; i++) {
         //source value
-        if (values.length == 1) {
+        if (values.length === 1) {
             values.push(all_values[i])
         }
         //target value
-        else if (values.length == 2) {
+        else if (values.length === 2) {
             values.push(all_values[i])
         }
         //the weight field was entered
-        else if (values.length == 3 && isNumeric(all_values[i])) {
+        else if (values.length === 3 && isNumeric(all_values[i])) {
             values[0] = parseFloat(all_values[i])
         }
         //the weight field was not entered

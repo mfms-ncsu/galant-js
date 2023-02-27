@@ -1,7 +1,7 @@
 import './Graph.scss';
 import GraphViewer from './GraphViewer/GraphViewer';
-import { useState } from "react";
 import GraphInput from './GraphInput/GraphInput';
+import { useState } from "react";
 
 /**
  * A React component for the Graph pane which loads graphs from a file and displays them.
@@ -18,7 +18,7 @@ function Graph(props) {
 
     return <div className="Graph">
         <GraphViewer predicates={graph}/>
-        <GraphInput handleChange={setGraph}/>
+        <GraphInput setGraph={setGraph}/>
     </div>;
 }
 

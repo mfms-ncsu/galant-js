@@ -1,8 +1,7 @@
 import './GraphInput.scss'
 
 import { useState } from "react";
-
-import { parseText } from 'backend/FileToPredicate';
+import { parseText } from 'src/backend/FileToPredicate.js';
 
 /**
  * This function loads an upload graph button and parses the graph input into a text area on the bottom right of the screen
@@ -26,29 +25,40 @@ function GraphInput(props) {
      * @param {event} e - the event of selecting a file from the upload graph button
      */
     function handleChange(e) {
+        var error = false;
+        var ext = e.target.files[0].name.match(/\.([^\.]+)$/)[1];
+        if (ext != "txt") {
+            alert("Unaccepted File Type: ." + ext);
+            error = true;
+        }
 
-        setFileName(e.target.files[0].name);
-        var file = e.target.files[0];
+        if (!error) {
+            setFileName(e.target.files[0].name);
+            var file = e.target.files[0];
 
-        //create a file reader and pass it the event
-        let reader = new FileReader();
-        reader.onerror = (e) => alert(e.target.error.name);
-        reader.readAsText(file);
+            //create a file reader and pass it the event
+            let reader = new FileReader();
+            reader.onerror = (e) => alert(e.target.error.name);
+            reader.readAsText(file);
 
-        //This function uses the file reader to call the parseText function
-        reader.onload = (e) => {
-            var file = e.target.result;
-            setTextValue(file);
-            //parse it into graph components
-            props.handleChange(parseText(file));
-        };
+            //This function uses the file reader to call the parseText function
+            reader.onload = (e) => {
+                var file = e.target.result;
+                setTextValue(file);
+                //parse it into graph components
+                var predicates = parseText(file)
+                if (predicates) {
+                    props.setGraph(predicates);
+                }
+            };
+        }
     };
     return <div className="GraphInput">
         <p>
         <button onClick={() => document.getElementById('filePicker').click()}>
             Upload Graph
         </button>
-        <input id="filePicker" hidden type={"file"} onChange={handleChange} />
+        <input id="filePicker" hidden type={"file"} onChange={handleChange} accept=".txt,text/plain"/>
         {' '}
         {fileName}
         </p>

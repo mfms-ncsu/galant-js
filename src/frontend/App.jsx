@@ -1,6 +1,6 @@
 import './App.scss';
 
-import Graph from 'frontend/Graph/Graph';
+import Graph from 'src/frontend/Graph/Graph';
 
 /**
  * A react component for the main app page.
