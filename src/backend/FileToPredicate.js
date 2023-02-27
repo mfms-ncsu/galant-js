@@ -6,14 +6,16 @@ export default graph
  * This function parses input graph text into predicates
  * 
  * @param {string} graphText - The text from the input graph text file
+ * @param {function} handleError - error handler to propagate messages to user
  * 
  * @returns a dictionary object with keys called nodes, directed_edges, and undirected_edges
  * 
  * @author Rishab Karwa
  */
-export function parseText(graphText) {
+export function parseText(graphText, handleError) {
 
-    var error = false;
+    var error = false
+    var errorMessage = ""
     //remove any previous values that the graph may have
     graph = {}
 
@@ -28,46 +30,43 @@ export function parseText(graphText) {
 
         //this is a node
         if (lines[line][0] === 'n') {
-            nodeParser(lines[line], node_map)
+            nodeParser(lines[line], node_map, error, errorMessage)
         }
         //this is an undirected edge
         else if (lines[line][0] === 'e') {
             edge_id += 1
-            edgeParser(lines[line], undirected_edge_map, edge_id)
+            edgeParser(lines[line], undirected_edge_map, edge_id, error, errorMessage)
         }
         //this is a directed edge
         else if (lines[line][0] === 'd') {
             edge_id += 1
-            edgeParser(lines[line], directed_edge_map, edge_id)
+            edgeParser(lines[line], directed_edge_map, edge_id, error, errorMessage)
         }
         //if the user had a new line character at the end of the file
         else if (lines[line][0] !== '\n') {
-            console.log("Incorrect file format")
             error = true
+            errorMessage = "Input file had a newline at the end of the file"
         }
     }
 
     //ensure that all entered source and targets for edges are valid node ids
-    /**
-     * TODO: Change console.log error messages to alerts with a more meaningful message and add functionality to reprompt for a file 
-     */
     for (var key in directed_edge_map) {
         if (!(directed_edge_map[key].source in node_map)) {
-            console.log("Source does not match a node ID")
+            errorMessage = "Source does not match a node ID"
             error = true
         }
         if (!(directed_edge_map[key].target in node_map)) {
-            console.log("Target does not match a node ID")
+            errorMessage = "Target does not match a node ID"
             error = true
         }
     }
     for (var key in undirected_edge_map) {
         if (!(undirected_edge_map[key].source in node_map)) {
-            console.log("Source does not match a node ID")
+            errorMessage = "Source does not match a node ID"
             error = true
         }
         if (!(undirected_edge_map[key].target in node_map)) {
-            console.log("Target does not match a node ID")
+            errorMessage = "Target does not match a node ID"
             error = true
         }
     }
@@ -80,7 +79,8 @@ export function parseText(graphText) {
     if (!error) {
         return graph
     } else {
-        return null
+        handleError(errorMessage)
+        return {}
     }
 }
 
@@ -90,7 +90,7 @@ export function parseText(graphText) {
  * @param {string} node_string - the line of the node predicate
  * @param {dictionary} node_map - the map of all the current nodes
  */
-function nodeParser(node_string, node_map) {
+function nodeParser(node_string, node_map, error, errorMessage) {
     //the id of the node
     var node_id = false
     //trim the end whitespace
@@ -126,24 +126,20 @@ function nodeParser(node_string, node_map) {
         }
         //the key value pairs were not created correctly or the x, y fields were not set
         else {
-            /**
-             * TODO: Change console.log error messages to alerts with a more meaningful message and add functionality to reprompt for a file
-             */
-            console.log("Incorrect node format")
+            errorMessage = "Incorrect node format"
+            error = true
         }
     }
     //one last error check: values needs weight, x and y and the minimum
     if (values.length < 3) {
-        /**
-         * TODO: Change console.log error messages to alerts with a more meaningful message and add functionality to reprompt for a file
-         */
-        console.log("Incorrect node format")
+        errorMessage = "Incorrect node format"
+        error = true
     }
     //set the node map of the id equal to dictionary
     node_map[node_id] = {}
     //go ahead store this node predicate among all nodes in the node_map
     for (var j = 0; j < keys.length; j++) {
-        node_map[node_id][keys[j]] = values[j];
+        node_map[node_id][keys[j]] = values[j]
     }
 }
 
@@ -154,7 +150,7 @@ function nodeParser(node_string, node_map) {
  * @param {dictionary} edge_map - the map of all the current undirected edges
  * @param {int} edge_id - the current id of the undirected edge
  */
-function edgeParser(edge_string, edge_map, edge_id) {
+function edgeParser(edge_string, edge_map, edge_id, error, errorMessage) {
     //trim the end whitespace
     var trimmed = edge_string.trimEnd()
     //split values to an array in the string by removing whitespace in middle
@@ -184,18 +180,14 @@ function edgeParser(edge_string, edge_map, edge_id) {
         }
         //the key value pairs were not created correctly or the source, target fields were not set
         else {
-            /**
-             * TODO: Change console.log error messages to alerts with a more meaningful message and add functionality to reprompt for a file
-             */
-            console.log("Incorrect edge format")
+            errorMessage = "Incorrect edge format"
+            error = true
         }
     }
      //one last error check: values needs weight, source and target and the minimum
     if (values.length < 3) {
-        /**
-         * TODO: Change console.log error messages to alerts with a more meaningful message and add functionality to reprompt for a file
-         */
-        console.log("Incorrect edge format")
+        errorMessage = "Incorrect edge format"
+        error = true
     }
 
     //the edge map of the edge id is a dictionary
