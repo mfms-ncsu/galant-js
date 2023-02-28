@@ -58,6 +58,12 @@ export function parseText(graphText) {
         return graph
 }
 
+/**
+ * This function checks that all created edges only reference node ids that exist in the given node_map
+ * @author ysherma
+ * @param {map} nodes - The map of nodes whose keys are their IDs and values are their attributes
+ * @param {map} edges - The map of edges whose keys are their IDs and values are their attributes
+ */
 function checkEdgeAnchors(nodes, edges) {
     for (var key in edges) {
         if (!(edges[key].source in nodes)) {
@@ -90,6 +96,9 @@ function nodeParser(node_string, node_map) {
         //id value
         if (node_id === false) {
             node_id = all_values[i]
+            if (node_id in node_map) {
+                throw Error("Duplicate node ID: '" + node_id + "'")
+            }
         }
         //x value
         else if (values.length === 1 && isNumeric(all_values[i])) {
@@ -104,19 +113,22 @@ function nodeParser(node_string, node_map) {
             values[0] = parseFloat(all_values[i])
         }
         //the weight field was not entered
-        else if (values.length >= 3    && all_values[i].includes(":")) {
+        else if (values.length >= 3 && all_values[i].includes(":")) {
             var key_val = all_values[i].split(":")
+            if (key_val[0] in keys) {
+                throw Error("Invalid key: '" + key_val[0] + "'")
+            }
             keys.push(key_val[0])
             values.push(key_val[1])
         }
         //the key value pairs were not created correctly or the x, y fields were not set
         else {
-            throw Error("Incorrect node format")
+            throw Error("Incorrect node format, ID: '" + node_id + "'")
         }
     }
     //one last error check: values needs weight, x and y and the minimum
     if (values.length < 3) {
-        throw Error("Incorrect node format")
+        throw Error("Incorrect node format, ID: '" + node_id + "'")
     }
     //set the node map of the id equal to dictionary
     node_map[node_id] = {}
