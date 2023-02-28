@@ -1,7 +1,3 @@
-//this graph that contains the nodes and edges can be imported into another javscript file 
-var graph = null
-export default graph
-
 /**
  * This function parses input graph text into predicates
  * 
@@ -17,7 +13,7 @@ export function parseText(graphText, handleError) {
     var error = false
     var errorMessage = ""
     //remove any previous values that the graph may have
-    graph = {}
+    var graph = {}
 
     //ids and dictionaries to store nodes adwnd edges
     var node_map = {}
