@@ -60,7 +60,7 @@ export function parseText(graphText, handleError) {
             error = true
         }
     }
-    for (var key in undirected_edge_map) {
+    for (key in undirected_edge_map) {
         if (!(undirected_edge_map[key].source in node_map)) {
             errorMessage = "Source does not match a node ID"
             error = true

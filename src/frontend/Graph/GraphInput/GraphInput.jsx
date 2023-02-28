@@ -28,8 +28,8 @@ function GraphInput(props) {
     function handleFile(e) {
         setErrorMessage("")
         var error = false;
-        var ext = e.target.files[0].name.match(/\.([^\.]+)$/)[1];
-        if (ext != "txt") {
+        var ext = e.target.files[0].name.match(/.([^.]+)$/)[1];
+        if (ext !== "txt") {
             setErrorMessage("Unaccepted File Type: '." + ext + "'");
             error = true;
         }
