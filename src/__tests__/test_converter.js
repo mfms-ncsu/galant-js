@@ -96,9 +96,9 @@ test ("predicate with nodes and undirected edges with some expected information"
           3: {x:4, y:2, label:'three', marked:false, highlighted:true, weight:0, color:'white'} 
         },
         undirected: {
-            4: {source:1, destination:2},
-            5: {source:2, destination:3, weight:4},
-            6: {source:3, destination:1}
+            4: {source:1, target:2},
+            5: {source:2, target:3, weight:4},
+            6: {source:3, target:1}
         }
       };
 
@@ -106,9 +106,9 @@ test ("predicate with nodes and undirected edges with some expected information"
         {data: {id:'1', marked:false, label:'one', highlighted:false, weight:3, color:'red'}, position: {x:3, y:2}},
         {data: {id:'2', marked:true, label:'two', highlighted:false, weight:1, color:'black'}, position: {x:1, y:2}},
         {data: {id:'3', marked:false, label:'three', highlighted:true, weight:0, color:'white'}, position: {x:4, y:2}},
-        {data: {label:'', source:1, destination: 2, highlighted:false, color:'black'}},
-        {data: {label:'4', source:2, destination:3, highlighted:false, color:'black'}},
-        {data: {label:'', source:3, destination:1, highlighted:false, color:'black'}}
+        {data: {label:'', source:1, target: 2, highlighted:false, color:'black'}},
+        {data: {label:'4', source:2, target:3, highlighted:false, color:'black'}},
+        {data: {label:'', source:3, target:1, highlighted:false, color:'black'}}
     ]
     
     let graphData = predicateConverter(predicate);
@@ -124,9 +124,9 @@ test ("predicate with nodes and undirected edges with all expected information",
           3: {x:4, y:2, label:'three', marked:false, highlighted:true, weight:0, color:'white'} 
         },
         undirected: {
-            4: {source:1, destination:2, weight:2, label:'four'},
-            5: {source:2, destination:3, weight:4, label:'five'},
-            6: {source:3, destination:1, weight:1, label:'six'}
+            4: {source:1, target:2, weight:2, label:'four'},
+            5: {source:2, target:3, weight:4, label:'five'},
+            6: {source:3, target:1, weight:1, label:'six'}
         }
       };
 
@@ -134,9 +134,9 @@ test ("predicate with nodes and undirected edges with all expected information",
         {data: {id:'1', marked:false, label:'one', highlighted:false, weight:3, color:'red'}, position: {x:3, y:2}},
         {data: {id:'2', marked:true, label:'two', highlighted:false, weight:1, color:'black'}, position: {x:1, y:2}},
         {data: {id:'3', marked:false, label:'three', highlighted:true, weight:0, color:'white'}, position: {x:4, y:2}},
-        {data: {label: "2\nfour", source: 1, destination: 2, highlighted:false, color:'black'}},
-        {data: {label: "4\nfive", source: 2, destination: 3, highlighted:false, color:'black'}},
-        {data: {label: "1\nsix", source: 3, destination: 1, highlighted:false, color:'black'}}
+        {data: {label: "2\nfour", source: 1, target: 2, highlighted:false, color:'black'}},
+        {data: {label: "4\nfive", source: 2, target: 3, highlighted:false, color:'black'}},
+        {data: {label: "1\nsix", source: 3, target: 1, highlighted:false, color:'black'}}
     ]
     
     let graphData = predicateConverter(predicate);
@@ -152,9 +152,9 @@ test ("predicate with nodes and directed edges with some expected information", 
           3: {x:4, y:2, label:'three', marked:false, highlighted:true, weight:0, color:'white'} 
         },
         directed: {
-            4: {source:1, destination:2},
-            5: {source:2, destination:3, weight:4},
-            6: {source:3, destination:1}
+            4: {source:1, target:2},
+            5: {source:2, target:3, weight:4},
+            6: {source:3, target:1}
         }
       };
 
@@ -162,9 +162,9 @@ test ("predicate with nodes and directed edges with some expected information", 
         {data: {id:'1', marked:false, label:'one', highlighted:false, weight:3, color:'red'}, position: {x:3, y:2}},
         {data: {id:'2', marked:true, label:'two', highlighted:false, weight:1, color:'black'}, position: {x:1, y:2}},
         {data: {id:'3', marked:false, label:'three', highlighted:true, weight:0, color:'white'}, position: {x:4, y:2}},
-        {data: {label:'', source:1, destination: 2, highlighted:false, color:'black'}, classes: ['directed']},
-        {data: {label:'4', source:2, destination:3, highlighted:false, color:'black'}, classes: ['directed']},
-        {data: {label:'', source:3, destination:1, highlighted:false, color:'black'}, classes: ['directed']}
+        {data: {label:'', source:1, target: 2, highlighted:false, color:'black'}, classes: ['directed']},
+        {data: {label:'4', source:2, target:3, highlighted:false, color:'black'}, classes: ['directed']},
+        {data: {label:'', source:3, target:1, highlighted:false, color:'black'}, classes: ['directed']}
     ]
     
     let graphData = predicateConverter(predicate);
@@ -180,9 +180,9 @@ test ("predicate with nodes and directed edges with all expected information", (
         3: {x:4, y:2, label:'three', marked:false, highlighted:true, weight:0, color:'white'} 
       },
       directed: {
-          4: {source:1, destination:2, weight:2, label:'four'},
-          5: {source:2, destination:3, weight:4, label:'five'},
-          6: {source:3, destination:1, weight:1, label:'six'}
+          4: {source:1, target:2, weight:2, label:'four'},
+          5: {source:2, target:3, weight:4, label:'five'},
+          6: {source:3, target:1, weight:1, label:'six'}
       }
     };
 
@@ -190,9 +190,9 @@ test ("predicate with nodes and directed edges with all expected information", (
       {data: {id:'1', marked:false, label:'one', highlighted:false, weight:3, color:'red'}, position: {x:3, y:2}},
       {data: {id:'2', marked:true, label:'two', highlighted:false, weight:1, color:'black'}, position: {x:1, y:2}},
       {data: {id:'3', marked:false, label:'three', highlighted:true, weight:0, color:'white'}, position: {x:4, y:2}},
-      {data: {label: "2\nfour", source: 1, destination: 2, highlighted:false, color:'black'}, classes: ['directed']},
-      {data: {label: "4\nfive", source: 2, destination: 3, highlighted:false, color:'black'}, classes: ['directed']},
-      {data: {label: "1\nsix", source: 3, destination: 1, highlighted:false, color:'black'}, classes: ['directed']}
+      {data: {label: "2\nfour", source: 1, target: 2, highlighted:false, color:'black'}, classes: ['directed']},
+      {data: {label: "4\nfive", source: 2, target: 3, highlighted:false, color:'black'}, classes: ['directed']},
+      {data: {label: "1\nsix", source: 3, target: 1, highlighted:false, color:'black'}, classes: ['directed']}
   ]
   
   let graphData = predicateConverter(predicate);

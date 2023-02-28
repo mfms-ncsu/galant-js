@@ -1,9 +1,0 @@
-/* Makes the test instructions and graph viewer appear horizontally. */
-.GraphViewerTest {
-	display: flex;
-}
-
-/* Ensures margins are reasonably balanced. */
-.GraphViewerTest>* {
-	flex: 1;
-}

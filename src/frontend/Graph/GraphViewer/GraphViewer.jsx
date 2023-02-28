@@ -1,11 +1,10 @@
-import './GraphViewer.css';
+import './GraphViewer.scss';
 
-import React from 'react';
+import { useState } from 'react';
 import { renderToString } from 'react-dom/server';
 import CytoscapeComponent from 'react-cytoscapejs';
 
-// TODO import the actual Predicate converter function.
-import predicateConverter from '../../backend/PredicateConverter';
+import predicateConverter from 'src/backend/PredicateConverter';
 
 // Enable the cose-bilkent layout which automatically lays out the graph in a reasonable configuration.
 import cytoscape from 'cytoscape';
@@ -30,12 +29,11 @@ nodeHtmlLabel( cytoscape );
  */
 function GraphViewer(props) {
 	/** @var {string} - The currently enabled layout. Begins as 'preset' which keeps the nodes in the specified positions. */
-	let [layout, setLayout] = React.useState("preset");
+	let [layout, setLayout] = useState("preset");
 	/** @var {cytoscape.ElementDefinition[]} - The currently displayed elements, converted from the Predicates into Cytoscape form. */
-	let [elements, ] = React.useState(predicateConverter(props.predicates));
+	let [elements, ] = useState(predicateConverter(props.predicates));
 	/** @var {cytoscape.Core} - The saved Cytoscape object. This is used to make direct calls to Cytoscape such as cytoscape.fit(). */
-	let [cytoscape, ] = React.useState(null);
-
+	let [cytoscape, ] = useState(null);
 	// Save the current positions of nodes so they can be preserved after an update.
 	let positions = {};
 	for (let element of elements) {
@@ -53,8 +51,6 @@ function GraphViewer(props) {
 			element.position = positions[element.data.id]
 		}
 	}
-
-	console.log(elements);
 
 	return <div className="GraphViewer">
 		{/* Button controls that allow the graph layout and camera to be updated. */}

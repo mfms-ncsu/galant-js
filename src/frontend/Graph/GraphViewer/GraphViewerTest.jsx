@@ -1,10 +1,8 @@
-import './GraphViewerTest.css';
+import './GraphViewerTest.scss';
 
-import GraphViewer from './GraphViewer';
+import GraphViewer from 'frontend/Graph/GraphViewer/GraphViewer';
 
-import React from 'react'
-
-const PureCanvas = React.forwardRef((props, ref) => <canvas ref={ref} />);
+import { useState } from 'react'
 
 /**
  * A React component providing a page to test the GraphViewer class.
@@ -17,10 +15,10 @@ const PureCanvas = React.forwardRef((props, ref) => <canvas ref={ref} />);
  */
 function GraphViewerTest() {
 	/** @var {Predicate} - The Predicate form of the currently displayed graph. */
-	let [graph, setGraph] = React.useState(plainGraph)
+	let [graph, setGraph] = useState(plainGraph)
   
 	return <div className="GraphViewerTest">
-		<div>
+		<div class="scrollable">
 			<h1>Graph Viewer Test</h1>
 			<p>This page is meant for testing the GraphViewer class. Perform the following tests:</p>
 			<p>1. Press <button onClick={() => setGraph(plainGraph)}>{"Load Plain Graph"}</button>.
