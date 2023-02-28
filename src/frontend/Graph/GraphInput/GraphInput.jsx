@@ -48,7 +48,14 @@ function GraphInput(props) {
                 var file = e.target.result;
                 setTextValue(file);
                 //parse it into graph components
-                props.setGraph(parseText(file, setErrorMessage));
+                var predicates = {}
+                try {
+                    predicates = parseText(file);
+                } catch (e) {
+                    // there was an error. So we need to handle it (display the error message)
+                    setErrorMessage(e.message)
+                }
+                props.setGraph(predicates);
             };
         }
     };

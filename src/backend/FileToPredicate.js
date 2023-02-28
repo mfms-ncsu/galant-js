@@ -9,7 +9,7 @@
  * @author Rishab Karwa
  * @author Andrew Watson
  */
-export function parseText(graphText, handleError) {
+export function parseText(graphText) {
 
     //remove any previous values that the graph may have
     var graph = {}
@@ -20,15 +20,12 @@ export function parseText(graphText, handleError) {
     var undirected_edge_map = {}
     var edge_id = 0
 
-    try {
-
         var lines = graphText.split('\n')
         for (var line = 0; line < lines.length; line++) {
             let current_line = lines[line].trim()
             //if the line starts with / or # it is a comment so skip it. Or if the line is empty, just skip it.
             if (current_line[0] === '/' || current_line[0] === '#' || current_line.length === 0) {
                 //this does nothing since we're skipping.
-                void(0)
             }
             //this is a node
             else if (current_line[0] === 'n') {
@@ -51,35 +48,25 @@ export function parseText(graphText, handleError) {
         }
 
         //ensure that all entered source and targets for edges are valid node ids
-        for (var key in directed_edge_map) {
-            if (!(directed_edge_map[key].source in node_map)) {
-                throw Error("Source does not match a node ID")
-            }
-            if (!(directed_edge_map[key].target in node_map)) {
-                throw Error("Target does not match a node ID")
-            }
-        }
-        for (key in undirected_edge_map) {
-            if (!(undirected_edge_map[key].source in node_map)) {
-                throw Error("Source does not match a node ID")
-            }
-            if (!(undirected_edge_map[key].target in node_map)) {
-                throw Error("Target does not match a node ID")
-            }
-        }
+        checkEdgeAnchors(directed_edge_map)
+        checkEdgeAnchors(undirected_edge_map)
 
         // if we get to here, then there are no errors. So combine everything into one object and return it
         graph.node = node_map
         graph.directed = directed_edge_map
         graph.undirected = undirected_edge_map
         return graph
+}
 
-    } catch (e) {
-        // there was an error. So we need to handle it (display the error message) and return an empty graph.
-        handleError(e.message)
-        return {}
+function checkEdgeAnchors(nodes, edges) {
+    for (var key in edges) {
+        if (!(edges[key].source in nodes)) {
+            throw Error("Source does not match a node ID: " + edges[key].source)
+        }
+        if (!(edges[key].target in nodes)) {
+            throw Error("Target does not match a node ID " + edges[key].target)
+        }
     }
-
 }
 
 /**
@@ -146,7 +133,7 @@ function nodeParser(node_string, node_map) {
  * @param {dictionary} edge_map - the map of all the current undirected edges
  * @param {int} edge_id - the current id of the undirected edge
  */
-function edgeParser(edge_string, edge_map, edge_id, error, errorMessage) {
+function edgeParser(edge_string, edge_map, edge_id) {
     //trim the end whitespace
     var trimmed = edge_string.trimEnd()
     //split values to an array in the string by removing whitespace in middle
