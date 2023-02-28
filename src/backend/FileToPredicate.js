@@ -7,11 +7,10 @@
  * @returns a dictionary object with keys called nodes, directed_edges, and undirected_edges
  * 
  * @author Rishab Karwa
+ * @author Andrew Watson
  */
 export function parseText(graphText, handleError) {
 
-    var error = false
-    var errorMessage = ""
     //remove any previous values that the graph may have
     var graph = {}
 
@@ -21,63 +20,66 @@ export function parseText(graphText, handleError) {
     var undirected_edge_map = {}
     var edge_id = 0
 
-    var lines = graphText.split('\n')
-    for (var line = 0; line < lines.length; line++) {
+    try {
 
-        //this is a node
-        if (lines[line][0] === 'n') {
-            nodeParser(lines[line], node_map, error, errorMessage)
+        var lines = graphText.split('\n')
+        for (var line = 0; line < lines.length; line++) {
+            let current_line = lines[line].trim()
+            //if the line starts with / or # it is a comment so skip it. Or if the line is empty, just skip it.
+            if (current_line[0] === '/' || current_line[0] === '#' || current_line.length === 0) {
+                //this does nothing since we're skipping.
+                void(0)
+            }
+            //this is a node
+            else if (current_line[0] === 'n') {
+                nodeParser(current_line, node_map)
+            }
+            //this is an undirected edge
+            else if (current_line[0] === 'e') {
+                edge_id += 1
+                edgeParser(current_line, undirected_edge_map, edge_id)
+            }
+            //this is a directed edge
+            else if (current_line[0] === 'd') {
+                edge_id += 1
+                edgeParser(current_line, directed_edge_map, edge_id)
+            }
+            //if it starts with something else then they screwed up so break.
+            else {
+                throw Error("Input file had an invalid line on line " + (line + 1))
+            }
         }
-        //this is an undirected edge
-        else if (lines[line][0] === 'e') {
-            edge_id += 1
-            edgeParser(lines[line], undirected_edge_map, edge_id, error, errorMessage)
-        }
-        //this is a directed edge
-        else if (lines[line][0] === 'd') {
-            edge_id += 1
-            edgeParser(lines[line], directed_edge_map, edge_id, error, errorMessage)
-        }
-        //if the user had a new line character at the end of the file
-        else if (lines[line][0] !== '\n') {
-            error = true
-            errorMessage = "Input file had a newline at the end of the file"
-        }
-    }
 
-    //ensure that all entered source and targets for edges are valid node ids
-    for (var key in directed_edge_map) {
-        if (!(directed_edge_map[key].source in node_map)) {
-            errorMessage = "Source does not match a node ID"
-            error = true
+        //ensure that all entered source and targets for edges are valid node ids
+        for (var key in directed_edge_map) {
+            if (!(directed_edge_map[key].source in node_map)) {
+                throw Error("Source does not match a node ID")
+            }
+            if (!(directed_edge_map[key].target in node_map)) {
+                throw Error("Target does not match a node ID")
+            }
         }
-        if (!(directed_edge_map[key].target in node_map)) {
-            errorMessage = "Target does not match a node ID"
-            error = true
+        for (key in undirected_edge_map) {
+            if (!(undirected_edge_map[key].source in node_map)) {
+                throw Error("Source does not match a node ID")
+            }
+            if (!(undirected_edge_map[key].target in node_map)) {
+                throw Error("Target does not match a node ID")
+            }
         }
-    }
-    for (key in undirected_edge_map) {
-        if (!(undirected_edge_map[key].source in node_map)) {
-            errorMessage = "Source does not match a node ID"
-            error = true
-        }
-        if (!(undirected_edge_map[key].target in node_map)) {
-            errorMessage = "Target does not match a node ID"
-            error = true
-        }
-    }
 
-    //combine everything into one object and return it
-    graph.node = node_map
-    graph.directed = directed_edge_map
-    graph.undirected = undirected_edge_map
-    
-    if (!error) {
+        // if we get to here, then there are no errors. So combine everything into one object and return it
+        graph.node = node_map
+        graph.directed = directed_edge_map
+        graph.undirected = undirected_edge_map
         return graph
-    } else {
-        handleError(errorMessage)
+
+    } catch (e) {
+        // there was an error. So we need to handle it (display the error message) and return an empty graph.
+        handleError(e.message)
         return {}
     }
+
 }
 
 /**
@@ -86,7 +88,7 @@ export function parseText(graphText, handleError) {
  * @param {string} node_string - the line of the node predicate
  * @param {dictionary} node_map - the map of all the current nodes
  */
-function nodeParser(node_string, node_map, error, errorMessage) {
+function nodeParser(node_string, node_map) {
     //the id of the node
     var node_id = false
     //trim the end whitespace
@@ -122,14 +124,12 @@ function nodeParser(node_string, node_map, error, errorMessage) {
         }
         //the key value pairs were not created correctly or the x, y fields were not set
         else {
-            errorMessage = "Incorrect node format"
-            error = true
+            throw Error("Incorrect node format")
         }
     }
     //one last error check: values needs weight, x and y and the minimum
     if (values.length < 3) {
-        errorMessage = "Incorrect node format"
-        error = true
+        throw Error("Incorrect node format")
     }
     //set the node map of the id equal to dictionary
     node_map[node_id] = {}
@@ -176,14 +176,12 @@ function edgeParser(edge_string, edge_map, edge_id, error, errorMessage) {
         }
         //the key value pairs were not created correctly or the source, target fields were not set
         else {
-            errorMessage = "Incorrect edge format"
-            error = true
+            throw Error("Incorrect edge format")
         }
     }
      //one last error check: values needs weight, source and target and the minimum
     if (values.length < 3) {
-        errorMessage = "Incorrect edge format"
-        error = true
+        throw Error("Incorrect edge format")
     }
 
     //the edge map of the edge id is a dictionary
