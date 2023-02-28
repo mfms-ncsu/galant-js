@@ -1,6 +1,6 @@
 // @author Art Schell
 
-.Graph {
+.Algorithm {
     // The component should take up the maximum available space
     width: 50%;
     height: 100%;
@@ -8,10 +8,13 @@
     // The GraphViewer takes up 70% of the vertical space while the GraphInput takes up 30%
     display: flex;
     flex-direction: column;
-    &>.GraphViewer {
+
+    &>.AlgorithmInput {
         flex: 70;
     }
-    &>.GraphInput {
+
+    &>.AlgorithmConsole {
         flex: 30;
     }
+
 }
