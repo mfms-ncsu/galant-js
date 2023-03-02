@@ -10,7 +10,6 @@
  * @author Andrew Watson
  */
 export function parseText(graphText) {
-
     //remove any previous values that the graph may have
     var graph = {}
 
@@ -20,42 +19,42 @@ export function parseText(graphText) {
     var undirected_edge_map = {}
     var edge_id = 0
 
-        var lines = graphText.split('\n')
-        for (var line = 0; line < lines.length; line++) {
-            let current_line = lines[line].trim()
-            //if the line starts with / or # it is a comment so skip it. Or if the line is empty, just skip it.
-            if (current_line[0] === '/' || current_line[0] === '#' || current_line.length === 0) {
-                //this does nothing since we're skipping.
-            }
-            //this is a node
-            else if (current_line[0] === 'n') {
-                nodeParser(current_line, node_map)
-            }
-            //this is an undirected edge
-            else if (current_line[0] === 'e') {
-                edge_id += 1
-                edgeParser(current_line, undirected_edge_map, edge_id)
-            }
-            //this is a directed edge
-            else if (current_line[0] === 'd') {
-                edge_id += 1
-                edgeParser(current_line, directed_edge_map, edge_id)
-            }
-            //if it starts with something else then they screwed up so break.
-            else {
-                throw Error("Input file had an invalid line on line " + (line + 1))
-            }
+    var lines = graphText.split('\n')
+    for (var line = 0; line < lines.length; line++) {
+        let current_line = lines[line].trim()
+        //if the line starts with / or # it is a comment so skip it. Or if the line is empty, just skip it.
+        if (current_line[0] === '/' || current_line[0] === '#' || current_line.length === 0) {
+            //this does nothing since we're skipping.
         }
+        //this is a node
+        else if (current_line[0] === 'n') {
+            nodeParser(current_line, node_map)
+        }
+        //this is an undirected edge
+        else if (current_line[0] === 'e') {
+            edge_id += 1
+            edgeParser(current_line, undirected_edge_map, edge_id)
+        }
+        //this is a directed edge
+        else if (current_line[0] === 'd') {
+            edge_id += 1
+            edgeParser(current_line, directed_edge_map, edge_id)
+        }
+        //if it starts with something else then they screwed up so break.
+        else {
+            throw Error("Input file had an invalid line on line " + (line + 1))
+        }
+    }
 
-        //ensure that all entered source and targets for edges are valid node ids
-        checkEdgeAnchors(directed_edge_map)
-        checkEdgeAnchors(undirected_edge_map)
+    //ensure that all entered source and targets for edges are valid node ids
+    checkEdgeAnchors(directed_edge_map)
+    checkEdgeAnchors(undirected_edge_map)
 
-        // if we get to here, then there are no errors. So combine everything into one object and return it
-        graph.node = node_map
-        graph.directed = directed_edge_map
-        graph.undirected = undirected_edge_map
-        return graph
+    // if we get to here, then there are no errors. So combine everything into one object and return it
+    graph.node = node_map
+    graph.directed = directed_edge_map
+    graph.undirected = undirected_edge_map
+    return graph
 }
 
 /**
