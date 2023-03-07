@@ -11,7 +11,6 @@ function AlgoConsoleManager() {
     return (
         <>
             <AlgorithmConsole onChange={setTextAreaValue} textAreaValue={textAreaValue} />
-            <button id= "messagebutton" hidden onClick={e => handleButtonClick(e.target.value)}></button>
         </>
     );
 }
