@@ -58,7 +58,9 @@ var errorMessages = {
 "invalid_graph_weight_string.txt": "Incorrect node format, ID: 'a'",
 "invalid_graph.pdf": "Unaccepted File Type: '.pdf'",
 "invalid_graph_source_no_match.txt": "Source does not match a node ID: 2",
-"invalid_graph_target_no_match.txt": "Target does not match a node ID: 2"
+"invalid_graph_target_no_match.txt": "Target does not match a node ID: 2",
+"invalid_graph_source_no_match_directed.txt": "Source does not match a node ID: 2",
+"invalid_graph_target_no_match_directed.txt": "Target does not match a node ID: 2"
 }
 
 test.each(invalidTestFiles)( 
