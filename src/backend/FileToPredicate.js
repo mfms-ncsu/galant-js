@@ -47,8 +47,8 @@ export function parseText(graphText) {
     }
 
     //ensure that all entered source and targets for edges are valid node ids
-    checkEdgeAnchors(directed_edge_map)
-    checkEdgeAnchors(undirected_edge_map)
+    checkEdgeAnchors(node_map, directed_edge_map)
+    checkEdgeAnchors(node_map, undirected_edge_map)
 
     // if we get to here, then there are no errors. So combine everything into one object and return it
     graph.node = node_map
@@ -66,10 +66,10 @@ export function parseText(graphText) {
 function checkEdgeAnchors(nodes, edges) {
     for (var key in edges) {
         if (!(edges[key].source in nodes)) {
-            throw Error("Source does not match a node ID: " + edges[key].source)
+            throw Error(`Source does not match a node ID: ${edges[key].source}`)
         }
         if (!(edges[key].target in nodes)) {
-            throw Error("Target does not match a node ID " + edges[key].target)
+            throw Error(`Target does not match a node ID: ${edges[key].target}`)
         }
     }
 }
@@ -96,7 +96,7 @@ function nodeParser(node_string, node_map) {
         if (node_id === false) {
             node_id = all_values[i]
             if (node_id in node_map) {
-                throw Error("Duplicate node ID: '" + node_id + "'")
+                throw Error(`Duplicate node ID: '${node_id}'`)
             }
         }
         //x value
@@ -114,20 +114,20 @@ function nodeParser(node_string, node_map) {
         //the weight field was not entered
         else if (values.length >= 3 && all_values[i].includes(":")) {
             var key_val = all_values[i].split(":")
-            if (key_val[0] in keys) {
-                throw Error("Invalid key: '" + key_val[0] + "'")
+            if (keys.includes(key_val[0])) {
+                throw Error(`Invalid key-value pair: '${key_val[0]}:${key_val[1]}'`)
             }
             keys.push(key_val[0])
             values.push(key_val[1])
         }
         //the key value pairs were not created correctly or the x, y fields were not set
         else {
-            throw Error("Incorrect node format, ID: '" + node_id + "'")
+            throw Error(`Incorrect node format, ID: '${node_id}'`)
         }
     }
     //one last error check: values needs weight, x and y and the minimum
     if (values.length < 3) {
-        throw Error("Incorrect node format, ID: '" + node_id + "'")
+        throw Error(`Incorrect node format, ID: '${node_id}'`)
     }
     //set the node map of the id equal to dictionary
     node_map[node_id] = {}
