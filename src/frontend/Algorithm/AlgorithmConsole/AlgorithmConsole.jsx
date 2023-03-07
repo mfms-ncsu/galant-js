@@ -1,15 +1,25 @@
-import './AlgorithmConsole.scss'
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import AlgorithmConsole from "./AlgorithmConsole";
 
-export function AlgorithmConsole(props) {
+export default function AlgorithmConsole(props) {
+    const [textAreaValue, setTextAreaValue] = useState(null);
 
-  // This function updates the text value when called
-  return (
-    <div className="AlgorithmConsole">
-      <label> Console </label>
-      <textarea value={props.textAreaValue} disabled > </textarea>
-    </div>
-  )
-};
+    if (textAreaValue = null) {
+        setTextAreaValue("");
 
-export default AlgorithmConsole;
+        function addNewMessage(message) {
+            setTextAreaValue(textAreaValue + message);
+        };
+
+        props.onSetupConsole(addNewMessage);
+    }
+
+    return <div className="AlgorithmConsole">
+        <label> Console </label>
+        <textarea value={props.textAreaValue} disabled > </textarea>
+    </div>;
+}
+
+
+
+

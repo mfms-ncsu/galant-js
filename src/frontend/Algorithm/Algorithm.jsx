@@ -1,33 +1,20 @@
 import React, { useState } from 'react';
-import AlgoConsoleManager from './AlgorithmConsole/AlgoConsoleManager';
-import AlgorithmInput from './AlgorithmInput/AlgorithmInput';
-import AlgorithmButton from './AlgorithmButtons/AlgorithmButton';
+import AlgorithmConsole from 'frontend/Algorithm/AlgorithmConsole/AlgorithmConsole';
+import AlgorithmInput from 'frontend/Algorithm/AlgorithmInput/AlgorithmInput';
+import AlgorithmControls from 'frontend/Algorithm/AlgorithmControls/AlgorithmControls';
 import './Algorithm.scss'
-import AlgorithmConsole from './AlgorithmConsole/AlgorithmConsole';
-import { Button, View, StyleSheet } from 'react-native';
-
 
 function Algorithm(props) {
-  /** @var {Predicates} - The current loaded graph, in predicate form */
-  const [algorithm, setAlgorithm] = useState({});
+  /** @var {string} - The current loaded algorithm */
+  const [algorithm, setAlgorithm] = useState("");
+  /** @var {Predicates} - The function to add a message to the console */
+  const [addNewMessage, setAddNewMessage] = useState(() => void 0);
 
   return <div className="Algorithm">
-    <AlgorithmInput />
-    <AlgorithmButton/>
-    <AlgoConsoleManager />
+    <AlgorithmInput onUpload={setAlgorithm}/>
+    <AlgorithmControls onForward={console.log("forward")} onBack={console.log("back")} />
+    <AlgorithmConsole onSetupConsole={setAddNewMessage} />
   </div>;
 }
-
-const styles = StyleSheet.create({
-  container: {
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-  },
-  buttonContainer: {
-      flex: 1,
-  }
-});
 
 export default Algorithm;

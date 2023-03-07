@@ -39,6 +39,7 @@ function AlgorithmInput(props) {
             var file = e.target.result;
             setTextValue(file);
 
+            props.onUpload(file);
         };
     };
     return <div className="AlgorithmInput">

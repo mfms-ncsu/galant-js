@@ -2,6 +2,7 @@ import './App.scss';
 
 import Graph from 'frontend/Graph/Graph';
 import Algorithm from 'frontend/Algorithm/Algorithm';
+import GraphContext from './GraphContext';
 /**
  * A react component for the main app page.
  * 
@@ -11,8 +12,10 @@ import Algorithm from 'frontend/Algorithm/Algorithm';
  */
 function App(props) {
     return <div className="App">
-        <Algorithm />
-        <Graph />
+        <GraphContext.Provider>
+            <Algorithm />
+            <Graph />
+        </GraphContext.Provider>
     </div>;
 }
 
