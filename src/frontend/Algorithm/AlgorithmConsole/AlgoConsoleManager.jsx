@@ -1,23 +1,22 @@
 import React, { useState } from "react";
 import AlgorithmConsole from "./AlgorithmConsole";
 
-function AlgoConsoleTest() {
+function AlgoConsoleManager() {
     const [textAreaValue, setTextAreaValue] = useState("");
 
-    const handleButtonClick = () => {
-        console.log("h")
-        setTextAreaValue(textAreaValue + "New value from button click");
+    function handleButtonClick(message) {
+        setTextAreaValue(textAreaValue + "message");
     };
 
     return (
         <>
             <AlgorithmConsole onChange={setTextAreaValue} textAreaValue={textAreaValue} />
-            <button onClick={handleButtonClick}>Update Text Area</button>
+            <button id= "messagebutton" hidden onClick={e => handleButtonClick(e.target.value)}></button>
         </>
     );
 }
 
-export default AlgoConsoleTest;
+export default AlgoConsoleManager;
 
 
 

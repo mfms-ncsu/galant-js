@@ -10,11 +10,15 @@
     flex-direction: column;
 
     &>.AlgorithmInput {
-        flex: 70;
+        flex: 65;
     }
-
+    &>.AlgorithmButton {
+        flex: 10;
+        justify-content: center
+       
+    }
     &>.AlgorithmConsole {
-        flex: 30;
+        flex: 25;
     }
 
 }
