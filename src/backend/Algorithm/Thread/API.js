@@ -1,12 +1,15 @@
-export function getNodes() {
-    console.log("getNodes");
-}
-export function colorNode() {
-    console.log("colorNode");
-}
-export function print() {
-    console.log("print");
-}
-export function consoleLog() {
-    console.log("consoleLog");
+
+module.exports = {
+    getNodes: () => {
+        console.log("getNodes has been called");
+    },
+    colorNode: () => {
+        console.log("colorNode");
+    },
+    print: () => {
+        console.log("print");
+    },
+    consoleLog: () => {
+        console.log("consoleLog");
+    }
 }
