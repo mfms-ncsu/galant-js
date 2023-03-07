@@ -15,9 +15,11 @@ class AlgorithmHandler {
     #resetAlgorithm() {
         if (this.stepHandler != null) {
             this.stepHandler.revertAll();
+            this.stepHandler = null;
         }
         if (this.threadHandler != null) {   
             this.threadHandler.killThread();
+            this.threadHandler = null;
         }
     }
     
@@ -68,5 +70,5 @@ class AlgorithmHandler {
         this.#broadcastStatus();
     }
 
-    
+
 }

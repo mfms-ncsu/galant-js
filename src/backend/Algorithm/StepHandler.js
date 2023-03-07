@@ -105,6 +105,15 @@ export default class StepHandler {
         let patches = step.flatMap((rule) => rule.revert).reverse()
         this.#updateGraph(patches);
     }
+    
+    /**
+     * Reverts all executed steps.
+     */
+    revertAll() {
+        while (this.canStepBack()) {
+            this.stepBack();
+        }
+    }
 
     /**
      * Adds a rule to the currently built step.
