@@ -15,12 +15,16 @@ let arr = new Int32Array(buf);
 
 let algorithm = 'console.log(\'this somehow works \'); api.getNodes();'
 //console.log(algorithm);
-console.log("initial value in arr[1]", arr[1]);
+arr[0] = 0;
+console.log("initial value in arr[0]", arr[0]);
 worker.postMessage(["shared", arr]);
 
-Atomics.wait(arr, 1, 0);
+console.log("about to change and notify")
+Atomics.store(arr, 0, 1);
+Atomics.notify(arr, 0);
+
 console.log('sending predicate and algorithm now', arr[1]);
-worker.postMessage(['pred and alg',predicate, algorithm]);
+worker.postMessage(['run this thang', predicate, algorithm]);
 
 worker.on("message", message => {
     //console.log(message);
