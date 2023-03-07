@@ -11,12 +11,6 @@ import { readFileSync, readdirSync, readdir } from 'fs';
 // unmount and cleanup DOM after the test is finished.
 afterEach(cleanup);
 
-// Sourced from https://stackoverflow.com/questions/68400489/how-to-wait-to-assert-an-element-never-appears-in-the-document
-// Waits until the waitFor timeout to see if the element appears. Passes if the element does NOT appear in that time.
-async function expectNever(callable) {
-    await expect(() => waitFor(callable)).rejects.toEqual(expect.anything());
-}
-
 /**
  * Takes a filename and returns a JavaScript File object containing the contents of that file pulled from the src/__tests__/test_files folder
  * If the given file doesn't exist, this function returns null.
@@ -47,21 +41,22 @@ var testFiles = readdirSync("src/__tests__/test_files/");
 var invalidTestFiles = testFiles.filter(element => element.split('_')[0] === 'invalid')
 var validTestFiles = testFiles.filter(element => element.split('_')[0] === 'valid')
 var errorMessages = {
-"invalid_graph_bad_key_value.txt": "Incorrect node format, ID: '2'",
-"invalid_graph_duplicate_node_ids.txt": "Duplicate node ID: '1'",
-"invalid_graph_edge_no_target.txt": "Incorrect edge format",
-"invalid_graph_invalid_key_pair_weight.txt": "Invalid key-value pair: 'weight:30'",
-"invalid_graph_marked_number.txt": "Invalid key-value pair: 'marked:100'",
-"invalid_graph_no_value.txt": "Incorrect node format, ID: 'a'",
-"invalid_graph_node_no_y_cord.txt": "Incorrect node format, ID: 'a'",
-"invalid_graph_random_character.txt": "Input file had an invalid line on line 2",
-"invalid_graph_weight_string.txt": "Incorrect node format, ID: 'a'",
-"invalid_graph.pdf": "Unaccepted File Type: '.pdf'",
-"invalid_graph_source_no_match.txt": "Source does not match a node ID: 2",
-"invalid_graph_target_no_match.txt": "Target does not match a node ID: 2",
-"invalid_graph_source_no_match_directed.txt": "Source does not match a node ID: 2",
-"invalid_graph_target_no_match_directed.txt": "Target does not match a node ID: 2"
-}
+    "invalid_graph_bad_key_value.txt": "Incorrect node format, ID: '2'",
+    "invalid_graph_duplicate_node_ids.txt": "Duplicate node ID: '1'",
+    "invalid_graph_edge_no_target.txt": "Incorrect edge format",
+    "invalid_graph_invalid_key_pair_weight.txt": "Duplicate key-value pair: 'weight:30'",
+    "invalid_graph_marked_number.txt": "Invalid key-value pair: 'marked:100'",
+    "invalid_graph_no_value.txt": "Incorrect node format, ID: 'a'",
+    "invalid_graph_node_no_y_cord.txt": "Incorrect node format, ID: 'a'",
+    "invalid_graph_random_character.txt": "Input file had an invalid line on line 2",
+    "invalid_graph_weight_string.txt": "Incorrect node format, ID: 'a'",
+    "invalid_graph.pdf": "Unaccepted File Type: '.pdf'",
+    "invalid_graph_source_no_match.txt": "Source does not match a node ID: 2",
+    "invalid_graph_target_no_match.txt": "Target does not match a node ID: 2",
+    "invalid_graph_source_no_match_directed.txt": "Source does not match a node ID: 2",
+    "invalid_graph_target_no_match_directed.txt": "Target does not match a node ID: 2",
+    "invalid_graph_string_positions.txt": "Incorrect node format, ID: '1'"
+    }
 
 test.each(invalidTestFiles)( 
     "<GraphInput /> with invalid input file '%s'", 
@@ -86,6 +81,6 @@ test.each(validTestFiles)(
         const {file, text} = getFile("valid_graph_no_edges.txt")
         Object.defineProperty(input, "files", { value: [file] });
         fireEvent.change(input);
-        await expect(findByTestId("errorMessage", {}, {timeout: 200})).rejects.toThrow();
+        await expect(findByTestId("errorMessage", {}, {timeout: 300})).rejects.toThrow();
         expect(getByRole('textbox').textContent).toEqual(text)
 });

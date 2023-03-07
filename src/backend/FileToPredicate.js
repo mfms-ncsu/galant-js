@@ -89,6 +89,7 @@ function nodeParser(node_string, node_map) {
     var all_values = trimmed.substring(2).split(" ")
     //keys and values of all values of the node
     var keys = ['weight', 'x', 'y']
+    var boolean_keys = ['highlighted', 'marked']
     var values = [null]
 
     for (var i = 0; i < all_values.length; i++) {
@@ -115,7 +116,16 @@ function nodeParser(node_string, node_map) {
         else if (values.length >= 3 && all_values[i].includes(":")) {
             var key_val = all_values[i].split(":")
             if (keys.includes(key_val[0])) {
+                // If the user tries to use a key that is one of the default keys, throw error
+                throw Error(`Duplicate key-value pair: '${key_val[0]}:${key_val[1]}'`)
+            }
+            if (boolean_keys.includes(key_val[0]) && key_val[1] !== '') {
+                // If the user tries to set a value to a boolean attribute, throw error
                 throw Error(`Invalid key-value pair: '${key_val[0]}:${key_val[1]}'`)
+            }
+            if (key_val[0] === 'color' && !isColor(key_val[1])) {
+                // If color attribute is not a valid color string, throw error
+                throw Error(`Invalid color: '${key_val[0]}:${key_val[1]}'`)
             }
             keys.push(key_val[0])
             values.push(key_val[1])
@@ -203,3 +213,14 @@ function isNumeric(str) {
         !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
 }
 
+/**
+ * This function checks if a string is a valid CSS color, allows common color strings i.e. red, and rgb hex codes.
+ * @author from https://stackoverflow.com/questions/48484767/javascript-check-if-string-is-valid-css-color
+ * @param {string} strColor - The color to check
+ * @returns true or false
+ */
+function isColor(strColor){
+    var s = new Option().style;
+    s.color = strColor;
+    return s.color !== '';
+}
