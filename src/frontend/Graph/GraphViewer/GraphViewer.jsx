@@ -98,6 +98,11 @@ function GraphViewer(props) {
 					},
 				]);
 				cytoscape = cy
+
+				//auto-camera the graph
+				cy.ready(function() {
+					cy.fit();
+				});
 			}}
 		/>
 	</div>;

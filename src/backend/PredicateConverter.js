@@ -9,6 +9,7 @@
  * 
  * @author Andrew Watson
  * @author Noah Alexander
+ * @author Rishabh Karwa
  */
 function convertEdges(elements, edges, isDirected) {
     //Loops through all keys inside of the edges
@@ -107,16 +108,50 @@ export default function predicateConverter(predicate) {
                 element.data[key] = node[key];
             }
         }
-        
+
         //Adds them to the list of elements
         elements.push(element);
 
     }
-    
+
+
     //Convert the edges to graph elements.
     convertEdges(elements, undirected, false);
     convertEdges(elements, directed, true);
     
+
+    //push all node positions to an array
+    var positions = []
+    for (var elem of elements) {
+        if ("position" in elem) {
+            positions.push(elem.position)
+        }
+    }
+
+    //the multiplier for all node positions
+    var multiplier = 1
+
+    //find the minimum distance to scale to
+    for (var i = 0; i < positions.length; i++) {
+        for (var j = i + 1; j < positions.length; j++) {
+            var a = positions[i].x - positions[j].x;
+            var b = positions[i].y - positions[j].y;
+            var dist = Math.sqrt( a*a + b*b );
+            //55 is the minimum distance to prevent node overlap, dist != 0 prevents divide by 0 error (although 2 nodes should not have the same position)
+            if (dist < 55 && dist !== 0) {
+                //this multiplier will be used on each x and y coordinate
+                multiplier = Math.max(multiplier, (55/dist))
+            }
+        }
+    }
+
+    //now multiply each element by the max multiplier to prevent overlap
+    for (var elem of elements) {
+        if ("position" in elem) {
+            elem.position.x *= multiplier
+            elem.position.y *= multiplier
+        }
+    }
     return(elements);
 
 }
