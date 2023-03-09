@@ -66,7 +66,7 @@ function GraphInput(props) {
             </div>
         }   
         <p>
-            <button class="file-picker">
+            <button className="file-picker">
                 <label htmlFor="file-picker">Upload Graph</label>
             </button>
             <input id="file-picker" hidden type={"file"} onChange={handleFile} accept=".txt,text/plain"/>
