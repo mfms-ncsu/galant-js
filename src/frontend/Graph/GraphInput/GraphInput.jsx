@@ -60,18 +60,19 @@ function GraphInput(props) {
         }
     };
     return <div className="GraphInput">
-        <div id="error" className="graph-input-error">
-            { errorMessage }
-        </div>
+        { errorMessage &&
+            <div data-testid="errorMessage" id="error" className="graph-input-error">
+                {errorMessage}
+            </div>
+        }   
         <p>
-        <button onClick={() => document.getElementById('filePicker').click()}>
-            Upload Graph
-        </button>
-        <input id="filePicker" hidden type={"file"} onChange={handleFile} accept=".txt,text/plain"/>
-        {' '}
-        {fileName}
+            <button className="file-picker">
+                <label htmlFor="file-picker">Upload Graph</label>
+            </button>
+            <input id="file-picker" hidden type={"file"} onChange={handleFile} accept=".txt,text/plain"/>
+            <span className="filename">{fileName}</span>
         </p>
-        <textarea value={textValue} disabled></textarea>
+        <textarea id="graph-text" value={textValue} disabled></textarea>
     </div>;
 };
 
