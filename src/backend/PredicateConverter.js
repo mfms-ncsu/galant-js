@@ -122,7 +122,7 @@ export default function predicateConverter(predicate) {
 
     //push all node positions to an array
     var positions = []
-    for (var elem of elements) {
+    for (let elem of elements) {
         if ("position" in elem) {
             positions.push(elem.position)
         }
@@ -146,7 +146,7 @@ export default function predicateConverter(predicate) {
     }
 
     //now multiply each element by the max multiplier to prevent overlap
-    for (var elem of elements) {
+    for (let elem of elements) {
         if ("position" in elem) {
             elem.position.x *= multiplier
             elem.position.y *= multiplier
