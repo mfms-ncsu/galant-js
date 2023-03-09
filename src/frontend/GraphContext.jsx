@@ -1,3 +1,13 @@
 import React from 'react';
 
-export default GraphContext = React.createContext();
+const GraphContext = React.createContext();
+
+export function GraphProvider({ children }) {
+    const [graph, setGraph] = React.useState({});
+
+    return <GraphContext.Provider value={[ graph, setGraph ]}>
+        {children}
+    </GraphContext.Provider>
+};
+
+export default GraphContext;

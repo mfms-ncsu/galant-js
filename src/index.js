@@ -3,8 +3,8 @@ import './index.scss'
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import App from 'frontend/App';
-import GraphViewerTest from 'frontend/Graph/GraphViewer/GraphViewerTest';
+import App from './frontend/App';
+import GraphViewerTest from './frontend/Graph/GraphViewer/GraphViewerTest';
 
 import reportWebVitals from 'reportWebVitals';
 

@@ -31,7 +31,6 @@ function GraphViewer(props) {
 	/** @var {string} - The currently enabled layout. Begins as 'preset' which keeps the nodes in the specified positions. */
 	let [layout, setLayout] = useState("preset");
 	/** @var {cytoscape.ElementDefinition[]} - The currently displayed elements, converted from the Predicates into Cytoscape form. */
-	console.log('made it here', props)
 	let [elements, ] = useState(predicateConverter(props.predicates));
 	/** @var {cytoscape.Core} - The saved Cytoscape object. This is used to make direct calls to Cytoscape such as cytoscape.fit(). */
 	let [cytoscape, ] = useState(null);
@@ -52,8 +51,6 @@ function GraphViewer(props) {
 			element.position = positions[element.data.id]
 		}
 	}
-
-	console.log(elements);
 
 	return <div className="GraphViewer">
 		{/* Button controls that allow the graph layout and camera to be updated. */}

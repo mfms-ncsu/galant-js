@@ -25,7 +25,7 @@ function GraphInput(props) {
      * 
      * @param {event} e - the event of selecting a file from the upload graph button
      */
-    function handleChange(e) {
+    function onUpload(e) {
 
         setFileName(e.target.files[0].name);
         var file = e.target.files[0];
@@ -40,7 +40,7 @@ function GraphInput(props) {
             var file = e.target.result;
             setTextValue(file);
             //parse it into graph components
-            props.handleChange(parseText(file));
+            props.onUpload(parseText(file));
         };
     };
     return <div className="GraphInput">
@@ -48,7 +48,7 @@ function GraphInput(props) {
         <button onClick={() => document.getElementById('filePicker').click()}>
             Upload Graph
         </button>
-        <input id="filePicker" hidden type={"file"} onChange={handleChange} />
+        <input id="filePicker" hidden type={"file"} onChange={onUpload} />
         {' '}
         {fileName}
         </p>

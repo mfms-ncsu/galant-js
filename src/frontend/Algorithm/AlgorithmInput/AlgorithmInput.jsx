@@ -24,7 +24,7 @@ function AlgorithmInput(props) {
      * 
      * @param {event} e - the event of selecting a file from the upload algorithm button
      */
-    function handleChange(e) {
+    function onUpload(e) {
 
         setFileName(e.target.files[0].name);
         var file = e.target.files[0];
@@ -47,7 +47,7 @@ function AlgorithmInput(props) {
             <button onClick={() => document.getElementById('algoPicker').click()}>
                 Upload Algorithm
             </button>
-            <input id="algoPicker" hidden type={"file"} onChange={handleChange} />
+            <input id="algoPicker" hidden type={"file"} onChange={onUpload} />
             {' '}
             {fileName}
         </div>
