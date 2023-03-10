@@ -3,6 +3,7 @@ import './App.scss';
 import Graph from 'frontend/Graph/Graph';
 import Algorithm from 'frontend/Algorithm/Algorithm';
 import {GraphProvider} from 'frontend/GraphContext';
+
 /**
  * A react component for the main app page.
  * 
