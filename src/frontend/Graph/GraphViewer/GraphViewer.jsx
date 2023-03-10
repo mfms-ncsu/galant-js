@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { renderToString } from 'react-dom/server';
 import CytoscapeComponent from 'react-cytoscapejs';
 
-import predicateConverter from 'src/backend/PredicateConverter';
+import predicateConverter from 'backend/PredicateConverter';
 
 // Enable the cose-bilkent layout which automatically lays out the graph in a reasonable configuration.
 import cytoscape from 'cytoscape';

@@ -1,44 +1,36 @@
-class AlgorithmHandler {
+import StepHandler from "./StepHandler";
+import Predicates from "backend/Graph/Predicates";
+import ThreadHandler from "./Thread/ThreadHandler";
+import {produce} from 'immer';
 
-    constructor(onMessage, onStatusChanged) {
+export default class AlgorithmHandler {
+
+    constructor(graph, algorithm, updateGraph, onMessage, onStatusChanged) {
+        this.graph = graph;
+        this.algorithm = algorithm;
+        this.updateGraph = updateGraph;
         this.onMessage = onMessage;
         this.onStatusChanged = onStatusChanged;
 
-        this.graph = null;
-        this.updateGraph = null;
-        this.algorithm = null;
+        this.#initAlgorithm();
 
-        this.stepHandler = null;
-        this.threadHandler = null;
-    }
-
-    #resetAlgorithm() {
-        if (this.stepHandler != null) {
-            this.stepHandler.revertAll();
-            this.stepHandler = null;
-        }
-        if (this.threadHandler != null) {   
-            this.threadHandler.killThread();
-            this.threadHandler = null;
-        }
+        this.onStatusChanged(this.stepHandler.getStatus());
     }
     
     #initAlgorithm() {
-        if (this.graph != null && this.updateGraph != null && this.algorithm != null) {
-            let graphCopy = JSON.parse(JSON.stringify(graph));
-            this.threadHandler = new ThreadHandler(graphCopy, algorithm);
-            this.stepHandler = new StepHandler(this.updateGraph, this.threadHandler.resumeThread);
-            this.threadHandler.onMessage = (message) => {
-                if (message.type == "rule") {
-                    this.stepHandler.ruleStep(message.rule);
-                    this.#broadcastStatus();
-                }
-                if (this.onMessage != null) {
-                    this.onMessage(message);
-                }
-            }
-        }
+        let predicates = new Predicates(produce(this.graph, draft => {}));
+        this.threadHandler = new ThreadHandler(predicates, this.algorithm, (message) => this.#onMessage(message));
+        this.stepHandler = new StepHandler(this.updateGraph, () => this.threadHandler.resumeThread());
+        this.threadHandler.startThread();
+    }
 
+    #onMessage(message) {
+        if (message.type == "rule") {
+            this.stepHandler.ruleStep(message.content);
+            this.#broadcastStatus();
+        } else if (this.onMessage != null) { // console messages
+            this.onMessage(message.content);
+        }
     }
 
     #broadcastStatus() {
@@ -47,15 +39,15 @@ class AlgorithmHandler {
         }
     }
 
-    setGraph(graph, updateGraph) {
-        this.#resetAlgorithm();
+    setGraph(graph) {
+        this.threadHandler.killThread();
         this.graph = graph;
-        this.updateGraph = updateGraph;
         this.#initAlgorithm();
     }
 
     setAlgorithm(algorithm) {
-        this.#resetAlgorithm();
+        this.stepHandler.revertAll();
+        this.threadHandler.killThread();
         this.algorithm = algorithm;
         this.#initAlgorithm();
     }

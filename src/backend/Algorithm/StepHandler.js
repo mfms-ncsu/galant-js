@@ -30,7 +30,6 @@ export default class StepHandler {
     #currentStep = null;
 
     constructor(updateGraph, onNeedsRules) {
-        updateGraph([]); // test to make sure updateGraph is a function
         this.#updateGraph = updateGraph;
         this.onNeedsRules = onNeedsRules;
     }
@@ -110,9 +109,11 @@ export default class StepHandler {
      * Reverts all executed steps.
      */
     revertAll() {
-        while (this.canStepBack()) {
-            this.stepBack();
-        }
+        let patches = this.#steps.reverse().flatMap((step) => step.flatMap((rule) => rule.revert).reverse())
+        console.log(patches);
+        this.#updateGraph(patches);
+
+        let displayState = 0;
     }
 
     /**
