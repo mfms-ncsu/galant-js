@@ -17,7 +17,7 @@ module.exports = class ThreadHandler {
     startThread() {
         this.worker = new Worker('./Thread.js');
         this.worker.postMessage(["shared", this.array]);
-        this.worker.postMessage(['algorithm/graph', this.predicate, this.algorithm]);
+        this.worker.postMessage(['graph/algorithm', this.predicate, this.algorithm]);
         this.worker.on("message", message => {
             this.onMessage(message);
         });

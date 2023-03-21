@@ -1,25 +1,14 @@
 
 module.exports = {
     getNodes: (graph) => {
-        let nodes = [];
-        console.log("getNodes has been called");
-        for (const key of Object.entries(graph)) {
-            nodes.push(graph.key);
-        }
-        return nodes;
+        // get the list of node ids
+        return Object.keys(graph["node"])
     },
-    colorNode: (color, node) => {
-        node.color = color;
-        return node;
-
-    },
-    print: () => {
-        console.log("print");
-    },
-    dispplay: () => {
-
-    },
-    consoleLog: () => {
-        console.log("consoleLog");
+    colorNode: (graph, node_id, color) => {
+        // changes the color of a node, sends that message out to the step handler
+        // returns a new, updated copy of the graph
+        graph["node"][node_id][color] = color;
+        return graph;
     }
+
 }

@@ -8,7 +8,7 @@ let predicate = {
     }
 };
 
-let algorithm = 'for (let i = 0; i < 10000; i++) {i++;} testSomething(\'This has finished the first array\'); for (let i = 0; i < 10000; i++) {i++;} testSomething(\'This has finished the third array\');';
+let algorithm = 'for (let i = 0; i < 10000; i++) {i++;} colorNode(1, "green"); for (let i = 0; i < 10000; i++) {i++;} testSomething(\'This has finished the third array\');';
 
 let onMessage = function(message) {
     console.log(message);
