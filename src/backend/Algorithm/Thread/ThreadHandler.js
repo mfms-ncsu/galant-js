@@ -1,9 +1,9 @@
 const {Worker} = require('worker_threads');
 
-export class ThreadHandler {
+module.exports = class ThreadHandler {
     predicate;
     algorithm;
-    array = new Int32Array(new SharedArrayBuffer(1024));
+    array;
     worker;
     onMessage;
 
@@ -11,20 +11,21 @@ export class ThreadHandler {
         this.predicate = predicate;
         this.algorithm = algorithm;
         this.onMessage = onMessage;
+        this.array = new Int32Array(new SharedArrayBuffer(1024));
     }
 
     startThread() {
         this.worker = new Worker('./Thread.js');
-        this.worker.postMessage(["shared", array]);
-        this.worker.postMessage(['algorithm/graph', predicate, algorithm]);
+        this.worker.postMessage(["shared", this.array]);
+        this.worker.postMessage(['algorithm/graph', this.predicate, this.algorithm]);
         this.worker.on("message", message => {
             this.onMessage(message);
         });
     }
 
     resumeThread() {
-        Atomics.store(this.arr, 0, 1);
-        Atomics.notify(this.arr, 0);
+        Atomics.store(this.array, 0, 1);
+        Atomics.notify(this.array, 0);
     }
 
     killThread() {

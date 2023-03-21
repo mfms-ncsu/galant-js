@@ -36,8 +36,8 @@ function getNodes(){
     api.getNodes(graph, sharedArray);
 }
 
-function testSomething() {
-    postMessage("This worked");
+function testSomething(message) {
+    parentPort.postMessage("This worked " + message);
     wait();
 }
 
