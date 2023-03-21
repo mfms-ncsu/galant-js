@@ -10,21 +10,24 @@ let predicate = {
     }
 };
 
-let buf = new SharedArrayBuffer(1024); 
-let arr = new Int32Array(buf); 
+let buf = new SharedArrayBuffer(4); 
+//let arr = new Int32Array(buf); 
 
 let algorithm = 'console.log(\'this somehow works \'); api.getNodes();'
 //console.log(algorithm);
-arr[0] = 0;
-console.log("initial value in arr[0]", arr[0]);
-worker.postMessage(["shared", arr]);
+//arr[0] = 0;
+//console.log("initial value in arr[0]", arr[0]);
+console.log("posting first message")
+worker.postMessage(["shared", buf]);
+console.log("posting second")
+worker.postMessage(["andrew", "ahh"])
 
-console.log("about to change and notify")
-Atomics.store(arr, 0, 1);
-Atomics.notify(arr, 0);
+// console.log("about to change and notify")
+// Atomics.store(arr, 0, 1);
+// Atomics.notify(arr, 0);
 
-console.log('sending predicate and algorithm now', arr[1]);
-worker.postMessage(['run this thang', predicate, algorithm]);
+// console.log('sending predicate and algorithm now', arr[1]);
+// worker.postMessage(['run this thang', predicate, algorithm]);
 
 worker.on("message", message => {
     //console.log(message);
