@@ -12,6 +12,7 @@ import { parseText } from 'src/backend/FileToPredicate.js';
  * @returns {HTML} - The HTML representation of the component.
  * 
  * @author Rishab Karwa
+ * @author Yuval Sherman
  */
 function GraphInput(props) {
 	/** @var {string} - The text contents of the currently loaded file. */

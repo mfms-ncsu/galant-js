@@ -59,7 +59,9 @@ var errorMessages = {
     }
 
 function setGraph(predicates) {
-    return predicates //TODO maybe test these predicates? Would involve a lot of manual making the predicates.. perhaps in expected output files or something.
+    return predicates // TODO maybe test these predicates? Possibly unnecessary repeat of test_FileToPredicate?
+                      // Would involve a lot of manual making the predicates.. perhaps in expected output files or something.
+                      // Something we can get to later if we run out of things to do
 }
 
 test.each(invalidTestFiles)( 
