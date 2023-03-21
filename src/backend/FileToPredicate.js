@@ -1,3 +1,5 @@
+import Graph from "backend/Graph/Graph"
+
 /**
  * This function parses input graph text into predicates
  * 
@@ -68,9 +70,7 @@ export function parseText(graphText, handleError) {
     }
 
     //combine everything into one object and return it
-    graph.node = node_map
-    graph.directed = directed_edge_map
-    graph.undirected = undirected_edge_map
+    graph = new Graph(node_map, directed_edge_map, undirected_edge_map, "");
     
     if (!error) {
         return graph

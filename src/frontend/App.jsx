@@ -1,6 +1,8 @@
 import './App.scss';
 
-import Graph from 'src/frontend/Graph/Graph';
+import Graph from 'frontend/Graph/Graph';
+import Algorithm from 'frontend/Algorithm/Algorithm';
+import {GraphProvider} from 'frontend/GraphContext';
 
 /**
  * A react component for the main app page.
@@ -11,7 +13,10 @@ import Graph from 'src/frontend/Graph/Graph';
  */
 function App(props) {
     return <div className="App">
-        <Graph />
+        <GraphProvider>
+            <Algorithm />
+            <Graph />
+        </GraphProvider>
     </div>;
 }
 

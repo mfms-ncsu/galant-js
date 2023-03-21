@@ -1,7 +1,7 @@
 import './GraphInput.scss'
 
 import { useState } from "react";
-import { parseText } from 'src/backend/FileToPredicate.js';
+import { parseText } from 'backend/FileToPredicate.js';
 
 /**
  * This function loads an upload graph button and parses the graph input into a text area on the bottom right of the screen
@@ -25,7 +25,8 @@ function GraphInput(props) {
      * 
      * @param {event} e - the event of selecting a file from the upload graph button
      */
-    function handleFile(e) {
+
+    function onUpload(e) {
         setErrorMessage("")
         var error = false;
         var ext = e.target.files[0].name.match(/.([^.]+)$/)[1];
@@ -48,7 +49,7 @@ function GraphInput(props) {
                 var file = e.target.result;
                 setTextValue(file);
                 //parse it into graph components
-                props.setGraph(parseText(file, setErrorMessage));
+                props.onUpload(parseText(file, setErrorMessage));
             };
         }
     };
@@ -60,7 +61,7 @@ function GraphInput(props) {
         <button onClick={() => document.getElementById('filePicker').click()}>
             Upload Graph
         </button>
-        <input id="filePicker" hidden type={"file"} onChange={handleFile} accept=".txt,text/plain"/>
+        <input id="filePicker" hidden type={"file"} onChange={onUpload} accept=".txt,text/plain"/>
         {' '}
         {fileName}
         </p>
