@@ -29,6 +29,7 @@ function GraphInput(props) {
      * @param {event} e - the event of selecting a file from the upload graph button
      */
     function handleFile(e) {
+        var filename = e.target.files[0].name;
         setErrorMessage("")
         if (!e.target.files[0].name.includes(".")) {
             setErrorMessage("Unaccepted File Type: No Extension");
@@ -37,10 +38,9 @@ function GraphInput(props) {
         var ext = e.target.files[0].name.match(/.([^.]+)$/)[1];
         if (ext !== "txt") {
             setErrorMessage("Unaccepted File Type: '." + ext + "'");
+            setErrorFilename(filename);
             return;
         }
-
-        var filename = e.target.files[0].name;
         var file = e.target.files[0];
 
         //create a file reader and pass it the event
