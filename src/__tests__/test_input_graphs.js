@@ -58,10 +58,14 @@ var errorMessages = {
     "invalid_graph_string_positions.txt": "Incorrect node format, ID: '1'"
     }
 
+function setGraph(predicates) {
+    return predicates //TODO maybe test these predicates? Would involve a lot of manual making the predicates.. perhaps in expected output files or something.
+}
+
 test.each(invalidTestFiles)( 
     "<GraphInput /> with invalid input file '%s'", 
     async (filename) => {
-        const {getByLabelText, findByTestId, getByTestId} = render(<GraphInput />);
+        const {getByLabelText, findByTestId, getByTestId} = render(<GraphInput/>);
         const input = getByLabelText("Upload Graph");
         expect(input).toBeInTheDocument();
         const {file, text} = getFile(filename)
@@ -75,7 +79,7 @@ test.each(invalidTestFiles)(
 test.each(validTestFiles)(
     "<GraphInput /> with valid input file '%s'", 
     async (filename) => {
-        const {getByLabelText, findByTestId, getByRole} = render(<GraphInput />);
+        const {getByLabelText, findByTestId, getByRole} = render(<GraphInput  setGraph={setGraph} />);
         const input = getByLabelText("Upload Graph");
         expect(input).toBeInTheDocument();
         const {file, text} = getFile("valid_graph_no_edges.txt")

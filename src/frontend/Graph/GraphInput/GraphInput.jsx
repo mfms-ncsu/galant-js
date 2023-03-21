@@ -20,6 +20,7 @@ function GraphInput(props) {
     var [fileName, setFileName] = useState("");
     var [errorMessage, setErrorMessage] = useState("");
     var [errorTextValue, setErrorTextValue] = useState("");
+    var [errorFilename, setErrorFilename] = useState("");
 
     /**
      * This function parses the file from the selected upload graph button
@@ -56,6 +57,7 @@ function GraphInput(props) {
                 // there was an error. So we need to handle it (display the error message)
                 setErrorMessage(e.message);
                 setErrorTextValue(file);
+                setErrorFilename(filename);
             }
         };
     };
@@ -64,12 +66,19 @@ function GraphInput(props) {
         e.target.value = ''
     }
 
+    function clearErrorMessage(e) {
+        setErrorMessage("");
+    }
+
     return <div className="GraphInput">
         { errorMessage &&
-            <div data-testid="errorMessage" id="error" className="graph-input-error">
-                <span>{errorMessage}</span>
-                <textarea id="graph-text" value={errorTextValue} disabled></textarea>
-                <button onClick={setErrorMessage}>Okay</button>
+            <div className="error-mask">
+                <div id="error" className="graph-input-error">
+                    <span className="filename">{errorFilename}</span>
+                    <span data-testid="errorMessage">{errorMessage}</span>
+                    <textarea id="graph-text" value={errorTextValue} disabled></textarea>
+                    <button onClick={clearErrorMessage}>Okay</button>
+                </div>
             </div>
         }
         <p>
