@@ -131,27 +131,45 @@ export default function predicateConverter(predicate) {
     //the multiplier for all node positions
     var multiplier = 1
 
+    //the divier for all node positions if nodes are too far apart (or to normalize graph based on ratio)
+    var divider = 1
+
     //find the minimum distance to scale to
     for (var i = 0; i < positions.length; i++) {
         for (var j = i + 1; j < positions.length; j++) {
             var a = positions[i].x - positions[j].x;
             var b = positions[i].y - positions[j].y;
             var dist = Math.sqrt( a*a + b*b );
-            //55 is the minimum distance to prevent node overlap, dist != 0 prevents divide by 0 error (although 2 nodes should not have the same position)
-            if (dist < 55 && dist !== 0) {
+            //100 is the distance used to prevent node overlap and display edges and labels, dist != 0 prevents divide by 0 error (although 2 nodes should not have the same position)
+            if (dist < 100 && dist !== 0) {
                 //this multiplier will be used on each x and y coordinate
-                multiplier = Math.max(multiplier, (55/dist))
+                multiplier = Math.max(multiplier, (100/dist))
+            }
+            //If all nodes are at least 100 units apart, then the distance between the closest nodes will be set to 100
+            if (dist > 100 && dist != 0) {
+                divider = Math.max(divider, (dist/100))
             }
         }
     }
 
-    //now multiply each element by the max multiplier to prevent overlap
-    for (let elem of elements) {
-        if ("position" in elem) {
-            elem.position.x *= multiplier
-            elem.position.y *= multiplier
+    //now multiply or divide each element by the max multiplier/divider to normalize the distance to 100
+    if (multiplier == 1) {
+        for (let elem of elements) {
+            if ("position" in elem) {
+                elem.position.x /= divider
+                elem.position.y /= divider
+            }
         }
     }
+    else {
+        for (let elem of elements) {
+            if ("position" in elem) {
+                elem.position.x *= multiplier
+                elem.position.y *= multiplier
+            }
+        }
+    }
+
     return(elements);
 
 }
