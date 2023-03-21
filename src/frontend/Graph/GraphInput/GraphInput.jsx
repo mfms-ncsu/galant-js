@@ -71,8 +71,10 @@ function GraphInput(props) {
         e.target.value = ''
     }
 
-    function clearErrorMessage(e) {
+    function clearErrors(e) {
         setErrorMessage("");
+        setErrorTextValue("");
+        setErrorFilename("");
     }
 
     return <div className="GraphInput">
@@ -82,7 +84,7 @@ function GraphInput(props) {
                     <span className="filename">{errorFilename}</span>
                     <span data-testid="errorMessage">{errorMessage}</span>
                     <textarea id="graph-text" value={errorTextValue} disabled></textarea>
-                    <button onClick={clearErrorMessage}>Okay</button>
+                    <button onClick={clearErrors}>Okay</button>
                 </div>
             </div>
         }
