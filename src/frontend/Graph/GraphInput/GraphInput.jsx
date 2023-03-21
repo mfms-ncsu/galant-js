@@ -19,6 +19,7 @@ function GraphInput(props) {
 	/** @var {string} - The filename of the currently loaded file. */
     var [fileName, setFileName] = useState("");
     var [errorMessage, setErrorMessage] = useState("");
+    var [errorTextValue, setErrorTextValue] = useState("");
 
     /**
      * This function parses the file from the selected upload graph button
@@ -27,49 +28,55 @@ function GraphInput(props) {
      */
     function handleFile(e) {
         setErrorMessage("")
-        var error = false;
         var ext = e.target.files[0].name.match(/.([^.]+)$/)[1];
         if (ext !== "txt") {
             setErrorMessage("Unaccepted File Type: '." + ext + "'");
-            error = true;
+            return
         }
 
-        if (!error) {
-            setFileName(e.target.files[0].name);
-            var file = e.target.files[0];
+        var filename = e.target.files[0].name;
+        var file = e.target.files[0];
 
-            //create a file reader and pass it the event
-            let reader = new FileReader();
-            reader.onerror = (e) => alert(e.target.error.name);
-            reader.readAsText(file);
+        //create a file reader and pass it the event
+        let reader = new FileReader();
+        reader.onerror = (e) => alert(e.target.error.name);
+        reader.readAsText(file);
 
-            //This function uses the file reader to call the parseText function
-            reader.onload = (e) => {
-                var file = e.target.result;
-                setTextValue(file);
-                //parse it into graph components
-                var predicates = {}
-                try {
-                    predicates = parseText(file);
-                } catch (e) {
-                    // there was an error. So we need to handle it (display the error message)
-                    setErrorMessage(e.message)
-                }
+        //This function uses the file reader to call the parseText function
+        reader.onload = (e) => {
+            var file = e.target.result;
+            //parse it into graph components
+            var predicates = {}
+            try {
+                predicates = parseText(file);
                 props.setGraph(predicates);
-            };
-        }
+                setTextValue(file);
+                setFileName(filename);
+            } catch (e) {
+                // there was an error. So we need to handle it (display the error message)
+                setErrorMessage(e.message);
+                setErrorTextValue(file);
+            }
+        };
     };
+
+    function handleClick(e) {
+        e.target.value = ''
+    }
+
     return <div className="GraphInput">
         { errorMessage &&
             <div data-testid="errorMessage" id="error" className="graph-input-error">
-                {errorMessage}
+                <span>{errorMessage}</span>
+                <textarea id="graph-text" value={errorTextValue} disabled></textarea>
+                <button onClick={setErrorMessage}>Okay</button>
             </div>
-        }   
+        }
         <p>
             <button className="file-picker">
                 <label htmlFor="file-picker">Upload Graph</label>
             </button>
-            <input id="file-picker" hidden type={"file"} onChange={handleFile} accept=".txt,text/plain"/>
+            <input id="file-picker" hidden type={"file"} onChange={handleFile} onClick={handleClick} accept=".txt,text/plain"/>
             <span className="filename">{fileName}</span>
         </p>
         <textarea id="graph-text" value={textValue} disabled></textarea>
