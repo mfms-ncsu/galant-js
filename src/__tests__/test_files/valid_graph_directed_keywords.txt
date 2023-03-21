@@ -1,8 +1,8 @@
 n 1 100 600 color:red
-n 2 300 400 marked:true
-n 6 100 200 highlighted:true color:blue
+n 2 300 400 marked:
+n 6 100 200 highlighted: color:blue
 n 90 300 600 label:Label
-n 70 400 400 marked:true
+n 70 400 400 marked:
 d 1 2 40
 d 2 1 39 color:blue
 d 1 6 color:red

@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import predicateConverter from '../backend/PredicateConverter'
+import predicateConverter from 'src/backend/PredicateConverter'
 
 /**
  * This class tests the predicate conversion to make sure the
