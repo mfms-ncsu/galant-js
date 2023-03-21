@@ -30,10 +30,14 @@ function GraphInput(props) {
      */
     function handleFile(e) {
         setErrorMessage("")
+        if (!e.target.files[0].name.includes(".")) {
+            setErrorMessage("Unaccepted File Type: No Extension");
+            return;
+        }
         var ext = e.target.files[0].name.match(/.([^.]+)$/)[1];
         if (ext !== "txt") {
             setErrorMessage("Unaccepted File Type: '." + ext + "'");
-            return
+            return;
         }
 
         var filename = e.target.files[0].name;

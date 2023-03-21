@@ -41,7 +41,8 @@ var testFiles = readdirSync("src/__tests__/test_files/");
 var invalidTestFiles = testFiles.filter(element => element.split('_')[0] === 'invalid')
 var validTestFiles = testFiles.filter(element => element.split('_')[0] === 'valid')
 var errorMessages = {
-    "invalid_graph_bad_key_value.txt": "Incorrect node format, ID: '2'",
+    "invalid_graph_node_no_id.txt": "Incorrect node format, ID: ''",
+    "invalid_graph_duplicate_key.txt": "Duplicate key-value pair: 'color:blue'",
     "invalid_graph_duplicate_node_ids.txt": "Duplicate node ID: '1'",
     "invalid_graph_edge_no_target.txt": "Incorrect edge format",
     "invalid_graph_invalid_key_pair_weight.txt": "Duplicate key-value pair: 'weight:30'",
@@ -51,6 +52,7 @@ var errorMessages = {
     "invalid_graph_random_character.txt": "Input file had an invalid line on line 2",
     "invalid_graph_weight_string.txt": "Incorrect node format, ID: 'a'",
     "invalid_graph.pdf": "Unaccepted File Type: '.pdf'",
+    "invalid_graph_no_extension": "Unaccepted File Type: No Extension",
     "invalid_graph_source_no_match.txt": "Source does not match a node ID: 2",
     "invalid_graph_target_no_match.txt": "Target does not match a node ID: 2",
     "invalid_graph_source_no_match_directed.txt": "Source does not match a node ID: 2",
@@ -67,7 +69,7 @@ function setGraph(predicates) {
 test.each(invalidTestFiles)( 
     "<GraphInput /> with invalid input file '%s'", 
     async (filename) => {
-        const {getByLabelText, findByTestId, getByTestId} = render(<GraphInput/>);
+        const {getByLabelText, findByTestId, getByTestId} = render(<GraphInput setGraph={setGraph}/>);
         const input = getByLabelText("Upload Graph");
         expect(input).toBeInTheDocument();
         const {file, text} = getFile(filename)
@@ -81,10 +83,10 @@ test.each(invalidTestFiles)(
 test.each(validTestFiles)(
     "<GraphInput /> with valid input file '%s'", 
     async (filename) => {
-        const {getByLabelText, findByTestId, getByRole} = render(<GraphInput  setGraph={setGraph} />);
+        const {getByLabelText, findByTestId, getByRole} = render(<GraphInput setGraph={setGraph}/>);
         const input = getByLabelText("Upload Graph");
         expect(input).toBeInTheDocument();
-        const {file, text} = getFile("valid_graph_no_edges.txt")
+        const {file, text} = getFile(filename)
         Object.defineProperty(input, "files", { value: [file] });
         fireEvent.change(input);
         await expect(findByTestId("errorMessage", {}, {timeout: 300})).rejects.toThrow();
