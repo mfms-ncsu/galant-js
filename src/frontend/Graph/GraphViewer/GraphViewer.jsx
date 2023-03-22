@@ -97,12 +97,6 @@ function GraphViewer(props) {
 						}
 					},
 				]);
-				cytoscape = cy
-
-				//auto-camera the graph
-				cy.ready(function() {
-					cy.fit();
-				});
 			}}
 		/>
 	</div>;
@@ -199,7 +193,7 @@ const stylesheet = [
 	{
 		selector: 'edge.directed',
 		style: {
-			curveStyle: 'straight',
+			curveStyle: 'bezier',
 
 			targetArrowShape: 'triangle',
 		}

@@ -80,7 +80,6 @@ export default function predicateConverter(predicate) {
     for (let ident in nodes) {
         //Grabs the node object
         let node = nodes[ident];
-
         //Creates an object that is formatted to the graph display format
         let element = {
             data: {
@@ -102,6 +101,9 @@ export default function predicateConverter(predicate) {
             //x and y coordinates are held in a seperate dictionary in the element object
             if (key === 'x' || key === 'y') {
                 element.position[key] = node[key];
+            }
+            else if (node[key] === "") {
+                element.data[key] = "true";
             }
             else {
                 //All other key value paris will transfer to the element object in the data
@@ -128,48 +130,30 @@ export default function predicateConverter(predicate) {
         }
     }
 
-    //the multiplier for all node positions
-    var multiplier = 1
-
-    //the divier for all node positions if nodes are too far apart (or to normalize graph based on ratio)
-    var divider = 1
-
-    //find the minimum distance to scale to
-    for (var i = 0; i < positions.length; i++) {
-        for (var j = i + 1; j < positions.length; j++) {
-            var a = positions[i].x - positions[j].x;
-            var b = positions[i].y - positions[j].y;
-            var dist = Math.sqrt( a*a + b*b );
-            //100 is the distance used to prevent node overlap and display edges and labels, dist != 0 prevents divide by 0 error (although 2 nodes should not have the same position)
-            if (dist < 100 && dist !== 0) {
-                //this multiplier will be used on each x and y coordinate
-                multiplier = Math.max(multiplier, (100/dist))
-            }
-            //If all nodes are at least 100 units apart, then the distance between the closest nodes will be set to 100
-            if (dist > 100 && dist != 0) {
-                divider = Math.max(divider, (dist/100))
-            }
+    var maxCoord = 1
+    for (var position of positions) {
+        maxCoord = Math.max(maxCoord, Math.abs(position.x), Math.abs(position.y))
+    }
+    var graphWindow = document.getElementsByClassName(" __________cytoscape_container")[0]
+    if (graphWindow) {
+        var minDim = Math.min(graphWindow.clientWidth, graphWindow.clientHeight)
+        // account for width of node being 50
+        var coordToPixel = (minDim-50) / maxCoord
+        var xOffset = 0;
+        var yOffset = 0;
+        // center the graph without using camera fit to avoid changing node sizes
+        // get the offset based on the larger dimension if canvas isn't square
+        if (graphWindow.clientWidth < graphWindow.clientHeight) {
+            yOffset = (graphWindow.clientHeight - graphWindow.clientWidth) / 2
+        } else {
+            xOffset = (graphWindow.clientWidth - graphWindow.clientHeight) / 2
+        }
+        for (position of positions) {
+            position.x = position.x * coordToPixel + xOffset + 25 // 25 to account for node width/height
+            position.y = position.y * coordToPixel + yOffset + 25
         }
     }
-
-    //now multiply or divide each element by the max multiplier/divider to normalize the distance to 100
-    if (multiplier == 1) {
-        for (let elem of elements) {
-            if ("position" in elem) {
-                elem.position.x /= divider
-                elem.position.y /= divider
-            }
-        }
-    }
-    else {
-        for (let elem of elements) {
-            if ("position" in elem) {
-                elem.position.x *= multiplier
-                elem.position.y *= multiplier
-            }
-        }
-    }
-
+    
     return(elements);
 
 }
