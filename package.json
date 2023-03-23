@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^13.5.0",
     "cytoscape-cose-bilkent": "^4.1.0",
     "cytoscape-node-html-label": "^1.2.2",
+    "http-proxy-middleware": "^2.0.6",
     "immer": "^9.0.19",
     "react": "^18.2.0",
     "react-cytoscapejs": "^2.0.0",
@@ -19,7 +20,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node scripts/start.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
