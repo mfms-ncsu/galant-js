@@ -9,11 +9,9 @@ import Graph from "backend/Graph/Graph"
  * @returns a dictionary object with keys called nodes, directed_edges, and undirected_edges
  * 
  * @author Rishab Karwa
+ * @author Andrew Watson
  */
-export function parseText(graphText, handleError) {
-
-    var error = false
-    var errorMessage = ""
+export function parseText(graphText) {
     //remove any previous values that the graph may have
     var graph = {}
 
@@ -25,58 +23,56 @@ export function parseText(graphText, handleError) {
 
     var lines = graphText.split('\n')
     for (var line = 0; line < lines.length; line++) {
-
+        let current_line = lines[line].trim()
+        //if the line starts with / or # it is a comment so skip it. Or if the line is empty, just skip it.
+        if (current_line[0] === '/' || current_line[0] === '#' || current_line.length === 0) {
+            //this does nothing since we're skipping.
+        }
         //this is a node
-        if (lines[line][0] === 'n') {
-            nodeParser(lines[line], node_map, error, errorMessage)
+        else if (current_line[0] === 'n') {
+            nodeParser(current_line, node_map)
         }
         //this is an undirected edge
-        else if (lines[line][0] === 'e') {
+        else if (current_line[0] === 'e') {
             edge_id += 1
-            edgeParser(lines[line], undirected_edge_map, edge_id, error, errorMessage)
+            edgeParser(current_line, undirected_edge_map, edge_id)
         }
         //this is a directed edge
-        else if (lines[line][0] === 'd') {
+        else if (current_line[0] === 'd') {
             edge_id += 1
-            edgeParser(lines[line], directed_edge_map, edge_id, error, errorMessage)
+            edgeParser(current_line, directed_edge_map, edge_id)
         }
-        //if the user had a new line character at the end of the file
-        else if (lines[line][0] !== '\n') {
-            error = true
-            errorMessage = "Input file had a newline at the end of the file"
+        //if it starts with something else then they screwed up so break.
+        else {
+            throw Error("Input file had an invalid line on line " + (line + 1))
         }
     }
 
     //ensure that all entered source and targets for edges are valid node ids
-    for (var key in directed_edge_map) {
-        if (!(directed_edge_map[key].source in node_map)) {
-            errorMessage = "Source does not match a node ID"
-            error = true
-        }
-        if (!(directed_edge_map[key].target in node_map)) {
-            errorMessage = "Target does not match a node ID"
-            error = true
-        }
-    }
-    for (key in undirected_edge_map) {
-        if (!(undirected_edge_map[key].source in node_map)) {
-            errorMessage = "Source does not match a node ID"
-            error = true
-        }
-        if (!(undirected_edge_map[key].target in node_map)) {
-            errorMessage = "Target does not match a node ID"
-            error = true
-        }
-    }
+    checkEdgeAnchors(node_map, directed_edge_map)
+    checkEdgeAnchors(node_map, undirected_edge_map)
 
-    //combine everything into one object and return it
-    graph = new Graph(node_map, directed_edge_map, undirected_edge_map, "");
-    
-    if (!error) {
-        return graph
-    } else {
-        handleError(errorMessage)
-        return {}
+    // if we get to here, then there are no errors. So combine everything into one object and return it
+    graph.node = node_map
+    graph.directed = directed_edge_map
+    graph.undirected = undirected_edge_map
+    return graph
+}
+
+/**
+ * This function checks that all created edges only reference node ids that exist in the given node_map
+ * @author ysherma
+ * @param {map} nodes - The map of nodes whose keys are their IDs and values are their attributes
+ * @param {map} edges - The map of edges whose keys are their IDs and values are their attributes
+ */
+function checkEdgeAnchors(nodes, edges) {
+    for (var key in edges) {
+        if (!(edges[key].source in nodes)) {
+            throw Error(`Source does not match a node ID: ${edges[key].source}`)
+        }
+        if (!(edges[key].target in nodes)) {
+            throw Error(`Target does not match a node ID: ${edges[key].target}`)
+        }
     }
 }
 
@@ -86,7 +82,7 @@ export function parseText(graphText, handleError) {
  * @param {string} node_string - the line of the node predicate
  * @param {dictionary} node_map - the map of all the current nodes
  */
-function nodeParser(node_string, node_map, error, errorMessage) {
+function nodeParser(node_string, node_map) {
     //the id of the node
     var node_id = false
     //trim the end whitespace
@@ -95,12 +91,16 @@ function nodeParser(node_string, node_map, error, errorMessage) {
     var all_values = trimmed.substring(2).split(" ")
     //keys and values of all values of the node
     var keys = ['weight', 'x', 'y']
+    var boolean_keys = ['highlighted', 'marked']
     var values = [null]
 
     for (var i = 0; i < all_values.length; i++) {
         //id value
         if (node_id === false) {
             node_id = all_values[i]
+            if (node_id in node_map) {
+                throw Error(`Duplicate node ID: '${node_id}'`)
+            }
         }
         //x value
         else if (values.length === 1 && isNumeric(all_values[i])) {
@@ -115,21 +115,31 @@ function nodeParser(node_string, node_map, error, errorMessage) {
             values[0] = parseFloat(all_values[i])
         }
         //the weight field was not entered
-        else if (values.length >= 3    && all_values[i].includes(":")) {
+        else if (values.length >= 3 && all_values[i].includes(":")) {
             var key_val = all_values[i].split(":")
+            if (keys.includes(key_val[0])) {
+                // If the user tries to use a key that is one of the default keys, throw error
+                throw Error(`Duplicate key-value pair: '${key_val[0]}:${key_val[1]}'`)
+            }
+            if (boolean_keys.includes(key_val[0]) && key_val[1] !== '') {
+                // If the user tries to set a value to a boolean attribute, throw error
+                throw Error(`Invalid key-value pair: '${key_val[0]}:${key_val[1]}'`)
+            }
+            if (key_val[0] === 'color' && !isColor(key_val[1])) {
+                // If color attribute is not a valid color string, throw error
+                throw Error(`Invalid color: '${key_val[0]}:${key_val[1]}'`)
+            }
             keys.push(key_val[0])
             values.push(key_val[1])
         }
         //the key value pairs were not created correctly or the x, y fields were not set
         else {
-            errorMessage = "Incorrect node format"
-            error = true
+            throw Error(`Incorrect node format, ID: '${node_id}'`)
         }
     }
     //one last error check: values needs weight, x and y and the minimum
     if (values.length < 3) {
-        errorMessage = "Incorrect node format"
-        error = true
+        throw Error(`Incorrect node format, ID: '${node_id}'`)
     }
     //set the node map of the id equal to dictionary
     node_map[node_id] = {}
@@ -146,7 +156,7 @@ function nodeParser(node_string, node_map, error, errorMessage) {
  * @param {dictionary} edge_map - the map of all the current undirected edges
  * @param {int} edge_id - the current id of the undirected edge
  */
-function edgeParser(edge_string, edge_map, edge_id, error, errorMessage) {
+function edgeParser(edge_string, edge_map, edge_id) {
     //trim the end whitespace
     var trimmed = edge_string.trimEnd()
     //split values to an array in the string by removing whitespace in middle
@@ -176,14 +186,12 @@ function edgeParser(edge_string, edge_map, edge_id, error, errorMessage) {
         }
         //the key value pairs were not created correctly or the source, target fields were not set
         else {
-            errorMessage = "Incorrect edge format"
-            error = true
+            throw Error("Incorrect edge format")
         }
     }
      //one last error check: values needs weight, source and target and the minimum
     if (values.length < 3) {
-        errorMessage = "Incorrect edge format"
-        error = true
+        throw Error("Incorrect edge format")
     }
 
     //the edge map of the edge id is a dictionary
@@ -207,3 +215,14 @@ function isNumeric(str) {
         !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
 }
 
+/**
+ * This function checks if a string is a valid CSS color, allows common color strings i.e. red, and rgb hex codes.
+ * @author from https://stackoverflow.com/questions/48484767/javascript-check-if-string-is-valid-css-color
+ * @param {string} strColor - The color to check
+ * @returns true or false
+ */
+function isColor(strColor){
+    var s = new Option().style;
+    s.color = strColor;
+    return s.color !== '';
+}
