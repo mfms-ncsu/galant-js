@@ -1,6 +1,6 @@
 import StepHandler from "./StepHandler";
 import Predicates from "backend/Graph/Predicates";
-import ThreadHandler from "./Thread/ThreadHandler";
+import ThreadHandler from "./Thread/ThreadHandlerDemo";
 import {produce} from 'immer';
 
 export default class AlgorithmHandler {

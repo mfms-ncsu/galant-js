@@ -18,7 +18,7 @@ function Graph(props) {
     const [graph, loadGraph] = useContext(GraphContext);
 
     return <div className="Graph">
-        <GraphViewer predicates={graph}/>
+        <GraphViewer/>
         <GraphInput onUpload={loadGraph}/>
     </div>;
 }
