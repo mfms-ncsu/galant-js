@@ -1,6 +1,6 @@
 // The api is all the functions that the user can use to animate their graph.
 const api = require('./API.js');
-const { parentPort } = require("worker_threads");
+//const { parentPort } = require("worker_threads");
 
 // The array has one purpose: telling the thread to run or wait with Atomics.wait().
 // If sharedArray[0] is 0, that means the Thread should wait. Once it is changed, the Thread wakes up from Atoimics.notify() from the Handler.
@@ -19,7 +19,7 @@ let graph;
  * @author Noah
  * @author Andrew
  */
-parentPort.on("message", message => {
+Worker.parentPort.on("message", message => {
     if (message[0] == 'shared') {
         sharedArray = message[1];
     }

@@ -1,4 +1,4 @@
-const {Worker} = require('worker_threads');
+//const {Worker} = require('worker_threads');
 
 module.exports = class ThreadHandler {
     predicate;
