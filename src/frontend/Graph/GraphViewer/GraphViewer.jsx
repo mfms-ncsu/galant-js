@@ -1,6 +1,6 @@
 import './GraphViewer.scss';
 
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useRef } from 'react';
 import { renderToString } from 'react-dom/server';
 import CytoscapeComponent from 'react-cytoscapejs';
 import GraphContext from 'frontend/GraphContext';
@@ -35,10 +35,17 @@ function GraphViewer(props) {
 	let [elements, setElements] = useState(predicateConverter({}));
 	/** @var {cytoscape.Core} - The saved Cytoscape object. This is used to make direct calls to Cytoscape such as cytoscape.fit(). */
 	let [cytoscape, setCytoscape] = useState(null);
+    let ref = useRef();
+    ref.current = cytoscape;
 	
     const [graph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
 	useEffect(() => {
-        registerOnLoad((graph) => setElements([]));
+        registerOnLoad((graph) => {
+			setElements([]);
+			ref.current.reset();
+			ref.current.zoom(ref.current.zoom() * 0.9);
+			ref.current.panBy({x: 0, y: 30});
+		});
     }, [])
 
 	useEffect(() => {
@@ -71,9 +78,13 @@ function GraphViewer(props) {
 			<button onClick={() => { // Automatically recenter the camera.
 				if (cytoscape) {
 					cytoscape.fit();
+					cytoscape.zoom(cytoscape.zoom() * 0.93);
+					cytoscape.center();
+					cytoscape.panBy({x: 0, y: 13});
 				}
 			}}>{"Auto-Camera"}</button>
 		</div>
+		<p className="GraphViewerMessage">{graph.message}</p>
 		<CytoscapeComponent elements={elements}
 			layout={{
 				name: layout,
@@ -201,7 +212,7 @@ const stylesheet = [
 	{
 		selector: 'edge.directed',
 		style: {
-			curveStyle: 'straight',
+			curveStyle: 'bezier',
 
 			targetArrowShape: 'triangle',
 		}
