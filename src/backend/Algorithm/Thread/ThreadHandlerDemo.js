@@ -1,5 +1,4 @@
 
-
 export default class ThreadHandler {
     constructor(predicates, algorithm, onMessage) {
         console.log("thread init");
@@ -24,6 +23,10 @@ export default class ThreadHandler {
                 return;
             }
         }
+        let rule = this.predicates.update((graph) => {
+            graph.message = "All nodes are marked.";
+        });
+        this.onMessage({type: "rule", content: rule});
     }
 
     killThread() {

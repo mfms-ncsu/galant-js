@@ -53,10 +53,7 @@ export function parseText(graphText) {
     checkEdgeAnchors(node_map, undirected_edge_map)
 
     // if we get to here, then there are no errors. So combine everything into one object and return it
-    graph.node = node_map
-    graph.directed = directed_edge_map
-    graph.undirected = undirected_edge_map
-    return graph
+    return new Graph(node_map, directed_edge_map, undirected_edge_map, "");
 }
 
 /**
