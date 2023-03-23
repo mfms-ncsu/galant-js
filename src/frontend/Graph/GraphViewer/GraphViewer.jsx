@@ -102,13 +102,13 @@ function GraphViewer(props) {
 							if (data.weight) {
 								return renderToString(
 									<div>
-										<p class="GraphViewerLabel">{data.weight}<br></br>{data.label}</p>
+										<p className="GraphViewerLabel">{data.weight}<br></br>{data.label}</p>
 									</div>
 								);
 							} else if (data.label) {
 								return renderToString(
 									<div>
-										<p class="GraphViewerLabel">{data.label}</p>
+										<p className="GraphViewerLabel">{data.label}</p>
 									</div>
 								);
 							}

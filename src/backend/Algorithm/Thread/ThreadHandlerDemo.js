@@ -13,6 +13,7 @@ export default class ThreadHandler {
 
     resumeThread() {
         // Iterate through the nodes and color them red.
+        console.log(this.predicates.get().nodes);
         for (let node of this.predicates.get().getNodes()) {
             if (this.predicates.get().node[node].marked != true) {
                 this.onMessage({type: "console", content: "Marked node " + node});

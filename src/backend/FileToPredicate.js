@@ -140,6 +140,18 @@ function nodeParser(node_string, node_map) {
     }
     //set the node map of the id equal to dictionary
     node_map[node_id] = {}
+
+    //ensure all boolean keys have an assigned boolean value
+    for (let bool_key of boolean_keys) {
+        let index = keys.findIndex((element) => element == bool_key);
+        if (index >= 0) {
+            values[index] = true;
+        } else {
+            keys.push(bool_key);
+            values.push(false);
+        }
+    }
+
     //go ahead store this node predicate among all nodes in the node_map
     for (var j = 0; j < keys.length; j++) {
         node_map[node_id][keys[j]] = values[j]
@@ -160,6 +172,7 @@ function edgeParser(edge_string, edge_map, edge_id) {
     var all_values = trimmed.substring(2).split(" ")
     //keys and values of all values of the edge
     var keys = ['weight', 'source', 'target']
+    var boolean_keys = ['highlighted']
     var values = [null]
 
     for (var i = 0; i < all_values.length; i++) {
@@ -178,6 +191,18 @@ function edgeParser(edge_string, edge_map, edge_id) {
         //the weight field was not entered
         else if (values.length >= 3 && all_values[i].includes(":")) {
             var key_val = all_values[i].split(":")
+            if (keys.includes(key_val[0])) {
+                // If the user tries to use a key that is one of the default keys, throw error
+                throw Error(`Duplicate key-value pair: '${key_val[0]}:${key_val[1]}'`)
+            }
+            if (boolean_keys.includes(key_val[0]) && key_val[1] !== '') {
+                // If the user tries to set a value to a boolean attribute, throw error
+                throw Error(`Invalid key-value pair: '${key_val[0]}:${key_val[1]}'`)
+            }
+            if (key_val[0] === 'color' && !isColor(key_val[1])) {
+                // If color attribute is not a valid color string, throw error
+                throw Error(`Invalid color: '${key_val[0]}:${key_val[1]}'`)
+            }
             keys.push(key_val[0])
             values.push(key_val[1])
         }
@@ -189,6 +214,17 @@ function edgeParser(edge_string, edge_map, edge_id) {
      //one last error check: values needs weight, source and target and the minimum
     if (values.length < 3) {
         throw Error("Incorrect edge format")
+    }
+
+    //ensure all boolean keys have an assigned boolean value
+    for (let bool_key of boolean_keys) {
+        let index = keys.findIndex((element) => element == bool_key);
+        if (index >= 0) {
+            values[index] = true;
+        } else {
+            keys.push(bool_key);
+            values.push(false);
+        }
     }
 
     //the edge map of the edge id is a dictionary
