@@ -1,6 +1,8 @@
 // The api is all the functions that the user can use to animate their graph.
-const api = require('./API.js');
+import { getNodes as _getNodes, colorNode as _colorNode } from './API.js';
 //const { parentPort } = require("worker_threads");
+
+export const location = './Thread.js'
 
 // The array has one purpose: telling the thread to run or wait with Atomics.wait().
 // If sharedArray[0] is 0, that means the Thread should wait. Once it is changed, the Thread wakes up from Atoimics.notify() from the Handler.
@@ -8,6 +10,9 @@ let sharedArray;
 //Instance of the graph that the thread will be working with
 let graph;
 
+export function worker_function () {
+    console.log("uhm")
+}
 /**
  * This is the listener for the Thread. It should recieve a SharedArray first, then an algorithm to run. 
  * 
@@ -19,30 +24,30 @@ let graph;
  * @author Noah
  * @author Andrew
  */
-Worker.parentPort.on("message", message => {
-    if (message[0] == 'shared') {
+Worker.onmessage = (message) => {
+    if (message[0] === 'shared') {
         sharedArray = message[1];
     }
-    else if (message[0] == 'graph/algorithm') {
+    else if (message[0] === 'graph/algorithm') {
         graph = message[1];
         eval(message[2]);
     }
-})
+}
 
 
 function getNodes(){
-    api.getNodes(graph);
+    _getNodes(graph);
 }
 
 function colorNode(node, color) {
     // color the node (getting an updated copy of the graph), then wait for a resume command
-    graph = api.colorNode(graph, node, color)
-    parentPort.postMessage("<put a rule here>")
+    graph = _colorNode(graph, node, color)
+    Worker.postMessage("<put a rule here>")
     wait();
 }
 
 function testSomething(message) {
-    parentPort.postMessage("This worked " + message);
+    Worker.postMessage("This worked " + message);
     wait();
 }
 

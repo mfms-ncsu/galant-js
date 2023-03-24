@@ -1,6 +1,7 @@
 //const {Worker} = require('worker_threads');
+import {location, worker_function} from './Thread.js'
 
-module.exports = class ThreadHandler {
+export default class ThreadHandler {
     predicate;
     algorithm;
     array;
@@ -15,12 +16,13 @@ module.exports = class ThreadHandler {
     }
 
     startThread() {
-        this.worker = new Worker('./Thread.js');
+        this.worker = new Worker(URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'})));
+        // this.worker = new Worker(new URL(location, import.meta.url));
         this.worker.postMessage(["shared", this.array]);
         this.worker.postMessage(['graph/algorithm', this.predicate, this.algorithm]);
-        this.worker.on("message", message => {
+        this.worker.onmessage = (message) => {
             this.onMessage(message);
-        });
+        };
     }
 
     resumeThread() {
