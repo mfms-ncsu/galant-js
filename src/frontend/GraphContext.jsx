@@ -8,8 +8,8 @@ const GraphContext = React.createContext();
 
 export function GraphProvider({ children }) {
     const [graph, setGraph] = useState(() => new Graph({}, {}, {}, ""));
-    console.log("GRAPH");
-    console.log(graph);
+    // console.log("GRAPH");
+    // console.log(graph);
     
     const [loadGraph, setLoadGraph] = useState(() => setGraph);
 
@@ -23,10 +23,10 @@ export function GraphProvider({ children }) {
     let ref = useRef();
     ref.current = graph;
     function updateGraph(patches) {
-        console.log(patches);
-        console.log(ref.current);
+        // console.log(patches);
+        // console.log(ref.current);
         let newGraph = applyPatches(ref.current, patches);
-        console.log(newGraph);
+        // console.log(newGraph);
         setGraph(newGraph);
     }
     // console.log(updateGraph);

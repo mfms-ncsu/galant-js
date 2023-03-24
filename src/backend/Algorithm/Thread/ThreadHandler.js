@@ -20,19 +20,13 @@ export default class ThreadHandler {
         client.open('GET', new URL('./Thread.js', import.meta.url));
         client.onreadystatechange = function() {
             response = client.responseText;
-            console.log(client, response)
             var blob = new Blob([response], {type: 'application/javascript'});
-            blob.text().then(function(txt) {
-                console.log(txt)
-            })
-                    // this.worker = new Worker(new URL(location, import.meta.url));
-            this.worker = new Worker(URL.createObjectURL(blob));
-            console.log(this.worker)
-            this.worker.postMessage(["shared", this.array]);
-            this.worker.postMessage(['graph/algorithm', this.predicate, this.algorithm]);
+            this.worker = new Worker(URL.createObjectURL(blob), { type: "module" });
             this.worker.onmessage = (message) => {
-                this.onMessage(message);
+                console.log(message)
             };
+            this.worker.postMessage(["shared", this.array]);
+            // this.worker.postMessage(['graph/algorithm', this.predicate, this.algorithm]);
         }
         client.send();        
     }
@@ -43,10 +37,10 @@ export default class ThreadHandler {
     }
 
     killThread() {
-        this.worker.terminate();
-    }
-
-    
+        if (this.worker) {
+            this.worker.terminate();
+        }
+    }    
 }
 
 // const worker = new Worker('./Thread.js');
