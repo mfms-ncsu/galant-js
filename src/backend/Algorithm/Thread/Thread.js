@@ -1,9 +1,9 @@
-// import {enablePatches, freeze, produce, applyPatches} from "immer";
+import Predicates from "backend/Graph/Predicates.js";
+import Graph from "backend/Graph/Graph.js";
 
 // The api is all the functions that the user can use to animate their graph.
 // import { getNodes } from './API.js';
 //const { parentPort } = require("worker_threads");
-
 
 // The array has one purpose: telling the thread to run or wait with Atomics.wait().
 // If sharedArray[0] is 0, that means the Thread should wait. Once it is changed, the Thread wakes up from Atoimics.notify() from the Handler.
@@ -30,15 +30,12 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
     message = message.data
     if (message[0] === 'shared') {
         sharedArray = message[1];
-        postMessage({type: "console", content: "recieved shared"})
     }
     else if (message[0] === 'graph/algorithm') {
-        postMessage({type: "console", content: "recieved graph/algorithm"})
-        predicates = message[1];
-        console.log("predicates");
-        console.log(predicates);
-        console.log(message[2]);
-        console.log(predicates.get);
+        let jsonGraph = message[1];
+        let graph = new Graph(jsonGraph.node, jsonGraph.directed, jsonGraph.undirected, jsonGraph.message);
+        predicates = new Predicates(graph);
+        wait();
         eval(message[2]);
     }
 }
@@ -54,7 +51,7 @@ function getNodes() {
 
 function mark(node) {
     // mark the node (getting an updated copy of the graph), then wait for a resume command
-    let rule = this.predicates.update((graph) => {
+    let rule = predicates.update((graph) => {
         graph.mark(node);
     });
     postMessage({type: "rule", content: rule});
@@ -66,10 +63,10 @@ function print(message) {
 }
 
 function display(message) {
-    let rule = this.predicates.update((graph) => {
+    let rule = predicates.update((graph) => {
         graph.display(message);
     });
-    this.onMessage({type: "rule", content: rule});
+    postMessage({type: "rule", content: rule});
     wait();
 }
 

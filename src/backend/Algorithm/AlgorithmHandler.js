@@ -16,8 +16,7 @@ export default class AlgorithmHandler {
     }
     
     #initAlgorithm() {
-        let predicates = new Predicates(produce(this.graph, draft => {}));
-        this.threadHandler = new ThreadHandler(predicates, this.algorithm, (message) => this.#onMessage(message));
+        this.threadHandler = new ThreadHandler(this.graph, this.algorithm, (message) => this.#onMessage(message));
         this.stepHandler = new StepHandler(this.updateGraph, () => this.threadHandler.resumeThread());
         this.threadHandler.startThread();
         
