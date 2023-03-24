@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import AlgorithmConsole from 'frontend/Algorithm/AlgorithmConsole/AlgorithmConsole';
 import AlgorithmInput from 'frontend/Algorithm/AlgorithmInput/AlgorithmInput';
 import AlgorithmControls from 'frontend/Algorithm/AlgorithmControls/AlgorithmControls';
@@ -14,12 +14,14 @@ function Algorithm(props) {
 
     const [graph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
 
-    const [algHandler, setAlgHandler] = useState(null);
+    const [algHandler, setAlgHandler] = useState(() => null);
     useEffect(() => {
         if (algHandler != null) {
             registerOnLoad((graph) => algHandler.setGraph(graph));
         }
     }, [algHandler])
+    let ref = useRef();
+    ref.current = algHandler;
 
     return <div className="Algorithm">
         <AlgorithmInput onUpload={(alg) => {
@@ -27,8 +29,8 @@ function Algorithm(props) {
             setAlgorithm(alg);
         }}/>
         <AlgorithmControls status={status}
-            onForward={() => algHandler.stepForward()}
-            onBack={() => algHandler.stepBack()} />
+            onForward={() => ref.current.stepForward()}
+            onBack={() => ref.current.stepBack()} />
         <AlgorithmConsole onSetupConsole={(addNewMessage) => {
             setAlgHandler(new AlgorithmHandler(graph, algorithm, updateGraph, addNewMessage, setStatus));
         }} />

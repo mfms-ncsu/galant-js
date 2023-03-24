@@ -1,8 +1,9 @@
 import './GraphViewer.scss';
 
-import { useState } from 'react';
+import { useState, useContext, useEffect, useRef } from 'react';
 import { renderToString } from 'react-dom/server';
 import CytoscapeComponent from 'react-cytoscapejs';
+import GraphContext from 'frontend/GraphContext';
 
 import predicateConverter from 'backend/PredicateConverter';
 
@@ -31,26 +32,39 @@ function GraphViewer(props) {
 	/** @var {string} - The currently enabled layout. Begins as 'preset' which keeps the nodes in the specified positions. */
 	let [layout, setLayout] = useState("preset");
 	/** @var {cytoscape.ElementDefinition[]} - The currently displayed elements, converted from the Predicates into Cytoscape form. */
-	let [elements, ] = useState(predicateConverter(props.predicates));
+	let [elements, setElements] = useState(predicateConverter({}));
 	/** @var {cytoscape.Core} - The saved Cytoscape object. This is used to make direct calls to Cytoscape such as cytoscape.fit(). */
-	let [cytoscape, ] = useState(null);
-	// Save the current positions of nodes so they can be preserved after an update.
-	let positions = {};
-	for (let element of elements) {
-		if (element.position && element.data && element.data.id) {
-			positions[element.data.id] = element.position;
-		}
-	}
+	let [cytoscape, setCytoscape] = useState(null);
+    let ref = useRef();
+    ref.current = cytoscape;
+	
+    const [graph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
+	useEffect(() => {
+        registerOnLoad((graph) => {
+			setElements([]);
+			ref.current.reset();
+			ref.current.zoom(ref.current.zoom() * 0.9);
+			ref.current.panBy({x: 0, y: 30});
+		});
+    }, [])
 
-	// Convert the updated set of Predicates into Cytoscape form.
-	elements = predicateConverter(props.predicates);
-
-	// Ensure the positions of nodes are preserved in the new list of elements.
-	for (let element of elements) {
-		if (positions[element.data.id]) {
-			element.position = positions[element.data.id]
+	useEffect(() => {
+		// Save the current positions of nodes so they can be preserved after an update.
+		let positions = {};
+		for (let element of elements) {
+			if (element.position && element.data && element.data.id) {
+				positions[element.data.id] = element.position;
+			}
 		}
-	}
+		let newElements = predicateConverter(graph);
+		// Ensure the positions of nodes are preserved in the new list of elements.
+		for (let element of newElements) {
+			if (positions[element.data.id]) {
+				element.position = positions[element.data.id]
+			}
+		}
+		setElements(newElements);
+    }, [graph])
 
 	return <div className="GraphViewer">
 		{/* Button controls that allow the graph layout and camera to be updated. */}
@@ -64,9 +78,13 @@ function GraphViewer(props) {
 			<button onClick={() => { // Automatically recenter the camera.
 				if (cytoscape) {
 					cytoscape.fit();
+					cytoscape.zoom(cytoscape.zoom() * 0.93);
+					cytoscape.center();
+					cytoscape.panBy({x: 0, y: 13});
 				}
 			}}>{"Auto-Camera"}</button>
 		</div>
+		<p className="GraphViewerMessage">{graph.message}</p>
 		<CytoscapeComponent elements={elements}
 			layout={{
 				name: layout,
@@ -84,20 +102,20 @@ function GraphViewer(props) {
 							if (data.weight) {
 								return renderToString(
 									<div>
-										<p class="GraphViewerLabel">{data.weight}<br></br>{data.label}</p>
+										<p className="GraphViewerLabel">{data.weight}<br></br>{data.label}</p>
 									</div>
 								);
 							} else if (data.label) {
 								return renderToString(
 									<div>
-										<p class="GraphViewerLabel">{data.label}</p>
+										<p className="GraphViewerLabel">{data.label}</p>
 									</div>
 								);
 							}
 						}
 					},
 				]);
-				cytoscape = cy
+				setCytoscape(cy);
 			}}
 		/>
 	</div>;
@@ -194,7 +212,7 @@ const stylesheet = [
 	{
 		selector: 'edge.directed',
 		style: {
-			curveStyle: 'straight',
+			curveStyle: 'bezier',
 
 			targetArrowShape: 'triangle',
 		}

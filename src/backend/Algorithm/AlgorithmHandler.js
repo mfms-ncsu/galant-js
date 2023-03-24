@@ -1,6 +1,6 @@
 import StepHandler from "./StepHandler";
 import Predicates from "backend/Graph/Predicates";
-import ThreadHandler from "./Thread/ThreadHandler";
+import ThreadHandler from "./Thread/ThreadHandlerDemo";
 import {produce} from 'immer';
 
 export default class AlgorithmHandler {
@@ -13,8 +13,6 @@ export default class AlgorithmHandler {
         this.onStatusChanged = onStatusChanged;
 
         this.#initAlgorithm();
-
-        this.onStatusChanged(this.stepHandler.getStatus());
     }
     
     #initAlgorithm() {
@@ -22,6 +20,8 @@ export default class AlgorithmHandler {
         this.threadHandler = new ThreadHandler(predicates, this.algorithm, (message) => this.#onMessage(message));
         this.stepHandler = new StepHandler(this.updateGraph, () => this.threadHandler.resumeThread());
         this.threadHandler.startThread();
+        
+        this.onStatusChanged(this.stepHandler.getStatus());
     }
 
     #onMessage(message) {
