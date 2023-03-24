@@ -10,9 +10,6 @@ let sharedArray;
 //Instance of the graph that the thread will be working with
 let graph;
 
-export function worker_function () {
-    console.log("uhm")
-}
 /**
  * This is the listener for the Thread. It should recieve a SharedArray first, then an algorithm to run. 
  * 

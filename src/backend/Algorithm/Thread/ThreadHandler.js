@@ -16,8 +16,16 @@ export default class ThreadHandler {
     }
 
     startThread() {
-        this.worker = new Worker(URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'})));
-        // this.worker = new Worker(new URL(location, import.meta.url));
+        var response
+        var client = new XMLHttpRequest();
+        client.open('GET', location);
+        client.onreadystatechange = function() {
+            response = client.responseText;
+        }
+        client.send();
+        var blob = new Blob([response], {type: 'application/javascript'});
+        this.worker = new Worker(URL.createObjectURL(blob));
+        console.log(this.worker)
         this.worker.postMessage(["shared", this.array]);
         this.worker.postMessage(['graph/algorithm', this.predicate, this.algorithm]);
         this.worker.onmessage = (message) => {
