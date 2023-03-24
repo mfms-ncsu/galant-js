@@ -4,26 +4,26 @@ enablePatches()
 
 export default class Predicates {
 
-    #state;
+    state;
 
     constructor(state) {
         freeze(state, true)
-        this.#state = state;
+        this.state = state;
     }
 
     get() {
-        return this.#state;
+        return this.state;
     }
 
     update(update) {
         let rule;
-        this.#state = produce(this.#state, update, (apply, revert) => {
+        this.state = produce(this.state, update, (apply, revert) => {
             rule = {apply: apply, revert: revert};
         });
         return rule;
     }
 
     applyPatches(patches) {
-        this.#state = applyPatches(this.#state, patches);
+        this.state = applyPatches(this.state, patches);
     }
 }

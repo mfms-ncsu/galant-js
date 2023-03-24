@@ -1,34 +1,50 @@
 //const {Worker} = require('worker_threads');
 
 export default class ThreadHandler {
-    predicate;
+    predicates;
     algorithm;
     array;
     worker;
     onMessage;
 
-    constructor(predicate, algorithm, onMessage) {
-        this.predicate = predicate;
+    constructor(predicates, algorithm, onMessage) {
+        console.log("thread init");
+        console.log(predicates);
+        console.log(algorithm);
+        console.log(onMessage);
+        this.predicates = predicates;
         this.algorithm = algorithm;
         this.onMessage = onMessage;
         this.array = new Int32Array(new SharedArrayBuffer(1024));
+        console.log(this.onMessage);
     }
 
     startThread() {
         var response
         var client = new XMLHttpRequest();
         client.open('GET', new URL('./Thread.js', import.meta.url));
-        client.onreadystatechange = function() {
+
+        let handleMessage = (message) => {
+            console.log('message');
+            console.log(message.data);
+            this.onMessage(message.data);
+        }
+
+        let initWorker = () => {
             response = client.responseText;
             var blob = new Blob([response], {type: 'application/javascript'});
             this.worker = new Worker(URL.createObjectURL(blob), { type: "module" });
-            this.worker.onmessage = (message) => {
-                console.log(message)
-            };
+            this.worker.onmessage = handleMessage;
             this.worker.postMessage(["shared", this.array]);
-            // this.worker.postMessage(['graph/algorithm', this.predicate, this.algorithm]);
+            console.log("sending message");
+            console.log(this.predicates);
+            console.log(this.algorithm);
+            console.log(this.predicates.get);
+            this.worker.postMessage(['graph/algorithm', this.predicates, this.algorithm]);
         }
-        client.send();        
+
+        client.onreadystatechange = initWorker;
+        client.send();    
     }
 
     resumeThread() {
@@ -45,7 +61,7 @@ export default class ThreadHandler {
 
 // const worker = new Worker('./Thread.js');
 // //console.log('running Threadhandler');
-// let predicate = {
+// let predicates = {
 //     node: {
 //       1: {x:3, y:2},
 //       2: {x:1, y:2},
@@ -60,7 +76,7 @@ export default class ThreadHandler {
 
 // worker.postMessage(["shared", arr]);
 
-// worker.postMessage(['algorithm/graph', predicate, algorithm]);
+// worker.postMessage(['algorithm/graph', predicates, algorithm]);
 
 // worker.on("message", message => {
 //     if (message[0]== 'message'){

@@ -14,7 +14,11 @@ export default class Graph {
         return Object.keys(this.node);
     }
 
-    setNodeColor(node, color) {
-        this.node[node].color = "red";
+    mark(node) {
+        this.node[node].marked = true;
+    }
+
+    display(message) {
+        this.message = message;
     }
 }
