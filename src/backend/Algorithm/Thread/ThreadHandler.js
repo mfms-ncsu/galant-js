@@ -1,5 +1,4 @@
 //const {Worker} = require('worker_threads');
-import {location, worker_function} from './Thread.js'
 
 export default class ThreadHandler {
     predicate;
@@ -18,19 +17,24 @@ export default class ThreadHandler {
     startThread() {
         var response
         var client = new XMLHttpRequest();
-        client.open('GET', location);
+        client.open('GET', new URL('./Thread.js', import.meta.url));
         client.onreadystatechange = function() {
             response = client.responseText;
+            console.log(client, response)
+            var blob = new Blob([response], {type: 'application/javascript'});
+            blob.text().then(function(txt) {
+                console.log(txt)
+            })
+                    // this.worker = new Worker(new URL(location, import.meta.url));
+            this.worker = new Worker(URL.createObjectURL(blob));
+            console.log(this.worker)
+            this.worker.postMessage(["shared", this.array]);
+            this.worker.postMessage(['graph/algorithm', this.predicate, this.algorithm]);
+            this.worker.onmessage = (message) => {
+                this.onMessage(message);
+            };
         }
-        client.send();
-        var blob = new Blob([response], {type: 'application/javascript'});
-        this.worker = new Worker(URL.createObjectURL(blob));
-        console.log(this.worker)
-        this.worker.postMessage(["shared", this.array]);
-        this.worker.postMessage(['graph/algorithm', this.predicate, this.algorithm]);
-        this.worker.onmessage = (message) => {
-            this.onMessage(message);
-        };
+        client.send();        
     }
 
     resumeThread() {
