@@ -1,2 +1,5 @@
-let nodes = getNodes(); 
-nodes.forEach(node => colorNode(red, node, arr));
+for (let node of getNodes()) {
+    print("Marked node " + node);
+    mark(node);
+}
+display("Marked every node");

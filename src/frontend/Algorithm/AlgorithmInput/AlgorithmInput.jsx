@@ -42,12 +42,17 @@ function AlgorithmInput(props) {
             props.onUpload(file);
         };
     };
+
+    function handleClick(e) {
+        e.target.value = ''
+    }
+    
     return <div className="AlgorithmInput">
         <div>
             <button onClick={() => document.getElementById('algoPicker').click()}>
                 Upload Algorithm
             </button>
-            <input id="algoPicker" hidden type={"file"} onChange={onUpload} />
+            <input id="algoPicker" hidden type={"file"} onChange={onUpload} onClick={handleClick}/>
             {' '}
             {fileName}
         </div>
