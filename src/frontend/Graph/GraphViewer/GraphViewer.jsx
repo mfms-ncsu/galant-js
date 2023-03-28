@@ -86,7 +86,11 @@ function GraphViewer(props) {
 			}}>{"Auto-Camera"}</button>
 		</div>	<div className='EdgeToggler'>
 			<button onClick={() => {
-				console.log(elements) 
+				console.log(graph)
+				// for (let g in startGraph.directed) {
+				// 	startGraph.undirected.push(g)
+				// 	startGraph.directed.
+				// }
 			}}>{'EdgeToggler'} </button>
 		</div>
 		<p className="GraphViewerMessage">{graph.message}</p>
