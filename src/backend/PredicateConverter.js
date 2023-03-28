@@ -69,9 +69,8 @@ function convertEdges(elements, edges, isDirected) {
  */
 export default function predicateConverter(predicate) {
     //A predicate will have up to three objects, nodes, undirected edges, and directed edges
-    let nodes = predicate['node'];
-    let undirected = predicate['undirected'];
-    let directed = predicate['directed'];
+    let nodes = predicate.nodes;
+    let edges = predicate.edges;
 
     //Holds all the formats for the graph
     let elements = [];
@@ -118,8 +117,7 @@ export default function predicateConverter(predicate) {
 
 
     //Convert the edges to graph elements.
-    convertEdges(elements, undirected, false);
-    convertEdges(elements, directed, true);
+    convertEdges(elements, edges, false);
     
 
     //push all node positions to an array

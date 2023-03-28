@@ -39,7 +39,7 @@ function GraphViewer(props) {
     let ref = useRef();
     ref.current = cytoscape;
 	
-    const [graph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
+    const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
 	useEffect(() => {
         registerOnLoad((graph) => {
 			setElements([]);
