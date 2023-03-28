@@ -41,6 +41,16 @@
         }
     }
 
+    &>.GraphViewerMessage {
+        position:absolute;
+        z-index: 1;
+        
+        right: 0;
+
+        margin-top: 5px;
+        margin-right: 5px;
+    }
+
     // Set the size of the canvas. Ideally this should be dynamic somehow, there is a bug where the canvas cannot shrink
     &>.__________cytoscape_container {
         text-align: left;
