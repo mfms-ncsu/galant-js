@@ -39,7 +39,7 @@ function GraphViewer(props) {
     let ref = useRef();
     ref.current = cytoscape;
 	
-    const [graph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
+    const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
 	useEffect(() => {
         registerOnLoad((graph) => {
 			setElements([]);
@@ -86,7 +86,11 @@ function GraphViewer(props) {
 			}}>{"Auto-Camera"}</button>
 		</div>	<div className='EdgeToggler'>
 			<button onClick={() => {
-				console.log(elements) 
+				console.log(graph)
+				// for (let g in startGraph.directed) {
+				// 	startGraph.undirected.push(g)
+				// 	startGraph.directed.
+				// }
 			}}>{'EdgeToggler'} </button>
 		</div>
 		<p className="GraphViewerMessage">{graph.message}</p>
