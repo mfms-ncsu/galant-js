@@ -11,8 +11,8 @@ import cytoscape from 'cytoscape';
 
 import nodeHtmlLabel from 'cytoscape-node-html-label';
 import coseBilkent from 'cytoscape-cose-bilkent';
-cytoscape.use( coseBilkent );
-nodeHtmlLabel( cytoscape );
+cytoscape.use(coseBilkent);
+nodeHtmlLabel(cytoscape);
 
 /**
  * A React component that displays a graph.
@@ -31,9 +31,9 @@ function GraphViewer(props) {
 	/** @var {string} - The currently enabled layout. Begins as 'preset' which keeps the nodes in the specified positions. */
 	let [layout, setLayout] = useState("preset");
 	/** @var {cytoscape.ElementDefinition[]} - The currently displayed elements, converted from the Predicates into Cytoscape form. */
-	let [elements, ] = useState(predicateConverter(props.predicates));
+	let [elements,] = useState(predicateConverter(props.predicates));
 	/** @var {cytoscape.Core} - The saved Cytoscape object. This is used to make direct calls to Cytoscape such as cytoscape.fit(). */
-	let [cytoscape, ] = useState(null);
+	let [cytoscape,] = useState(null);
 	// Save the current positions of nodes so they can be preserved after an update.
 	let positions = {};
 	for (let element of elements) {
@@ -66,6 +66,11 @@ function GraphViewer(props) {
 					cytoscape.fit();
 				}
 			}}>{"Auto-Camera"}</button>
+		</div>
+		<div className='EdgeToggler'>
+			<button onClick={() => {
+				console.log(elements) 
+			}}>{'EdgeToggler'} </button>
 		</div>
 		<CytoscapeComponent elements={elements}
 			layout={{
@@ -116,7 +121,7 @@ const stylesheet = [
 			label: 'data(id)',
 			textValign: 'center',
 		}
-	},	
+	},
 	// Marked nodes
 	{
 		selector: 'node[!marked]',
