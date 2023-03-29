@@ -117,7 +117,7 @@ export default function predicateConverter(predicate) {
 
 
     //Convert the edges to graph elements.
-    convertEdges(elements, edges, false);
+    convertEdges(elements, edges, predicate.directed);
     
 
     //push all node positions to an array
