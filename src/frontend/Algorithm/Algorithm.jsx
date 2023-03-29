@@ -12,7 +12,7 @@ function Algorithm(props) {
     /** @var {string} - The current loaded algorithm */
     const [algorithm, setAlgorithm] = useState("");
 
-    const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
+    const [graph, startGraph, loadGraph, setLoadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
 
     const [algHandler, setAlgHandler] = useState(() => null);
     useEffect(() => {

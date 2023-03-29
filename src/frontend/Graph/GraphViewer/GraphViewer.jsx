@@ -39,7 +39,7 @@ function GraphViewer(props) {
     let ref = useRef();
     ref.current = cytoscape;
 	
-    const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
+    const [graph, startGraph, loadGraph, setLoadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
 	useEffect(() => {
         registerOnLoad((graph) => {
 			setElements([]);
@@ -48,6 +48,7 @@ function GraphViewer(props) {
 			ref.current.panBy({x: 0, y: 30});
 		});
     }, [])
+
 
 	useEffect(() => {
 		// Save the current positions of nodes so they can be preserved after an update.
@@ -86,11 +87,19 @@ function GraphViewer(props) {
 			}}>{"Auto-Camera"}</button>
 		</div>	<div className='EdgeToggler'>
 			<button onClick={() => {
-				console.log(graph)
-				// for (let g in startGraph.directed) {
-				// 	startGraph.undirected.push(g)
-				// 	startGraph.directed.
-				// }
+				console.log(startGraph)
+				if (startGraph.directed) {
+					console.log("h")
+					startGraph.directed = false
+					setLoadGraph(startGraph)
+				}
+				else {
+					console.log("g")
+					startGraph.directed = true
+					setLoadGraph(startGraph)
+
+				}
+				
 			}}>{'EdgeToggler'} </button>
 		</div>
 		<p className="GraphViewerMessage">{graph.message}</p>

@@ -22,6 +22,7 @@ export function GraphProvider({ children }) {
             loadGraph(g);
             onLoad(g);
         })
+        
     }
 
     let ref = useRef();
@@ -36,7 +37,9 @@ export function GraphProvider({ children }) {
     }
     // console.log(updateGraph);
 
-    return <GraphContext.Provider value={[graph, startGraph, loadGraph, updateGraph, registerOnLoad]}>
+
+
+    return <GraphContext.Provider value={[graph, startGraph, loadGraph, setLoadGraph, updateGraph, registerOnLoad]}>
         {children}
     </GraphContext.Provider>
 };
