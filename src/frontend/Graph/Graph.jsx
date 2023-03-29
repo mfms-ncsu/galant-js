@@ -15,7 +15,7 @@ import GraphContext from 'frontend/GraphContext';
  */
 function Graph(props) {
 	/** @var {Predicates} - The current loaded graph, in predicate form */
-    const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
+    const [graph, startGraph, loadGraph, setLoadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
 
     return <div className="Graph">
         <GraphViewer/>
