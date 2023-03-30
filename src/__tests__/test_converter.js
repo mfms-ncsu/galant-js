@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import predicateConverter from 'src/backend/PredicateConverter'
+import predicateConverter from 'backend/PredicateConverter'
 
 /**
  * This class tests the predicate conversion to make sure the
@@ -10,7 +10,7 @@ import predicateConverter from 'src/backend/PredicateConverter'
 
 test ("predicate with just nodes with basic information", () => {
     let predicate = {
-        node: {
+        nodes: {
           1: {x:300, y:200},
           2: {x:100, y:200},
           3: {x:400, y:200}
@@ -24,13 +24,12 @@ test ("predicate with just nodes with basic information", () => {
     ]
     
     let graphData = predicateConverter(predicate);
-
     expect(expectedGraphData).toEqual(graphData);
 });
 
 test ("predicate with just nodes with some expected information", () => {
     let predicate = {
-        node: {
+        nodes: {
           1: {x:300, y:200, label:'one'},
           2: {x:100, y:200, weight:3},
           3: {x:400, y:200, label:'three'}
@@ -50,7 +49,7 @@ test ("predicate with just nodes with some expected information", () => {
 
 test ("predicate with just nodes with all expected information", () => {
     let predicate = {
-        node: {
+        nodes: {
           1: {x:300, y:200, label:'one', marked:false, highlighted:false, weight:3, color:'red'},
           2: {x:100, y:200, label:'two', marked:true, highlighted:false, weight:1, color:'black'},
           3: {x:400, y:200, label:'three', marked:false, highlighted:true, weight:0, color:'white'} 
@@ -70,7 +69,7 @@ test ("predicate with just nodes with all expected information", () => {
 
 test ("predicate with just nodes with all expected information with extra key:value pairs", () => {
     let predicate = {
-        node: {
+        nodes: {
           1: {x:300, y:200, label:'one', marked:false, highlighted:false, weight:3, color:'red', border:'dashed'},
           2: {x:100, y:200, label:'two', marked:true, highlighted:false, weight:1, color:'black'},
           3: {x:400, y:200, label:'three', marked:false, highlighted:true, weight:0, color:'white'} 
@@ -90,12 +89,12 @@ test ("predicate with just nodes with all expected information with extra key:va
 
 test ("predicate with nodes and undirected edges with some expected information", () => {
     let predicate = {
-        node: {
+        nodes: {
           1: {x:300, y:200, label:'one', marked:false, highlighted:false, weight:3, color:'red'},
           2: {x:100, y:200, label:'two', marked:true, highlighted:false, weight:1, color:'black'},
           3: {x:400, y:200, label:'three', marked:false, highlighted:true, weight:0, color:'white'} 
         },
-        undirected: {
+        edges: {
             4: {source:1, target:2},
             5: {source:2, target:3, weight:4},
             6: {source:3, target:1}
@@ -118,12 +117,12 @@ test ("predicate with nodes and undirected edges with some expected information"
 
 test ("predicate with nodes and undirected edges with all expected information", () => {
     let predicate = {
-        node: {
+        nodes: {
           1: {x:300, y:200, label:'one', marked:false, highlighted:false, weight:3, color:'red'},
           2: {x:100, y:200, label:'two', marked:true, highlighted:false, weight:1, color:'black'},
           3: {x:400, y:200, label:'three', marked:false, highlighted:true, weight:0, color:'white'} 
         },
-        undirected: {
+        edges: {
             4: {source:1, target:2, weight:2, label:'four'},
             5: {source:2, target:3, weight:4, label:'five'},
             6: {source:3, target:1, weight:1, label:'six'}
@@ -146,16 +145,17 @@ test ("predicate with nodes and undirected edges with all expected information",
 
 test ("predicate with nodes and directed edges with some expected information", () => {
     let predicate = {
-        node: {
+        nodes: {
           1: {x:300, y:200, label:'one', marked:false, highlighted:false, weight:3, color:'red'},
           2: {x:100, y:200, label:'two', marked:true, highlighted:false, weight:1, color:'black'},
           3: {x:400, y:200, label:'three', marked:false, highlighted:true, weight:0, color:'white'} 
         },
-        directed: {
+        edges: {
             4: {source:1, target:2},
             5: {source:2, target:3, weight:4},
             6: {source:3, target:1}
-        }
+        },
+        directed: true
       };
 
     let expectedGraphData = [
@@ -174,16 +174,17 @@ test ("predicate with nodes and directed edges with some expected information", 
 
 test ("predicate with nodes and directed edges with all expected information", () => {
   let predicate = {
-      node: {
+      nodes: {
         1: {x:300, y:200, label:'one', marked:false, highlighted:false, weight:3, color:'red'},
         2: {x:100, y:200, label:'two', marked:true, highlighted:false, weight:1, color:'black'},
         3: {x:400, y:200, label:'three', marked:false, highlighted:true, weight:0, color:'white'} 
       },
-      directed: {
+      edges: {
           4: {source:1, target:2, weight:2, label:'four'},
           5: {source:2, target:3, weight:4, label:'five'},
           6: {source:3, target:1, weight:1, label:'six'}
-      }
+      },
+      directed: true
     };
 
   let expectedGraphData = [
@@ -212,12 +213,12 @@ test ("predicate with just nothing inside it", () => {
 
 test ("predicate with nodes but empty directed and undirected edges", () => {
   let predicate = {
-    node: {
+    nodes: {
       1: {x:300, y:200},
       2: {x:100, y:200},
       3: {x:400, y:200}
     },
-    directed: {}
+    edges: {}
   };
 
   let expectedGraphData = [
@@ -232,12 +233,12 @@ test ("predicate with nodes but empty directed and undirected edges", () => {
 
   //now make a predicate with undirected being empty
   predicate = {
-    node: {
+    nodes: {
       1: {x:300, y:200},
       2: {x:100, y:200},
       3: {x:400, y:200}
     },
-    undirected: {}
+    edges: {}
   };
 
   graphData = predicateConverter(predicate);
@@ -247,13 +248,12 @@ test ("predicate with nodes but empty directed and undirected edges", () => {
   //now make predicate with both undirected and directed being empty
 
   predicate = {
-    node: {
+    nodes: {
       1: {x:300, y:200},
       2: {x:100, y:200},
       3: {x:400, y:200}
     },
-    undirected: {},
-    directed: {}
+    edges: {}
   };
 
   graphData = predicateConverter(predicate);

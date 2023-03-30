@@ -12,6 +12,7 @@ function Algorithm(props) {
     /** @var {string} - The current loaded algorithm */
     const [algorithm, setAlgorithm] = useState("");
 
+
     /** @var {string} - used for setting error box */
     var [algErrorMessage, setAlgErrorMessage] = useState("");
     var [algErrorTextValue, setAlgErrorTextValue] = useState("");
@@ -55,7 +56,8 @@ function Algorithm(props) {
         }
     }
 
-    const [graph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
+    const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
+
 
     const [algHandler, setAlgHandler] = useState(() => null);
     useEffect(() => {

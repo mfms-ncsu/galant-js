@@ -1,15 +1,15 @@
-import StepHandler from 'src/backend/Algorithm/StepHandler';
-import Graph from 'src/backend/Graph/Graph';
-import Predicates from 'src/backend/Graph/Predicates';
+import StepHandler from 'backend/Algorithm/StepHandler';
+import Graph from 'backend/Graph/Graph';
+import Predicates from 'backend/Graph/Predicates';
 // import StepHandler from 'src/backend/Algorithm/StepHandler';
 
 test ("test stepping forward and back", () => {
     // Create the predicates
     let algPredicates = new Predicates(
-        new Graph({a: {color: "black"}, b: {color: "black"}, c: {color: "black"}}, {}, {}, "")
+        new Graph({a: {}, b: {}, c: {}}, {}, {}, "")
     );
     let dispPredicates = new Predicates(
-        new Graph({a: {color: "black"}, b: {color: "black"}, c: {color: "black"}}, {}, {}, "")
+        new Graph({a: {}, b: {}, c: {}}, {}, {}, "")
     );
 
     // Create a StepHandler that just uses the default applyPatches function to update the predicates.
@@ -18,7 +18,7 @@ test ("test stepping forward and back", () => {
     // Iterate through the nodes and color them red.
     for (let node of algPredicates.get().getNodes()) {
         let rule = algPredicates.update((graph) => {
-            graph.setNodeColor(node, "red");
+            graph.mark(node);
         });
         // Make sure generated rules are added to the StepHandler one at a time.
         handler.ruleStep(rule);
@@ -26,35 +26,35 @@ test ("test stepping forward and back", () => {
     }
 
     expect(handler.getStatus()).toEqual({displayState: 3, algorithmState: 3, canStepForward: true, canStepBack: true});
-    expect(dispPredicates.get().node).toEqual({a: {color: "red"}, b: {color: "red"}, c: {color: "red"}});
+    expect(dispPredicates.get().nodes).toEqual({a: {marked: true}, b: {marked: true}, c: {marked: true}});
 
     handler.stepBack();
 
     expect(handler.getStatus()).toEqual({displayState: 2, algorithmState: 3, canStepForward: true, canStepBack: true});
-    expect(dispPredicates.get().node).toEqual({a: {color: "red"}, b: {color: "red"}, c: {color: "black"}});
+    expect(dispPredicates.get().nodes).toEqual({a: {marked: true}, b: {marked: true}, c: {}});
 
     handler.stepBack();
 
     expect(handler.getStatus()).toEqual({displayState: 1, algorithmState: 3, canStepForward: true, canStepBack: true});
-    expect(dispPredicates.get().node).toEqual({a: {color: "red"}, b: {color: "black"}, c: {color: "black"}});
+    expect(dispPredicates.get().nodes).toEqual({a: {marked: true}, b: {}, c: {}});
 
     handler.stepBack();
 
     expect(handler.getStatus()).toEqual({displayState: 0, algorithmState: 3, canStepForward: true, canStepBack: false});
-    expect(dispPredicates.get().node).toEqual({a: {color: "black"}, b: {color: "black"}, c: {color: "black"}});
+    expect(dispPredicates.get().nodes).toEqual({a: {}, b: {}, c: {}});
 
     handler.stepForward();
     
     expect(handler.getStatus()).toEqual({displayState: 1, algorithmState: 3, canStepForward: true, canStepBack: true});
-    expect(dispPredicates.get().node).toEqual({a: {color: "red"}, b: {color: "black"}, c: {color: "black"}});
+    expect(dispPredicates.get().nodes).toEqual({a: {marked: true}, b: {}, c: {}});
     
     handler.stepForward();
     
     expect(handler.getStatus()).toEqual({displayState: 2, algorithmState: 3, canStepForward: true, canStepBack: true});
-    expect(dispPredicates.get().node).toEqual({a: {color: "red"}, b: {color: "red"}, c: {color: "black"}});
+    expect(dispPredicates.get().nodes).toEqual({a: {marked: true}, b: {marked: true}, c: {}});
     
     handler.stepForward();
     
     expect(handler.getStatus()).toEqual({displayState: 3, algorithmState: 3, canStepForward: true, canStepBack: true});
-    expect(dispPredicates.get().node).toEqual({a: {color: "red"}, b: {color: "red"}, c: {color: "red"}});
+    expect(dispPredicates.get().nodes).toEqual({a: {marked: true}, b: {marked: true}, c: {marked: true}});
 });

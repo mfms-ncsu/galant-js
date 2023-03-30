@@ -42,7 +42,6 @@ export default class ThreadHandler {
             console.log("sending message");
             console.log(this.graph);
             console.log(this.algorithm);
-            console.log(this.graph.get);
             this.worker.postMessage(['graph/algorithm', this.graph, this.algorithm]);
         }
 
