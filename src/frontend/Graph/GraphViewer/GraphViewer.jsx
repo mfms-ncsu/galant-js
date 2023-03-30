@@ -17,8 +17,6 @@ import Graph from "backend/Graph/Graph.js";
 cytoscape.use(coseBilkent);
 nodeHtmlLabel(cytoscape);
 
-
-
 /**
  * A React component that displays a graph.
  * 
@@ -71,12 +69,7 @@ function GraphViewer(props) {
 		}
 		setElements(newElements);
     }, [graph])
-
-	//setting the graph toggler text to either "Make Directed" or "Make Undirected"
-	var graph_type = "Make Undirected/Directed"
-	const [buttonText, setButtonText] = useState(graph_type);
-	const changeText = (text) => setButtonText(text);
-
+	
 	return <div className="GraphViewer">
 		{/* Button controls that allow the graph layout and camera to be updated. */}
 		<div className="GraphViewerControls">
@@ -96,15 +89,9 @@ function GraphViewer(props) {
 			}}>{"Auto-Camera"}</button>
 		</div>	<div className='EdgeToggler'>
 			<button onClick={() => {
-				if (startGraph.directed) {
-					changeText("Make Directed")
-				}
-				else {
-					changeText("Make Undirected")
-				}
 				let newGraph = new Graph(startGraph.nodes, startGraph.edges, !startGraph.directed, startGraph.message);
 				loadGraph(newGraph)
-			}}>{buttonText} </button>
+			}}>{graph.directed ? "Make Undirected" : "Make Directed"} </button>
 		</div>
 		<p className="GraphViewerMessage">{graph.message}</p>
 		<CytoscapeComponent elements={elements}
