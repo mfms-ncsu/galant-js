@@ -39,7 +39,7 @@ export function GraphProvider({ children }) {
 
 
 
-    return <GraphContext.Provider value={[graph, startGraph, loadGraph, setLoadGraph, updateGraph, registerOnLoad]}>
+    return <GraphContext.Provider value={[graph, startGraph, loadGraph, updateGraph, registerOnLoad]}>
         {children}
     </GraphContext.Provider>
 };

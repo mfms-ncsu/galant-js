@@ -10,10 +10,14 @@ import predicateConverter from 'backend/PredicateConverter';
 // Enable the cose-bilkent layout which automatically lays out the graph in a reasonable configuration.
 import cytoscape from 'cytoscape';
 
+
 import nodeHtmlLabel from 'cytoscape-node-html-label';
 import coseBilkent from 'cytoscape-cose-bilkent';
+import Graph from "backend/Graph/Graph.js";
 cytoscape.use(coseBilkent);
 nodeHtmlLabel(cytoscape);
+
+
 
 /**
  * A React component that displays a graph.
@@ -39,7 +43,7 @@ function GraphViewer(props) {
     let ref = useRef();
     ref.current = cytoscape;
 	
-    const [graph, startGraph, loadGraph, setLoadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
+    const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
 	useEffect(() => {
         registerOnLoad((graph) => {
 			setElements([]);
@@ -68,6 +72,11 @@ function GraphViewer(props) {
 		setElements(newElements);
     }, [graph])
 
+	//setting the graph toggler text to either "Make Directed" or "Make Undirected"
+	var graph_type = "Make Undirected/Directed"
+	const [buttonText, setButtonText] = useState(graph_type);
+	const changeText = (text) => setButtonText(text);
+
 	return <div className="GraphViewer">
 		{/* Button controls that allow the graph layout and camera to be updated. */}
 		<div className="GraphViewerControls">
@@ -87,20 +96,15 @@ function GraphViewer(props) {
 			}}>{"Auto-Camera"}</button>
 		</div>	<div className='EdgeToggler'>
 			<button onClick={() => {
-				console.log(startGraph)
 				if (startGraph.directed) {
-					console.log("h")
-					startGraph.directed = false
-					setLoadGraph(startGraph)
+					changeText("Make Directed")
 				}
 				else {
-					console.log("g")
-					startGraph.directed = true
-					setLoadGraph(startGraph)
-
+					changeText("Make Undirected")
 				}
-				
-			}}>{'EdgeToggler'} </button>
+				let newGraph = new Graph(startGraph.nodes, startGraph.edges, !startGraph.directed, startGraph.message);
+				loadGraph(newGraph)
+			}}>{buttonText} </button>
 		</div>
 		<p className="GraphViewerMessage">{graph.message}</p>
 		<CytoscapeComponent elements={elements}
