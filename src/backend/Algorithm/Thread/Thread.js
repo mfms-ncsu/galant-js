@@ -36,7 +36,13 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         let graph = new Graph(jsonGraph.node, jsonGraph.directed, jsonGraph.undirected, jsonGraph.message);
         predicates = new Predicates(graph);
         wait();
-        eval(message[2]);
+        try {
+            eval(message[2]);
+        } catch (error) {
+            // if there's an error, send a message with the error
+            postMessage({type: "error", content: error});
+            throw error
+        }
     }
 }
 
