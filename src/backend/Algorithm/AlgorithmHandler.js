@@ -5,12 +5,17 @@ import {produce} from 'immer';
 
 export default class AlgorithmHandler {
 
-    constructor(graph, algorithm, updateGraph, onMessage, onStatusChanged) {
+    /**
+     * 
+     * @param {function} setAlgError function from the parent to set the error box
+     */
+    constructor(graph, algorithm, updateGraph, onMessage, onStatusChanged, setAlgError) {
         this.graph = graph;
         this.algorithm = algorithm;
         this.updateGraph = updateGraph;
         this.onMessage = onMessage;
         this.onStatusChanged = onStatusChanged;
+        this.setAlgError = setAlgError
 
         this.#initAlgorithm();
     }
@@ -27,6 +32,12 @@ export default class AlgorithmHandler {
         if (message.type == "rule") {
             this.stepHandler.ruleStep(message.content);
             this.#broadcastStatus();
+        } else if (message.type == "error") {
+            // display an error box. yes I know this code is hideous but its what we've got.
+            if (this.setAlgError != null) {
+                this.setAlgError(message.content, this.algorithm)
+                this.threadHandler.killThread()
+            }
         } else if (this.onMessage != null) { // console messages
             this.onMessage(message.content);
         }

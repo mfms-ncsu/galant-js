@@ -38,8 +38,15 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         let graph = new Graph(jsonGraph.nodes, jsonGraph.edges, jsonGraph.directed, jsonGraph.message);
         predicates = new Predicates(graph);
         wait();
-        print("starting algorithm");
-        eval(message[2]);
+
+        try {
+            eval(message[2]);
+        } catch (error) {
+            // if there's an error, send a message with the error
+            postMessage({type: "error", content: error});
+            throw error
+        }
+
     }
 }
 
