@@ -17,8 +17,6 @@ import Graph from "backend/Graph/Graph.js";
 cytoscape.use(coseBilkent);
 nodeHtmlLabel(cytoscape);
 
-
-
 /**
  * A React component that displays a graph.
  * 
