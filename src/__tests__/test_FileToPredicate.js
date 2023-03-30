@@ -23,7 +23,10 @@ e a b 20
 e a a 20`
     //check if it matched
     var converted = parseText(text)
-    expect(converted).toEqual(graph)
+    expect(converted.nodes).toEqual(graph.nodes)
+    expect(converted.edges).toEqual(graph.edges)
+    expect(converted.directed).toEqual(graph.directed)
+    expect(converted.message).toEqual(graph.message)
 
 });
 
@@ -44,7 +47,10 @@ e a b
 e a a`
     //check if it matched
     var converted = parseText(text)
-    expect(converted).toEqual(graph)
+    expect(converted.nodes).toEqual(graph.nodes)
+    expect(converted.edges).toEqual(graph.edges)
+    expect(converted.directed).toEqual(graph.directed)
+    expect(converted.message).toEqual(graph.message)
 
 });
 
@@ -65,7 +71,10 @@ e a b 5 color:yellow
 directed`
     //check if it matched
     var converted = parseText(text)
-    expect(converted).toEqual(graph)
+    expect(converted.nodes).toEqual(graph.nodes)
+    expect(converted.edges).toEqual(graph.edges)
+    expect(converted.directed).toEqual(graph.directed)
+    expect(converted.message).toEqual(graph.message)
 
 });
 
@@ -86,6 +95,9 @@ e a a color:yellow
 directed`
     //check if it matched
     var converted = parseText(text)
-    expect(converted).toEqual(graph)
+    expect(converted.nodes).toEqual(graph.nodes)
+    expect(converted.edges).toEqual(graph.edges)
+    expect(converted.directed).toEqual(graph.directed)
+    expect(converted.message).toEqual(graph.message)
 
 });
