@@ -4,7 +4,7 @@
  * @author ysherma
  */
 import {cleanup, fireEvent, render, waitFor, screen, getByTestId} from '@testing-library/react';
-import GraphInput from 'src/frontend/Graph/GraphInput/GraphInput.jsx';
+import GraphInput from 'frontend/Graph/GraphInput/GraphInput.jsx';
 import { readFileSync, readdirSync, readdir } from 'fs';
 
 // Note: running cleanup afterEach is done automatically for you in @testing-library/react@9.0.0 or higher
@@ -66,10 +66,14 @@ function setGraph(predicates) {
                       // Something we can get to later if we run out of things to do
 }
 
+function onUpload(graph) {
+    return graph // give it 
+}
+
 test.each(invalidTestFiles)( 
     "<GraphInput /> with invalid input file '%s'", 
     async (filename) => {
-        const {getByLabelText, findByTestId, getByTestId} = render(<GraphInput setGraph={setGraph}/>);
+        const {getByLabelText, findByTestId, getByTestId} = render(<GraphInput setGraph={setGraph} onUpload={onUpload}/>);
         const input = getByLabelText("Upload Graph");
         expect(input).toBeInTheDocument();
         const {file, text} = getFile(filename)
@@ -83,7 +87,7 @@ test.each(invalidTestFiles)(
 test.each(validTestFiles)(
     "<GraphInput /> with valid input file '%s'", 
     async (filename) => {
-        const {getByLabelText, findByTestId, getByRole} = render(<GraphInput setGraph={setGraph}/>);
+        const {getByLabelText, findByTestId, getByRole} = render(<GraphInput setGraph={setGraph} onUpload={onUpload}/>);
         const input = getByLabelText("Upload Graph");
         expect(input).toBeInTheDocument();
         const {file, text} = getFile(filename)
