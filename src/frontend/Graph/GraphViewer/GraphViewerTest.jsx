@@ -13,7 +13,7 @@ import { useState } from 'react'
  * 
  * @author Art Schell
  */
-function GraphViewerTest() {
+export default function GraphViewerTest() {
 	/** @var {Predicate} - The Predicate form of the currently displayed graph. */
 	let [graph, setGraph] = useState(plainGraph)
   
@@ -31,17 +31,21 @@ function GraphViewerTest() {
 				Both the weights and labels should appear in the same box. The weights should be above the labels. </p>
 			<p>5. Press <button onClick={() => setGraph(coloredGraph)}>{"Load Colored Graph"}</button>.
 				The weights and labels should dissapear. The graph should now have red and blue nodes and edges.</p>
-			<p>6. Press <button onClick={() => setGraph(directedGraph)}>{"Load Directed Graph"}</button>.
-				The colors should return to black. Each edge should now be directional, showing an arrow.</p>
-			<p>7. Press <button onClick={() => setGraph(markedGraph)}>{"Load Marked Graph"}</button>.
-				The arrows should disappear. Now, some vertices should be 'marked' by being shaded orange.
-				Some vertices and edges should be 'highlighted' by being displayed in bold.</p>
-			<p>8. Using the mouse, you should be able to move the graph nodes and camera around.</p> 
-			<p>9. Repeat tests 1-7. The same changes should take place,
-				with the nodes and camera remaining in their new positions.</p>
-			<p>10. Drag the nodes on top of each other, such that the structure of the graph is unclear.
+			<p>6. Press <button onClick={() => setGraph(markedGraph)}>{"Load Marked Graph"}</button>.
+				Instead of being colored, some vertices and edges should be 'highlighted' by being displayed in bold.</p>
+			<p>7. Press <button onClick={() => setGraph(markedGraph)}>{"Load Directed Graph"}</button>.
+				The edges should now be directed, having arrows that point from one node to another.</p>
+			<p>8. Press the Make Directed/Undirected button. The arrows should go away.</p>
+			<p>9. Press the Make Directed/Undirected button again. The arrows should return.</p>
+			<p>10. Using the mouse, you should be able to move the graph nodes and camera around.</p> 
+			<p>11. Press <button onClick={() => updateGraph(
+				[{op: "replace", path: ["message"], value: "Message"}]
+			)}>{"Set Message"}</button>.
+				The word "Message" should appear in the top right of the graph. The node positions should not change.</p>
+			<p>12. Repeat test 1. The nodes should return to their original positions.</p>
+			<p>13. Drag the nodes on top of each other, such that the structure of the graph is unclear.
 				Press the Auto-Layout button on the graph viewer and the nodes should move to reasonable positions.</p> 
-			<p>11. Move the camera far away from the nodes such that they are no longer in view by panning or zooming.
+			<p>14. Move the camera far away from the nodes such that they are no longer in view by panning or zooming.
 				Press the Auto-Camera button on the graph viewer and the camera should move to a reasonable position.</p> 
 		</div>
         <GraphViewer predicates={graph}></GraphViewer>
@@ -49,136 +53,107 @@ function GraphViewerTest() {
 }
 
 /** @const {Predicate} - The predicates for a plain graph with no extra visual properties. */
-const plainGraph = {
-	node: {
+const plainGraph = new Graph({
 		'1': {x: 0, y: 0},
 		'2': {x: 100, y: 0},
 		'3': {x: 100, y: 100},
 		'4': {x: 200, y: 0},
 		'5': {x: 200, y: 100},
-	},
-	undirected: {
+	}, {
 		1: {source: '1', target: '2'},
 		2: {source: '2', target: '3'},
 		3: {source: '2', target: '4'},
 		4: {source: '4', target: '5'},
 		5: {source: '5', target: '1'},
-	},
-	directed: {},
-};
+	}, false, "");
 
 /** @const {Predicate} - The predicates for a graph with labels. */
-const labeledGraph = {
-	node: {
+const labeledGraph = new Graph({
 		'1': {x: 0, y: 0, label: 'Node A'},
 		'2': {x: 100, y: 0, label: 'Node B'},
 		'3': {x: 100, y: 100, label: 'Node C'},
 		'4': {x: 200, y: 0, label: 'Node D'},
 		'5': {x: 200, y: 100, label: 'Node E'},
-	},
-	undirected: {
+	}, {
 		1: {source: '1', target: '2', label: 'Edge AB'},
 		2: {source: '2', target: '3', label: 'Edge BC'},
 		3: {source: '2', target: '4', label: 'Edge BD'},
 		4: {source: '4', target: '5', label: 'Edge DE'},
 		5: {source: '5', target: '1', label: 'Edge EA'},
-	},
-	directed: {},
-};
+	}, false, "");
 
 /** @const {Predicate} - The predicates for a graph with weights. */
-const weightedGraph = {
-	node: {
+const weightedGraph = new Graph({
 		'1': {x: 0, y: 0, weight: 3},
 		'2': {x: 100, y: 0, weight: 5},
 		'3': {x: 100, y: 100, weight: 99},
 		'4': {x: 200, y: 0, weight: 0.2},
 		'5': {x: 200, y: 100, weight: 4},
-	},
-	undirected: {
+	}, {
 		1: {source: '1', target: '2', weight: 67},
 		2: {source: '2', target: '3', weight: 703},
 		3: {source: '2', target: '4', weight: 727},
 		4: {source: '4', target: '5', weight: 3.14},
 		5: {source: '5', target: '1', weight: -30},
-	},
-	directed: {},
-};
+	}, false, "");
 
 /** @const {Predicate} - The predicates for a graph with labels and weights. */
-const weightedLabeledGraph = {
-	node: {
+const weightedLabeledGraph = new Graph({
 		'1': {x: 0, y: 0, label: 'Node A', weight: 3},
 		'2': {x: 100, y: 0, label: 'Node B', weight: 5},
 		'3': {x: 100, y: 100, label: 'Node C', weight: 99},
 		'4': {x: 200, y: 0, label: 'Node D', weight: 0.2},
 		'5': {x: 200, y: 100, label: 'Node E', weight: 4},
-	},
-	undirected: {
+	}, {
 		1: {source: '1', target: '2', label: 'Edge AB', weight: 67},
 		2: {source: '2', target: '3', label: 'Edge BC', weight: 703},
 		3: {source: '2', target: '4', label: 'Edge BD', weight: 727},
 		4: {source: '4', target: '5', label: 'Edge DE', weight: 3.14},
 		5: {source: '5', target: '1', label: 'Edge EA', weight: -30},
-	},
-	directed: {},
-};
+	
+	}, false, "");
 
 /** @const {Predicate} - The predicates for a graph with colors. */
-const coloredGraph = {
-	node: {
-		'1': {x: 0, y: 0, color: 'red'},
+const coloredGraph = new Graph({
+	'1': {x: 0, y: 0, color: 'red'},
 		'2': {x: 100, y: 0, color: 'blue'},
 		'3': {x: 100, y: 100, color: 'red'},
 		'4': {x: 200, y: 0, color: 'red'},
 		'5': {x: 200, y: 100, color: 'blue'},
-	},
-	undirected: {
+	}, {
 		1: {source: '1', target: '2', color: 'blue'},
 		2: {source: '2', target: '3', color: 'red'},
 		3: {source: '2', target: '4', color: 'red'},
 		4: {source: '4', target: '5', color: 'blue'},
 		5: {source: '5', target: '1', color: 'blue'},
-	},
-	directed: {},
-};
+	}, false, "");
 
 /** @const {Predicate} - The predicates for a graph with directed edges. */
-const directedGraph = {
-	node: {
+const directedGraph = new Graph({
 		'1': {x: 0, y: 0},
 		'2': {x: 100, y: 0},
 		'3': {x: 100, y: 100},
 		'4': {x: 200, y: 0},
 		'5': {x: 200, y: 100},
-	},
-	undirected: {},
-	directed: {
+	}, {
 		1: {source: '1', target: '2'},
 		2: {source: '2', target: '3'},
 		3: {source: '2', target: '4'},
 		4: {source: '4', target: '5'},
 		5: {source: '5', target: '1'},
-	},
-};
+	}, true, "");
 
 /** @const {Predicate} - The predicates for a graph with marked and highlighted vertices and edges. */
-const markedGraph = {
-	node: {
+const markedGraph = new Graph({
 		'1': {x: 0, y: 0, marked: true, highlighted: false},
 		'2': {x: 100, y: 0, marked: false, highlighted: true},
 		'3': {x: 100, y: 100, marked: true, highlighted: true},
 		'4': {x: 200, y: 0, marked: false, highlighted: false},
 		'5': {x: 200, y: 100, marked: true, highlighted: false},
-	},
-	undirected: {
+	}, {
 		1: {source: '1', target: '2', highlighted: false},
 		2: {source: '2', target: '3', highlighted: true},
 		3: {source: '2', target: '4', highlighted: false},
 		4: {source: '4', target: '5', highlighted: true},
 		5: {source: '5', target: '1', highlighted: true},
-	},
-	directed: {},
-};
-
-export default GraphViewerTest;
+	}, false, "");
