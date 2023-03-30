@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from 'frontend/App';
 import GraphViewerTest from 'frontend/Graph/GraphViewer/GraphViewerTest';
+import GraphInputTest from 'frontend/Graph/GraphInput/GraphInputTest';
 
 import reportWebVitals from 'reportWebVitals';
 
@@ -21,6 +22,11 @@ root.render(
             <Route exact path='/testGraphViewer' element={
                 <GraphProvider>
                     <GraphViewerTest />
+                </GraphProvider>
+            }></Route>
+            <Route exact path='/testGraphInput' element={
+                <GraphProvider>
+                    <GraphInputTest />
                 </GraphProvider>
             }></Route>
         </Routes>
