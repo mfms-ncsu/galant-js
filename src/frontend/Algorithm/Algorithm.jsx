@@ -15,36 +15,44 @@ function Algorithm(props) {
     /** @var {string} - used for setting error box */
     var [algErrorMessage, setAlgErrorMessage] = useState("");
     var [algErrorTextValue, setAlgErrorTextValue] = useState("");
-    var [algErrorFilename, setAlgErrorFilename] = useState("");
+    var [algErrorTitle, setAlgErrorTitle] = useState("");
     function clearErrors(e) {
         setAlgErrorMessage("");
         setAlgErrorTextValue("");
-        setAlgErrorFilename("");
+        setAlgErrorTitle("");
     }
-    function setAlgError(errorContent, algFromThread) {
-        setAlgErrorFilename("Error on line " + errorContent.lineNumber);
-        setAlgErrorMessage(errorContent.toString());
+    function setAlgError(errorObject, algFromThread) {
+        // if its a timeout error, we've set the line number to -1. And we don't need to do put the line here.
+        if (errorObject.lineNumber === -1) {
+            setAlgErrorTitle("Timeout Error. Likely an infinite loop.")
+            setAlgErrorMessage(errorObject.toString())
+            setAlgErrorTextValue("Your code took longer than 5 seconds to execute.\nFor technical reasons, we're not able to discern where in your code this occured.\nSorry!")
+        } else {
+            // its a regular error, so generate the data to go in the popup.
+            setAlgErrorTitle("Error on line " + errorObject.lineNumber);
+            setAlgErrorMessage(errorObject.toString());
 
-        // we need to add the line numbers here
-        // get the number of lines in the algorithm
-        let splitAlg = algFromThread.toString().split(/\r\n|\r|\n/);
-        let numLines = splitAlg.length;
-        // make sure we offset by enough characters
-        let offsetSize = ("" + numLines).length;
-        let adjustedAlgText = "";
-        splitAlg.forEach(function (line, i) {
-            // generate the line number and offset
-            // we star the line if it is the bad one
-            let starTags = ["  ", "   "]
-            // eslint-disable-next-line
-            if (i + 1 == errorContent.lineNumber) {
-                starTags = ["**", "** "];
-            }
-            let offset = starTags[0] + ("" + (i + 1)).padStart(offsetSize) + starTags[1]
-            adjustedAlgText = adjustedAlgText.concat("\n", offset, line)
-        })
+            // we need to add the line numbers here
+            // get the number of lines in the algorithm
+            let splitAlg = algFromThread.toString().split(/\r\n|\r|\n/);
+            let numLines = splitAlg.length;
+            // make sure we offset by enough characters
+            let offsetSize = ("" + numLines).length;
+            let adjustedAlgText = "";
+            splitAlg.forEach(function (line, i) {
+                // generate the line number and offset
+                // we star the line if it is the bad one
+                let starTags = ["  ", "   "]
+                // eslint-disable-next-line
+                if (i + 1 == errorObject.lineNumber) {
+                    starTags = ["**", "** "];
+                }
+                let offset = starTags[0] + ("" + (i + 1)).padStart(offsetSize) + starTags[1]
+                adjustedAlgText = adjustedAlgText.concat("\n", offset, line)
+            })
 
-        setAlgErrorTextValue(adjustedAlgText)
+            setAlgErrorTextValue(adjustedAlgText)
+        }
     }
 
     const [graph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
@@ -62,9 +70,9 @@ function Algorithm(props) {
         { algErrorMessage &&
             <div className="alg-error-mask">
                 <div id="algError" className="alg-parse-error">
-                    <span className="alg-filename">{algErrorFilename}</span>
+                    <span className="alg-filename">{algErrorTitle}</span>
                     <span data-testid="alg-errorMessage">{algErrorMessage}</span>
-                    <div class="alg-code-block-container">
+                    <div className="alg-code-block-container">
                         <pre id="alg-text">{algErrorTextValue}</pre>
                     </div>
                     <button onClick={clearErrors}>Okay</button>

@@ -5,6 +5,11 @@ import {produce} from 'immer';
 
 export default class AlgorithmHandler {
 
+    /** @var {int} timeoutID - the ID of the timeout instance so that it can be canceled if we get a good message */
+    #timeoutID;
+    /** @var {int} timeoutPeriod - the number of miliseconds before a timeout happens. DONT CHANGE THIS */
+    #timeoutPeriod = 5000;
+
     /**
      * 
      * @param {function} setAlgError function from the parent to set the error box
@@ -29,6 +34,11 @@ export default class AlgorithmHandler {
     }
 
     #onMessage(message) {
+        // TODO ONCE WE CHANGE TO JUST STOPPING ON STEPS, GET RID OF THE RULE IN THIS LIST
+        // if we get a step or an error, stop the timeout.
+        if (["rule", "step", "error"].includes(message.type.toString())) {
+            clearTimeout(this.#timeoutID)
+        }
         if (message.type == "rule") {
             this.stepHandler.ruleStep(message.content);
             this.#broadcastStatus();
@@ -63,7 +73,15 @@ export default class AlgorithmHandler {
     }
 
     stepForward() {
-        this.stepHandler.stepForward();
+        let needToTimeout = this.stepHandler.stepForward();
+        if (needToTimeout) {
+            this.#timeoutID = setTimeout(() => {
+                this.threadHandler.killThread();
+                var errorToSend = new Error("Timeout has occurred.");
+                errorToSend.lineNumber = -1;
+                this.setAlgError(errorToSend, this.algorithm);
+            }, this.#timeoutPeriod);
+        }
         this.#broadcastStatus();
     }
 

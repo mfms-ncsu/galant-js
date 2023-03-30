@@ -69,25 +69,29 @@ export default class StepHandler {
 
     /**
      * Executes the next step, or if there is no next step, requests new rules via the callback function.
+     * @returns true if we needed and generated one, false if we didn't need to restart the thread bc we already had a rule queued.
      */
     stepForward() {
         if (!this.canStepForward()) {
             throw new Error("Can't step forward");
         }
 
+        // if we are out of rules in the queue, go make a new one.
         if (this.#displayState == this.#steps.length) {
             this.#currentStep = [];
             if (this.onNeedsRules != null) {
                 this.onNeedsRules();
             }
-            return;
+            return true;
         }
 
+        // if we get here, we already have enough rules.
         let step = this.#steps[this.#displayState];
         this.#displayState++;
 
         let patches = step.flatMap((rule) => rule.apply)
         this.#updateGraph(patches);
+        return false;
     }
 
     /**
@@ -110,7 +114,6 @@ export default class StepHandler {
      */
     revertAll() {
         let patches = this.#steps.reverse().flatMap((step) => step.flatMap((rule) => rule.revert).reverse())
-        console.log(patches);
         this.#updateGraph(patches);
 
         let displayState = 0;
