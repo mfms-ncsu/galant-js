@@ -1,8 +1,10 @@
 import './GraphViewerTest.scss';
 
+import Graph from 'backend/Graph/Graph';
 import GraphViewer from 'frontend/Graph/GraphViewer/GraphViewer';
+import GraphContext from 'frontend/GraphContext';
 
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 
 /**
  * A React component providing a page to test the GraphViewer class.
@@ -15,25 +17,32 @@ import { useState } from 'react'
  */
 export default function GraphViewerTest() {
 	/** @var {Predicate} - The Predicate form of the currently displayed graph. */
-	let [graph, setGraph] = useState(plainGraph)
+	let [graph, startGraph, setGraph, updateGraph, registerOnLoad] = useContext(GraphContext)
+
+	function makeGraphFunc(graph) {
+		return () => {
+			let newGraph = new Graph(graph.nodes, graph.edges, graph.directed, graph.message);
+			setGraph(newGraph);
+		}
+	}
   
 	return <div className="GraphViewerTest">
-		<div class="scrollable">
+		<div className="scrollable">
 			<h1>Graph Viewer Test</h1>
 			<p>This page is meant for testing the GraphViewer class. Perform the following tests:</p>
-			<p>1. Press <button onClick={() => setGraph(plainGraph)}>{"Load Plain Graph"}</button>.
+			<p>1. Press <button onClick={makeGraphFunc(plainGraph)}>{"Load Plain Graph"}</button>.
 				An all-black graph with node numbers but no labels should appear.</p>
-			<p>2. Press <button onClick={() => setGraph(labeledGraph)}>{"Load Labeled Graph"}</button>.
+			<p>2. Press <button onClick={makeGraphFunc(labeledGraph)}>{"Load Labeled Graph"}</button>.
 				Labels should appear for every node and edge. The labels should appear on top of the edges.</p>
-			<p>3. Press <button onClick={() => setGraph(weightedGraph)}>{"Load Weighted Only Graph"}</button>.
+			<p>3. Press <button onClick={makeGraphFunc(weightedGraph)}>{"Load Weighted Only Graph"}</button>.
 				The labels should be replaced by weights. There should be integer, decimal, and negative weights.</p>
-			<p>4. Press <button onClick={() => setGraph(weightedLabeledGraph)}>{"Load Weighted Labeled Graph"}</button>.
+			<p>4. Press <button onClick={makeGraphFunc(weightedLabeledGraph)}>{"Load Weighted Labeled Graph"}</button>.
 				Both the weights and labels should appear in the same box. The weights should be above the labels. </p>
-			<p>5. Press <button onClick={() => setGraph(coloredGraph)}>{"Load Colored Graph"}</button>.
+			<p>5. Press <button onClick={makeGraphFunc(coloredGraph)}>{"Load Colored Graph"}</button>.
 				The weights and labels should dissapear. The graph should now have red and blue nodes and edges.</p>
-			<p>6. Press <button onClick={() => setGraph(markedGraph)}>{"Load Marked Graph"}</button>.
+			<p>6. Press <button onClick={makeGraphFunc(markedGraph)}>{"Load Marked Graph"}</button>.
 				Instead of being colored, some vertices and edges should be 'highlighted' by being displayed in bold.</p>
-			<p>7. Press <button onClick={() => setGraph(markedGraph)}>{"Load Directed Graph"}</button>.
+			<p>7. Press <button onClick={makeGraphFunc(directedGraph)}>{"Load Directed Graph"}</button>.
 				The edges should now be directed, having arrows that point from one node to another.</p>
 			<p>8. Press the Make Directed/Undirected button. The arrows should go away.</p>
 			<p>9. Press the Make Directed/Undirected button again. The arrows should return.</p>
