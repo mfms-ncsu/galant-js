@@ -6,7 +6,7 @@ import Graph from "backend/Graph/Graph"
  * @param {string} graphText - The text from the input graph text file
  * @param {function} handleError - error handler to propagate messages to user
  * 
- * @returns a dictionary object with keys called nodes, directed_edges, and undirected_edges
+ * @returns a dictionary object with keys called nodes, directed_edges, and edges
  * 
  * @author Rishab Karwa
  * @author Andrew Watson
@@ -17,9 +17,10 @@ export function parseText(graphText) {
 
     //ids and dictionaries to store nodes adwnd edges
     var node_map = {}
-    var directed_edge_map = {}
-    var undirected_edge_map = {}
+    var edge_map = {}
     var edge_id = 0
+
+    let directed = false;
 
     var lines = graphText.split('\n')
     for (var line = 0; line < lines.length; line++) {
@@ -32,15 +33,13 @@ export function parseText(graphText) {
         else if (current_line[0] === 'n') {
             nodeParser(current_line, node_map)
         }
-        //this is an undirected edge
+        //this is an edge
         else if (current_line[0] === 'e') {
             edge_id += 1
-            edgeParser(current_line, undirected_edge_map, edge_id)
+            edgeParser(current_line, edge_map, edge_id)
         }
-        //this is a directed edge
-        else if (current_line[0] === 'd') {
-            edge_id += 1
-            edgeParser(current_line, directed_edge_map, edge_id)
+        else if (current_line === 'directed') {
+            directed = true;
         }
         //if it starts with something else then they screwed up so break.
         else {
@@ -49,11 +48,10 @@ export function parseText(graphText) {
     }
 
     //ensure that all entered source and targets for edges are valid node ids
-    checkEdgeAnchors(node_map, directed_edge_map)
-    checkEdgeAnchors(node_map, undirected_edge_map)
+    checkEdgeAnchors(node_map, edge_map)
 
     // if we get to here, then there are no errors. So combine everything into one object and return it
-    return new Graph(node_map, directed_edge_map, undirected_edge_map, "");
+    return new Graph(node_map, edge_map, directed, "");
 }
 
 /**
@@ -229,7 +227,7 @@ function edgeParser(edge_string, edge_map, edge_id) {
 
     //the edge map of the edge id is a dictionary
     edge_map[edge_id] = {}
-    //go ahead store this edge predicate among all edges in the undirected_edge_map
+    //go ahead store this edge predicate among all edges in the edge_map
     for (var j = 0; j < keys.length; j++) {
         edge_map[edge_id][keys[j]] = values[j];
     }

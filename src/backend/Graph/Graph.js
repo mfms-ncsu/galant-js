@@ -3,19 +3,19 @@ import {immerable} from "immer";
 export default class Graph {
     [immerable] = true;
 
-    constructor(node, directed, undirected, message) {
-        this.node = node;
+    constructor(nodes, edges, directed, message) {
+        this.nodes = nodes;
+        this.edges = edges;
         this.directed = directed;
-        this.undirected = undirected;
         this.message = message;
     }
 
     getNodes() {
-        return Object.keys(this.node);
+        return Object.keys(this.nodes);
     }
 
     mark(node) {
-        this.node[node].marked = true;
+        this.nodes[node].marked = true;
     }
 
     display(message) {
