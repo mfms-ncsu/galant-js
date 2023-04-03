@@ -18,17 +18,14 @@ import { useState, useContext } from 'react'
  * @author Art Schell
  */
 export default function GraphViewerTest() {
-	/** @var {Predicate} - The Predicate form of the currently displayed graph. */
-	let [graph, startGraph, setGraph, updateGraph, registerOnLoad] = useContext(GraphContext)
-  
 	return <div className="GraphInputTest">
 		<div className="scrollable">
 			<h1>Graph Input Test</h1>
 			<p>This page is meant for testing the GraphInput class. Perform the following tests:</p>
-			<p>1. Download <Link to="/testGraphInput/graph.txt" target="_blank" download>graph.txt</Link>. 
+			<p>1. Download <Link to="/tests/graphInput/graph.txt" target="_blank" download>graph.txt</Link>. 
 				Press the Upload Graph button and upload this file. The graph should look like this:</p>
-			<img src="/testGraphInput/expected.png" />
-			<p>2. Download <Link to="/testGraphInput/invalid.txt" target="_blank" download>invalid.txt</Link>. 
+			<img src="/tests/graphInput/expected.png" />
+			<p>2. Download <Link to="/tests/graphInput/invalid.txt" target="_blank" download>invalid.txt</Link>. 
 				Press the Upload Graph button and upload this file. An error should appear.</p>
 		</div>
         <Graph />

@@ -36,7 +36,7 @@ export default class AlgorithmHandler {
     #onMessage(message) {
         // TODO ONCE WE CHANGE TO JUST STOPPING ON STEPS, GET RID OF THE RULE IN THIS LIST
         // if we get a step or an error, stop the timeout.
-        if (["rule", "step", "error"].includes(message.type.toString())) {
+        if (["rule", "step", "error", "complete"].includes(message.type.toString())) {
             clearTimeout(this.#timeoutID)
         }
         if (message.type == "rule") {
@@ -44,10 +44,15 @@ export default class AlgorithmHandler {
             this.#broadcastStatus();
         } else if (message.type == "error") {
             // display an error box. yes I know this code is hideous but its what we've got.
+            if (this.onMessage != null) { // console messages
+                this.onMessage(message.content);
+            }
             if (this.setAlgError != null) {
                 this.setAlgError(message.content, this.algorithm)
                 this.threadHandler.killThread()
             }
+        } else if (message.type == "complete") {
+            this.threadHandler.killThread()
         } else if (this.onMessage != null) { // console messages
             this.onMessage(message.content);
         }
@@ -77,6 +82,9 @@ export default class AlgorithmHandler {
         if (needToTimeout) {
             this.#timeoutID = setTimeout(() => {
                 this.threadHandler.killThread();
+                if (this.onMessage != null) { // console message
+                    this.onMessage("Timeout has occurred.");
+                }
                 var errorToSend = new Error("Timeout has occurred.");
                 errorToSend.lineNumber = -1;
                 this.setAlgError(errorToSend, this.algorithm);

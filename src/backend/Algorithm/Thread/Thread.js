@@ -29,18 +29,19 @@ let predicates;
 self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
     message = message.data
     if (message[0] === 'shared') {
-        print("recieved shared");
         sharedArray = message[1];
     }
     else if (message[0] === 'graph/algorithm') {
-        print("recieved graph/algorithm");
         let jsonGraph = message[1];
         let graph = new Graph(jsonGraph.nodes, jsonGraph.edges, jsonGraph.directed, jsonGraph.message);
         predicates = new Predicates(graph);
+        print("Algorithm initialized");
         wait();
 
         try {
             eval(message[2]);
+            print("Algorithm completed");
+            postMessage({type: "complete"});
         } catch (error) {
             // if there's an error, send a message with the error
             postMessage({type: "error", content: error});
