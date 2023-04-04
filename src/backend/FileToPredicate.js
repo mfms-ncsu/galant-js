@@ -1,23 +1,23 @@
+import Graph from "backend/Graph/Graph"
+
 /**
  * This function parses input graph text into predicates
  * 
  * @param {string} graphText - The text from the input graph text file
  * @param {function} handleError - error handler to propagate messages to user
  * 
- * @returns a dictionary object with keys called nodes, directed_edges, and undirected_edges
+ * @returns a dictionary object with keys called nodes, directed_edges, and edges
  * 
  * @author Rishab Karwa
  * @author Andrew Watson
  */
 export function parseText(graphText) {
-    //remove any previous values that the graph may have
-    var graph = {}
-
-    //ids and dictionaries to store nodes adwnd edges
+    //ids and dictionaries to store nodes and edges
     var node_map = {}
-    var directed_edge_map = {}
-    var undirected_edge_map = {}
+    var edge_map = {}
     var edge_id = 0
+
+    let directed = false;
 
     var lines = graphText.split('\n')
     for (var line = 0; line < lines.length; line++) {
@@ -30,15 +30,13 @@ export function parseText(graphText) {
         else if (current_line[0] === 'n') {
             nodeParser(current_line, node_map)
         }
-        //this is an undirected edge
+        //this is an edge
         else if (current_line[0] === 'e') {
             edge_id += 1
-            edgeParser(current_line, undirected_edge_map, edge_id)
+            edgeParser(current_line, edge_map, edge_id)
         }
-        //this is a directed edge
-        else if (current_line[0] === 'd') {
-            edge_id += 1
-            edgeParser(current_line, directed_edge_map, edge_id)
+        else if (current_line === 'directed') {
+            directed = true;
         }
         //if it starts with something else then they screwed up so break.
         else {
@@ -47,14 +45,10 @@ export function parseText(graphText) {
     }
 
     //ensure that all entered source and targets for edges are valid node ids
-    checkEdgeAnchors(node_map, directed_edge_map)
-    checkEdgeAnchors(node_map, undirected_edge_map)
+    checkEdgeAnchors(node_map, edge_map)
 
     // if we get to here, then there are no errors. So combine everything into one object and return it
-    graph.node = node_map
-    graph.directed = directed_edge_map
-    graph.undirected = undirected_edge_map
-    return graph
+    return new Graph(node_map, edge_map, directed, "");
 }
 
 /**
@@ -141,6 +135,18 @@ function nodeParser(node_string, node_map) {
     }
     //set the node map of the id equal to dictionary
     node_map[node_id] = {}
+
+    //ensure all boolean keys have an assigned boolean value
+    for (let bool_key of boolean_keys) {
+        let index = keys.findIndex((element) => element===bool_key);
+        if (index >= 0) {
+            values[index] = true;
+        } else {
+            keys.push(bool_key);
+            values.push(false);
+        }
+    }
+
     //go ahead store this node predicate among all nodes in the node_map
     for (var j = 0; j < keys.length; j++) {
         node_map[node_id][keys[j]] = values[j]
@@ -161,6 +167,7 @@ function edgeParser(edge_string, edge_map, edge_id) {
     var all_values = trimmed.substring(2).split(" ")
     //keys and values of all values of the edge
     var keys = ['weight', 'source', 'target']
+    var boolean_keys = ['highlighted']
     var values = [null]
 
     for (var i = 0; i < all_values.length; i++) {
@@ -179,6 +186,18 @@ function edgeParser(edge_string, edge_map, edge_id) {
         //the weight field was not entered
         else if (values.length >= 3 && all_values[i].includes(":")) {
             var key_val = all_values[i].split(":")
+            if (keys.includes(key_val[0])) {
+                // If the user tries to use a key that is one of the default keys, throw error
+                throw Error(`Duplicate key-value pair: '${key_val[0]}:${key_val[1]}'`)
+            }
+            if (boolean_keys.includes(key_val[0]) && key_val[1] !== '') {
+                // If the user tries to set a value to a boolean attribute, throw error
+                throw Error(`Invalid key-value pair: '${key_val[0]}:${key_val[1]}'`)
+            }
+            if (key_val[0] === 'color' && !isColor(key_val[1])) {
+                // If color attribute is not a valid color string, throw error
+                throw Error(`Invalid color: '${key_val[0]}:${key_val[1]}'`)
+            }
             keys.push(key_val[0])
             values.push(key_val[1])
         }
@@ -192,9 +211,20 @@ function edgeParser(edge_string, edge_map, edge_id) {
         throw Error("Incorrect edge format")
     }
 
+    //ensure all boolean keys have an assigned boolean value
+    for (let bool_key of boolean_keys) {
+        let index = keys.findIndex((element) => element===bool_key);
+        if (index >= 0) {
+            values[index] = true;
+        } else {
+            keys.push(bool_key);
+            values.push(false);
+        }
+    }
+
     //the edge map of the edge id is a dictionary
     edge_map[edge_id] = {}
-    //go ahead store this edge predicate among all edges in the undirected_edge_map
+    //go ahead store this edge predicate among all edges in the edge_map
     for (var j = 0; j < keys.length; j++) {
         edge_map[edge_id][keys[j]] = values[j];
     }

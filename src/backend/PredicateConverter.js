@@ -9,6 +9,7 @@
  * 
  * @author Andrew Watson
  * @author Noah Alexander
+ * @author Rishabh Karwa
  */
 function convertEdges(elements, edges, isDirected) {
     //Loops through all keys inside of the edges
@@ -68,9 +69,8 @@ function convertEdges(elements, edges, isDirected) {
  */
 export default function predicateConverter(predicate) {
     //A predicate will have up to three objects, nodes, undirected edges, and directed edges
-    let nodes = predicate['node'];
-    let undirected = predicate['undirected'];
-    let directed = predicate['directed'];
+    let nodes = predicate.nodes;
+    let edges = predicate.edges;
 
     //Holds all the formats for the graph
     let elements = [];
@@ -79,7 +79,6 @@ export default function predicateConverter(predicate) {
     for (let ident in nodes) {
         //Grabs the node object
         let node = nodes[ident];
-
         //Creates an object that is formatted to the graph display format
         let element = {
             data: {
@@ -102,20 +101,56 @@ export default function predicateConverter(predicate) {
             if (key === 'x' || key === 'y') {
                 element.position[key] = node[key];
             }
+            else if (node[key] === "") {
+                element.data[key] = "true";
+            }
             else {
                 //All other key value paris will transfer to the element object in the data
                 element.data[key] = node[key];
             }
         }
-        
+
         //Adds them to the list of elements
         elements.push(element);
 
     }
-    
+
+
     //Convert the edges to graph elements.
-    convertEdges(elements, undirected, false);
-    convertEdges(elements, directed, true);
+    convertEdges(elements, edges, predicate.directed);
+    
+
+    //push all node positions to an array
+    var positions = []
+    for (let elem of elements) {
+        if ("position" in elem) {
+            positions.push(elem.position)
+        }
+    }
+
+    var maxCoord = 1
+    for (var position of positions) {
+        maxCoord = Math.max(maxCoord, Math.abs(position.x), Math.abs(position.y))
+    }
+    var graphWindow = document.getElementsByClassName(" __________cytoscape_container")[0]
+    if (graphWindow) {
+        var minDim = Math.min(graphWindow.clientWidth, graphWindow.clientHeight)
+        // account for width of node being 50
+        var coordToPixel = (minDim-50) / maxCoord
+        var xOffset = 0;
+        var yOffset = 0;
+        // center the graph without using camera fit to avoid changing node sizes
+        // get the offset based on the larger dimension if canvas isn't square
+        if (graphWindow.clientWidth < graphWindow.clientHeight) {
+            yOffset = (graphWindow.clientHeight - graphWindow.clientWidth) / 2
+        } else {
+            xOffset = (graphWindow.clientWidth - graphWindow.clientHeight) / 2
+        }
+        for (position of positions) {
+            position.x = position.x * coordToPixel + xOffset + 25 // 25 to account for node width/height
+            position.y = position.y * coordToPixel + yOffset + 25
+        }
+    }
     
     return(elements);
 

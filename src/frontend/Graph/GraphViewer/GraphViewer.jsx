@@ -1,18 +1,21 @@
 import './GraphViewer.scss';
 
-import { useState } from 'react';
+import { useState, useContext, useEffect, useRef } from 'react';
 import { renderToString } from 'react-dom/server';
 import CytoscapeComponent from 'react-cytoscapejs';
+import GraphContext from 'frontend/GraphContext';
 
-import predicateConverter from 'src/backend/PredicateConverter';
+import predicateConverter from 'backend/PredicateConverter';
 
 // Enable the cose-bilkent layout which automatically lays out the graph in a reasonable configuration.
 import cytoscape from 'cytoscape';
 
+
 import nodeHtmlLabel from 'cytoscape-node-html-label';
 import coseBilkent from 'cytoscape-cose-bilkent';
-cytoscape.use( coseBilkent );
-nodeHtmlLabel( cytoscape );
+import Graph from "backend/Graph/Graph.js";
+cytoscape.use(coseBilkent);
+nodeHtmlLabel(cytoscape);
 
 /**
  * A React component that displays a graph.
@@ -31,27 +34,45 @@ function GraphViewer(props) {
 	/** @var {string} - The currently enabled layout. Begins as 'preset' which keeps the nodes in the specified positions. */
 	let [layout, setLayout] = useState("preset");
 	/** @var {cytoscape.ElementDefinition[]} - The currently displayed elements, converted from the Predicates into Cytoscape form. */
-	let [elements, ] = useState(predicateConverter(props.predicates));
+
+	let [elements, setElements] = useState(predicateConverter({}));
 	/** @var {cytoscape.Core} - The saved Cytoscape object. This is used to make direct calls to Cytoscape such as cytoscape.fit(). */
-	let [cytoscape, ] = useState(null);
-	// Save the current positions of nodes so they can be preserved after an update.
-	let positions = {};
-	for (let element of elements) {
-		if (element.position && element.data && element.data.id) {
-			positions[element.data.id] = element.position;
+	let [cytoscape, setCytoscape] = useState(null);
+    let ref = useRef();
+    ref.current = cytoscape;
+	
+    /* eslint-disable-next-line no-unused-vars */
+    const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
+	useEffect(() => {
+        registerOnLoad((graph) => {
+			setElements([]);
+			ref.current.reset();
+			ref.current.zoom(ref.current.zoom() * 0.9);
+			ref.current.panBy({x: 0, y: 30});
+		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+
+	useEffect(() => {
+		// Save the current positions of nodes so they can be preserved after an update.
+		let positions = {};
+		for (let element of elements) {
+			if (element.position && element.data && element.data.id) {
+				positions[element.data.id] = element.position;
+			}
 		}
-	}
-
-	// Convert the updated set of Predicates into Cytoscape form.
-	elements = predicateConverter(props.predicates);
-
-	// Ensure the positions of nodes are preserved in the new list of elements.
-	for (let element of elements) {
-		if (positions[element.data.id]) {
-			element.position = positions[element.data.id]
+		let newElements = predicateConverter(graph);
+		// Ensure the positions of nodes are preserved in the new list of elements.
+		for (let element of newElements) {
+			if (positions[element.data.id]) {
+				element.position = positions[element.data.id]
+			}
 		}
-	}
-
+		setElements(newElements);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [graph])
+	
 	return <div className="GraphViewer">
 		{/* Button controls that allow the graph layout and camera to be updated. */}
 		<div className="GraphViewerControls">
@@ -64,9 +85,18 @@ function GraphViewer(props) {
 			<button onClick={() => { // Automatically recenter the camera.
 				if (cytoscape) {
 					cytoscape.fit();
+					cytoscape.zoom(cytoscape.zoom() * 0.93);
+					cytoscape.center();
+					cytoscape.panBy({x: 0, y: 13});
 				}
 			}}>{"Auto-Camera"}</button>
+		</div>	<div className='EdgeToggler'>
+			<button onClick={() => {
+				let newGraph = new Graph(startGraph.nodes, startGraph.edges, !startGraph.directed, startGraph.message);
+				loadGraph(newGraph)
+			}}>{graph.directed ? "Make Undirected" : "Make Directed"} </button>
 		</div>
+		<p className="GraphViewerMessage">{graph.message}</p>
 		<CytoscapeComponent elements={elements}
 			layout={{
 				name: layout,
@@ -84,20 +114,20 @@ function GraphViewer(props) {
 							if (data.weight) {
 								return renderToString(
 									<div>
-										<p class="GraphViewerLabel">{data.weight}<br></br>{data.label}</p>
+										<p className="GraphViewerLabel">{data.weight}<br></br>{data.label}</p>
 									</div>
 								);
 							} else if (data.label) {
 								return renderToString(
 									<div>
-										<p class="GraphViewerLabel">{data.label}</p>
+										<p className="GraphViewerLabel">{data.label}</p>
 									</div>
 								);
 							}
 						}
 					},
 				]);
-				cytoscape = cy
+				setCytoscape(cy);
 			}}
 		/>
 	</div>;
@@ -117,7 +147,7 @@ const stylesheet = [
 			label: 'data(id)',
 			textValign: 'center',
 		}
-	},	
+	},
 	// Marked nodes
 	{
 		selector: 'node[!marked]',
@@ -194,7 +224,7 @@ const stylesheet = [
 	{
 		selector: 'edge.directed',
 		style: {
-			curveStyle: 'straight',
+			curveStyle: 'bezier',
 
 			targetArrowShape: 'triangle',
 		}

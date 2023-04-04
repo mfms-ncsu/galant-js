@@ -2,16 +2,49 @@ import './index.scss'
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from 'src/frontend/App';
+import App from 'frontend/App';
+import GraphViewerTest from 'frontend/Graph/GraphViewer/GraphViewerTest';
+import GraphInputTest from 'frontend/Graph/GraphInput/GraphInputTest';
+import AlgorithmTest from 'frontend/Algorithm/AlgorithmTest';
 
-import reportWebVitals from 'src/reportWebVitals';
+import reportWebVitals from 'reportWebVitals';
+
+import { Routes, Route, BrowserRouter, Link } from 'react-router-dom';
+import { GraphProvider } from 'frontend/GraphContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
-    <React.StrictMode>
-        <App />
-    </React.StrictMode>
+    <BrowserRouter>
+        <Routes>
+            <Route exact path='/' element={
+                <App />
+            }></Route>
+            <Route exact path='/tests' element={
+                <div>
+                    <h1>Galant Tests</h1>
+                    <p>1. <Link to="/tests/graphViewer">Graph Viewer Test</Link></p>
+                    <p>2. <Link to="/tests/graphInput">Graph Input Test</Link></p>
+                    <p>3. <Link to="/tests/algorithm">Algorithm Test</Link></p>
+                </div>
+            }></Route>
+            <Route exact path='/tests/graphViewer' element={
+                <GraphProvider>
+                    <GraphViewerTest />
+                </GraphProvider>
+            }></Route>
+            <Route exact path='/tests/graphInput' element={
+                <GraphProvider>
+                    <GraphInputTest />
+                </GraphProvider>
+            }></Route>
+            <Route exact path='/tests/algorithm' element={
+                <GraphProvider>
+                    <AlgorithmTest />
+                </GraphProvider>
+            }></Route>
+        </Routes>
+    </BrowserRouter>
 );
 
 // If you want to start measuring performance in your app, pass a function

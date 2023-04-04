@@ -1,0 +1,15 @@
+// @author Rishabh Karwa
+
+.AlgorithmControls {
+    // The component should take up the maximum available space
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    &>.stepcounter {
+        flex: 1;
+        text-align: center;
+        font-size: 200%;
+    }
+}
