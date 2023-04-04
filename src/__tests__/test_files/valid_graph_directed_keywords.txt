@@ -3,9 +3,10 @@ n 2 300 400 marked:
 n 6 100 200 highlighted: color:blue
 n 90 300 600 label:Label
 n 70 400 400 marked:
-d 1 2 40
-d 2 1 39 color:blue
-d 1 6 color:red
-d 6 2 label:six_to_two
-d 2 6 50
-d 90 70
+e 1 2 40
+e 2 1 39 color:blue
+e 1 6 color:red
+e 6 2 label:six_to_two
+e 2 6 50
+e 90 70
+directed

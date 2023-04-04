@@ -1,0 +1,5 @@
+Header add Access-Control-Allow-Origin "*"
+Header add Access-Control-Allow-Methods "*"
+Header add Access-Control-Allow-Headers "*"
+Header add Cross-Origin-Opener-Policy "same-origin"
+Header add Cross-Origin-Embedder-Policy "require-corp"

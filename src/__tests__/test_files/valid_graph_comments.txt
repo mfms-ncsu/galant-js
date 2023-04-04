@@ -3,8 +3,6 @@ n A 0 0
 n B 0 100
 n C 0 200
 
-/ edges
+# edges
 e A B
-
-# directed
-d B C
+e B C

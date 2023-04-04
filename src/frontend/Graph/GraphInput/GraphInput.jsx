@@ -1,7 +1,7 @@
 import './GraphInput.scss'
 
 import { useState } from "react";
-import { parseText } from 'src/backend/FileToPredicate.js';
+import { parseText } from 'backend/FileToPredicate.js';
 
 /**
  * This function loads an upload graph button and parses the graph input into a text area on the bottom right of the screen
@@ -55,7 +55,7 @@ function GraphInput(props) {
             var predicates = {}
             try {
                 predicates = parseText(file);
-                props.setGraph(predicates);
+                props.onUpload(predicates);
                 setTextValue(file);
                 setFileName(filename);
             } catch (e) {

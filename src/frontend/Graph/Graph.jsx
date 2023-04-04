@@ -1,7 +1,8 @@
 import './Graph.scss';
-import GraphViewer from './GraphViewer/GraphViewer';
-import GraphInput from './GraphInput/GraphInput';
-import { useState } from "react";
+import GraphViewer from 'frontend/Graph/GraphViewer/GraphViewer';
+import GraphInput from 'frontend/Graph/GraphInput/GraphInput';
+import { useContext } from "react";
+import GraphContext from 'frontend/GraphContext';
 
 /**
  * A React component for the Graph pane which loads graphs from a file and displays them.
@@ -14,11 +15,12 @@ import { useState } from "react";
  */
 function Graph(props) {
 	/** @var {Predicates} - The current loaded graph, in predicate form */
-    const [graph, setGraph] = useState({});
+    /* eslint-disable-next-line no-unused-vars */
+    const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
 
     return <div className="Graph">
-        <GraphViewer predicates={graph}/>
-        <GraphInput setGraph={setGraph}/>
+        <GraphViewer/>
+        <GraphInput onUpload={loadGraph}/>
     </div>;
 }
 
