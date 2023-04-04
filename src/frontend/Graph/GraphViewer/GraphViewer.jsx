@@ -55,24 +55,22 @@ function GraphViewer(props) {
 
 
 	useEffect(() => {
-		const fixPositions = () => {
-			// Save the current positions of nodes so they can be preserved after an update.
-			let positions = {};
-			for (let element of elements) {
-				if (element.position && element.data && element.data.id) {
-					positions[element.data.id] = element.position;
-				}
+		// Save the current positions of nodes so they can be preserved after an update.
+		let positions = {};
+		for (let element of elements) {
+			if (element.position && element.data && element.data.id) {
+				positions[element.data.id] = element.position;
 			}
-			let newElements = predicateConverter(graph);
-			// Ensure the positions of nodes are preserved in the new list of elements.
-			for (let element of newElements) {
-				if (positions[element.data.id]) {
-					element.position = positions[element.data.id]
-				}
+		}
+		let newElements = predicateConverter(graph);
+		// Ensure the positions of nodes are preserved in the new list of elements.
+		for (let element of newElements) {
+			if (positions[element.data.id]) {
+				element.position = positions[element.data.id]
 			}
-			setElements(newElements);
-		};
-		fixPositions();
+		}
+		setElements(newElements);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
     }, [graph])
 	
 	return <div className="GraphViewer">
