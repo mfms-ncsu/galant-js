@@ -1,7 +1,7 @@
 import StepHandler from "./StepHandler";
 import Predicates from "backend/Graph/Predicates";
-import ThreadHandler from "./Thread/ThreadHandler";
 import {produce} from 'immer';
+var ThreadHandler = null
 
 export default class AlgorithmHandler {
 
@@ -14,15 +14,22 @@ export default class AlgorithmHandler {
      * 
      * @param {function} setAlgError function from the parent to set the error box
      */
-    constructor(graph, algorithm, updateGraph, onMessage, onStatusChanged, setAlgError) {
+    constructor(graph, algorithm, updateGraph, onMessage, onStatusChanged, setAlgError, testFlag = null) {
         this.graph = graph;
         this.algorithm = algorithm;
         this.updateGraph = updateGraph;
         this.onMessage = onMessage;
         this.onStatusChanged = onStatusChanged;
         this.setAlgError = setAlgError
-
-        this.#initAlgorithm();
+        
+        var threadHandlerImport = "./Thread/ThreadHandler"
+        if (testFlag) {
+            threadHandlerImport += 'Demo';
+        }
+        import(threadHandlerImport).then(module => {
+            ThreadHandler = module.default;
+            this.#initAlgorithm();
+        }).catch(error => console.log(error));
     }
     
     #initAlgorithm() {
@@ -32,6 +39,7 @@ export default class AlgorithmHandler {
         
         this.onStatusChanged(this.stepHandler.getStatus());
     }
+
 
     #onMessage(message) {
         // TODO ONCE WE CHANGE TO JUST STOPPING ON STEPS, GET RID OF THE RULE IN THIS LIST

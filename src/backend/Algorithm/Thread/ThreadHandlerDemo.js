@@ -1,36 +1,34 @@
 
-export default class ThreadHandler {
+export default class ThreadHandlerDemo {
     constructor(predicates, algorithm, onMessage) {
-        console.log("thread init");
         this.predicates = predicates;
-        
-        this.onMessage = onMessage;
+        this.postMessage = onMessage;
     }
 
     startThread() {
-        this.onMessage({type: "console", content: "Started thread"});
+        this.postMessage({type: "console", content: "Started thread"});
     }
 
     resumeThread() {
-        // Iterate through the nodes and color them red.
-        console.log(this.predicates.get().nodes);
+        // Example algorithm for testing. Marks every node, sends an error at the end.
         for (let node of this.predicates.get().getNodes()) {
-            if (this.predicates.get()["node"][node].marked != true) {
-                this.onMessage({type: "console", content: "Marked node " + node});
+            if (this.predicates.get()["nodes"][node].marked != true) {
+                this.postMessage({type: "console", content: "Marked node " + node});
                 let rule = this.predicates.update((graph) => {
-                    graph["node"][node].marked = true;
+                    graph["nodes"][node].marked = true;
                 });
-                this.onMessage({type: "rule", content: rule});
+                this.postMessage({type: "rule", content: rule});
                 return;
             }
         }
         let rule = this.predicates.update((graph) => {
-            graph.message = "All nodes are marked.";
+            graph.display("All nodes are marked");
         });
-        this.onMessage({type: "rule", content: rule});
+        this.postMessage({type: "rule", content: rule});
+        this.postMessage({type: "error", content: "Example error"});
     }
 
     killThread() {
-        this.onMessage({type: "console", content: "Killed thread"});
+        this.postMessage({type: "console", content: "Killed thread"});
     }
 }
