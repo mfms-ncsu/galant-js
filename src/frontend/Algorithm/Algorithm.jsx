@@ -56,6 +56,7 @@ function Algorithm(props) {
         }
     }
 
+    /* eslint-disable-next-line no-unused-vars */
     const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
 
 
@@ -64,6 +65,7 @@ function Algorithm(props) {
         if (algHandler != null) {
             registerOnLoad((graph) => algHandler.setGraph(graph));
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [algHandler])
     let ref = useRef();
     ref.current = algHandler;

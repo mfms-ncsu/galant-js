@@ -1,12 +1,7 @@
 import './GraphInputTest.scss';
-
 import Graph from 'frontend/Graph/Graph';
-import GraphViewer from 'frontend/Graph/GraphViewer/GraphViewer';
-import GraphContext from 'frontend/GraphContext';
-
 import { Link } from 'react-router-dom';
 
-import { useState, useContext } from 'react'
 
 /**
  * A React component providing a page to test the GraphInput class.
@@ -24,7 +19,7 @@ export default function GraphViewerTest() {
 			<p>This page is meant for testing the GraphInput class. Perform the following tests:</p>
 			<p>1. Download <Link to="/tests/graphInput/graph.txt" target="_blank" download>graph.txt</Link>. 
 				Press the Upload Graph button and upload this file. The graph should look like this:</p>
-			<img src="/tests/graphInput/expected.png" />
+			<img src="/tests/graphInput/expected.png" alt="what the expected graph should be"/>
 			<p>2. Download <Link to="/tests/graphInput/invalid.txt" target="_blank" download>invalid.txt</Link>. 
 				Press the Upload Graph button and upload this file. An error should appear.</p>
 		</div>

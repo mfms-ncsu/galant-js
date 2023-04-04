@@ -15,6 +15,7 @@ import GraphContext from 'frontend/GraphContext';
  */
 function Graph(props) {
 	/** @var {Predicates} - The current loaded graph, in predicate form */
+    /* eslint-disable-next-line no-unused-vars */
     const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
 
     return <div className="Graph">

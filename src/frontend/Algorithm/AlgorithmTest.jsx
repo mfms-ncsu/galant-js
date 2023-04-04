@@ -1,13 +1,8 @@
 import './AlgorithmTest.scss';
 
-import Graph from 'frontend/Graph/Graph';
-import GraphViewer from 'frontend/Graph/GraphViewer/GraphViewer';
-import GraphContext from 'frontend/GraphContext';
 import App from 'frontend/App';
 
 import { Link } from 'react-router-dom';
-
-import { useState, useContext } from 'react'
 
 /**
  * A React component providing a page to test the GraphInput class.

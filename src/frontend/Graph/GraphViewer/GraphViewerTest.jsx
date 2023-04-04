@@ -4,7 +4,7 @@ import Graph from 'backend/Graph/Graph';
 import GraphViewer from 'frontend/Graph/GraphViewer/GraphViewer';
 import GraphContext from 'frontend/GraphContext';
 
-import { useState, useContext } from 'react'
+import { useContext } from 'react'
 
 /**
  * A React component providing a page to test the GraphViewer class.
@@ -17,6 +17,7 @@ import { useState, useContext } from 'react'
  */
 export default function GraphViewerTest() {
 	/** @var {Predicate} - The Predicate form of the currently displayed graph. */
+    /* eslint-disable-next-line no-unused-vars */
 	let [graph, startGraph, setGraph, updateGraph, registerOnLoad] = useContext(GraphContext)
 
 	function makeGraphFunc(graph) {

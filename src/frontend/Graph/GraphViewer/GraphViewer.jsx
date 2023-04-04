@@ -41,6 +41,7 @@ function GraphViewer(props) {
     let ref = useRef();
     ref.current = cytoscape;
 	
+    /* eslint-disable-next-line no-unused-vars */
     const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
 	useEffect(() => {
         registerOnLoad((graph) => {
@@ -49,25 +50,29 @@ function GraphViewer(props) {
 			ref.current.zoom(ref.current.zoom() * 0.9);
 			ref.current.panBy({x: 0, y: 30});
 		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
 
 	useEffect(() => {
-		// Save the current positions of nodes so they can be preserved after an update.
-		let positions = {};
-		for (let element of elements) {
-			if (element.position && element.data && element.data.id) {
-				positions[element.data.id] = element.position;
+		const fixPositions = () => {
+			// Save the current positions of nodes so they can be preserved after an update.
+			let positions = {};
+			for (let element of elements) {
+				if (element.position && element.data && element.data.id) {
+					positions[element.data.id] = element.position;
+				}
 			}
-		}
-		let newElements = predicateConverter(graph);
-		// Ensure the positions of nodes are preserved in the new list of elements.
-		for (let element of newElements) {
-			if (positions[element.data.id]) {
-				element.position = positions[element.data.id]
+			let newElements = predicateConverter(graph);
+			// Ensure the positions of nodes are preserved in the new list of elements.
+			for (let element of newElements) {
+				if (positions[element.data.id]) {
+					element.position = positions[element.data.id]
+				}
 			}
-		}
-		setElements(newElements);
+			setElements(newElements);
+		};
+		fixPositions();
     }, [graph])
 	
 	return <div className="GraphViewer">

@@ -33,6 +33,7 @@ export default function AlgorithmControls(props) {
     //the windowlistener for back for forward and backward button presses
     useEffect(() => {
         document.addEventListener('keydown', handleKeyPress, true)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return (
@@ -47,7 +48,7 @@ export default function AlgorithmControls(props) {
                 onClick={frontButtonPress}>
                 <img src={Forward} alt="forward arrow"/>
             </button>
-            <div class="stepcounter">
+            <div className="stepcounter">
                 <p>Step {props.status.displayState}/{props.status.algorithmState}</p>
             </div>
         </div>

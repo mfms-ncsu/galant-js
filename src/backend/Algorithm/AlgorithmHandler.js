@@ -1,6 +1,4 @@
 import StepHandler from "./StepHandler";
-import Predicates from "backend/Graph/Predicates";
-import {produce} from 'immer';
 var ThreadHandler = null
 
 export default class AlgorithmHandler {
@@ -26,7 +24,7 @@ export default class AlgorithmHandler {
         if (testFlag) {
             threadHandlerImport += 'Demo';
         }
-        import(threadHandlerImport).then(module => {
+        import(`${threadHandlerImport}`).then(module => {
             ThreadHandler = module.default;
             this.#initAlgorithm();
         }).catch(error => console.log(error));
@@ -47,10 +45,10 @@ export default class AlgorithmHandler {
         if (["rule", "step", "error", "complete"].includes(message.type.toString())) {
             clearTimeout(this.#timeoutID)
         }
-        if (message.type == "rule") {
+        if (message.type === "rule") {
             this.stepHandler.ruleStep(message.content);
             this.#broadcastStatus();
-        } else if (message.type == "error") {
+        } else if (message.type === "error") {
             // display an error box. yes I know this code is hideous but its what we've got.
             if (this.onMessage != null) { // console messages
                 this.onMessage(message.content);
@@ -59,7 +57,7 @@ export default class AlgorithmHandler {
                 this.setAlgError(message.content, this.algorithm)
                 this.threadHandler.killThread()
             }
-        } else if (message.type == "complete") {
+        } else if (message.type === "complete") {
             this.threadHandler.killThread()
         } else if (this.onMessage != null) { // console messages
             this.onMessage(message.content);

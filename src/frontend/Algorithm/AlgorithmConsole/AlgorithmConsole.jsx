@@ -16,6 +16,7 @@ export default function AlgorithmConsole(props) {
 
     useEffect(() => {
         props.onSetupConsole(addNewMessage);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return <div className="AlgorithmConsole">

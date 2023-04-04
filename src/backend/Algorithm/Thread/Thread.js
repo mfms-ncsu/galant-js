@@ -1,9 +1,6 @@
+/* eslint-disable no-unused-vars */
 import Predicates from "backend/Graph/Predicates.js";
 import Graph from "backend/Graph/Graph.js";
-
-// The api is all the functions that the user can use to animate their graph.
-// import { getNodes } from './API.js';
-//const { parentPort } = require("worker_threads");
 
 // The array has one purpose: telling the thread to run or wait with Atomics.wait().
 // If sharedArray[0] is 0, that means the Thread should wait. Once it is changed, the Thread wakes up from Atoimics.notify() from the Handler.
@@ -22,10 +19,6 @@ let predicates;
  * @author Noah
  * @author Andrew
  */
-// self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
-//     console.log(message)
-//     self.postMessage("shared") /* eslint-disable-line no-restricted-globals */
-// }
 self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
     message = message.data
     if (message[0] === 'shared') {
@@ -39,7 +32,7 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         wait();
 
         try {
-            eval(message[2]);
+            eval(message[2]); /* eslint-disable-line no-eval */
             print("Algorithm completed");
             postMessage({type: "complete"});
         } catch (error) {
@@ -50,11 +43,6 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
 
     }
 }
-
-// self.addEventListener('message', e => { /* eslint-disable-line no-restricted-globals */
-//     console.log(e.data)
-//   });
-
 
 function getNodes() {
     return predicates.get().getNodes();

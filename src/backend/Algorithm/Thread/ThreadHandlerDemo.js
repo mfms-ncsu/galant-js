@@ -12,7 +12,7 @@ export default class ThreadHandlerDemo {
     resumeThread() {
         // Example algorithm for testing. Marks every node, sends an error at the end.
         for (let node of this.predicates.get().getNodes()) {
-            if (this.predicates.get()["nodes"][node].marked != true) {
+            if (this.predicates.get()["nodes"][node].marked !== true) {
                 this.postMessage({type: "console", content: "Marked node " + node});
                 let rule = this.predicates.update((graph) => {
                     graph["nodes"][node].marked = true;

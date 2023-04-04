@@ -12,10 +12,7 @@ import Graph from "backend/Graph/Graph"
  * @author Andrew Watson
  */
 export function parseText(graphText) {
-    //remove any previous values that the graph may have
-    var graph = {}
-
-    //ids and dictionaries to store nodes adwnd edges
+    //ids and dictionaries to store nodes and edges
     var node_map = {}
     var edge_map = {}
     var edge_id = 0
@@ -141,7 +138,7 @@ function nodeParser(node_string, node_map) {
 
     //ensure all boolean keys have an assigned boolean value
     for (let bool_key of boolean_keys) {
-        let index = keys.findIndex((element) => element == bool_key);
+        let index = keys.findIndex((element) => element===bool_key);
         if (index >= 0) {
             values[index] = true;
         } else {
@@ -216,7 +213,7 @@ function edgeParser(edge_string, edge_map, edge_id) {
 
     //ensure all boolean keys have an assigned boolean value
     for (let bool_key of boolean_keys) {
-        let index = keys.findIndex((element) => element == bool_key);
+        let index = keys.findIndex((element) => element===bool_key);
         if (index >= 0) {
             values[index] = true;
         } else {

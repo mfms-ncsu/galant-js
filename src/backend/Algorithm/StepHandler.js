@@ -41,7 +41,7 @@ export default class StepHandler {
      * @returns {bool}
      */
     canStepForward() {
-        return this.#displayState != this.#steps.length || this.#currentStep == null;
+        return this.#displayState !== this.#steps.length || this.#currentStep === null;
     }
 
     /**
@@ -50,7 +50,7 @@ export default class StepHandler {
      * @returns {bool}
      */
     canStepBack() {
-        return this.#displayState != 0;
+        return this.#displayState !== 0;
     }
 
     /**
@@ -77,9 +77,9 @@ export default class StepHandler {
         }
 
         // if we are out of rules in the queue, go make a new one.
-        if (this.#displayState == this.#steps.length) {
+        if (this.#displayState === this.#steps.length) {
             this.#currentStep = [];
-            if (this.onNeedsRules != null) {
+            if (this.onNeedsRules !== null) {
                 this.onNeedsRules();
             }
             return true;
@@ -116,7 +116,7 @@ export default class StepHandler {
         let patches = this.#steps.reverse().flatMap((step) => step.flatMap((rule) => rule.revert).reverse())
         this.#updateGraph(patches);
 
-        let displayState = 0;
+        this.#displayState = 0;
     }
 
     /**
@@ -126,7 +126,7 @@ export default class StepHandler {
      * @param {Rule} rule - The rule to add.
      */
     addRule(rule) {
-        if (this.#currentStep == null) {
+        if (this.#currentStep === null) {
             this.#currentStep = [];
         }
         this.#currentStep.push(rule);
@@ -139,7 +139,7 @@ export default class StepHandler {
     completeStep() {
         this.#steps.push(this.#currentStep);
 
-        if (this.#displayState + 1 == this.#steps.length) {
+        if (this.#displayState + 1 === this.#steps.length) {
             this.stepForward();
         }
 
