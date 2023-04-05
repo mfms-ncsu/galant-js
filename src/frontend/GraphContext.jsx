@@ -1,8 +1,10 @@
 import React, {useRef, useState} from 'react';
 
-import {applyPatches} from "immer";
+import {enablePatches, applyPatches} from "immer";
 
 import Graph from 'backend/Graph/Graph';
+
+enablePatches();
 
 const GraphContext = React.createContext();
 
