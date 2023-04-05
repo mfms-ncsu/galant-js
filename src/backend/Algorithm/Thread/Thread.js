@@ -36,11 +36,12 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
             print("Algorithm completed");
             postMessage({type: "complete"});
         } catch (error) {
+            let matches = error.stack.match(/eval:([0-9]+):[0-9]+\n/);
+            error.lineNumber = parseInt(matches[1]);
             // if there's an error, send a message with the error
             postMessage({type: "error", content: error});
             throw error
         }
-
     }
 }
 
@@ -67,6 +68,56 @@ function display(message) {
     });
     postMessage({type: "rule", content: rule});
     wait();
+}
+
+function prompt(message, error="") {
+    postMessage({type: "prompt", content: [message, error]})
+    wait();
+    let len = Atomics.load(sharedArray, 1);
+    let promptResult = "";
+    for (let i = 0; i < len; i++) {
+        promptResult += String.fromCharCode(Atomics.load(sharedArray, i + 2));
+    }
+    return promptResult;
+}
+
+function promptFrom(message, list, error) {
+    if (error == null) {
+        error = "Must enter a value from " + list;
+    }
+    let promptResult = prompt(message);
+    while (!list.includes(promptResult)) {
+        promptResult = prompt(message, error);
+    }
+    return promptResult;
+}
+
+function promptBoolean(message) {
+    return Boolean(promptFrom(message, ["true", "false"], "Must enter a boolean value (true/false)"));
+}
+
+function promptInteger(message) {
+    let promptResult = parseInt(prompt(message));
+    while (isNaN(promptResult)) {
+        promptResult = parseInt(prompt(message, "Must enter an integer"));
+    }
+    return promptResult;
+}
+
+function promptNumber(message) {
+    let promptResult = parseFloat(prompt(message));
+    while (isNaN(promptResult)) {
+        promptResult = parseFloat(prompt(message, "Must enter a number"));
+    }
+    return promptResult;
+}
+
+function promptNode(message) {
+    let nodes = getNodes();
+    if (nodes.length == 0) {
+        throw new Error("Cannot prompt for a node when no valid nodes exist.");
+    }
+    return promptFrom(message, nodes, "Must enter a valid Node ID. The valid nodes are " + nodes);
 }
 
 function wait() {
