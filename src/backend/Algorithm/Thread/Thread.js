@@ -37,7 +37,9 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
             postMessage({type: "complete"});
         } catch (error) {
             let matches = error.stack.match(/eval:([0-9]+):[0-9]+\n/);
-            error.lineNumber = parseInt(matches[1]);
+            if (matches != null) {
+                error.lineNumber = parseInt(matches[1]);
+            }
             // if there's an error, send a message with the error
             postMessage({type: "error", content: error});
             throw error
@@ -57,6 +59,15 @@ function mark(node) {
     // mark the node (getting an updated copy of the graph), then wait for a resume command
     let rule = predicates.update((graph) => {
         graph.mark(node);
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function color(edge, color) {
+    // color the edge (getting an updated copy of the graph), then wait for a resume command
+    let rule = predicates.update((graph) => {
+        graph.color(edge, color);
     });
     postMessage({type: "rule", content: rule});
     wait();
@@ -89,7 +100,7 @@ function promptFrom(message, list, error) {
     if (list.length === 0) {
         throw new Error("Cannot prompt when no valid options exist.");
     }
-    if (error === null) {
+    if (error == null) {
         error = "Must enter a value from " + list;
     }
     let promptResult = prompt(message);
@@ -100,7 +111,7 @@ function promptFrom(message, list, error) {
 }
 
 function promptBoolean(message) {
-    return Boolean(promptFrom(message, ["true", "false"], "Must enter a boolean value (true/false)"));
+    return promptFrom(message, ["true", "false"], "Must enter a boolean value (true/false)") == "true";
 }
 
 function promptInteger(message) {
@@ -130,7 +141,7 @@ function promptNode(message) {
 function promptEdge(message) {
     let edges = getEdges();
     if (edges.length === 0) {
-        throw new Error("Cannot prompt for an edge when no valid nodes exist.");
+        throw new Error("Cannot prompt for an edge when no valid edges exist.");
     }
     return promptFrom(message, edges, "Must enter a valid Edge ID. The valid edges are " + edges);
 }

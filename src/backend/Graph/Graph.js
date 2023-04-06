@@ -37,6 +37,10 @@ export default class Graph {
         this.nodes[node].marked = true;
     }
 
+    color(edge, color) {
+        this.edges[edge].color = color;
+    }
+
     display(message) {
         this.message = message;
     }
