@@ -1,0 +1,60 @@
+for (let node of getNodes()) {
+    hideNode(node);
+}
+display("Hid every node");
+
+for (let node of getNodes()) {
+    showNode(node);
+}
+display("Shown every node");
+
+for (let edge of getEdges()) {
+    hideEdge(edge);
+}
+
+display("Hid every edge");
+
+for (let edge of getEdges()) {
+    showEdge(edge);
+}
+
+display("Shown every edge");
+
+for (let node of getNodes()) {
+    hideNodeWeight(node);
+}
+
+display("Hid every node weight");
+
+for (let node of getNodes()) {
+    hideNodeLabel(node);
+}
+
+display("Hid every node label");
+
+
+for (let node of getNodes()) {
+    showNodeWeight(node);
+}
+
+display("Shown every node weight");
+
+for (let node of getNodes()) {
+    showNodeLabel(node);
+}
+
+display("Show every node label");
+
+
+for (let edge of getEdges()) {
+    hideEdgeLabel(edge);
+}
+
+display("Hid every edge Label");
+
+for (let edge of getEdges()) {
+    showEdgeLabel(edge);
+}
+
+display("Shown every edge Label");
+

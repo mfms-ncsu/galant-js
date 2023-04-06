@@ -111,13 +111,13 @@ function GraphViewer(props) {
 						valign: "top",
 						valignBox: "top",
 						tpl: (data) => {
-							if (data.weight) {
+							if (!data.invisible && !data.invisibleWeight && data.weight) {
 								return renderToString(
 									<div>
-										<p className="GraphViewerLabel">{data.weight}<br></br>{data.label}</p>
+										<p className="GraphViewerLabel">{data.weight}<br></br>{!data.invisibleLabel ? data.label : ""}</p>
 									</div>
 								);
-							} else if (data.label) {
+							} else if (!data.invisible && !data.invisibleLabel && data.label) {
 								return renderToString(
 									<div>
 										<p className="GraphViewerLabel">{data.label}</p>
@@ -146,6 +146,7 @@ const stylesheet = [
 			borderColor: 'black',
 			label: 'data(id)',
 			textValign: 'center',
+			visibility: 'visible',
 		}
 	},
 	// Marked nodes
@@ -172,6 +173,20 @@ const stylesheet = [
 		selector: 'node[?highlighted]',
 		style: {
 			borderWidth: '10px',
+		}
+	},
+	// Invisible nodes
+	{
+		selector: 'node[?invisible]',
+		style: {
+			visibility: 'hidden',
+		}
+	},
+	// Invisible edges
+	{
+		selector: 'edge[?invisible]',
+		style: {
+			visibility: 'hidden',
 		}
 	},
 	// Highlighted edges
@@ -218,6 +233,13 @@ const stylesheet = [
 			textBorderStyle: 'solid',
 			textBorderWidth: '1.5px',
 			textBorderColor: 'black',
+		}
+	},
+	// Invisible edge label
+	{
+		selector: 'edge[?invisibleLabel]',
+		style: {
+			label: '',
 		}
 	},
 	// Directed edges

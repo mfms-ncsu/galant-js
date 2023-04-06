@@ -44,4 +44,55 @@ export default class Graph {
     display(message) {
         this.message = message;
     }
+
+    hideNode(node) {
+        this.nodes[node].invisible = true;
+        for (let e in this.edges) {
+            if (this.edges[e].source === JSON.parse(JSON.stringify(node)) || this.edges[e].target == JSON.parse(JSON.stringify(node))) {
+                this.edges[e].invisible = true;   
+            }      
+        }
+    }
+
+    showNode(node) {
+        this.nodes[node].invisible = false;
+        for (let e in this.edges) {
+            if (this.edges[e].source === JSON.parse(JSON.stringify(node)) || this.edges[e].target == JSON.parse(JSON.stringify(node))) {
+                this.edges[e].invisible = false;   
+            }      
+        }
+    }
+
+    hideNodeWeight(node) {
+        this.nodes[node].invisibleWeight = true;
+    }
+
+    showNodeWeight(node) {
+        this.nodes[node].invisibleWeight = false;
+    }
+
+    hideNodeLabel(node) {
+        this.nodes[node].invisibleLabel = true;
+    }
+
+    showNodeLabel(node) {
+        this.nodes[node].invisibleLabel = false;
+    }
+
+    hideEdgeLabel(edge) {
+        this.edges[edge].invisibleLabel = true;
+    }
+
+    showEdgeLabel(edge) {
+        this.edges[edge].invisibleLabel = false;
+    }
+
+    hideEdge(edge) {
+        this.edges[edge].invisible = true;
+    }
+
+
+    showEdge(edge) {
+        this.edges[edge].invisible = false;
+    }
 }

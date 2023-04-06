@@ -146,7 +146,94 @@ function promptEdge(message) {
     return promptFrom(message, edges, "Must enter a valid Edge ID. The valid edges are " + edges);
 }
 
+function hideNode(node) {
+    // hide the node (getting an updated copy of the graph), then wait for a resume command
+    let rule = predicates.update((graph) => {
+        graph.hideNode(node);
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function showNode(node) {
+    // hide the node (getting an updated copy of the graph), then wait for a resume command
+    let rule = predicates.update((graph) => {
+        graph.showNode(node);
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function hideEdge(edge) {
+    // hide the node (getting an updated copy of the graph), then wait for a resume command
+    let rule = predicates.update((graph) => {
+        graph.hideEdge(edge);
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function showEdge(edge) {
+    // hide the node (getting an updated copy of the graph), then wait for a resume command
+    let rule = predicates.update((graph) => {
+        graph.showEdge(edge);
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function hideNodeWeight(node) {
+    let rule = predicates.update((graph) => {
+        graph.hideNodeWeight(node);
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function showNodeWeight(node) {
+    let rule = predicates.update((graph) => {
+        graph.showNodeWeight(node);
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function hideNodeLabel(node) {
+    let rule = predicates.update((graph) => {
+        graph.hideNodeLabel(node);
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function showNodeLabel(node) {
+    let rule = predicates.update((graph) => {
+        graph.showNodeLabel(node);
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function hideEdgeLabel(edge) {
+    let rule = predicates.update((graph) => {
+        graph.hideEdgeLabel(edge);
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function showEdgeLabel(edge) {
+    let rule = predicates.update((graph) => {
+        graph.showEdgeLabel(edge);
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+
 function wait() {
     Atomics.store(sharedArray, 0, 0);
     Atomics.wait(sharedArray, 0, 0);
 }
+
+
