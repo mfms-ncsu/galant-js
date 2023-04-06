@@ -111,7 +111,7 @@ function promptFrom(message, list, error) {
 }
 
 function promptBoolean(message) {
-    return promptFrom(message, ["true", "false"], "Must enter a boolean value (true/false)") == "true";
+    return promptFrom(message, ["true", "false"], "Must enter a boolean value (true/false)") === "true";
 }
 
 function promptInteger(message) {

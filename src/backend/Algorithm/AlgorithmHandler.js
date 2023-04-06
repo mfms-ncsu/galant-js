@@ -57,7 +57,7 @@ export default class AlgorithmHandler {
                 this.setAlgError(message.content, this.algorithm)
                 this.threadHandler.killThread()
             }
-        } else if (message.type == "prompt") {
+        } else if (message.type === "prompt") {
             if (this.setAlgPrompt != null) {
                 this.setAlgPrompt(message.content[0], message.content[1])
             }
