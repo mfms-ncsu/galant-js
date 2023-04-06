@@ -10,6 +10,21 @@ export default class Graph {
         this.message = message;
     }
 
+    createEdgeId(source, target) {
+        if (!(source in this.nodes)) {
+            throw Error(`Source does not match a node ID: ${source}`)
+        }
+        if (!(target in this.nodes)) {
+            throw Error(`Target does not match a node ID: ${target}`)
+        }
+        let edge_id = `${source} ${target}`;
+        let duplicate_num = 2;
+        while (edge_id in this.edges) {
+            edge_id = `${source} ${target} ${duplicate_num++}`;
+        }
+        return edge_id;
+    }
+
     getNodes() {
         return Object.keys(this.nodes);
     }
@@ -26,53 +41,24 @@ export default class Graph {
         return Object.keys(this.edges).length;
     }
 
-    outgoing(node) {
-        let edges = [];
-        if (this.directed) {
-            for (const edge of this.getEdges()) {
-                if (this.edges[edge].source === node) {
-                    edges.push(edge);
-                }
-            }
-        } else {
-            return this.adjacent(node);
-        }
-        
-        
-    }
-
-    incoming(node) {
-        let edges = [];
-        for (const edge of this.edges) {
-            if (edge.target === node) {
-                edges.push(edge);
-            }
-        }
-        return edges;
-    }
-
-    adjacent(node) {
-        let edges = [];
-        for (const edge of this.edges) {
-            if (edge.source === node || edge.target === node) {
-                edges.push(edge);
-            }
-        }
-        return edges;
-    }
-
     adjacentNodes(node) {
         let nodes = [];
         for (const edge of this.getEdges()) {
+            let temp;
+
             if (this.edges[edge].source === node && this.edges[edge].target === node) {
                 //possibly do nothing
-                nodes.push(edge.source);
+                temp = this.edges[edge].source;
             }
             else if (this.edges[edge].source === node) {
-                nodes.push(edge.target);
+                temp = this.edges[edge].target;
             }
             else if (this.edges[edge].target === node) {
-                nodes.push(edge.source);
+                temp = this.edges[edge].source;
+            }
+
+            if (temp && !nodes.includes(temp)) {
+                nodes.push(temp);
             }
         }
         return nodes;
@@ -84,7 +70,7 @@ export default class Graph {
             for (const edge of this.getEdges()) {
                 if (this.edges[edge].target === node) {
                     //possibly do nothing
-                    nodes.push(edge.source);
+                    nodes.push(this.edges[edge].source);
                 }
             }
             return nodes;
@@ -101,7 +87,7 @@ export default class Graph {
             for (const edge of this.getEdges()) {
                 if (this.edges[edge].source === node) {
                     //possibly do nothing
-                    nodes.push(edge.target);
+                    nodes.push(this.edges[edge].target);
                 }
             }
             return nodes;
@@ -167,7 +153,7 @@ export default class Graph {
     }
 
     clearNodeMarks() {
-        for (const node of this.nodes) {
+        for (const node of this.getNodes()) {
             this.unmark(node);
         }
     }
@@ -184,6 +170,10 @@ export default class Graph {
             throw new Error("This edge does not exist " + edge);
         }
         return this.edges[edge];
+    }
+
+    color(edge, color) {
+        this.edges[edge].color = color;
     }
 
     display(message) {

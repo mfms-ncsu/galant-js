@@ -9,16 +9,16 @@ export default class AlgorithmHandler {
     #timeoutPeriod = 5000;
 
     /**
-     * 
      * @param {function} setAlgError function from the parent to set the error box
      */
-    constructor(graph, algorithm, updateGraph, onMessage, onStatusChanged, setAlgError, testFlag = null) {
+    constructor(graph, algorithm, updateGraph, onMessage, onStatusChanged, setAlgError, setAlgPrompt, testFlag = null) {
         this.graph = graph;
         this.algorithm = algorithm;
         this.updateGraph = updateGraph;
         this.onMessage = onMessage;
         this.onStatusChanged = onStatusChanged;
         this.setAlgError = setAlgError
+        this.setAlgPrompt = setAlgPrompt
         
         var threadHandlerImport = "./Thread/ThreadHandler"
         if (testFlag) {
@@ -42,7 +42,7 @@ export default class AlgorithmHandler {
     #onMessage(message) {
         // TODO ONCE WE CHANGE TO JUST STOPPING ON STEPS, GET RID OF THE RULE IN THIS LIST
         // if we get a step or an error, stop the timeout.
-        if (["rule", "step", "error", "complete"].includes(message.type.toString())) {
+        if (["rule", "step", "error", "complete", "prompt"].includes(message.type.toString())) {
             clearTimeout(this.#timeoutID)
         }
         if (message.type === "rule") {
@@ -56,6 +56,10 @@ export default class AlgorithmHandler {
             if (this.setAlgError != null) {
                 this.setAlgError(message.content, this.algorithm)
                 this.threadHandler.killThread()
+            }
+        } else if (message.type === "prompt") {
+            if (this.setAlgPrompt != null) {
+                this.setAlgPrompt(message.content[0], message.content[1])
             }
         } else if (message.type === "complete") {
             this.threadHandler.killThread()
@@ -83,18 +87,22 @@ export default class AlgorithmHandler {
         this.#initAlgorithm();
     }
 
+    setupTimeout() {
+        this.#timeoutID = setTimeout(() => {
+            this.threadHandler.killThread();
+            if (this.onMessage != null) { // console message
+                this.onMessage("Timeout has occurred.");
+            }
+            var errorToSend = new Error("Timeout has occurred.");
+            errorToSend.lineNumber = -1;
+            this.setAlgError(errorToSend, this.algorithm);
+        }, this.#timeoutPeriod);
+    }
+
     stepForward() {
         let needToTimeout = this.stepHandler.stepForward();
         if (needToTimeout) {
-            this.#timeoutID = setTimeout(() => {
-                this.threadHandler.killThread();
-                if (this.onMessage != null) { // console message
-                    this.onMessage("Timeout has occurred.");
-                }
-                var errorToSend = new Error("Timeout has occurred.");
-                errorToSend.lineNumber = -1;
-                this.setAlgError(errorToSend, this.algorithm);
-            }, this.#timeoutPeriod);
+            this.setupTimeout();
         }
         this.#broadcastStatus();
     }
@@ -104,5 +112,8 @@ export default class AlgorithmHandler {
         this.#broadcastStatus();
     }
 
-
+    enterPromptResult(promptResult) {
+        this.threadHandler.enterPromptResult(promptResult);
+        this.setupTimeout();
+    }
 }
