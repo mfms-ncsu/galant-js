@@ -138,7 +138,11 @@ function marked(node) {
 }
 
 function clearNodeMarks() {
-    
+    let rule = predicates.update((graph) => {
+        graph.clearNodeMarks();
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
 }
 
 function print(message) {

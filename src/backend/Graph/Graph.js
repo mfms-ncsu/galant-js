@@ -28,12 +28,17 @@ export default class Graph {
 
     outgoing(node) {
         let edges = [];
-        for (const edge of this.edges) {
-            if (edge.source === node) {
-                edges.push(edge);
+        if (this.directed) {
+            for (const edge of this.getEdges()) {
+                if (this.edges[edge].source === node) {
+                    edges.push(edge);
+                }
             }
+        } else {
+            return this.adjacent(node);
         }
-        return edges;
+        
+        
     }
 
     incoming(node) {
@@ -58,15 +63,15 @@ export default class Graph {
 
     adjacentNodes(node) {
         let nodes = [];
-        for (const edge of this.edges) {
-            if (edge.source === node && edge.target === node) {
+        for (const edge of this.getEdges()) {
+            if (this.edges[edge].source === node && this.edges[edge].target === node) {
                 //possibly do nothing
                 nodes.push(edge.source);
             }
-            else if (edge.source === node) {
+            else if (this.edges[edge].source === node) {
                 nodes.push(edge.target);
             }
-            else if (edge.target === node) {
+            else if (this.edges[edge].target === node) {
                 nodes.push(edge.source);
             }
         }
@@ -75,49 +80,70 @@ export default class Graph {
 
     incomingNodes(node) {
         let nodes = [];
-        for (const edge of this.edges) {
-            if (edge.source === node && edge.target === node) {
-                //possibly do nothing
-                nodes.push(edge.source);
+        if (this.directed) {
+            for (const edge of this.getEdges()) {
+                if (this.edges[edge].target === node) {
+                    //possibly do nothing
+                    nodes.push(edge.source);
+                }
             }
-            else if (edge.target === node) {
-                nodes.push(edge.source);
-            }
+            return nodes;
         }
-        return nodes;
+        else {
+            return this.adjacentNodes(node);
+        }
+        
     }
 
     outgoingNodes(node) {
         let nodes = [];
-        for (const edge of this.edges) {
-            if (edge.source === node && edge.target === node) {
-                //possibly do nothing
-                nodes.push(edge.source);
+        if (this.directed) {
+            for (const edge of this.getEdges()) {
+                if (this.edges[edge].source === node) {
+                    //possibly do nothing
+                    nodes.push(edge.target);
+                }
             }
-            else if (edge.source === node) {
-                nodes.push(edge.target);
-            }
+            return nodes;
         }
-        return nodes;
+        else {
+            return this.adjacentNodes(node);
+        }
+        
     }
 
     source(edge) {
-        return this.edges[edge].source;
+        return this.getEdgeObject(edge).source
     }
 
     target(edge) {
-        return this.edges[edge].target;
+        return this.getEdgeObject(edge).target;
     }
 
     getEdgeBetween(source, target) {
-        for (const edge of this.edges) {
-            if (edge.source === source && edge.target === target) {
+        for (const edge of this.getEdges()) {
+            if (this.edges[edge].source === source && this.edges[edge].target === target) {
                 //possibly do nothing
                 return edge
             }
         }
         //This may need to be changed to throw an error later one.
         return null;
+    }
+
+    other(node, edge) {
+        this.getNodeObject(node);
+        let edgeObJ = this.getEdgeObject(edge);
+
+        if (edgeObJ.source === node) {
+            return edgeObJ.target;
+        }
+        else if (edgeObJ.target === node) {
+            return edgeObJ.source;
+        }
+        else {
+            throw new Error("The node " + node + "was not connected to edge " + edge);
+        }
     }
 
     colorNode(color, node) {
@@ -129,26 +155,35 @@ export default class Graph {
     }
 
     mark(node) {
-        this.nodes[node].marked = true;
+        this.getNodeObject(node).marked = true;
     }
 
     unmark(node) {
-        this.nodes[node].marked = false;
+        this.getNodeObject(node).marked = false;
     }
 
     marked(node) {
-        return this.nodes[node].marked;
+        return this.getNodeObject(node).marked;
     }
 
     clearNodeMarks() {
         for (const node of this.nodes) {
-            //This might have to be done in Thread since rules need
-            //to be generated and I am not sure if all of them would be
-            //made in this context
-            if (node.marked) {
-                node.marked = false;
-            }
+            this.unmark(node);
         }
+    }
+
+    getNodeObject(node) {
+        if (!(node in this.nodes)) {
+            throw new Error("This node does not exist " + node);
+        }
+        return this.nodes[node];
+    }
+
+    getEdgeObject(edge) {
+        if (!(edge in this.edges)) {
+            throw new Error("This edge does not exist " + edge);
+        }
+        return this.edges[edge];
     }
 
     display(message) {
