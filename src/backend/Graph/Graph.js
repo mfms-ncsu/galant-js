@@ -48,7 +48,7 @@ export default class Graph {
     hideNode(node) {
         this.nodes[node].invisible = true;
         for (let e in this.edges) {
-            if (this.edges[e].source === JSON.parse(JSON.stringify(node)) || this.edges[e].target == JSON.parse(JSON.stringify(node))) {
+            if (this.edges[e].source === JSON.parse(JSON.stringify(node)) || this.edges[e].target === JSON.parse(JSON.stringify(node))) {
                 this.edges[e].invisible = true;   
             }      
         }
@@ -57,7 +57,7 @@ export default class Graph {
     showNode(node) {
         this.nodes[node].invisible = false;
         for (let e in this.edges) {
-            if (this.edges[e].source === JSON.parse(JSON.stringify(node)) || this.edges[e].target == JSON.parse(JSON.stringify(node))) {
+            if (this.edges[e].source === JSON.parse(JSON.stringify(node)) || this.edges[e].target === JSON.parse(JSON.stringify(node))) {
                 this.edges[e].invisible = false;   
             }      
         }
