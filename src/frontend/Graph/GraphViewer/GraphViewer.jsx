@@ -92,6 +92,7 @@ function GraphViewer(props) {
 			}}>{"Auto-Camera"}</button>
 		</div>	<div className='EdgeToggler'>
 			<button onClick={() => {
+				console.log(graph)
 				let newGraph = new Graph(startGraph.nodes, startGraph.edges, !startGraph.directed, startGraph.message);
 				loadGraph(newGraph)
 			}}>{graph.directed ? "Make Undirected" : "Make Directed"} </button>

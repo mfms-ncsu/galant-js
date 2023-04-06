@@ -103,7 +103,7 @@ function nodeParser(node_string, node_map) {
         }
     }
     //one last error check: values needs weight, x and y and the minimum
-    if (values.length < 3) {
+    if (values.length < 6) {
         throw Error(`Incorrect node format, ID: '${node_id}'`)
     }
     //set the node map of the id equal to dictionary
@@ -148,7 +148,7 @@ function edgeParser(edge_string, edge_map, createEdgeId) {
         //source value
         if (values.length === 3) {
             values.push(all_values[i])
-            edge_id = `${values[1]} ?`;
+            edge_id = `${values[3]} ?`;
         }
         //target value
         else if (values.length === 4) {
