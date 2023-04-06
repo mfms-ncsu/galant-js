@@ -1,0 +1,9 @@
+n A 0 0
+n B 0 1
+n C 1 0
+
+directed
+e A B
+e B A
+e B C
+e C A

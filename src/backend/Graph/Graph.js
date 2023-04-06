@@ -37,6 +37,16 @@ export default class Graph {
         this.nodes[node].marked = true;
     }
 
+    unmark(node) {
+        this.nodes[node].marked = false;
+    }
+    
+    clearNodeMarks() {
+        for (let node of this.getNodes()) {
+            this.unmark(node);
+        }
+    }
+
     color(edge, color) {
         this.edges[edge].color = color;
     }
