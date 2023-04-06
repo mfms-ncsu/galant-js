@@ -231,6 +231,22 @@ function showEdgeLabel(edge) {
 }
 
 
+function hideEdgeWeight(edge) {
+    let rule = predicates.update((graph) => {
+        graph.hideEdgeWeight(edge);
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function showEdgeWeight(edge) {
+    let rule = predicates.update((graph) => {
+        graph.showEdgeWeight(edge);
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
 function wait() {
     Atomics.store(sharedArray, 0, 0);
     Atomics.wait(sharedArray, 0, 0);

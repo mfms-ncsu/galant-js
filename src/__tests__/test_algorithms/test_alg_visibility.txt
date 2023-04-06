@@ -50,11 +50,22 @@ for (let edge of getEdges()) {
     hideEdgeLabel(edge);
 }
 
-display("Hid every edge Label");
+display("Hide every edge label");
 
 for (let edge of getEdges()) {
     showEdgeLabel(edge);
 }
 
-display("Shown every edge Label");
+display("Show every edge label");
 
+for (let edge of getEdges()) {
+    hideEdgeWeight(edge);
+}
+
+display("Hid every edge weight");
+
+for (let edge of getEdges()) {
+    showEdgeWeight(edge);
+}
+
+display("Shown every edge weight");

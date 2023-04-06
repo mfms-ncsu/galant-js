@@ -79,20 +79,28 @@ export default class Graph {
         this.nodes[node].invisibleLabel = false;
     }
 
+
+    hideEdge(edge) {
+        this.edges[edge].invisible = true;
+    }
+
+    showEdge(edge) {
+        this.edges[edge].invisible = false;
+    }
+
+    hideEdgeWeight(edge) {
+        this.edges[edge].invisibleWeight = true;
+    }
+
+    showEdgeWeight(edge) {
+        this.edges[edge].invisibleWeight = false;
+    }
+
     hideEdgeLabel(edge) {
         this.edges[edge].invisibleLabel = true;
     }
 
     showEdgeLabel(edge) {
         this.edges[edge].invisibleLabel = false;
-    }
-
-    hideEdge(edge) {
-        this.edges[edge].invisible = true;
-    }
-
-
-    showEdge(edge) {
-        this.edges[edge].invisible = false;
     }
 }

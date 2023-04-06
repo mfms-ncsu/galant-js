@@ -236,13 +236,6 @@ const stylesheet = [
 			textBorderColor: 'black',
 		}
 	},
-	// Invisible edge label
-	{
-		selector: 'edge[?invisibleLabel]',
-		style: {
-			label: '',
-		}
-	},
 	// Directed edges
 	{
 		selector: 'edge.directed',

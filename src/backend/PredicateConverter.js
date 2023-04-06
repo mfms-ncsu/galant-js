@@ -36,21 +36,21 @@ function convertEdges(elements, edges, isDirected) {
         for (let key in edge) {
             //If the predicate for an edge has a weightm it gets added later to a label to be displayed. Ignore it for now.
             //Transfer all other key value pairs to the edge
-            if (key !== 'weight' && key !== 'label') {
+           if (key !== 'weight' && key !== 'label') {
                 element.data[key] = edge[key];
             }
         }
 
         //Addes the weight and labeled combined in the labeled field
         //If there is only one or the other then that is only added
-        if (edge.weight && edge.label) {
+        if (!edge.invisibleWeight && edge.weight && !edge.invisibleLabel && edge.label) {
             element.data.label = edge.weight + '\n' + edge.label;
         }
-        else if (edge.weight) {
-            element.data.label = String(edge.weight);
-        }
-        else if (edge.label) {
+        else if (!edge.invisibleLabel && edge.label) {
             element.data.label = edge.label;
+        }
+        else if (!edge.invisibleWeight && edge.weight) {
+            element.data.label = String(edge.weight);
         }
         //Add the edge to the list of elements
         elements.push(element);
