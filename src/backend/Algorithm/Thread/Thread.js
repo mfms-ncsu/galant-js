@@ -44,8 +44,76 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
     }
 }
 
+/*******************************
+ * API Methods for user to use *
+ * *****************************/
+
 function getNodes() {
     return predicates.get().getNodes();
+}
+
+function getEdges() {
+    return predicates.get().getEdges();
+}
+
+function numberOfNodes() {
+    return predicates.get().getNumberOfNodes();
+}
+
+function numberOfEdges() {
+    return predicates.get().getNumberOfEdges();
+}
+
+function colorNode(color, node) {
+    let rule = predicates.update((graph) => {
+        graph.colorNode(color, node);
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function colorEdge(color, edge) {
+    let rule = predicates.update((graph) => {
+        graph.colorEdge(color, edge);
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function outgoing(node) {
+    return predicates.get().outgoing(node);
+}
+
+function incoming(node) {
+    return predicates.get().incoming(node);
+}
+
+function adjacent(node) {
+    return predicates.get().adjacent(node);
+}
+
+function outgoingNodes(node) {
+    return predicates.get().outgoingNodes(node);
+}
+
+function incomingNodes(node) {
+    return predicates.get().incomingNodes(node);
+}
+
+function adjacentNodes(node) {
+    return predicates.get().adjacentNodes(node);
+}
+
+function source(edge) {
+    return predicates.get().source(edge);
+}
+
+function target(edge) {
+    return predicates.get().target(edge);
+}
+
+function getEdgeBetween(source, target) {
+    return predicates.get().getEdgeBetween(source, target);
 }
 
 function mark(node) {
@@ -55,6 +123,22 @@ function mark(node) {
     });
     postMessage({type: "rule", content: rule});
     wait();
+}
+
+function unmark(node) {
+    let rule = predicates.update((graph) => {
+        graph.unmark(node);
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function marked(node) {
+    return predicates.get().marked(node);
+}
+
+function clearNodeMarks() {
+    
 }
 
 function print(message) {
@@ -69,7 +153,16 @@ function display(message) {
     wait();
 }
 
+
 function wait() {
     Atomics.store(sharedArray, 0, 0);
     Atomics.wait(sharedArray, 0, 0);
+}
+
+function disableAutoStep() {
+
+}
+
+function step() {
+
 }
