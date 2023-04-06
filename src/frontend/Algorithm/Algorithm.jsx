@@ -12,17 +12,32 @@ function Algorithm(props) {
     /** @var {string} - The current loaded algorithm */
     const [algorithm, setAlgorithm] = useState("");
 
+    const [algHandler, setAlgHandler] = useState(() => null);
+    useEffect(() => {
+        if (algHandler != null) {
+            registerOnLoad((graph) => algHandler.setGraph(graph));
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [algHandler])
+    let ref = useRef();
+    ref.current = algHandler;
 
     /** @var {string} - used for setting error box */
     var [algErrorMessage, setAlgErrorMessage] = useState("");
     var [algErrorTextValue, setAlgErrorTextValue] = useState("");
     var [algErrorTitle, setAlgErrorTitle] = useState("");
+    var [algErrorIsPrompt, setAlgErrorIsPrompt] = useState(false);
+    var [algPromptResult, setAlgPromptResult] = useState("");
     function clearErrors(e) {
         setAlgErrorMessage("");
         setAlgErrorTextValue("");
         setAlgErrorTitle("");
+        if (algErrorIsPrompt) {
+            ref.current.enterPromptResult(algPromptResult);
+        }
     }
     function setAlgError(errorObject, algFromThread) {
+        setAlgErrorIsPrompt(false);
         // if its a timeout error, we've set the line number to -1. And we don't need to do put the line here.
         if (errorObject.lineNumber === -1) {
             setAlgErrorTitle("Timeout Error. Likely an infinite loop.")
@@ -55,23 +70,28 @@ function Algorithm(props) {
             setAlgErrorTextValue(adjustedAlgText)
         }
     }
+    function setAlgPrompt(promptMessage, promptError) {
+        setAlgErrorTitle(promptMessage);
+        setAlgErrorMessage(promptError);
+        setAlgPromptResult("");
+        setAlgErrorIsPrompt(true);
+    }
 
     /* eslint-disable-next-line no-unused-vars */
     const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
 
-
-    const [algHandler, setAlgHandler] = useState(() => null);
-    useEffect(() => {
-        if (algHandler != null) {
-            registerOnLoad((graph) => algHandler.setGraph(graph));
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [algHandler])
-    let ref = useRef();
-    ref.current = algHandler;
-
     return <div className="Algorithm">
-        { algErrorMessage &&
+        { (algErrorTitle && algErrorIsPrompt) &&
+            <div className="alg-prompt-mask">
+                <div id="algPrompt" className="alg-prompt">
+                    <span className="alg-promptTitle">{algErrorTitle}</span>
+                    <span data-testid="alg-errorMessage">{algErrorMessage}</span>
+                    <input className='alg-prompt-box' onChange={(e) => setAlgPromptResult(e.target.value)}></input>
+                    <button onClick={clearErrors}>Okay</button>
+                </div>
+            </div>
+        }
+        { (algErrorMessage && !algErrorIsPrompt) && 
             <div className="alg-error-mask">
                 <div id="algError" className="alg-parse-error">
                     <span className="alg-filename">{algErrorTitle}</span>
@@ -91,7 +111,7 @@ function Algorithm(props) {
             onForward={() => ref.current.stepForward()}
             onBack={() => ref.current.stepBack()} />
         <AlgorithmConsole onSetupConsole={(addNewMessage) => {
-            setAlgHandler(new AlgorithmHandler(graph, algorithm, updateGraph, addNewMessage, setStatus, setAlgError));
+            setAlgHandler(new AlgorithmHandler(graph, algorithm, updateGraph, addNewMessage, setStatus, setAlgError, setAlgPrompt));
         }} />
     </div>;
 }

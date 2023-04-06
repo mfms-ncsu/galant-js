@@ -44,7 +44,7 @@ var errorMessages = {
     "invalid_graph_node_no_id.txt": "Incorrect node format, ID: ''",
     "invalid_graph_duplicate_key.txt": "Duplicate key-value pair: 'color:blue'",
     "invalid_graph_duplicate_node_ids.txt": "Duplicate node ID: '1'",
-    "invalid_graph_edge_no_target.txt": "Incorrect edge format",
+    "invalid_graph_edge_no_target.txt": "Incorrect edge format, ID: '1 ?'",
     "invalid_graph_invalid_key_pair_weight.txt": "Duplicate key-value pair: 'weight:30'",
     "invalid_graph_marked_number.txt": "Invalid key-value pair: 'marked:100'",
     "invalid_graph_no_value.txt": "Incorrect node format, ID: 'a'",

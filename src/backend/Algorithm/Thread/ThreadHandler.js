@@ -60,7 +60,16 @@ export default class ThreadHandler {
         if (this.worker) {
             this.worker.terminate();
         }
-    }    
+    }  
+    
+    enterPromptResult(promptResult) {
+        let len = Math.min(promptResult.length, 254)
+        Atomics.store(this.array, 1, len);
+        for (let i = 0; i < len; i++) {
+            Atomics.store(this.array, i + 2, promptResult.charCodeAt(i));
+        }
+        this.resumeThread();
+    }
 }
 
 // const worker = new Worker('./Thread.js');

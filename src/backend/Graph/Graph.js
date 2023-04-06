@@ -10,12 +10,35 @@ export default class Graph {
         this.message = message;
     }
 
+    createEdgeId(source, target) {
+        if (!(source in this.nodes)) {
+            throw Error(`Source does not match a node ID: ${source}`)
+        }
+        if (!(target in this.nodes)) {
+            throw Error(`Target does not match a node ID: ${target}`)
+        }
+        let edge_id = `${source} ${target}`;
+        let duplicate_num = 2;
+        while (edge_id in this.edges) {
+            edge_id = `${source} ${target} ${duplicate_num++}`;
+        }
+        return edge_id;
+    }
+
     getNodes() {
         return Object.keys(this.nodes);
     }
 
+    getEdges() {
+        return Object.keys(this.edges);
+    }
+
     mark(node) {
         this.nodes[node].marked = true;
+    }
+
+    color(edge, color) {
+        this.edges[edge].color = color;
     }
 
     display(message) {

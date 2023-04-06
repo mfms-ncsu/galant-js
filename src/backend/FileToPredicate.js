@@ -12,12 +12,7 @@ import Graph from "backend/Graph/Graph"
  * @author Andrew Watson
  */
 export function parseText(graphText) {
-    //ids and dictionaries to store nodes and edges
-    var node_map = {}
-    var edge_map = {}
-    var edge_id = 0
-
-    let directed = false;
+    let graph = new Graph({}, {}, false, "");
 
     var lines = graphText.split('\n')
     for (var line = 0; line < lines.length; line++) {
@@ -28,15 +23,14 @@ export function parseText(graphText) {
         }
         //this is a node
         else if (current_line[0] === 'n') {
-            nodeParser(current_line, node_map)
+            nodeParser(current_line, graph.nodes)
         }
         //this is an edge
         else if (current_line[0] === 'e') {
-            edge_id += 1
-            edgeParser(current_line, edge_map, edge_id)
+            edgeParser(current_line, graph.edges, (s, t) => graph.createEdgeId(s, t));
         }
         else if (current_line === 'directed') {
-            directed = true;
+            graph.directed = true;
         }
         //if it starts with something else then they screwed up so break.
         else {
@@ -44,28 +38,7 @@ export function parseText(graphText) {
         }
     }
 
-    //ensure that all entered source and targets for edges are valid node ids
-    checkEdgeAnchors(node_map, edge_map)
-
-    // if we get to here, then there are no errors. So combine everything into one object and return it
-    return new Graph(node_map, edge_map, directed, "");
-}
-
-/**
- * This function checks that all created edges only reference node ids that exist in the given node_map
- * @author ysherma
- * @param {map} nodes - The map of nodes whose keys are their IDs and values are their attributes
- * @param {map} edges - The map of edges whose keys are their IDs and values are their attributes
- */
-function checkEdgeAnchors(nodes, edges) {
-    for (var key in edges) {
-        if (!(edges[key].source in nodes)) {
-            throw Error(`Source does not match a node ID: ${edges[key].source}`)
-        }
-        if (!(edges[key].target in nodes)) {
-            throw Error(`Target does not match a node ID: ${edges[key].target}`)
-        }
-    }
+    return graph;
 }
 
 /**
@@ -160,7 +133,7 @@ function nodeParser(node_string, node_map) {
  * @param {dictionary} edge_map - the map of all the current undirected edges
  * @param {int} edge_id - the current id of the undirected edge
  */
-function edgeParser(edge_string, edge_map, edge_id) {
+function edgeParser(edge_string, edge_map, createEdgeId) {
     //trim the end whitespace
     var trimmed = edge_string.trimEnd()
     //split values to an array in the string by removing whitespace in middle
@@ -169,15 +142,18 @@ function edgeParser(edge_string, edge_map, edge_id) {
     var keys = ['weight', 'source', 'target']
     var boolean_keys = ['highlighted']
     var values = [null]
+    let edge_id = "? ?";
 
     for (var i = 0; i < all_values.length; i++) {
         //source value
         if (values.length === 1) {
             values.push(all_values[i])
+            edge_id = `${values[1]} ?`;
         }
         //target value
         else if (values.length === 2) {
             values.push(all_values[i])
+            edge_id = createEdgeId(values[1], values[2]);
         }
         //the weight field was entered
         else if (values.length === 3 && isNumeric(all_values[i])) {
@@ -203,12 +179,12 @@ function edgeParser(edge_string, edge_map, edge_id) {
         }
         //the key value pairs were not created correctly or the source, target fields were not set
         else {
-            throw Error("Incorrect edge format")
+            throw Error(`Incorrect edge format, ID: '${edge_id}'`);
         }
     }
      //one last error check: values needs weight, source and target and the minimum
     if (values.length < 3) {
-        throw Error("Incorrect edge format")
+        throw Error(`Incorrect edge format, ID: '${edge_id}'`);
     }
 
     //ensure all boolean keys have an assigned boolean value
