@@ -55,9 +55,9 @@ function nodeParser(node_string, node_map) {
     //split values to an array in the string by removing whitespace in middle
     var all_values = trimmed.substring(2).split(" ")
     //keys and values of all values of the node
-    var keys = ['invisibleLabel', 'invisibleWeight', 'invisible', 'weight', 'x', 'y']
-    var boolean_keys = ['highlighted', 'marked']
-    var values = [false, false, false, null]
+    var keys = ['weight', 'x', 'y']
+    var boolean_keys = ['invisibleLabel', 'invisibleWeight', 'invisible', 'highlighted', 'marked']
+    var values = [null]
 
     for (var i = 0; i < all_values.length; i++) {
         //id value
@@ -68,19 +68,19 @@ function nodeParser(node_string, node_map) {
             }
         }
         //x value
-        else if (values.length === 4 && isNumeric(all_values[i])) {
+        else if (values.length === 1 && isNumeric(all_values[i])) {
             values.push(parseFloat(all_values[i]))
         }
         //y value
-        else if (values.length === 5 && isNumeric(all_values[i])) {
+        else if (values.length === 2 && isNumeric(all_values[i])) {
             values.push(parseFloat(all_values[i]))
         }
         //the weight field was entered
-        else if (values.length === 6 && isNumeric(all_values[i])) {
-            values[3] = parseFloat(all_values[i])
+        else if (values.length === 3 && isNumeric(all_values[i])) {
+            values[0] = parseFloat(all_values[i])
         }
         //the weight field was not entered
-        else if (values.length >= 6 && all_values[i].includes(":")) {
+        else if (values.length >= 3 && all_values[i].includes(":")) {
             var key_val = all_values[i].split(":")
             if (keys.includes(key_val[0])) {
                 // If the user tries to use a key that is one of the default keys, throw error
@@ -103,7 +103,7 @@ function nodeParser(node_string, node_map) {
         }
     }
     //one last error check: values needs weight, x and y and the minimum
-    if (values.length < 6) {
+    if (values.length < 3) {
         throw Error(`Incorrect node format, ID: '${node_id}'`)
     }
     //set the node map of the id equal to dictionary
@@ -139,28 +139,28 @@ function edgeParser(edge_string, edge_map, createEdgeId) {
     //split values to an array in the string by removing whitespace in middle
     var all_values = trimmed.substring(2).split(" ")
     //keys and values of all values of the edge
-    var keys = ['invisibleLabel','invisible', 'weight', 'source', 'target']
-    var boolean_keys = ['highlighted']
-    var values = [false, false, null]
+    var keys = ['weight', 'source', 'target']
+    var boolean_keys = ['invisibleLabel','invisible', 'highlighted']
+    var values = [null]
     let edge_id = "? ?";
 
     for (var i = 0; i < all_values.length; i++) {
         //source value
-        if (values.length === 3) {
+        if (values.length === 1) {
             values.push(all_values[i])
-            edge_id = `${values[3]} ?`;
+            edge_id = `${values[1]} ?`;
         }
         //target value
-        else if (values.length === 4) {
+        else if (values.length === 2) {
             values.push(all_values[i])
-            edge_id = createEdgeId(values[3], values[4]);
+            edge_id = createEdgeId(values[1], values[2]);
         }
         //the weight field was entered
-        else if (values.length === 5 && isNumeric(all_values[i])) {
-            values[2] = parseFloat(all_values[i])
+        else if (values.length === 3 && isNumeric(all_values[i])) {
+            values[0] = parseFloat(all_values[i])
         }
         //the weight field was not entered
-        else if (values.length >= 5 && all_values[i].includes(":")) {
+        else if (values.length >= 3 && all_values[i].includes(":")) {
             var key_val = all_values[i].split(":")
             if (keys.includes(key_val[0])) {
                 // If the user tries to use a key that is one of the default keys, throw error
@@ -183,7 +183,7 @@ function edgeParser(edge_string, edge_map, createEdgeId) {
         }
     }
      //one last error check: values needs weight, source and target and the minimum
-    if (values.length < 5) {
+    if (values.length < 3) {
         throw Error(`Incorrect edge format, ID: '${edge_id}'`);
     }
 
