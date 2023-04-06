@@ -49,6 +49,10 @@ function getNodes() {
     return predicates.get().getNodes();
 }
 
+function getEdges() {
+    return predicates.get().getEdges();
+}
+
 function mark(node) {
     // mark the node (getting an updated copy of the graph), then wait for a resume command
     let rule = predicates.update((graph) => {
@@ -82,10 +86,10 @@ function prompt(message, error="") {
 }
 
 function promptFrom(message, list, error) {
-    if (list.length == 0) {
+    if (list.length === 0) {
         throw new Error("Cannot prompt when no valid options exist.");
     }
-    if (error == null) {
+    if (error === null) {
         error = "Must enter a value from " + list;
     }
     let promptResult = prompt(message);
@@ -117,10 +121,18 @@ function promptNumber(message) {
 
 function promptNode(message) {
     let nodes = getNodes();
-    if (nodes.length == 0) {
+    if (nodes.length === 0) {
         throw new Error("Cannot prompt for a node when no valid nodes exist.");
     }
     return promptFrom(message, nodes, "Must enter a valid Node ID. The valid nodes are " + nodes);
+}
+
+function promptEdge(message) {
+    let edges = getEdges();
+    if (edges.length === 0) {
+        throw new Error("Cannot prompt for an edge when no valid nodes exist.");
+    }
+    return promptFrom(message, edges, "Must enter a valid Edge ID. The valid edges are " + edges);
 }
 
 function wait() {
