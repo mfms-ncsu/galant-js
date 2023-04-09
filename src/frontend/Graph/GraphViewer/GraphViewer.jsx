@@ -41,6 +41,11 @@ function GraphViewer(props) {
     let ref = useRef();
     ref.current = cytoscape;
 	
+	let [nodeLabels, setNodeLabels] = useState(false);
+	let [nodeWeights, setNodeWeights] = useState(false);
+	let [edgeLabels, setEdgeLabels] = useState(false);
+	let [edgeWeights, setEdgeWeights] = useState(false);
+
     /* eslint-disable-next-line no-unused-vars */
     const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
 	useEffect(() => {
@@ -90,13 +95,62 @@ function GraphViewer(props) {
 					cytoscape.panBy({x: 0, y: 13});
 				}
 			}}>{"Auto-Camera"}</button>
-		</div>	<div className='EdgeToggler'>
+		</div>	
+		<div className='EdgeToggler'>
 			<button onClick={() => {
-				console.log(graph)
 				let newGraph = new Graph(startGraph.nodes, startGraph.edges, !startGraph.directed, startGraph.message);
 				loadGraph(newGraph)
 			}}>{graph.directed ? "Make Undirected" : "Make Directed"} </button>
+		</div> 
+		<div className='Node-Edge-Hide'>
+			<button onClick={() => {
+				let newElements = JSON.parse(JSON.stringify(elements));
+				//hide all weights
+				for (let e = 0; e < newElements.length; e++) {
+					if ("position" in newElements[e]) {
+						newElements[e].data.invisibleWeight = nodeWeights
+					}
+				}
+				setElements(newElements)
+				setNodeWeights(!nodeWeights)
+			}}>{nodeWeights ? "Hide Node Weights" : "Show Node Weights"} </button>
+			<button onClick={() => {
+				let newElements = JSON.parse(JSON.stringify(elements));
+				//hide all labels
+				for (let e = 0; e < newElements.length; e++) {
+					if ("position" in newElements[e]) {
+						newElements[e].data.invisibleLabel = nodeLabels
+					}
+				}
+				setElements(newElements)
+				setNodeLabels(!nodeLabels)
+			}}>{nodeLabels ? "Hide Node Labels" : "Show Node Labels"} </button>
+			<button onClick={() => {
+				let newElements = JSON.parse(JSON.stringify(elements));
+				//hide all weights
+				for (let e = 0; e < newElements.length; e++) {
+					//only edges have source
+					if ("classes" in newElements[e]) {
+						newElements[e].data.invisibleWeight	= edgeWeights
+					}
+				}
+				setElements(newElements)
+				setEdgeWeights(!edgeWeights)
+			}}>{edgeWeights ? "Hide Edge Weights" : "Show Edge Weights"} </button>
+			<button onClick={() => {
+				let newElements = JSON.parse(JSON.stringify(elements));
+				//hide all weights
+				for (let e = 0; e < newElements.length; e++) {
+					//only edges have classes
+					if ("classes" in newElements[e]) {
+						newElements[e].data.invisibleLabel= edgeLabels
+					}
+				}
+				setElements(newElements)
+				setEdgeLabels(!edgeLabels)
+			}}>{edgeLabels ? "Hide Edge Labels" : "Show Edge Labels"} </button>
 		</div>
+		
 		<p className="GraphViewerMessage">{graph.message}</p>
 		<CytoscapeComponent elements={elements}
 			layout={{

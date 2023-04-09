@@ -13,8 +13,8 @@ test("String to Predicate With Weights No Special Key/Value Pairs", () => {
     nodes['a'] = { 'x': 10, 'y': 10, 'weight': 20,'highlighted': false, 'marked': false, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false}
     nodes['b'] = { 'x': 15, 'y': 10, 'weight': 20, 'highlighted': false, 'marked': false, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false}
     var edges = {}
-    edges["a b"] = { 'highlighted': false, 'source': 'a', 'target': 'b', 'weight': 20, 'invisible': false, 'invisibleLabel': false }
-    edges["a a"] = { 'highlighted': false, 'source': 'a', 'target': 'a', 'weight': 20, 'invisible': false, 'invisibleLabel': false }
+    edges["a b"] = { 'highlighted': false, 'source': 'a', 'target': 'b', 'weight': 20, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
+    edges["a a"] = { 'highlighted': false, 'source': 'a', 'target': 'a', 'weight': 20, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
     var graph = new Graph(nodes, edges, false, "")
     //create a string to Test
     var text = `n a 10 10 20
@@ -37,8 +37,8 @@ test("String to Predicate Without Weights No Special Key/Value Pairs", () => {
     nodes['a'] = { 'x': 10, 'y': 10, 'weight': null,'highlighted': false, 'marked': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
     nodes['b'] = { 'x': 15, 'y': 10, 'weight': null, 'highlighted': false, 'marked': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
     var edges = {}
-    edges["a b"] = { 'source': 'a', 'target': 'b', 'weight': null, 'highlighted': false,  'invisible': false, 'invisibleLabel': false }
-    edges["a a"] = { 'source': 'a', 'target': 'a', 'weight': null, 'highlighted': false,  'invisible': false, 'invisibleLabel': false }
+    edges["a b"] = { 'source': 'a', 'target': 'b', 'weight': null, 'highlighted': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
+    edges["a a"] = { 'source': 'a', 'target': 'a', 'weight': null, 'highlighted': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
     var graph = new Graph(nodes, edges, false, "")
     //create a string to Test
     var text = `n a 10 10
@@ -60,8 +60,8 @@ test("String to Predicate With Weights And Special Key/Value Pairs", () => {
     nodes['a'] = { 'x': 10, 'y': 10, 'weight': 5, 'color': 'brown','highlighted': false, 'marked': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
     nodes['b'] = { 'x': 15, 'y': 10, 'weight': 5, 'color': 'red', 'highlighted': false, 'marked': false, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false}
     var edges = {}
-    edges["a b"] = { 'source': 'a', 'target': 'b', 'weight': 5, 'color': 'white', 'highlighted': false,  'invisible': false, 'invisibleLabel': false }
-    edges["a b 2"] = { 'source': 'a', 'target': 'b', 'weight': 5, 'color': 'yellow', 'highlighted': false,  'invisible': false, 'invisibleLabel': false }
+    edges["a b"] = { 'source': 'a', 'target': 'b', 'weight': 5, 'color': 'white', 'highlighted': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false  }
+    edges["a b 2"] = { 'source': 'a', 'target': 'b', 'weight': 5, 'color': 'yellow', 'highlighted': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
     var graph = new Graph(nodes, edges, true, "")
     //create a string to Test
     var text = `n a 10 10 5 color:brown
@@ -84,8 +84,8 @@ test("String to Predicate Without Weights But With Special Key/Value Pairs", () 
     nodes['a'] = { 'x': 10, 'y': 10, 'weight': null, 'color': 'brown','highlighted': false, 'marked': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
     nodes['b'] = { 'x': 15, 'y': 10, 'weight': null, 'color': 'brown', 'highlighted': false, 'marked': false, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
     var edges = {}
-    edges["a b"] = { 'source': 'a', 'target': 'b', 'weight': null, 'color': 'white', 'highlighted': false, 'invisible': false, 'invisibleLabel': false}
-    edges["a a"] = { 'source': 'a', 'target': 'a', 'weight': null, 'color': 'yellow', 'highlighted': false,  'invisible': false, 'invisibleLabel': false }
+    edges["a b"] = { 'source': 'a', 'target': 'b', 'weight': null, 'color': 'white', 'highlighted': false, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
+    edges["a a"] = { 'source': 'a', 'target': 'a', 'weight': null, 'color': 'yellow', 'highlighted': false,  'invisible': false, 'invisibleLabel': false,'invisibleWeight': false, 'shouldBeInvisible': false }
     var graph = new Graph(nodes, edges, true, "")
     //create a string to Test
     var text = `n a 10 10 color:brown

@@ -140,7 +140,7 @@ function edgeParser(edge_string, edge_map, createEdgeId) {
     var all_values = trimmed.substring(2).split(" ")
     //keys and values of all values of the edge
     var keys = ['weight', 'source', 'target']
-    var boolean_keys = ['invisibleLabel','invisible', 'highlighted']
+    var boolean_keys = ['shouldBeInvisible', 'invisibleLabel', 'invisibleWeight', 'invisible', 'highlighted']
     var values = [null]
     let edge_id = "? ?";
 

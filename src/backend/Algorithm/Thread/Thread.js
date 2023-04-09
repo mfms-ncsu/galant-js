@@ -247,6 +247,39 @@ function showEdgeWeight(edge) {
     wait();
 }
 
+function hideAllNodeWeights() {
+    let rule = predicates.update((graph) => {
+        graph.hideAllNodeWeights();
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function showAllNodeWeights() {
+    let rule = predicates.update((graph) => {
+        graph.showAllNodeWeights();
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function hideAllEdgeWeights() {
+    let rule = predicates.update((graph) => {
+        graph.hideAllEdgeWeights();
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+function showAllEdgeWeights() {
+    let rule = predicates.update((graph) => {
+        graph.showAllEdgeWeights();
+    });
+    postMessage({type: "rule", content: rule});
+    wait();
+}
+
+
 function wait() {
     Atomics.store(sharedArray, 0, 0);
     Atomics.wait(sharedArray, 0, 0);
