@@ -15,7 +15,7 @@ export default function PromptTest() {
 	return <div className="PromptTest">
 		<div className="scrollable">
 			<h1>Prompt Test</h1>
-			<p>This page is meant for testing the GraphInput class. Perform the following tests:</p>
+			<p>This page is meant for testing the prompt sectin of the API. Perform the following tests:</p>
 			<p>1. Download <Link to="/tests/prompt/algorithm.js" target="_blank" download>algorithm.js</Link>. 
 				Press the Upload Algorithm button and upload this file.</p>
 			<p>2. Press the Forward button. You should be prompted for a message.</p>

@@ -42,11 +42,13 @@ export default class AlgorithmHandler {
     #onMessage(message) {
         // TODO ONCE WE CHANGE TO JUST STOPPING ON STEPS, GET RID OF THE RULE IN THIS LIST
         // if we get a step or an error, stop the timeout.
-        if (["rule", "step", "error", "complete", "prompt"].includes(message.type.toString())) {
+        if (["step", "error", "complete", "prompt"].includes(message.type.toString())) {
             clearTimeout(this.#timeoutID)
         }
         if (message.type === "rule") {
-            this.stepHandler.ruleStep(message.content);
+            this.stepHandler.addRule(message.content);
+        } else if (message.type === "step") {
+            this.stepHandler.completeStep();
             this.#broadcastStatus();
         } else if (message.type === "error") {
             // display an error box. yes I know this code is hideous but its what we've got.
