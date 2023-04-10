@@ -7,8 +7,7 @@ import GraphViewerTest from 'frontend/Graph/GraphViewer/GraphViewerTest';
 import GraphInputTest from 'frontend/Graph/GraphInput/GraphInputTest';
 import AlgorithmTest from 'frontend/Algorithm/AlgorithmTest';
 import PromptTest from 'frontend_tests/PromptTest';
-
-import reportWebVitals from 'reportWebVitals';
+import Navbar from 'frontend/Navbar/Navbar';
 
 import { Routes, Route, BrowserRouter, Link } from 'react-router-dom';
 import { GraphProvider } from 'frontend/GraphContext';
@@ -53,8 +52,3 @@ root.render(
         </Routes>
     </BrowserRouter>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
