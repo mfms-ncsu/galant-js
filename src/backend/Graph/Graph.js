@@ -25,6 +25,31 @@ export default class Graph {
         return edge_id;
     }
 
+    getNodeObject(node) {
+        if (!(node in this.nodes)) {
+            throw new Error(`${node} is not a valid node.`);
+        }
+        return this.nodes[node];
+    }
+
+    getEdgeObject(edge) {
+        if (!(edge in this.edges)) {
+            throw new Error(`${edge} is not a valid edge.`);
+        }
+        return this.edges[edge];
+    }
+
+    getNodeOrEdgeObject(id) {
+        let string = String(id);
+        if (string.includes(" ")) {
+            return this.getEdgeObject(string);
+        } else {
+            return this.getNodeObject(string);
+        }
+    }
+
+    // Getters
+
     getNodes() {
         return Object.keys(this.nodes);
     }
@@ -34,69 +59,14 @@ export default class Graph {
     }
 
     getNumberOfNodes() {
-        return Object.keys(this.nodes).length;
+        return this.getNodes().length;
     }
 
     getNumberOfEdges() {
-        return Object.keys(this.edges).length;
+        return this.getEdges().length;
     }
 
-    adjacentNodes(node) {
-        let nodes = [];
-        for (const edge of this.getEdges()) {
-            let temp;
-
-            if (this.edges[edge].source === node && this.edges[edge].target === node) {
-                //possibly do nothing
-                temp = this.edges[edge].source;
-            }
-            else if (this.edges[edge].source === node) {
-                temp = this.edges[edge].target;
-            }
-            else if (this.edges[edge].target === node) {
-                temp = this.edges[edge].source;
-            }
-
-            if (temp && !nodes.includes(temp)) {
-                nodes.push(temp);
-            }
-        }
-        return nodes;
-    }
-
-    incomingNodes(node) {
-        let nodes = [];
-        if (this.directed) {
-            for (const edge of this.getEdges()) {
-                if (this.edges[edge].target === node) {
-                    //possibly do nothing
-                    nodes.push(this.edges[edge].source);
-                }
-            }
-            return nodes;
-        }
-        else {
-            return this.adjacentNodes(node);
-        }
-        
-    }
-
-    outgoingNodes(node) {
-        let nodes = [];
-        if (this.directed) {
-            for (const edge of this.getEdges()) {
-                if (this.edges[edge].source === node) {
-                    //possibly do nothing
-                    nodes.push(this.edges[edge].target);
-                }
-            }
-            return nodes;
-        }
-        else {
-            return this.adjacentNodes(node);
-        }
-        
-    }
+    // Edge source and target info
 
     source(edge) {
         return this.getEdgeObject(edge).source
@@ -108,37 +78,109 @@ export default class Graph {
 
     getEdgeBetween(source, target) {
         for (const edge of this.getEdges()) {
-            if (this.edges[edge].source === source && this.edges[edge].target === target) {
-                //possibly do nothing
-                return edge
+            let edgeObj = this.getEdgeObject(edge);
+            if (edgeObj.source === source && edgeObj.target === target) {
+                return edge;
+            }
+            if (!directed && // Should edges be read both ways undirected?
+                edgeObj.target == source && edgeObj.source === target) {
+                return edge;
             }
         }
         //This may need to be changed to throw an error later one.
         return null;
     }
 
-    other(node, edge) {
-        this.getNodeObject(node);
-        let edgeObJ = this.getEdgeObject(edge);
+    other(id1, id2) {
+        let obj1 = this.getNodeOrEdgeObject(id1);
+        let obj2 = this.getNodeOrEdgeObject(id2);
 
-        if (edgeObJ.source === node) {
-            return edgeObJ.target;
+        let node = null;
+        let edgeObj = null;
+        if (!obj2.source && obj1.source) {
+            let node = id2;
+            let edgeObj = obj1;
+        } else if (!obj1.source && obj2.source) {
+            let node = id1;
+            let edgeObj = obj2;
+        } else {
+            throw new Error("other() should be called with one node and one edge");
         }
-        else if (edgeObJ.target === node) {
-            return edgeObJ.source;
+
+        if (edgeObj.source === node) {
+            return edgeObj.target;
+        }
+        else if (edgeObj.target === node) {
+            return edgeObj.source;
         }
         else {
             throw new Error("The node " + node + "was not connected to edge " + edge);
         }
     }
 
-    colorNode(color, node) {
-        this.nodes[node].color = color;
+    adjacentNodes(node) {
+        this.getNodeObject(node);
+
+        let nodes = [];
+        for (const edge of this.getEdges()) {
+            let edgeObj = this.getEdgeObject(edge);
+
+            let adjacent = null;
+
+            if (edgeObj.source === node && edgeObj.target === node) {
+                adjacent = node;
+            }
+            else if (edgeObj.source === node) {
+                adjacent = edgeObj.target;
+            }
+            else if (edgeObj.target === node) {
+                adjacent = edgeObj.source;
+            }
+
+            if (adjacent && !nodes.includes(adjacent)) {
+                nodes.push(adjacent);
+            }
+        }
+        return nodes;
     }
 
-    colorEdge(color, edge) {
-        this.edges[edge].color = color;
+    incomingNodes(node) {
+        this.getNodeObject(node);
+
+        let nodes = [];
+        if (!this.directed) {
+            return this.adjacentNodes(node);
+        }
+
+        for (const edge of this.getEdges()) {
+            let edgeObj = this.getEdgeObject(edge);
+
+            if (edgeObj.target === node) {
+                nodes.push(edgeObj.source);
+            }
+        }
+        return nodes;
     }
+
+    outgoingNodes(node) {
+        this.getNodeObject(node);
+
+        let nodes = [];
+        if (!this.directed) {
+            return this.adjacentNodes(node);
+        }
+        for (const edge of this.getEdges()) {
+            let edgeObj = this.getEdgeObject(edge);
+
+            if (edgeObj.source === node) {
+                nodes.push(edgeObj.target);
+            }
+        }
+
+        return nodes;
+    }
+
+    // Control 'mark' property of nodes
 
     mark(node) {
         this.getNodeObject(node).marked = true;
@@ -158,22 +200,120 @@ export default class Graph {
         }
     }
 
-    getNodeObject(node) {
-        if (!(node in this.nodes)) {
-            throw new Error("This node does not exist " + node);
-        }
-        return this.nodes[node];
+    // Control 'highlight' property of nodes and edges
+
+    highlight(id) {
+        this.getNodeOrEdgeObject(id).highlighted = true;
     }
 
-    getEdgeObject(edge) {
-        if (!(edge in this.edges)) {
-            throw new Error("This edge does not exist " + edge);
-        }
-        return this.edges[edge];
+    unhighlight(id) {
+        this.getNodeOrEdgeObject(id).highlighted = false;
     }
 
-    color(edge, color) {
-        this.edges[edge].color = color;
+    highlighted(id) {
+        return this.getNodeOrEdgeObject(id).highlighted;
+    }
+
+    clearNodeHighlights() {
+        for (const node of this.getNodes()) {
+            this.unhighlight(node);
+        }
+    }
+
+    clearEdgeHighlights() {
+        for (const edge of this.getEdges()) {
+            this.unhighlight(edge);
+        }
+    }
+
+    // Control 'color' property of nodes and edges
+
+    color(id, color) {
+        this.getNodeOrEdgeObject(id).color = color;
+    }
+
+    uncolor(id) {
+        this.getNodeOrEdgeObject(id).color = null;
+    }
+
+    getColor(id) {
+        return this.getNodeOrEdgeObject(id).color;
+    }
+
+    hasColor(id) {
+        return this.getNodeOrEdgeObject(id).color != null;
+    }
+
+    clearNodeColors() {
+        for (const node of this.getNodes()) {
+            this.uncolor(node);
+        }
+    }
+
+    clearEdgeColors() {
+        for (const edge of this.getEdges()) {
+            this.uncolor(edge);
+        }
+    }
+
+    // Control 'label' property of nodes and edges
+
+    label(id, label) {
+        this.getNodeOrEdgeObject(id).label = label;
+    }
+
+    unlabel(id) {
+        this.getNodeOrEdgeObject(id).label = null;
+    }
+
+    getLabel(id) {
+        return this.getNodeOrEdgeObject(id).label;
+    }
+
+    hasLabel(id) {
+        return this.getNodeOrEdgeObject(id).label != null;
+    }
+
+    clearNodeLabels() {
+        for (const node of this.getNodes()) {
+            this.unlabel(node);
+        }
+    }
+
+    clearEdgeLabels() {
+        for (const edge of this.getEdges()) {
+            this.unlabel(edge);
+        }
+    }
+
+    // Control 'weight' property of nodes and edges
+
+    setWeight(id, weight) {
+        this.getNodeOrEdgeObject(id).weight = weight;
+    }
+
+    clearWeight(id) {
+        this.getNodeOrEdgeObject(id).weight = null;
+    }
+
+    weight(id) {
+        return this.getNodeOrEdgeObject(id).weight;
+    }
+
+    hasWeight(id) {
+        return this.getNodeOrEdgeObject(id).weight != null;
+    }
+
+    clearNodeWeights() {
+        for (const node of this.getNodes()) {
+            this.clearWeight(node);
+        }
+    }
+
+    clearEdgeWeights() {
+        for (const edge of this.getEdges()) {
+            this.clearWeight(edge);
+        }
     }
 
     display(message) {
