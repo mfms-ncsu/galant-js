@@ -18,10 +18,14 @@ root.render(
     <BrowserRouter>
         <Routes>
             <Route exact path='/' element={
-                <App />
+                <>
+                    <Navbar />
+                    <App />
+                </>
             }></Route>
             <Route exact path='/tests' element={
                 <div>
+                    <Navbar />
                     <h1>Galant Tests</h1>
                     <p>1. <Link to="/tests/graphViewer">Graph Viewer Test</Link></p>
                     <p>2. <Link to="/tests/graphInput">Graph Input Test</Link></p>
@@ -31,21 +35,25 @@ root.render(
             }></Route>
             <Route exact path='/tests/graphViewer' element={
                 <GraphProvider>
+                    <Navbar />
                     <GraphViewerTest />
                 </GraphProvider>
             }></Route>
             <Route exact path='/tests/graphInput' element={
                 <GraphProvider>
+                    <Navbar />
                     <GraphInputTest />
                 </GraphProvider>
             }></Route>
             <Route exact path='/tests/algorithm' element={
                 <GraphProvider>
+                    <Navbar />
                     <AlgorithmTest />
                 </GraphProvider>
             }></Route>
             <Route exact path='/tests/prompt' element={
                 <GraphProvider>
+                    <Navbar />
                     <PromptTest />
                 </GraphProvider>
             }></Route>
