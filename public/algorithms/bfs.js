@@ -4,11 +4,14 @@ let queue = [];
 let time = 0;
 
 // Adds a node to the queue
-function queueNode(node) {
+function queueNode(node, weight) {
     highlight(node);
+    setWeight(next, distance);
     label(node, "#" + time++);
+
     queue.push(node);
     display("Queue: " + queue);
+    print(`Queued node '${node}'`);
 }
 
 step(() => { // Initialize with start node
@@ -16,33 +19,31 @@ step(() => { // Initialize with start node
     clearNodeLabels();
 
     let start = promptNode("Enter start node:");
-    setWeight(start, 0);
-    queueNode(start);
+    queueNode(start, 0);
+    print(`Starting at node '${start}'`);
 });
 
 while (queue.length > 0) {
     let current = queue.shift();
     step(() => { // Visit node
         display("Queue: " + queue);
+        print(`Visiting node '${current}'`);
+
         mark(current);
     });
     
-    print(outgoing(current));
     for (let edge of outgoing(current)) {
-        print(edge);
         let next = other(current, edge);
 
-        step(() => { // Check adjacent node
-            if (!highlighted(next)) {
-                color(edge, "blue");
-
-                let distance = weight(current) + 1;
-                setWeight(next, distance);
-                queueNode(next);
-            } else if (hasColor(edge)) {
+        step(() => { // Check outgoing edges
+            print(`Checking edge '${edge}'`);
+            if (hasColor(edge)) { // seeing edge from other side
                 highlight(edge);
-            } else {
+            } else if (highlighted(next)) { // already visited node
                 color(edge, "red");
+            } else { // have not visited node
+                color(edge, "blue");
+                queueNode(next, weight(current) + 1);
             }
         });
     }
