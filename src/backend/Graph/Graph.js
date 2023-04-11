@@ -274,11 +274,11 @@ export default class Graph {
     // Colors
 
     color(id, color) {
-        this.getNodeOrEdgeObject(id).color = color;
+        this.getNodeOrEdgeObject(id).color = String(color);
     }
 
     uncolor(id) {
-        this.getNodeOrEdgeObject(id).color = null;
+        this.getNodeOrEdgeObject(id).color = undefined;
     }
 
     getColor(id) {
@@ -286,7 +286,7 @@ export default class Graph {
     }
 
     hasColor(id) {
-        return this.getNodeOrEdgeObject(id).color != null;
+        return this.getNodeOrEdgeObject(id).color != undefined;
     }
 
     clearNodeColors() {
@@ -304,11 +304,11 @@ export default class Graph {
     // Labels
 
     label(id, label) {
-        this.getNodeOrEdgeObject(id).label = label;
+        this.getNodeOrEdgeObject(id).label = String(label);
     }
 
     unlabel(id) {
-        this.getNodeOrEdgeObject(id).label = null;
+        this.getNodeOrEdgeObject(id).label = undefined;
     }
 
     getLabel(id) {
@@ -316,7 +316,7 @@ export default class Graph {
     }
 
     hasLabel(id) {
-        return this.getNodeOrEdgeObject(id).label != null;
+        return this.getNodeOrEdgeObject(id).label != undefined;
     }
 
     clearNodeLabels() {
@@ -334,11 +334,14 @@ export default class Graph {
     // Weights
 
     setWeight(id, weight) {
+        if (!(weight instanceof Number)) {
+            throw new Error("Weight must be a number");
+        }
         this.getNodeOrEdgeObject(id).weight = weight;
     }
 
     clearWeight(id) {
-        this.getNodeOrEdgeObject(id).weight = null;
+        this.getNodeOrEdgeObject(id).weight = undefined;
     }
 
     weight(id) {
@@ -346,7 +349,7 @@ export default class Graph {
     }
 
     hasWeight(id) {
-        return this.getNodeOrEdgeObject(id).weight != null;
+        return this.getNodeOrEdgeObject(id).weight != undefined;
     }
 
     clearNodeWeights() {
