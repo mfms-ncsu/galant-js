@@ -83,7 +83,7 @@ export default class Graph {
             if (edgeObj.source === source && edgeObj.target === target) {
                 edges.push(edge);
             } else if (!this.directed && // Should edges be read both ways undirected?
-                edgeObj.target == source && edgeObj.source === target) {
+                edgeObj.target === source && edgeObj.source === target) {
                 edges.push(edge);
             }
         }
@@ -191,11 +191,10 @@ export default class Graph {
 
         let nodes = [];
         for (const edge of edges) {
-            let other = other(node, edge)
+            let other = this.other(node, edge)
             if (!nodes.includes(other)) {
                 nodes.push(other);
             }
-            let edgeObj = this.getEdgeObject(edge);
         }
         return nodes;
     }
@@ -205,11 +204,10 @@ export default class Graph {
 
         let nodes = [];
         for (const edge of edges) {
-            let other = other(node, edge)
+            let other = this.other(node, edge)
             if (!nodes.includes(other)) {
                 nodes.push(other);
             }
-            let edgeObj = this.getEdgeObject(edge);
         }
         return nodes;
     }
@@ -219,11 +217,10 @@ export default class Graph {
 
         let nodes = [];
         for (const edge of edges) {
-            let other = other(node, edge)
+            let other = this.other(node, edge)
             if (!nodes.includes(other)) {
                 nodes.push(other);
             }
-            let edgeObj = this.getEdgeObject(edge);
         }
         return nodes;
     }

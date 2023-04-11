@@ -63,7 +63,7 @@ function error(message) {
 // Prompt the user for input
 
 function prompt(message, error="") {
-    if (message == null || message == "") {
+    if (message === null || message === "") {
         message = "Prompt";
     }
     postMessage({type: "prompt", content: [message, error]})
@@ -80,7 +80,7 @@ function promptFrom(message, list, error) {
     if (list.length === 0) {
         throw new Error("Cannot prompt when no valid options exist.");
     }
-    if (error == null) {
+    if (error === null) {
         error = "Must enter a value from " + list;
     }
     let promptResult = prompt(message);

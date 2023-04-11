@@ -43,10 +43,10 @@ function convertEdges(elements, edges, isDirected) {
 
         //Addes the weight and labeled combined in the labeled field
         //If there is only one or the other then that is only added
-        if (edge.weight != null && edge.label) {
+        if (edge.weight !== null && edge.label) {
             element.data.label = edge.weight + '\n' + edge.label;
         }
-        else if (edge.weight != null) {
+        else if (edge.weight !== null) {
             element.data.label = String(edge.weight);
         }
         else if (edge.label) {
