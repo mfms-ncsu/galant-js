@@ -41,10 +41,10 @@ function GraphViewer(props) {
     let ref = useRef();
     ref.current = cytoscape;
 	
-	let [nodeLabels, setNodeLabels] = useState(false);
-	let [nodeWeights, setNodeWeights] = useState(false);
-	let [edgeLabels, setEdgeLabels] = useState(false);
-	let [edgeWeights, setEdgeWeights] = useState(false);
+	let [nodeLabels, setNodeLabels] = useState(null);
+	let [nodeWeights, setNodeWeights] = useState(null);
+	let [edgeLabels, setEdgeLabels] = useState(null);
+	let [edgeWeights, setEdgeWeights] = useState(null);
 
     /* eslint-disable-next-line no-unused-vars */
     const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
@@ -67,7 +67,7 @@ function GraphViewer(props) {
 				positions[element.data.id] = element.position;
 			}
 		}
-		let newElements = predicateConverter(graph);
+		let newElements = predicateConverter(graph, nodeWeights, nodeLabels, edgeWeights, edgeLabels);
 		// Ensure the positions of nodes are preserved in the new list of elements.
 		for (let element of newElements) {
 			if (positions[element.data.id]) {
@@ -76,7 +76,7 @@ function GraphViewer(props) {
 		}
 		setElements(newElements);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [graph])
+    }, [graph, nodeWeights, nodeLabels, edgeWeights, edgeLabels])
 	
 	return <div className="GraphViewer">
 		{/* Button controls that allow the graph layout and camera to be updated. */}
@@ -104,51 +104,17 @@ function GraphViewer(props) {
 		</div> 
 		<div className='Node-Edge-Hide'>
 			<button onClick={() => {
-				let newElements = JSON.parse(JSON.stringify(elements));
-				//hide all weights
-				for (let e = 0; e < newElements.length; e++) {
-					if ("position" in newElements[e]) {
-						newElements[e].data.invisibleWeight = nodeWeights
-					}
-				}
-				setElements(newElements)
 				setNodeWeights(!nodeWeights)
-			}}>{nodeWeights ? "Hide Node Weights" : "Show Node Weights"} </button>
+			}}>{nodeWeights === null ? "Node Weight Toggle" : nodeWeights ? "Hide Node Weights" : "Show Node Weights"} </button>
 			<button onClick={() => {
-				let newElements = JSON.parse(JSON.stringify(elements));
-				//hide all labels
-				for (let e = 0; e < newElements.length; e++) {
-					if ("position" in newElements[e]) {
-						newElements[e].data.invisibleLabel = nodeLabels
-					}
-				}
-				setElements(newElements)
 				setNodeLabels(!nodeLabels)
-			}}>{nodeLabels ? "Hide Node Labels" : "Show Node Labels"} </button>
+			}}>{ nodeLabels === null ? "Node Label Toggle" : nodeLabels ? "Hide Node Labels" : "Show Node Labels"} </button>
 			<button onClick={() => {
-				let newElements = JSON.parse(JSON.stringify(elements));
-				//hide all weights
-				for (let e = 0; e < newElements.length; e++) {
-					//only edges have source
-					if ("classes" in newElements[e]) {
-						newElements[e].data.invisibleWeight	= edgeWeights
-					}
-				}
-				setElements(newElements)
 				setEdgeWeights(!edgeWeights)
-			}}>{edgeWeights ? "Hide Edge Weights" : "Show Edge Weights"} </button>
+			}}>{edgeWeights === null ? "Edge Weight Toggle" : edgeWeights ? "Hide Edge Weights" : "Show Edge Weights"} </button>
 			<button onClick={() => {
-				let newElements = JSON.parse(JSON.stringify(elements));
-				//hide all weights
-				for (let e = 0; e < newElements.length; e++) {
-					//only edges have classes
-					if ("classes" in newElements[e]) {
-						newElements[e].data.invisibleLabel= edgeLabels
-					}
-				}
-				setElements(newElements)
 				setEdgeLabels(!edgeLabels)
-			}}>{edgeLabels ? "Hide Edge Labels" : "Show Edge Labels"} </button>
+			}}>{edgeLabels === null ? "Edge Label Toggle" : edgeLabels ? "Hide Edge Labels" : "Show Edge Labels"} </button>
 		</div>
 		
 		<p className="GraphViewerMessage">{graph.message}</p>
