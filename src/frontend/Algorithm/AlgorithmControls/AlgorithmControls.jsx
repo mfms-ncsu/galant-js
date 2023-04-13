@@ -8,14 +8,12 @@ import { useEffect } from "react"
 export default function AlgorithmControls(props) {
 
     function frontButtonPress() {
-        console.log("forward");
         if (!document.getElementById("forwardbutton").disabled) {
             props.onForward();
         }
     } 
 
     function backButtonPress() {
-        console.log("back");
         if (!document.getElementById("backbutton").disabled) {
             props.onBack();
         }

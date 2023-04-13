@@ -69,7 +69,6 @@ function GraphViewer(props) {
 				element.position = positions[element.data.id]
 			}
 		}
-		console.log(newElements);
 		setElements(newElements);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
     }, [graph])

@@ -11,11 +11,9 @@ let predicate = {
 let algorithm = 'for (let i = 0; i < 10000; i++) {i++;} colorNode(1, "green"); for (let i = 0; i < 10000; i++) {i++;} testSomething(\'This has finished the third array\');';
 
 let onMessage = function(message) {
-    console.log(message);
     for (let i = 0; i < 10000000000; i++) {
         i++;
     }
-    console.log('finished tester array.')
     handler.resumeThread();
 }
 
