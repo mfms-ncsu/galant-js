@@ -22,7 +22,6 @@ function convertEdges(elements, edges, isDirected) {
             data: {
                 source: '',
                 target: '',
-                label: '',
                 highlighted: false,
                 color: 'black'
             }
@@ -36,21 +35,23 @@ function convertEdges(elements, edges, isDirected) {
         for (let key in edge) {
             //If the predicate for an edge has a weightm it gets added later to a label to be displayed. Ignore it for now.
             //Transfer all other key value pairs to the edge
-            if (key !== 'weight' && key !== 'label') {
+            if (key !== 'weight' && key !== 'label' && edge[key] !== undefined) {
                 element.data[key] = edge[key];
             }
         }
 
         //Addes the weight and labeled combined in the labeled field
         //If there is only one or the other then that is only added
-        if (edge.weight !== null && edge.label) {
+        if (edge.weight !== undefined && edge.label) {
             element.data.label = edge.weight + '\n' + edge.label;
         }
-        else if (edge.weight !== null) {
+        else if (edge.weight !== undefined) {
             element.data.label = String(edge.weight);
         }
         else if (edge.label) {
             element.data.label = edge.label;
+        } else {
+            element.data.label = "";
         }
         //Add the edge to the list of elements
         elements.push(element);
@@ -85,9 +86,7 @@ export default function predicateConverter(predicate) {
                 //All nodes will have an id and a parent identity filed
                 id: ident,
                 marked: false,
-                label: '',
                 highlighted: false,
-                weight: null,
                 color: 'black'
             },
             //All nodes will have a position
@@ -100,11 +99,7 @@ export default function predicateConverter(predicate) {
             //x and y coordinates are held in a seperate dictionary in the element object
             if (key === 'x' || key === 'y') {
                 element.position[key] = node[key];
-            }
-            else if (node[key] === "") {
-                element.data[key] = "true";
-            }
-            else {
+            } else if (node[key] !== undefined) {
                 //All other key value paris will transfer to the element object in the data
                 element.data[key] = node[key];
             }

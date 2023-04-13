@@ -334,7 +334,7 @@ export default class Graph {
     // Weights
 
     setWeight(id, weight) {
-        if (!(weight instanceof Number)) {
+        if (isNaN(weight)) {
             throw new Error("Weight must be a number");
         }
         this.getNodeOrEdgeObject(id).weight = weight;

@@ -57,7 +57,7 @@ function nodeParser(node_string, node_map) {
     //keys and values of all values of the node
     var keys = ['weight', 'x', 'y']
     var boolean_keys = ['highlighted', 'marked']
-    var values = [null]
+    var values = [undefined]
 
     for (var i = 0; i < all_values.length; i++) {
         //id value
@@ -141,7 +141,7 @@ function edgeParser(edge_string, edge_map, createEdgeId) {
     //keys and values of all values of the edge
     var keys = ['weight', 'source', 'target']
     var boolean_keys = ['highlighted']
-    var values = [null]
+    var values = [undefined]
     let edge_id = "? ?";
 
     for (var i = 0; i < all_values.length; i++) {

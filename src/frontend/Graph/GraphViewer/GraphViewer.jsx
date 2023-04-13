@@ -111,7 +111,7 @@ function GraphViewer(props) {
 						valign: "top",
 						valignBox: "top",
 						tpl: (data) => {
-							if (data.weight) {
+							if (data.weight !== undefined) {
 								return renderToString(
 									<div>
 										<p className="GraphViewerLabel">{data.weight}<br></br>{data.label}</p>
