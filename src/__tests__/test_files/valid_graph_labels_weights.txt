@@ -1,0 +1,7 @@
+n 1 100 600 40 label:bruh
+n 2 300 400 40 label:yuh
+n 6 100 200 40 label:duh highlighted: color:blue
+e 1 2 40 label:edge
+e 2 1 39 color:blue label:y
+e 1 6 color:red label:h
+directed

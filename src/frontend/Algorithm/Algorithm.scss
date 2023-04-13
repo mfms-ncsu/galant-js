@@ -90,7 +90,7 @@
     .alg-prompt {
         color: red;
         position: absolute;
-        width: 50%;
+        width: 25%;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
@@ -120,7 +120,8 @@
         }
 
         .alg-prompt-box {
-            width:100%;
+            width:50%;
+            margin: 0 auto;
             overflow: auto;
             border: 1px solid #4d4d4d;
             background-color: #f1f1f1;
