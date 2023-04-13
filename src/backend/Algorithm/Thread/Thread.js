@@ -245,3 +245,5 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         }
     }
 }
+
+
