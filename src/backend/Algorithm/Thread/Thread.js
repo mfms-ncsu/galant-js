@@ -126,6 +126,138 @@ function promptEdge(message) {
     return promptFrom(message, edges, "Must enter a valid Edge ID. The valid edges are " + edges);
 }
 
+function hideNode(node) {
+    // hide the node (getting an updated copy of the graph), then wait for a resume command
+    let rule = predicates.update((graph) => {
+        graph.hideNode(node);
+    });
+    postMessage({type: "rule", content: rule});
+    autoStep();
+}
+
+function showNode(node) {
+    // hide the node (getting an updated copy of the graph), then wait for a resume command
+    let rule = predicates.update((graph) => {
+        graph.showNode(node);
+    });
+    postMessage({type: "rule", content: rule});
+    autoStep();
+}
+
+function hideEdge(edge) {
+    // hide the node (getting an updated copy of the graph), then wait for a resume command
+    let rule = predicates.update((graph) => {
+        graph.hideEdge(edge);
+    });
+    postMessage({type: "rule", content: rule});
+    autoStep();
+}
+
+function showEdge(edge) {
+    // hide the node (getting an updated copy of the graph), then wait for a resume command
+    let rule = predicates.update((graph) => {
+        graph.showEdge(edge);
+    });
+    postMessage({type: "rule", content: rule});
+    autoStep();
+}
+
+function hideNodeWeight(node) {
+    let rule = predicates.update((graph) => {
+        graph.hideNodeWeight(node);
+    });
+    postMessage({type: "rule", content: rule});
+    autoStep();
+}
+
+function showNodeWeight(node) {
+    let rule = predicates.update((graph) => {
+        graph.showNodeWeight(node);
+    });
+    postMessage({type: "rule", content: rule});
+    autoStep();
+}
+
+function hideNodeLabel(node) {
+    let rule = predicates.update((graph) => {
+        graph.hideNodeLabel(node);
+    });
+    postMessage({type: "rule", content: rule});
+    autoStep();
+}
+
+function showNodeLabel(node) {
+    let rule = predicates.update((graph) => {
+        graph.showNodeLabel(node);
+    });
+    postMessage({type: "rule", content: rule});
+    autoStep();
+}
+
+function hideEdgeLabel(edge) {
+    let rule = predicates.update((graph) => {
+        graph.hideEdgeLabel(edge);
+    });
+    postMessage({type: "rule", content: rule});
+    autoStep();
+}
+
+function showEdgeLabel(edge) {
+    let rule = predicates.update((graph) => {
+        graph.showEdgeLabel(edge);
+    });
+    postMessage({type: "rule", content: rule});
+    autoStep();
+}
+
+function hideEdgeWeight(edge) {
+    let rule = predicates.update((graph) => {
+        graph.hideEdgeWeight(edge);
+    });
+    postMessage({type: "rule", content: rule});
+    autoStep();
+}
+
+function showEdgeWeight(edge) {
+    let rule = predicates.update((graph) => {
+        graph.showEdgeWeight(edge);
+    });
+    postMessage({type: "rule", content: rule});
+    autoStep();
+}
+
+function hideAllNodeWeights() {
+    let rule = predicates.update((graph) => {
+        graph.hideAllNodeWeights();
+    });
+    postMessage({type: "rule", content: rule});
+    autoStep();
+}
+
+function showAllNodeWeights() {
+    let rule = predicates.update((graph) => {
+        graph.showAllNodeWeights();
+    });
+    postMessage({type: "rule", content: rule});
+    autoStep();
+}
+
+function hideAllEdgeWeights() {
+    let rule = predicates.update((graph) => {
+        graph.hideAllEdgeWeights();
+    });
+    postMessage({type: "rule", content: rule});
+    autoStep();
+}
+
+function showAllEdgeWeights() {
+    let rule = predicates.update((graph) => {
+        graph.showAllEdgeWeights();
+    });
+    postMessage({type: "rule", content: rule});
+    autoStep();
+}
+
 // Automatic getter/setter generation functions
 
 function generateGetter(fnName) {
