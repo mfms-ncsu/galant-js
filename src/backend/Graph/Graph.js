@@ -286,7 +286,7 @@ export default class Graph {
     }
 
     hasColor(id) {
-        return this.getNodeOrEdgeObject(id).color != undefined;
+        return this.getNodeOrEdgeObject(id).color !== undefined;
     }
 
     clearNodeColors() {
@@ -316,7 +316,7 @@ export default class Graph {
     }
 
     hasLabel(id) {
-        return this.getNodeOrEdgeObject(id).label != undefined;
+        return this.getNodeOrEdgeObject(id).label !== undefined;
     }
 
     clearNodeLabels() {
@@ -349,7 +349,7 @@ export default class Graph {
     }
 
     hasWeight(id) {
-        return this.getNodeOrEdgeObject(id).weight != undefined;
+        return this.getNodeOrEdgeObject(id).weight !== undefined;
     }
 
     clearNodeWeights() {
