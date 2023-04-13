@@ -34,11 +34,11 @@ e a a 20`
 test("String to Predicate Without Weights No Special Key/Value Pairs", () => {
     //Make a dictionary to Test
     var nodes = {}
-    nodes['a'] = { 'x': 10, 'y': 10, 'weight': null,'highlighted': false, 'marked': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
-    nodes['b'] = { 'x': 15, 'y': 10, 'weight': null, 'highlighted': false, 'marked': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
+    nodes['a'] = { 'x': 10, 'y': 10, 'weight': undefined,'highlighted': false, 'marked': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
+    nodes['b'] = { 'x': 15, 'y': 10, 'weight': undefined, 'highlighted': false, 'marked': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
     var edges = {}
-    edges["a b"] = { 'source': 'a', 'target': 'b', 'weight': null, 'highlighted': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
-    edges["a a"] = { 'source': 'a', 'target': 'a', 'weight': null, 'highlighted': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
+    edges["a b"] = { 'source': 'a', 'target': 'b', 'weight': undefined, 'highlighted': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
+    edges["a a"] = { 'source': 'a', 'target': 'a', 'weight': undefined, 'highlighted': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
     var graph = new Graph(nodes, edges, false, "")
     //create a string to Test
     var text = `n a 10 10
@@ -81,11 +81,11 @@ directed`
 test("String to Predicate Without Weights But With Special Key/Value Pairs", () => {
     //Make a dictionary to Test
     var nodes = {}
-    nodes['a'] = { 'x': 10, 'y': 10, 'weight': null, 'color': 'brown','highlighted': false, 'marked': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
-    nodes['b'] = { 'x': 15, 'y': 10, 'weight': null, 'color': 'brown', 'highlighted': false, 'marked': false, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
+    nodes['a'] = { 'x': 10, 'y': 10, 'weight': undefined, 'color': 'brown','highlighted': false, 'marked': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
+    nodes['b'] = { 'x': 15, 'y': 10, 'weight': undefined, 'color': 'brown', 'highlighted': false, 'marked': false, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
     var edges = {}
-    edges["a b"] = { 'source': 'a', 'target': 'b', 'weight': null, 'color': 'white', 'highlighted': false, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
-    edges["a a"] = { 'source': 'a', 'target': 'a', 'weight': null, 'color': 'yellow', 'highlighted': false,  'invisible': false, 'invisibleLabel': false,'invisibleWeight': false, 'shouldBeInvisible': false }
+    edges["a b"] = { 'source': 'a', 'target': 'b', 'weight': undefined, 'color': 'white', 'highlighted': false, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
+    edges["a a"] = { 'source': 'a', 'target': 'a', 'weight': undefined, 'color': 'yellow', 'highlighted': false,  'invisible': false, 'invisibleLabel': false,'invisibleWeight': false, 'shouldBeInvisible': false }
     var graph = new Graph(nodes, edges, true, "")
     //create a string to Test
     var text = `n a 10 10 color:brown
