@@ -13,7 +13,15 @@ textarea {
 
 body {
     // if you make this 100%, it makes it scroll. I do not understand why. I have spent 2.5 hours on this it does not make sense.
-    height: 98%;
+    // oh okay maybe its bc of the body padding?
+    height: 95%;
+}
+
+p, label, button {
+    font-family: monospace;
+}
+button, label {
+    margin-bottom: 5px;
 }
 
 #root {
@@ -26,6 +34,7 @@ body {
 
 // Set default fonts
 body {
+    padding: 16px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
         'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;

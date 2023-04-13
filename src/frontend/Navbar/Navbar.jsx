@@ -12,7 +12,7 @@ function Navbar(props) {
             <div className='nav_container'>
                 <div className='logo'>
                     <NavLink to="/" className="navbar__content__logo">
-                        <img id='galant_logo' src='/galant_full_logo.svg' alt='The logo for Galant'/>
+                        <img id='galant_logo' src='/img/galant_full_logo_without_words.svg' alt='The logo for Galant'/>
                     </NavLink>
                 </div>
                 <div className='nav-elements'>

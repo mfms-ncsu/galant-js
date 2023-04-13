@@ -1,8 +1,5 @@
 import './AlgorithmControls.scss'
 
-import Forward from "./forward_arrow.png"
-import Backward from "./backward_arrow.png"
-
 import { useEffect } from "react"
 
 export default function AlgorithmControls(props) {
@@ -38,19 +35,21 @@ export default function AlgorithmControls(props) {
 
     return (
         <div className="AlgorithmControls">
-            <button id="backbutton"
-                disabled={!props.status.canStepBack}
-                onClick={backButtonPress}>
-                <img src={Backward} alt="backward arrow"/>
-            </button>
-            <button id="forwardbutton"
-                disabled={!props.status.canStepForward}
-                onClick={frontButtonPress}>
-                <img src={Forward} alt="forward arrow"/>
-            </button>
-            <div className="stepcounter">
+
+            <div className='arrow'>
+                <button disabled={!props.status.canStepBack} onClick={backButtonPress}>
+                    <img src='/img/left_arrow.svg' alt="backward arrow"/>
+                </button>
+            </div>
+            <div className='stepcounter'>
                 <p>Step {props.status.displayState}/{props.status.algorithmState}</p>
             </div>
+            <div className='arrow'>
+                <button disabled={!props.status.canStepForward} onClick={frontButtonPress}>
+                    <img src='/img/right_arrow.svg' alt="forward arrow"/>
+                </button>
+            </div>
+
         </div>
     );
 }
