@@ -6,6 +6,8 @@ $navbar_height: 70px;
     height: $navbar_height;
     position: relative;
     font-family: monospace;
+
+    z-index: 100;
 }
 
 .nav_container{

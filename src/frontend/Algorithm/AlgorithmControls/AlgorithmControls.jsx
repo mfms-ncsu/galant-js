@@ -35,7 +35,7 @@ export default function AlgorithmControls(props) {
         <div className="AlgorithmControls">
 
             <div className='arrow'>
-                <button disabled={!props.status.canStepBack} onClick={backButtonPress}>
+                <button id='backbutton' disabled={!props.status.canStepBack} onClick={backButtonPress}>
                     <img src='/img/left_arrow.svg' alt="backward arrow"/>
                 </button>
             </div>
@@ -43,7 +43,7 @@ export default function AlgorithmControls(props) {
                 <p>Step {props.status.displayState}/{props.status.algorithmState}</p>
             </div>
             <div className='arrow'>
-                <button disabled={!props.status.canStepForward} onClick={frontButtonPress}>
+                <button id='forwardbutton' disabled={!props.status.canStepForward} onClick={frontButtonPress}>
                     <img src='/img/right_arrow.svg' alt="forward arrow"/>
                 </button>
             </div>
