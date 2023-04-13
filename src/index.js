@@ -7,9 +7,8 @@ import GraphViewerTest from 'frontend/Graph/GraphViewer/GraphViewerTest';
 import GraphInputTest from 'frontend/Graph/GraphInput/GraphInputTest';
 import AlgorithmTest from 'frontend/Algorithm/AlgorithmTest';
 import PromptTest from 'frontend_tests/PromptTest';
+import Navbar from 'frontend/Navbar/Navbar';
 import StepTest from 'frontend_tests/StepTest';
-
-import reportWebVitals from 'reportWebVitals';
 
 import { Routes, Route, BrowserRouter, Link } from 'react-router-dom';
 import { GraphProvider } from 'frontend/GraphContext';
@@ -20,10 +19,14 @@ root.render(
     <BrowserRouter>
         <Routes>
             <Route exact path='/' element={
-                <App />
+                <>
+                    <Navbar />
+                    <App />
+                </>
             }></Route>
             <Route exact path='/tests' element={
                 <div>
+                    <Navbar />
                     <h1>Galant Tests</h1>
                     <p>1. <Link to="/tests/graphViewer">Graph Viewer Test</Link></p>
                     <p>2. <Link to="/tests/graphInput">Graph Input Test</Link></p>
@@ -34,21 +37,25 @@ root.render(
             }></Route>
             <Route exact path='/tests/graphViewer' element={
                 <GraphProvider>
+                    <Navbar />
                     <GraphViewerTest />
                 </GraphProvider>
             }></Route>
             <Route exact path='/tests/graphInput' element={
                 <GraphProvider>
+                    <Navbar />
                     <GraphInputTest />
                 </GraphProvider>
             }></Route>
             <Route exact path='/tests/algorithm' element={
                 <GraphProvider>
+                    <Navbar />
                     <AlgorithmTest />
                 </GraphProvider>
             }></Route>
             <Route exact path='/tests/prompt' element={
                 <GraphProvider>
+                    <Navbar />
                     <PromptTest />
                 </GraphProvider>
             }></Route>
@@ -60,8 +67,3 @@ root.render(
         </Routes>
     </BrowserRouter>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

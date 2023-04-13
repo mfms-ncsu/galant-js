@@ -6,10 +6,48 @@
     height: 100%;
 
     display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8%;
+
+    &>.arrow {
+        
+        max-height: 100%;
+        height: auto;
+        flex-shrink: 1;
+        align-items: center;
+        justify-items: center;
+
+        &>button {
+            &>img {
+                max-height: 10vh;
+            }
+        }
+
+        button:disabled, button[disabled]{
+            img {
+                opacity: .6;
+            }
+        }
+
+        border-radius: 10px;
+    }
 
     &>.stepcounter {
-        flex: 1;
+        flex-shrink: 1;
         text-align: center;
+
         font-size: 200%;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: 1000;
+
+        background-color: #ffffff;
+        border: 2px solid #6e6e6e;
+        border-radius: 10px;
+
+        &>p {
+            margin: 10px;
+        }
     }
+
 }

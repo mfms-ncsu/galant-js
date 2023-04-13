@@ -17,6 +17,8 @@
     button.file-picker {
         margin-right: 20px;
         padding: 0px;
+        width: min-content;
+        white-space: nowrap;
     }
 
     button.file-picker>label {
