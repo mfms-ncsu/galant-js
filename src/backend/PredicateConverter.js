@@ -11,7 +11,7 @@
  * @author Noah Alexander
  * @author Rishabh Karwa
  */
-function convertEdges(elements, edges, isDirected) {
+function convertEdges(elements, edges, isDirected, edgeWeights, edgeLabels) {
     //Loops through all keys inside of the edges
     for (let id in edges) {
         //Gets the edge
@@ -22,9 +22,10 @@ function convertEdges(elements, edges, isDirected) {
             data: {
                 source: '',
                 target: '',
-                label: '',
                 highlighted: false,
-                color: 'black'
+                color: 'black',
+                label: '',
+                weight: null,
             }
         }
 
@@ -36,21 +37,23 @@ function convertEdges(elements, edges, isDirected) {
         for (let key in edge) {
             //If the predicate for an edge has a weightm it gets added later to a label to be displayed. Ignore it for now.
             //Transfer all other key value pairs to the edge
-            if (key !== 'weight' && key !== 'label') {
+            if (key !== 'weight' && key !== 'label' && edge[key] !== undefined) {
                 element.data[key] = edge[key];
             }
         }
 
         //Addes the weight and labeled combined in the labeled field
         //If there is only one or the other then that is only added
-        if (edge.weight && edge.label) {
+        if ((edgeWeights === null || edgeWeights) && !edge.invisibleWeight && edge.weight && (edgeLabels === null || edgeLabels) && !edge.invisibleLabel && edge.label) {
             element.data.label = edge.weight + '\n' + edge.label;
         }
-        else if (edge.weight) {
+        else if ((edgeWeights === null || edgeWeights) && !edge.invisibleWeight && edge.weight) {
             element.data.label = String(edge.weight);
         }
-        else if (edge.label) {
+        else if ((edgeLabels === null || edgeLabels) && !edge.invisibleLabel && edge.label) {
             element.data.label = edge.label;
+        } else {
+            element.data.label = "";
         }
         //Add the edge to the list of elements
         elements.push(element);
@@ -67,7 +70,7 @@ function convertEdges(elements, edges, isDirected) {
  * @param {Object} predicate - the predicates that had been converted from a test file
  * @returns returns a graph object in the cytoscape format
  */
-export default function predicateConverter(predicate) {
+export default function predicateConverter(predicate, nodeWeights, nodeLabels, edgeWeights, edgeLabels) {
     //A predicate will have up to three objects, nodes, undirected edges, and directed edges
     let nodes = predicate.nodes;
     let edges = predicate.edges;
@@ -85,10 +88,10 @@ export default function predicateConverter(predicate) {
                 //All nodes will have an id and a parent identity filed
                 id: ident,
                 marked: false,
-                label: '',
                 highlighted: false,
+                color: 'black',
+                label: '',
                 weight: null,
-                color: 'black'
             },
             //All nodes will have a position
             position: {}
@@ -104,8 +107,11 @@ export default function predicateConverter(predicate) {
             else if (node[key] === "") {
                 element.data[key] = "true";
             }
-            else {
+            else if ((key === 'weight' && (nodeWeights === null || nodeWeights)) || (key === 'label' && (nodeLabels === null || nodeLabels))) {
                 //All other key value paris will transfer to the element object in the data
+                element.data[key] = node[key];
+            }
+            else if (key !== 'weight' && key !== 'label') {
                 element.data[key] = node[key];
             }
         }
@@ -117,7 +123,7 @@ export default function predicateConverter(predicate) {
 
 
     //Convert the edges to graph elements.
-    convertEdges(elements, edges, predicate.directed);
+    convertEdges(elements, edges, predicate.directed, edgeWeights, edgeLabels);
     
 
     //push all node positions to an array

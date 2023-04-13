@@ -18,6 +18,7 @@ export default class ThreadHandlerDemo {
                     graph["nodes"][node].marked = true;
                 });
                 this.postMessage({type: "rule", content: rule});
+                this.postMessage({type: "step"});
                 return;
             }
         }
@@ -25,6 +26,7 @@ export default class ThreadHandlerDemo {
             graph.display("All nodes are marked");
         });
         this.postMessage({type: "rule", content: rule});
+        this.postMessage({type: "step"});
         this.postMessage({type: "error", content: "Example error"});
     }
 
