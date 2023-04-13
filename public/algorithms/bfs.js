@@ -6,7 +6,7 @@ let time = 0;
 // Adds a node to the queue
 function queueNode(node, weight) {
     highlight(node);
-    setWeight(next, distance);
+    setWeight(node, weight);
     label(node, "#" + time++);
 
     queue.push(node);
@@ -15,8 +15,13 @@ function queueNode(node, weight) {
 }
 
 step(() => { // Initialize with start node
-    clearNodeWeights();
+    clearNodeMarks();
+    clearNodeHighlights();
     clearNodeLabels();
+    clearNodeWeights();
+
+    clearEdgeHighlights();
+    clearEdgeColors();
 
     let start = promptNode("Enter start node:");
     queueNode(start, 0);

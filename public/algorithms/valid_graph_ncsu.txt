@@ -1,0 +1,50 @@
+n a 10 0 color:black
+n b 20 0 color:black
+n c 6 4 color:black
+n d 24 4 color:black
+n e 24 8 color:black
+n f 6 10 color:black
+n g 20 8 color:black
+n h 24 12 color:black
+n i 10 14 color:black
+n j 6 14 color:black 
+n k 6 18 color:black
+n l 24 18 color:black
+n m 10 22 color:black
+n n 20 22 color:black
+e a b
+e a c
+e b d
+e d e 
+e c f 
+e e g
+e g h
+e f i
+e i j
+e j k
+e h l
+e k m
+e l n
+e m n
+n o 12 4 color:red
+n p 18 4 color:red
+n q 12 9 color:red
+n r 18 9 color:red
+e q o color:red
+e o r color:red
+e r p color:red
+n s 12 13 color:red
+n t 18 13 color:red
+n u 12 18 color:red
+n v 18 18 color:red 
+e t s color:red
+e s u color:red
+e u v color:red
+e i s color:blue
+e v n color:blue
+e u m color:blue
+e t h color:blue
+e r g color:blue
+e f q color:blue
+e a o color:blue
+e p b color:blue
