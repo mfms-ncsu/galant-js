@@ -69,6 +69,7 @@ function GraphViewer(props) {
 				element.position = positions[element.data.id]
 			}
 		}
+		console.log(newElements);
 		setElements(newElements);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
     }, [graph])
@@ -111,13 +112,13 @@ function GraphViewer(props) {
 						valign: "top",
 						valignBox: "top",
 						tpl: (data) => {
-							if (data.weight !== undefined) {
+							if (data.weight !== null) {
 								return renderToString(
 									<div>
 										<p className="GraphViewerLabel">{data.weight}<br></br>{data.label}</p>
 									</div>
 								);
-							} else if (data.label) {
+							} else if (data.label !== '') {
 								return renderToString(
 									<div>
 										<p className="GraphViewerLabel">{data.label}</p>

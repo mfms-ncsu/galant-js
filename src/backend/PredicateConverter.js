@@ -23,7 +23,9 @@ function convertEdges(elements, edges, isDirected) {
                 source: '',
                 target: '',
                 highlighted: false,
-                color: 'black'
+                color: 'black',
+                label: '',
+                weight: null,
             }
         }
 
@@ -87,7 +89,9 @@ export default function predicateConverter(predicate) {
                 id: ident,
                 marked: false,
                 highlighted: false,
-                color: 'black'
+                color: 'black',
+                label: '',
+                weight: null,
             },
             //All nodes will have a position
             position: {}
