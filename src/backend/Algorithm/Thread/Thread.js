@@ -207,6 +207,11 @@ const clearEdgeWeights = generateSetter("clearEdgeWeights");
 // Display
 const display = generateSetter("display");
 
+/** Just a little easter egg :) */
+function fireworks() {
+    postMessage({type: "fireworks", content: "boom. explosion sound effects."})
+}
+
 /**
  * This is the listener for the Thread. It should recieve a SharedArray first, then an algorithm to run. 
  * 
