@@ -1,4 +1,5 @@
 import StepHandler from "./StepHandler";
+import { Fireworks } from 'fireworks-js'
 var ThreadHandler = null
 
 export default class AlgorithmHandler {
@@ -42,7 +43,7 @@ export default class AlgorithmHandler {
     #onMessage(message) {
         // TODO ONCE WE CHANGE TO JUST STOPPING ON STEPS, GET RID OF THE RULE IN THIS LIST
         // if we get a step or an error, stop the timeout.
-        if (["step", "error", "complete", "prompt"].includes(message.type.toString())) {
+        if (["step", "error", "complete", "prompt", "fireworks"].includes(message.type.toString())) {
             clearTimeout(this.#timeoutID)
         }
         if (message.type === "rule") {
@@ -65,6 +66,18 @@ export default class AlgorithmHandler {
             }
         } else if (message.type === "complete") {
             this.threadHandler.killThread()
+        } else if (message.type === "fireworks") {
+            console.log("launching")
+            // :) fireworks run until you click the screen, then they stop
+            const fireworks_div = document.createElement('div');
+            fireworks_div.id = "fireworks_div";
+            fireworks_div.style.cssText = "position:fixed;width:100%;height:100%;top:0px;left:0px;z-index:100000;"
+            fireworks_div.setAttribute("onclick", "let selfToRemove=document.getElementById('fireworks_div');selfToRemove.parentNode.removeChild(selfToRemove)")
+            document.getElementById('root').appendChild(fireworks_div);
+            const container = document.querySelector('#fireworks_div');
+            const fireworks = new Fireworks(container, { })
+            fireworks.start()
+            this.onMessage(message.content)
         } else if (this.onMessage != null) { // console messages
             this.onMessage(message.content);
         }
