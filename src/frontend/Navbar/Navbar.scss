@@ -1,6 +1,6 @@
 // yes, I admit, this is an ugly file. but, counter-point, it works.
 
-$navbar_height: 70px;
+$navbar_height: 6.82vh;
 
 .navbar {
     height: $navbar_height;
@@ -21,9 +21,9 @@ $navbar_height: 70px;
 }
 
 #galant_logo {
-  height: 100px;
+  height: 9.75vh;
   object-fit: cover;
-  margin-top: 20px;
+  margin-top: 1.94vh;
 }
 
 #github_logo {
