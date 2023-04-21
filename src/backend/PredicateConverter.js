@@ -1,3 +1,5 @@
+import { nodeSize } from "frontend/Graph/GraphViewer/GraphViewer";
+
 /**
  * Helper function for predicateConverter which handles the directed and undirected objects.
  * 
@@ -142,7 +144,7 @@ export default function predicateConverter(predicate, nodeWeights, nodeLabels, e
     if (graphWindow) {
         var minDim = Math.min(graphWindow.clientWidth, graphWindow.clientHeight)
         // account for width of node being 50
-        var coordToPixel = (minDim-50) / maxCoord
+        var coordToPixel = (minDim-nodeSize) / maxCoord
         var xOffset = 0;
         var yOffset = 0;
         // center the graph without using camera fit to avoid changing node sizes
@@ -153,8 +155,8 @@ export default function predicateConverter(predicate, nodeWeights, nodeLabels, e
             xOffset = (graphWindow.clientWidth - graphWindow.clientHeight) / 2
         }
         for (position of positions) {
-            position.x = position.x * coordToPixel + xOffset + 25 // 25 to account for node width/height
-            position.y = position.y * coordToPixel + yOffset + 25
+            position.x = position.x * coordToPixel + xOffset + nodeSize/2 // 25 to account for node width/height
+            position.y = position.y * coordToPixel + yOffset + nodeSize/2
         }
     }
     

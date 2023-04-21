@@ -154,13 +154,15 @@ function GraphViewer(props) {
 	</div>;
 }
 
+export const nodeSize = 30;
+
 /** @const {cytoscape.Stylesheet[]} - The stylesheet for Cytoscape, defining the default visual appearance of elements. */
 const stylesheet = [
 	{
 		selector: 'node',
 		style: {
-			width: '50px',
-			height: '50px',
+			width: nodeSize + 'px',
+			height: nodeSize + 'px',
 			backgroundColor: 'white',
 			borderWidth: '5px',
 			borderStyle: 'solid',
