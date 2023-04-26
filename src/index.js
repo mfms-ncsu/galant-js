@@ -10,7 +10,7 @@ import PromptTest from 'frontend_tests/PromptTest';
 import Navbar from 'frontend/Navbar/Navbar';
 import StepTest from 'frontend_tests/StepTest';
 
-import { Routes, Route, BrowserRouter, Link } from 'react-router-dom';
+import { Routes, Route, BrowserRouter, Link, Navigate } from 'react-router-dom';
 import { GraphProvider } from 'frontend/GraphContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -63,6 +63,10 @@ root.render(
                 <GraphProvider>
                     <StepTest />
                 </GraphProvider>
+            }></Route>
+            <Route exact path='/documentation' element={
+                // if you ever want to host the documentation locally you can change this!
+                <Navigate to='//drive.google.com/drive/u/1/folders/1o-Yqo1NH4WSr9GLRDciCoCvpugwhh7JB' />
             }></Route>
         </Routes>
     </BrowserRouter>

@@ -1,5 +1,5 @@
 /* TEAM */
-This site was created by and NC State Senior Design Team in the Spring of 2023. We are:
+This site was created by an NC State Senior Design Team in the Spring of 2023. We are:
 - Noah Alexander
 - Rishabh Kurwa
 - Yuval Sherman

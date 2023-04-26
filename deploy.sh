@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Automated deployment to the server.
 
 # This will pull main and deploy it to the website. You NEED to have an ssh key put in ~/.ssh
