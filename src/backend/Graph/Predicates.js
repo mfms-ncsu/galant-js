@@ -1,6 +1,6 @@
 import {enablePatches, freeze, produce, applyPatches} from "immer";
 
-enablePatches()
+enablePatches();
 
 export default class Predicates {
 

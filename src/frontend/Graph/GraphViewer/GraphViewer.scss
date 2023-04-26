@@ -1,4 +1,5 @@
 // @author Art Schell
+@import "index.scss";
 
 .GraphViewer {
     // The component should take up the maximum available space
@@ -11,6 +12,7 @@
     border-style: solid;
     border-color: black;
     box-sizing: border-box;
+    border-radius: $general_border_radius;
 
 
     // Style the camera / layout control buttons
@@ -37,6 +39,19 @@
             
             margin-bottom: 5px;
             margin-left: 5px;
+        }
+    }
+
+    &>.Node-Edge-Hide {
+        z-index: 1;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+
+        &>button {
+            
+            margin-bottom: 5px;
+            margin-right: 5px;
         }
     }
 

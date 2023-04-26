@@ -3,7 +3,8 @@
 .AlgorithmTest {
     // The component should take up the maximum available space
 	width: 100%;
-	height: 100%;
+	height: 90%;
+	gap: 1%;
 	
 	// Makes each pane of the window take up half the screen
 	display: flex;
@@ -12,6 +13,10 @@
 	&>.scrollable {
 		flex: 1;
 		overflow-y: auto;
+		border: 2px solid #6e6e6e;
+		border-radius: 10px;
+		background-color: #ffffff;
+		padding: 10px;
 	}
 
 	&>.App {

@@ -10,7 +10,9 @@ export default function AlgorithmConsole(props) {
     let textAreaRef = useRef(null);
 
     function addNewMessage(message) {
-        setTextAreaValue(ref.current + message + "\n");
+        let newText = ref.current + message + "\n";
+        setTextAreaValue(newText);
+        ref.current = newText;
         textAreaRef.current.scrollTop = textAreaRef.current.scrollHeight;
     };
 

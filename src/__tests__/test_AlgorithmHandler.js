@@ -41,9 +41,13 @@ function setAlgError(error, alg) {
     _alg = alg
 }
 
+function setAlgPrompt(prompt, error) {
+    // unused right now
+}
+
 test("AlgorithmHandler init", async () => {
     var graph = new Predicates(new Graph({}, {}, false, ""))
-    var handler = new AlgorithmHandler(graph, "", updateGraph, addNewMessage, setStatus, setAlgError, true)
+    var handler = new AlgorithmHandler(graph, "", updateGraph, addNewMessage, setStatus, setAlgError, setAlgPrompt, true)
     await (waitFor(() => {
         expect(handler.stepHandler).not.toBeUndefined()
     }))
@@ -59,7 +63,7 @@ test("AlgorithmHandler stepForward", async () => {
     edges[2] = { 'highlighted': false, 'source': 'a', 'target': 'a', 'weight': 20 }
     var graph = new Predicates(new Graph(nodes, edges, false, ""))
     
-    var handler = new AlgorithmHandler(graph, "", updateGraph, addNewMessage, setStatus, setAlgError, true)
+    var handler = new AlgorithmHandler(graph, "", updateGraph, addNewMessage, setStatus, setAlgError, setAlgPrompt, true)
     await (waitFor(() => {
         expect(handler.stepHandler).not.toBeUndefined()
     }))
@@ -80,7 +84,7 @@ test("AlgorithmHandler stepError", async() =>{
     edges[2] = { 'highlighted': false, 'source': 'a', 'target': 'a', 'weight': 20 }
     var graph = new Predicates(new Graph(nodes, edges, false, ""))
     
-    var handler = new AlgorithmHandler(graph, "", updateGraph, addNewMessage, setStatus, setAlgError, true)
+    var handler = new AlgorithmHandler(graph, "", updateGraph, addNewMessage, setStatus, setAlgError, setAlgPrompt, true)
     await (waitFor(() => {
         expect(handler.stepHandler).not.toBeUndefined()
     }))
@@ -104,7 +108,7 @@ test("AlgorithmHandler setGraph and setAlg", async() =>{
     edges[2] = { 'highlighted': false, 'source': 'a', 'target': 'a', 'weight': 20 }
     var graph = new Predicates(new Graph(nodes, edges, false, ""))
     
-    var handler = new AlgorithmHandler(graph, "", updateGraph, addNewMessage, setStatus, setAlgError, true)
+    var handler = new AlgorithmHandler(graph, "", updateGraph, addNewMessage, setStatus, setAlgError, setAlgPrompt, true)
     await (waitFor(() => {
         expect(handler.stepHandler).not.toBeUndefined()
     }))

@@ -8,15 +8,10 @@ export default class ThreadHandler {
     onMessage;
 
     constructor(graph, algorithm, onMessage) {
-        console.log("thread init");
-        console.log(graph);
-        console.log(algorithm);
-        console.log(onMessage);
         this.graph = graph;
         this.algorithm = algorithm;
         this.onMessage = onMessage;
         this.array = new Int32Array(new SharedArrayBuffer(1024));
-        console.log(this.onMessage);
     }
 
     startThread() {
@@ -25,8 +20,6 @@ export default class ThreadHandler {
         // client.open('GET', new URL('./Thread.js', import.meta.url));
 
         let handleMessage = (message) => {
-            console.log('message');
-            console.log(message.data);
             this.onMessage(message.data);
         }
 
@@ -39,9 +32,6 @@ export default class ThreadHandler {
 
             this.worker.onmessage = handleMessage;
             this.worker.postMessage(["shared", this.array]);
-            console.log("sending message");
-            console.log(this.graph);
-            console.log(this.algorithm);
             this.worker.postMessage(['graph/algorithm', this.graph, this.algorithm]);
         }
 
@@ -60,34 +50,14 @@ export default class ThreadHandler {
         if (this.worker) {
             this.worker.terminate();
         }
-    }    
+    }  
+    
+    enterPromptResult(promptResult) {
+        let len = Math.min(promptResult.length, 254)
+        Atomics.store(this.array, 1, len);
+        for (let i = 0; i < len; i++) {
+            Atomics.store(this.array, i + 2, promptResult.charCodeAt(i));
+        }
+        this.resumeThread();
+    }
 }
-
-// const worker = new Worker('./Thread.js');
-// //console.log('running Threadhandler');
-// let graph = {
-//     node: {
-//       1: {x:3, y:2},
-//       2: {x:1, y:2},
-//       3: {x:4, y:2}
-//     }
-// };
-
-// let buf = new SharedArrayBuffer(1024); 
-// let arr = new Int32Array(buf); 
-
-// let algorithm = 'let nodes = getNodes(); nodes.forEach(node => colorNode(red, node, arr);'
-
-// worker.postMessage(["shared", arr]);
-
-// worker.postMessage(['algorithm/graph', graph, algorithm]);
-
-// worker.on("message", message => {
-//     if (message[0]== 'message'){
-//         console.log(message[0] + ' ' + message[1]);
-//     }
-//     else if (message[0] == 'rule') {
-//         console.log(message[0] + ' ' + message[1]);
-//     }
-// });
-

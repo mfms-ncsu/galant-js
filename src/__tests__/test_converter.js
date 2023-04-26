@@ -23,8 +23,8 @@ test ("predicate with just nodes with basic information", () => {
         {data: {id:'3', marked:false, label:'', highlighted:false, weight:null, color:'black'}, position: {x:400, y:200}}
     ]
     
-    let graphData = predicateConverter(predicate);
-    expect(expectedGraphData).toEqual(graphData);
+    let graphData = predicateConverter(predicate, null, null, null, null);
+    expect(graphData).toEqual(expectedGraphData);
 });
 
 test ("predicate with just nodes with some expected information", () => {
@@ -42,7 +42,7 @@ test ("predicate with just nodes with some expected information", () => {
         {data: {id:'3', marked:false, label:'three', highlighted:false, weight:null, color:'black'}, position: {x:400, y:200}}
     ]
     
-    let graphData = predicateConverter(predicate);
+    let graphData = predicateConverter(predicate, null, null, null, null);
 
     expect(expectedGraphData).toEqual(graphData);
 });
@@ -62,7 +62,7 @@ test ("predicate with just nodes with all expected information", () => {
         {data: {id:'3', marked:false, label:'three', highlighted:true, weight:0, color:'white'}, position: {x:400, y:200}}
     ]
     
-    let graphData = predicateConverter(predicate);
+    let graphData = predicateConverter(predicate, null, null, null, null);
 
     expect(expectedGraphData).toEqual(graphData);
 });
@@ -82,7 +82,7 @@ test ("predicate with just nodes with all expected information with extra key:va
         {data: {id:'3', marked:false, label:'three', highlighted:true, weight:0, color:'white'}, position: {x:400, y:200}}
     ]
     
-    let graphData = predicateConverter(predicate);
+    let graphData = predicateConverter(predicate, null, null, null, null);
 
     expect(expectedGraphData).toEqual(graphData);
 });
@@ -105,12 +105,12 @@ test ("predicate with nodes and undirected edges with some expected information"
         {data: {id:'1', marked:false, label:'one', highlighted:false, weight:3, color:'red'}, position: {x:300, y:200}},
         {data: {id:'2', marked:true, label:'two', highlighted:false, weight:1, color:'black'}, position: {x:100, y:200}},
         {data: {id:'3', marked:false, label:'three', highlighted:true, weight:0, color:'white'}, position: {x:400, y:200}},
-        {data: {label:'', source:1, target: 2, highlighted:false, color:'black'}},
-        {data: {label:'4', source:2, target:3, highlighted:false, color:'black'}},
-        {data: {label:'', source:3, target:1, highlighted:false, color:'black'}}
+        {data: {label:'', source:1, target: 2, highlighted:false, color:'black', weight:null}},
+        {data: {label:'4', source:2, target:3, highlighted:false, color:'black', weight:null}},
+        {data: {label:'', source:3, target:1, highlighted:false, color:'black', weight:null}}
     ]
     
-    let graphData = predicateConverter(predicate);
+    let graphData = predicateConverter(predicate, null, null, null, null);
 
     expect(expectedGraphData).toEqual(graphData);
 });
@@ -133,12 +133,12 @@ test ("predicate with nodes and undirected edges with all expected information",
         {data: {id:'1', marked:false, label:'one', highlighted:false, weight:3, color:'red'}, position: {x:300, y:200}},
         {data: {id:'2', marked:true, label:'two', highlighted:false, weight:1, color:'black'}, position: {x:100, y:200}},
         {data: {id:'3', marked:false, label:'three', highlighted:true, weight:0, color:'white'}, position: {x:400, y:200}},
-        {data: {label: "2\nfour", source: 1, target: 2, highlighted:false, color:'black'}},
-        {data: {label: "4\nfive", source: 2, target: 3, highlighted:false, color:'black'}},
-        {data: {label: "1\nsix", source: 3, target: 1, highlighted:false, color:'black'}}
+        {data: {label: "2\nfour", source: 1, target: 2, highlighted:false, color:'black', weight:null}},
+        {data: {label: "4\nfive", source: 2, target: 3, highlighted:false, color:'black', weight:null}},
+        {data: {label: "1\nsix", source: 3, target: 1, highlighted:false, color:'black', weight:null}}
     ]
     
-    let graphData = predicateConverter(predicate);
+    let graphData = predicateConverter(predicate, null, null, null, null);
 
     expect(expectedGraphData).toEqual(graphData);
 });
@@ -162,12 +162,12 @@ test ("predicate with nodes and directed edges with some expected information", 
         {data: {id:'1', marked:false, label:'one', highlighted:false, weight:3, color:'red'}, position: {x:300, y:200}},
         {data: {id:'2', marked:true, label:'two', highlighted:false, weight:1, color:'black'}, position: {x:100, y:200}},
         {data: {id:'3', marked:false, label:'three', highlighted:true, weight:0, color:'white'}, position: {x:400, y:200}},
-        {data: {label:'', source:1, target: 2, highlighted:false, color:'black'}, classes: ['directed']},
-        {data: {label:'4', source:2, target:3, highlighted:false, color:'black'}, classes: ['directed']},
-        {data: {label:'', source:3, target:1, highlighted:false, color:'black'}, classes: ['directed']}
+        {data: {label:'', source:1, target: 2, highlighted:false, color:'black', weight:null}, classes: ['directed']},
+        {data: {label:'4', source:2, target:3, highlighted:false, color:'black', weight:null}, classes: ['directed']},
+        {data: {label:'', source:3, target:1, highlighted:false, color:'black', weight:null}, classes: ['directed']}
     ]
     
-    let graphData = predicateConverter(predicate);
+    let graphData = predicateConverter(predicate, null, null, null, null);
 
     expect(expectedGraphData).toEqual(graphData);
 });
@@ -191,12 +191,12 @@ test ("predicate with nodes and directed edges with all expected information", (
       {data: {id:'1', marked:false, label:'one', highlighted:false, weight:3, color:'red'}, position: {x:300, y:200}},
       {data: {id:'2', marked:true, label:'two', highlighted:false, weight:1, color:'black'}, position: {x:100, y:200}},
       {data: {id:'3', marked:false, label:'three', highlighted:true, weight:0, color:'white'}, position: {x:400, y:200}},
-      {data: {label: "2\nfour", source: 1, target: 2, highlighted:false, color:'black'}, classes: ['directed']},
-      {data: {label: "4\nfive", source: 2, target: 3, highlighted:false, color:'black'}, classes: ['directed']},
-      {data: {label: "1\nsix", source: 3, target: 1, highlighted:false, color:'black'}, classes: ['directed']}
+      {data: {label: "2\nfour", source: 1, target: 2, highlighted:false, color:'black', weight:null}, classes: ['directed']},
+      {data: {label: "4\nfive", source: 2, target: 3, highlighted:false, color:'black', weight:null}, classes: ['directed']},
+      {data: {label: "1\nsix", source: 3, target: 1, highlighted:false, color:'black', weight:null}, classes: ['directed']}
   ]
   
-  let graphData = predicateConverter(predicate);
+  let graphData = predicateConverter(predicate, null, null, null, null);
 
   expect(expectedGraphData).toEqual(graphData);
 });
@@ -206,7 +206,7 @@ test ("predicate with just nothing inside it", () => {
 
   let expectedGraphData = [];
   
-  let graphData = predicateConverter(predicate);
+  let graphData = predicateConverter(predicate, null, null, null, null);
 
   expect(expectedGraphData).toEqual(graphData);
 });
@@ -227,7 +227,7 @@ test ("predicate with nodes but empty directed and undirected edges", () => {
     {data: {id:'3', marked:false, label:'', highlighted:false, weight:null, color:'black'}, position: {x:400, y:200}}
   ];
   
-  let graphData = predicateConverter(predicate);
+  let graphData = predicateConverter(predicate, null , null, null, null);
 
   expect(expectedGraphData).toEqual(graphData);
 
@@ -241,7 +241,7 @@ test ("predicate with nodes but empty directed and undirected edges", () => {
     edges: {}
   };
 
-  graphData = predicateConverter(predicate);
+  graphData = predicateConverter(predicate, null, null, null, null);
 
   expect(expectedGraphData).toEqual(graphData);
 
@@ -256,7 +256,7 @@ test ("predicate with nodes but empty directed and undirected edges", () => {
     edges: {}
   };
 
-  graphData = predicateConverter(predicate);
+  graphData = predicateConverter(predicate, null, null, null, null);
 
   expect(expectedGraphData).toEqual(graphData);
 });

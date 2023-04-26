@@ -88,13 +88,13 @@ function GraphInput(props) {
                 </div>
             </div>
         }
-        <p>
-            <button className="file-picker">
-                <label htmlFor="file-picker">Upload Graph</label>
-            </button>
-            <input id="file-picker" hidden type={"file"} onChange={handleFile} onClick={handleClick} accept=".txt,text/plain"/>
-            <span className="filename">{fileName}</span>
-        </p>
+        
+        <button className="file-picker">
+            <label htmlFor="file-picker">Upload Graph</label>
+        </button>
+        <input id="file-picker" hidden type={"file"} onChange={handleFile} onClick={handleClick} accept=".txt,text/plain"/>
+        <span className="filename">{fileName}</span>
+        
         <textarea id="graph-text" value={textValue} disabled></textarea>
     </div>;
 };

@@ -41,6 +41,11 @@ function GraphViewer(props) {
     let ref = useRef();
     ref.current = cytoscape;
 	
+	let [nodeLabels, setNodeLabels] = useState(null);
+	let [nodeWeights, setNodeWeights] = useState(null);
+	let [edgeLabels, setEdgeLabels] = useState(null);
+	let [edgeWeights, setEdgeWeights] = useState(null);
+
     /* eslint-disable-next-line no-unused-vars */
     const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
 	useEffect(() => {
@@ -62,7 +67,7 @@ function GraphViewer(props) {
 				positions[element.data.id] = element.position;
 			}
 		}
-		let newElements = predicateConverter(graph);
+		let newElements = predicateConverter(graph, nodeWeights, nodeLabels, edgeWeights, edgeLabels);
 		// Ensure the positions of nodes are preserved in the new list of elements.
 		for (let element of newElements) {
 			if (positions[element.data.id]) {
@@ -71,7 +76,7 @@ function GraphViewer(props) {
 		}
 		setElements(newElements);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [graph])
+    }, [graph, nodeWeights, nodeLabels, edgeWeights, edgeLabels])
 	
 	return <div className="GraphViewer">
 		{/* Button controls that allow the graph layout and camera to be updated. */}
@@ -90,12 +95,28 @@ function GraphViewer(props) {
 					cytoscape.panBy({x: 0, y: 13});
 				}
 			}}>{"Auto-Camera"}</button>
-		</div>	<div className='EdgeToggler'>
+		</div>	
+		<div className='EdgeToggler'>
 			<button onClick={() => {
 				let newGraph = new Graph(startGraph.nodes, startGraph.edges, !startGraph.directed, startGraph.message);
 				loadGraph(newGraph)
 			}}>{graph.directed ? "Make Undirected" : "Make Directed"} </button>
+		</div> 
+		<div className='Node-Edge-Hide'>
+			<button onClick={() => {
+				setNodeWeights(!nodeWeights)
+			}}>{nodeWeights === null ? "Node Weight Toggle" : nodeWeights ? "Hide Node Weights" : "Show Node Weights"} </button>
+			<button onClick={() => {
+				setNodeLabels(!nodeLabels)
+			}}>{ nodeLabels === null ? "Node Label Toggle" : nodeLabels ? "Hide Node Labels" : "Show Node Labels"} </button>
+			<button onClick={() => {
+				setEdgeWeights(!edgeWeights)
+			}}>{edgeWeights === null ? "Edge Weight Toggle" : edgeWeights ? "Hide Edge Weights" : "Show Edge Weights"} </button>
+			<button onClick={() => {
+				setEdgeLabels(!edgeLabels)
+			}}>{edgeLabels === null ? "Edge Label Toggle" : edgeLabels ? "Hide Edge Labels" : "Show Edge Labels"} </button>
 		</div>
+		
 		<p className="GraphViewerMessage">{graph.message}</p>
 		<CytoscapeComponent elements={elements}
 			layout={{
@@ -111,13 +132,13 @@ function GraphViewer(props) {
 						valign: "top",
 						valignBox: "top",
 						tpl: (data) => {
-							if (data.weight) {
+							if (!data.invisible && !data.invisibleWeight && data.weight) {
 								return renderToString(
 									<div>
-										<p className="GraphViewerLabel">{data.weight}<br></br>{data.label}</p>
+										<p className="GraphViewerLabel">{data.weight}<br></br>{!data.invisibleLabel ? data.label : ""}</p>
 									</div>
 								);
-							} else if (data.label) {
+							} else if (!data.invisible && !data.invisibleLabel && data.label) {
 								return renderToString(
 									<div>
 										<p className="GraphViewerLabel">{data.label}</p>
@@ -133,19 +154,22 @@ function GraphViewer(props) {
 	</div>;
 }
 
+export const nodeSize = 30;
+
 /** @const {cytoscape.Stylesheet[]} - The stylesheet for Cytoscape, defining the default visual appearance of elements. */
 const stylesheet = [
 	{
 		selector: 'node',
 		style: {
-			width: '50px',
-			height: '50px',
+			width: nodeSize + 'px',
+			height: nodeSize + 'px',
 			backgroundColor: 'white',
 			borderWidth: '5px',
 			borderStyle: 'solid',
 			borderColor: 'black',
 			label: 'data(id)',
 			textValign: 'center',
+			visibility: 'visible',
 		}
 	},
 	// Marked nodes
@@ -172,6 +196,20 @@ const stylesheet = [
 		selector: 'node[?highlighted]',
 		style: {
 			borderWidth: '10px',
+		}
+	},
+	// Invisible nodes
+	{
+		selector: 'node[?invisible]',
+		style: {
+			visibility: 'hidden',
+		}
+	},
+	// Invisible edges
+	{
+		selector: 'edge[?invisible]',
+		style: {
+			visibility: 'hidden',
 		}
 	},
 	// Highlighted edges
