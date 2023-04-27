@@ -7,16 +7,29 @@ import Graph from "backend/Graph/Graph.js";
 let sharedArray;
 //Instance of the graph that the thread will be working with
 let predicates;
+//Lets the user automatically stop algorithm execution when a change to the graph happens when enabled
+//When set to false the user will have to manually stop the algorithm execution.
+let autoStepEnabled = true;
 
 // Waiting, stepping and automatically stepping
-
+/**
+ * This function uses Atomics to cause the algorithm to wait for user input before continuing
+ */
 function wait() {
     Atomics.store(sharedArray, 0, 0);
     Atomics.wait(sharedArray, 0, 0);
 }
 
-let autoStepEnabled = true;
-
+/**
+ * This function has the ability to take in a chunk of users code that has been
+ * made into a funcyion. This will disable the autostep functionality so that the
+ * code will run all the way through without waiting/stepping. Once done it will
+ * generate a message with all the users steps and wait.
+ * 
+ * If no function is passed in then it posts a message of a step occuring and then waits.
+ * 
+ * @param {*} code optional parameter of a function from a users algorithm
+ */
 function step(code=null) {
     let prevAutoStep = autoStepEnabled;
 
@@ -31,15 +44,20 @@ function step(code=null) {
     autoStepEnabled = prevAutoStep;
 }
 
+/**
+ * This method is at the end of every api method that changes the graph
+ * and if the user has not disabled autostep then it will automatically
+ * step once the method is called.
+ */
 function autoStep() {
     if (autoStepEnabled) {
         step();
     }
 }
 
-/*******************************
- * API Methods for user to use *
- * *****************************/
+/*******************************  *************************************************
+ * API Methods for user to use *  * See programmer documentation for method usage *
+ *******************************  *************************************************/
 
 
 function enableAutoStep() {
