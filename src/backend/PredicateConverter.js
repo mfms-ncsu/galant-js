@@ -1,4 +1,4 @@
-import { nodeSize } from "frontend/Graph/GraphViewer/GraphViewer";
+export const nodeSize = 30;
 
 /**
  * Helper function for predicateConverter which handles the directed and undirected objects.
