@@ -1,6 +1,7 @@
 import './GraphViewer.scss';
 
 import { useState, useContext, useEffect, useRef } from 'react';
+import { nodeSize } from "backend/PredicateConverter";
 import { renderToString } from 'react-dom/server';
 import CytoscapeComponent from 'react-cytoscapejs';
 import GraphContext from 'frontend/GraphContext';
@@ -154,7 +155,6 @@ function GraphViewer(props) {
 	</div>;
 }
 
-export const nodeSize = 30;
 
 /** @const {cytoscape.Stylesheet[]} - The stylesheet for Cytoscape, defining the default visual appearance of elements. */
 const stylesheet = [

@@ -18,6 +18,7 @@ function Navbar(props) {
                 <div className='nav-elements'>
                     <ul>
                         <li><NavLink to='/'>Home</NavLink></li>
+                        <li><NavLink to='/collection'>Collection</NavLink></li>
                         <li><NavLink to='/tests'>Tests</NavLink></li>
                         <li><NavLink to='/documentation'>Documentation</NavLink></li>
                         <li>
