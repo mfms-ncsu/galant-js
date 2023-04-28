@@ -3,9 +3,10 @@ import './index.scss'
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from 'frontend/App';
-import GraphViewerTest from 'frontend/Graph/GraphViewer/GraphViewerTest';
-import GraphInputTest from 'frontend/Graph/GraphInput/GraphInputTest';
-import AlgorithmTest from 'frontend/Algorithm/AlgorithmTest';
+import Collection from 'frontend/Collection/Collection'
+import GraphViewerTest from 'frontend_tests/GraphViewerTest';
+import GraphInputTest from 'frontend_tests/GraphInputTest';
+import AlgorithmTest from 'frontend_tests/AlgorithmTest';
 import PromptTest from 'frontend_tests/PromptTest';
 import Navbar from 'frontend/Navbar/Navbar';
 import StepTest from 'frontend_tests/StepTest';
@@ -22,6 +23,12 @@ root.render(
                 <>
                     <Navbar />
                     <App />
+                </>
+            }></Route>
+            <Route exact path='/collection' element={
+                <>
+                    <Navbar />
+                    <Collection />
                 </>
             }></Route>
             <Route exact path='/tests' element={
@@ -61,6 +68,7 @@ root.render(
             }></Route>
             <Route exact path='/tests/step' element={
                 <GraphProvider>
+                    <Navbar />
                     <StepTest />
                 </GraphProvider>
             }></Route>
