@@ -1,0 +1,33 @@
+# unweighted, based on a Delaunay triangulation
+# if directed, all nodes are reachable from node 1
+n 1 50 20
+n 2 30 20
+n 3 5 60
+n 4 35 5
+n 5 20 50
+n 6 10 30
+n 7 25 30
+n 8 50 60
+n 9 40 35
+n 10 5 40
+e 1 9
+e 1 8
+e 1 4
+e 4 2
+e 2 6
+e 2 7
+e 2 9
+e 3 10
+e 3 8
+e 5 3
+e 4 9
+e 4 6
+e 5 7
+e 5 6
+e 10 5
+e 5 8
+e 6 10
+e 6 7
+e 7 8
+e 7 9
+e 8 9
