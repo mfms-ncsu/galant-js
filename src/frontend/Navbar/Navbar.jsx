@@ -22,7 +22,7 @@ function Navbar(props) {
                         <li><NavLink to='/tests'>Tests</NavLink></li>
                         <li><NavLink to='/documentation'>Documentation</NavLink></li>
                         <li>
-                            <NavLink to='https://github.ncsu.edu/engr-csc-sdc/2023SpringTeam37-Stallmann' target="_blank">
+                            <NavLink to='https://github.com/mfms-ncsu/galant-js' target="_blank">
                                 <img id='github_logo' src='/img/github-mark.png' alt='Github logo' />
                             </NavLink>
                         </li>

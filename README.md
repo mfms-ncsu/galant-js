@@ -1,4 +1,4 @@
-# 2023SpringTeam37-Stallmann
+# Galant Web
 
 <div align='center'>
   <a href='https://galant.csc.ncsu.edu'>
