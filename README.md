@@ -2,7 +2,7 @@
 
 <div align='center'>
   <a href='https://galant.csc.ncsu.edu'>
-  <img src='https://github.ncsu.edu/engr-csc-sdc/2023SpringTeam37-Stallmann/blob/main/public/img/galant_full_logo.svg?raw=true' alt='Galant Logo' width=600px/>
+  <img src='https://github.com/mfms-ncsu/galant-js/blob/main/public/img/galant_full_logo.svg?raw=true' alt='Galant Logo' width=600px/>
   </a>
 </div>
 
