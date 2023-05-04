@@ -36,7 +36,7 @@ function GraphInput(props) {
             return;
         }
         var ext = e.target.files[0].name.match(/.([^.]+)$/)[1];
-        if (ext !== "txt") {
+        if (ext !== "txt" && ext !== "gph" && ext !== "sgf") {
             setErrorMessage("Unaccepted File Type: '." + ext + "'");
             setErrorFilename(filename);
             return;
@@ -92,7 +92,7 @@ function GraphInput(props) {
         <button className="file-picker">
             <label htmlFor="file-picker">Upload Graph</label>
         </button>
-        <input id="file-picker" hidden type={"file"} onChange={handleFile} onClick={handleClick} accept=".txt,text/plain"/>
+        <input id="file-picker" hidden type={"file"} onChange={handleFile} onClick={handleClick} accept=".txt,text/plain,.gph,.sgf"/>
         <span className="filename">{fileName}</span>
         
         <textarea id="graph-text" value={textValue} disabled></textarea>
