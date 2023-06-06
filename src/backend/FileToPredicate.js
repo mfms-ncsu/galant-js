@@ -17,8 +17,12 @@ export function parseText(graphText) {
     var lines = graphText.split('\n')
     for (var line = 0; line < lines.length; line++) {
         let current_line = lines[line].trim()
-        //if the line starts with / or # it is a comment so skip it. Or if the line is empty, just skip it.
-        if (current_line[0] === '/' || current_line[0] === '#' || current_line.length === 0) {
+        //if the line is a comment or tag line in one of the standard graph formats
+        // or if the line is empty, just skip it.
+        if (current_line[0] === '/' || current_line[0] === '#'
+            || current_line[0] === 'c' || current_line[0] === 'g'
+            || current_line[0] === 't' || current_line[0] === '-'
+            || current_line.length === 0) {
             //this does nothing since we're skipping.
         }
         //this is a node
@@ -53,7 +57,7 @@ function nodeParser(node_string, node_map) {
     //trim the end whitespace
     var trimmed = node_string.trimEnd()
     //split values to an array in the string by removing whitespace in middle
-    var all_values = trimmed.substring(2).split(" ")
+    var all_values = trimmed.substring(2).split(/\s+/)
     //keys and values of all values of the node
     var keys = ['weight', 'x', 'y']
     var boolean_keys = ['invisibleLabel', 'invisibleWeight', 'invisible', 'highlighted', 'marked']
@@ -137,7 +141,7 @@ function edgeParser(edge_string, edge_map, createEdgeId) {
     //trim the end whitespace
     var trimmed = edge_string.trimEnd()
     //split values to an array in the string by removing whitespace in middle
-    var all_values = trimmed.substring(2).split(" ")
+    var all_values = trimmed.substring(2).split(/\s+/)
     //keys and values of all values of the edge
     var keys = ['weight', 'source', 'target']
     var boolean_keys = ['shouldBeInvisible', 'invisibleLabel', 'invisibleWeight', 'invisible', 'highlighted']

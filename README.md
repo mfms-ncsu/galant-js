@@ -1,8 +1,8 @@
-# 2023SpringTeam37-Stallmann
+# Galant Web
 
 <div align='center'>
   <a href='https://galant.csc.ncsu.edu'>
-  <img src='https://github.ncsu.edu/engr-csc-sdc/2023SpringTeam37-Stallmann/blob/main/public/img/galant_full_logo.svg?raw=true' alt='Galant Logo' width=600px/>
+  <img src='https://github.com/mfms-ncsu/galant-js/blob/main/public/img/galant_full_logo.svg?raw=true' alt='Galant Logo' width=600px/>
   </a>
 </div>
 
@@ -23,7 +23,7 @@ Developer and User documentation can be found [here](https://galant.csc.ncsu.edu
 To deploy a change to the production server:
 - Create an ssh key if you haven't already with `ssh-keygen` and make sure it is in `~/.ssh`.
 - Copy the public key you created to your Github settings (Settings > SSH keys).
-- Go to the base of the project at `var/www/web-based-galant` and run `$ ./deploy.sh <your username on the box>`
+- Go to the base of the project at `/var/www/web-based-galant` and run `$ ./deploy.sh <your username on the box>`
     - This script pulls `main`, runs `npm run build` and restarts Apache. You can also do this all manually if you want.
 
 This software is licensed by a [Gnu Public License](https://www.gnu.org/licenses/gpl.html).
