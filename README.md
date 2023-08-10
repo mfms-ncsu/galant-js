@@ -1,6 +1,6 @@
 # Galant Web
 
-***[+++ Check the development branch for the latest updates and feature requests +++]***
+***[+++ Check the develop branch for the latest updates +++]***
 
 <div align='center'>
   <a href='https://galant.csc.ncsu.edu'>
