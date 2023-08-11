@@ -56,14 +56,15 @@ function nodeParser(node_string, node_map) {
     var node_id = false
     //trim the end whitespace
     var trimmed = node_string.trimEnd()
-    //split values to an array in the string by removing whitespace in middle
-    var all_values = trimmed.substring(2).split(/\s+/)
+    //split string to an array using whitespace as a delimiter
+    var all_values = trimmed.split(/\s+/)
     //keys and values of all values of the node
     var keys = ['weight', 'x', 'y']
     var boolean_keys = ['invisibleLabel', 'invisibleWeight', 'invisible', 'highlighted', 'marked']
     var values = [undefined]
 
-    for (var i = 0; i < all_values.length; i++) {
+    //start with the second item; the first should be 'n'
+    for (var i = 1; i < all_values.length; i++) {
         //id value
         if (node_id === false) {
             node_id = all_values[i]
@@ -140,15 +141,16 @@ function nodeParser(node_string, node_map) {
 function edgeParser(edge_string, edge_map, createEdgeId) {
     //trim the end whitespace
     var trimmed = edge_string.trimEnd()
-    //split values to an array in the string by removing whitespace in middle
-    var all_values = trimmed.substring(2).split(/\s+/)
+    //split string to an array using whitespace as a delimiter
+    var all_values = trimmed.split(/\s+/)
     //keys and values of all values of the edge
     var keys = ['weight', 'source', 'target']
     var boolean_keys = ['shouldBeInvisible', 'invisibleLabel', 'invisibleWeight', 'invisible', 'highlighted']
     var values = [undefined]
     let edge_id = "? ?";
 
-    for (var i = 0; i < all_values.length; i++) {
+    //start with the second item; the first should be 'n'
+    for (var i = 1; i < all_values.length; i++) {
         //source value
         if (values.length === 1) {
             values.push(all_values[i])

@@ -14,6 +14,7 @@ Developer and User documentation can be found [here](https://galant.csc.ncsu.edu
 
 ### Development
 - Clone repo, run `npm install` in repo directory.
+- run `npm run build` after each change.
 - Run `npm start` to run app to develop.
 
 ### Testing
