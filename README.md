@@ -21,9 +21,13 @@ Developer and User documentation can be found [here](https://galant.csc.ncsu.edu
 
 ### Deployment
 To deploy a change to the production server:
-- Create an ssh key if you haven't already with `ssh-keygen` and make sure it is in `~/.ssh`.
+- BOX currently refers to `galant.csc.ncsu.edu`, but can be replaced with any server, and UID to the login id on the box, unity id currently
+- log on to BOX using UID
+- Create an ssh key if you haven't already with `ssh-keygen` and make sure it is in `~/.ssh` in a file called id_rsa (public key is in id_rsa.pub)
 - Copy the public key you created to your Github settings (Settings > SSH keys).
-- Go to the base of the project at `/var/www/web-based-galant` and run `$ ./deploy.sh <your username on the box>`
+- Go to the base of the project at `/var/www/galant-js` and run `$ ./deploy.sh UID
     - This script pulls `main`, runs `npm run build` and restarts Apache. You can also do this all manually if you want.
+
+***Note:*** *It appears that you have to own the files in `/var/www/galant-js` to do the ` git pull` command in the script successfully.* There may be a workaround.
 
 This software is licensed by a [Gnu Public License](https://www.gnu.org/licenses/gpl.html).
