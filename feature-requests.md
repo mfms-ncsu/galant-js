@@ -22,4 +22,4 @@
 
 10. It would be nice (for my own graph drawing research) to be able to draw sgf files and animate layered graph algorithms. The local version is already capable of reading sgf files, but it would be nice to scale horizontal and vertical coordinates proportional to window dimensions, as is done in the Java version. A classic example is the graph n42-t48v150.
     - n42-t48v150.sgf can be uploaded into galant-js.
-    - what is should look like (rotated 90 degrees) is n42-t48v150.png
+    - what it should look like (rotated 90 degrees) is n42-t48v150.png
