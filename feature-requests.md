@@ -1,5 +1,5 @@
 # The following are desired in a future version of galant-js
-Ones that have been accomplished are turned into bullet items. Others are highlighted.
+Ones that have been accomplished by the Fall 2023 Senior Design Team of Ryan Bruce, Charlie Fligg, Emma Holincheck, and Sudhanshu Moghe are turned into bullet items. These are yet to be merged into this repository. Other feature requests are highlighted.
 
 * 1. Graph and the algorithm in separate resizeable popup windows. Failing that, some way to give most of the space to the graph when it is being manipulated or the animation is running. *Galant-js now has popup windows for algorithms and graphs; each popup has (or will have) tabs for different algorithms/graphs*
 
