@@ -11,7 +11,7 @@ Ones that have been accomplished by the Fall 2023 Senior Design Team of Ryan Bru
 - detailed information about where and how each feature is implemented
 - a log of design and implementation decisions and the reasoning behind them
 
-* 5. User documentation. The important details are in the current programmer documentation. Keyboard shortcuts for most operations would be great. 
+* 5. User documentation. The important details are in the current programmer documentation. ***Keyboard shortcuts for most operations would be great.*** 
 
 * 6. A mechanism to save the current state of a graph. ***Will be done in the final iteration; already done for edited algorithm.***
 
@@ -25,19 +25,19 @@ Ones that have been accomplished by the Fall 2023 Senior Design Team of Ryan Bru
     - n42-t48v150.sgf can be uploaded into galant-js
     - what it should look like (rotated 90 degrees) is n42-t48v150.png
 ***Major unfinished business here. More details below***   
-
    
 # Some unfinished business
 ## Backend
-11. Adding modules/classes that can be accessed/imported from any part of the JS code. The most obvious applications are data structure implementations, debug printing, and utilities for special types of graphs. Putting this in Thread.js is undesirable for two reasons: much of it needs to be accessed from other parts of the code; and Thread.js should not become cluttered.
+11. Adding modules/classes that can be accessed/imported from any part of the JS code. The most obvious applications are ***data structure implementations, debug printing, and utilities for special types of graphs.*** Putting this in Thread.js is undesirable for two reasons: much of it needs to be accessed from other parts of the code; and Thread.js should not become cluttered.
 
 ## Frontend
-12. Scaling of graph based on both height and width of window. Cytoscape's ability to pan and Zoom is sufficient in almost all situations, but layered graphs, sorting graphs, and the corresponding algorithms require special treatment. The desired behavior is hard to explain - you need to load a layered graph or run a sorting algorithm in the Java version.
+12. ***Scaling of graph based on both height and width of window.*** Cytoscape's ability to pan and Zoom is sufficient in almost all situations, but layered graphs, sorting graphs, and the corresponding algorithms require special treatment. The desired behavior is hard to explain - you need to load a layered graph or run a sorting algorithm in the Java version.
 13. Put buttons in different places, use different colors for text and background, different defaults for text fonts and sizes, etc.
+14. ***Keyboard shortcuts*** for all actions that currently require a mouse. Ideally, these would be defined in one place. The following shortcuts are important: ability to press `return` instead of an `okay` button, file uploading,loading, and saving, and toggles for visibility of weights, labels, and directedness.
 
 ## Both ends
-14. Algorithms should have the ability to move nodes. Two options for node positioning
+14. ***Algorithms should have the ability to move nodes.*** Two options for node positioning
     - nodes can be moved by user during editing and algorithm execution; nodes stay in where the user puts them
-    - nodes cannot be moved by the user or moved only in limited fashion; any move by the user during algorithm execution is undone by the next step, whether forward or backward; ***algorithms are capable of moving nodes***
+    - nodes cannot be moved by the user or moved only in limited fashion; any move by the user during algorithm execution is undone by the next step, whether forward or backward
    
 
