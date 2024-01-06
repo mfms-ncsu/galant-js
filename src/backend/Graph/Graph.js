@@ -1,5 +1,12 @@
 import {immerable} from "immer";
 
+// Send messages to the console
+// @todo should be available elsewhere
+
+function print(message) {
+    postMessage({type: "console", content: message});
+}
+
 export default class Graph {
     [immerable] = true;
 
@@ -169,16 +176,15 @@ export default class Graph {
     outgoing(node) {
         this.getNodeObject(node);
 
-        if (!this.directed) {
+        if ( ! this.directed ) {
             return this.incident(node);
         }
 
         let edges = [];
-        for (const edge of this.getEdges()) {
+        for ( const edge of this.incident(node) ) {
             let edgeObj = this.getEdgeObject(edge);
-
-            if (edgeObj.source === node) {
-                if (!edges.includes(edge)) {
+            if ( edgeObj.source === node ) {
+                if ( ! edges.includes(edge) ) {
                     edges.push(edge);
                 }
             }
