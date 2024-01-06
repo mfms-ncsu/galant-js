@@ -29,30 +29,29 @@ function visit(node) {
     });
 
     print(outgoing(node));
-	for (let edge of outgoing(node)) {
+	for ( let edge of outgoing(node) ) {
         print(edge);
 		let nextNode = other(node, edge);
 
-        if (hasLabel(edge)) {
+        if ( hasLabel(edge) ) {
             continue;
         }
 
         step(() => {
-            if (!marked(nextNode)) { // not yet visited
+            if ( ! marked(nextNode) ) { // not yet visited
                 highlight(edge);
-                label(edge, "Tree");
                 color(edge, "blue");
 
                 highlight(nextNode);
                 visit(nextNode);
-            } else if (finishTimes[nextNode] == null ) { // ancestor
-                label(edge, "Back");
+            } else if ( finishTimes[nextNode] == null ) { // ancestor
+                label(edge, "B");
                 color(edge, "red");
-            } else if (finishTimes[nextNode] > discoveryTimes[node]) { // descendant
-                label(edge, "Forward");
+            } else if ( finishTimes[nextNode] > discoveryTimes[node] ) { // descendant
+                label(edge, "F");
                 color(edge, "green");
             } else {
-                label(edge, "Cross");
+                label(edge, "C");
                 color(edge, "orange");
             }
         });
