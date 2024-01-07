@@ -1,14 +1,15 @@
-export const nodeSize = 30;
+// Default node size when converting the radius of the node to Cytoscape
+const nodeSize = 30;
 
 /**
  * Helper function for predicateConverter which handles the directed and undirected objects.
- * 
+ *
  * @param elements - the elements list to push newly created graph objects to.
  * @param edges - the list of directed or undirected.
  * @param isDirected - boolean True or False telling the function whether to include a `classes: ['directed']` clause in the graph object.
  *
  * @returns - The converted elements
- * 
+ *
  * @author Andrew Watson
  * @author Noah Alexander
  * @author Rishabh Karwa
@@ -67,7 +68,7 @@ function convertEdges(elements, edges, isDirected, edgeWeights, edgeLabels) {
  * This method will take a specified predicate format and convert
  * it into a graph object that is in the format of a cytoscape
  * object
- * 
+ *
  * @author Noah Alexander ngalexa2
  * @param {Object} predicate - the predicates that had been converted from a test file
  * @returns returns a graph object in the cytoscape format
@@ -97,9 +98,9 @@ export default function predicateConverter(predicate, nodeWeights, nodeLabels, e
             },
             //All nodes will have a position
             position: {}
-            
+
         }
-        
+
         //Loop through all the keys in the node
         for (let key in node) {
             //x and y coordinates are held in a seperate dictionary in the element object
@@ -126,7 +127,7 @@ export default function predicateConverter(predicate, nodeWeights, nodeLabels, e
 
     //Convert the edges to graph elements.
     convertEdges(elements, edges, predicate.directed, edgeWeights, edgeLabels);
-    
+
 
     //push all node positions to an array
     var positions = []
@@ -159,7 +160,7 @@ export default function predicateConverter(predicate, nodeWeights, nodeLabels, e
             position.y = position.y * coordToPixel + yOffset + nodeSize/2
         }
     }
-    
+
     return(elements);
 
 }

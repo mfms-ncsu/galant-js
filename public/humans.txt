@@ -6,5 +6,12 @@ This site was created by an NC State Senior Design Team in the Spring of 2023. W
 - Art Schell
 - Andrew Watson
 
+This site has been edited by subsequent NC State Senior Design Team's. We are:
+- Fall 2023
+    - Ryan Bruce
+    - Charlie Fligg
+    - Emma Holincheck
+    - Sudhanshu Moghe
+
 /* THANKS */
 Senior Design Sponsor and Original Galant Sponsor: Dr. Matthias Stallmann.

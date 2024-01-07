@@ -1,5 +1,5 @@
 // @author Rishabh Karwa
-
+@import '~bootstrap/scss/bootstrap.scss';
 .AlgorithmControls {
     // The component should take up the maximum available space
     width: 100%;
@@ -8,25 +8,19 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 8%;
+    gap: 2%;
 
     &>.arrow {
         
-        max-height: 100%;
-        height: auto;
+        //max-height: 200%;
         flex-shrink: 1;
         align-items: center;
         justify-items: center;
-
-        &>button {
-            &>img {
-                max-height: 10vh;
-            }
-        }
+        background-color: #79c7ff;
 
         button:disabled, button[disabled]{
             img {
-                opacity: .6;
+                opacity: 1;
             }
         }
 

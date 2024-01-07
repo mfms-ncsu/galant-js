@@ -1,19 +1,22 @@
-import './AlgorithmControls.scss'
+import React, { useContext } from 'react';
+import './AlgorithmControls.scss';
+import ArrowCircleLeftRoundedIcon from '@mui/icons-material/ArrowCircleLeftRounded';
+import ArrowCircleRightRoundedIcon from '@mui/icons-material/ArrowCircleRightRounded';
+import { IconButton } from '@mui/material';
+import GraphContext from 'frontend/GraphContext.jsx';
 
-import { useEffect } from "react"
+import { useEffect } from "react";
 
 export default function AlgorithmControls(props) {
 
+    const {status, stepForward, stepBack} = useContext(GraphContext);
+
     function frontButtonPress() {
-        if (!document.getElementById("forwardbutton").disabled) {
-            props.onForward();
-        }
+        stepForward();
     } 
 
     function backButtonPress() {
-        if (!document.getElementById("backbutton").disabled) {
-            props.onBack();
-        }
+        stepBack();
     }   
 
     function handleKeyPress(event) {
@@ -35,17 +38,17 @@ export default function AlgorithmControls(props) {
         <div className="AlgorithmControls">
 
             <div className='arrow'>
-                <button id='backbutton' disabled={!props.status.canStepBack} onClick={backButtonPress}>
-                    <img src='/img/left_arrow.svg' alt="backward arrow"/>
-                </button>
+                <IconButton id='forwardbutton' size="large" disabled={!status.canStepBack} onClick={() => backButtonPress()}>
+                    <ArrowCircleLeftRoundedIcon size="large" />
+                </IconButton>
             </div>
             <div className='stepcounter'>
-                <p>Step {props.status.displayState}/{props.status.algorithmState}</p>
+                <p>Step {status.displayState}/{status.algorithmState}</p>
             </div>
             <div className='arrow'>
-                <button id='forwardbutton' disabled={!props.status.canStepForward} onClick={frontButtonPress}>
-                    <img src='/img/right_arrow.svg' alt="forward arrow"/>
-                </button>
+                <IconButton id='forwardbutton' size="large" disabled={!status.canStepForward} onClick={() => frontButtonPress()}>
+                    <ArrowCircleRightRoundedIcon size="large" />
+                </IconButton>
             </div>
 
         </div>
