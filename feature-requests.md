@@ -1,5 +1,5 @@
 # The following are desired in a future version of galant-js
-Ones that have been accomplished are turned into bullet items. Others are highlighted.
+Ones that have been accomplished by the Fall 2023 Senior Design Team of Ryan Bruce, Charlie Fligg, Emma Holincheck, and Sudhanshu Moghe are turned into bullet items. These are yet to be merged into this repository. Other feature requests are highlighted.
 
 * (1) Graph and the algorithm in separate resizeable popup windows. Failing that, some way to give most of the space to the graph when it is being manipulated or the animation is running. *Galant-js now has popup windows for algorithms and graphs; each popup has (or will have) tabs for different algorithms/graphs*
 
@@ -25,19 +25,19 @@ Ones that have been accomplished are turned into bullet items. Others are highli
     - n42-t48v150.sgf can be uploaded into galant-js
     - what it should look like (rotated 90 degrees) is n42-t48v150.png
 ***Major unfinished business here. More details below***   
-
    
 # Some unfinished business
 ## Backend
-11. Adding modules/classes that can be accessed/imported from any part of the JS code. The most obvious applications are data structure implementations, debug printing, and utilities for special types of graphs. Putting this in Thread.js is undesirable for two reasons: much of it needs to be accessed from other parts of the code; and Thread.js should not become cluttered.
+11. Adding modules/classes that can be accessed/imported from any part of the JS code. The most obvious applications are ***data structure implementations, debug printing, and utilities for special types of graphs.*** Putting this in Thread.js is undesirable for two reasons: much of it needs to be accessed from other parts of the code; and Thread.js should not become cluttered.
 
 ## Frontend
-12. Scaling of graph based on both height and width of window. Cytoscape's ability to pan and Zoom is sufficient in almost all situations, but layered graphs, sorting graphs, and the corresponding algorithms require special treatment. The desired behavior is hard to explain - you need to load a layered graph or run a sorting algorithm in the Java version.
+12. ***Scaling of graph based on both height and width of window.*** Cytoscape's ability to pan and Zoom is sufficient in almost all situations, but layered graphs, sorting graphs, and the corresponding algorithms require special treatment. The desired behavior is hard to explain - you need to load a layered graph or run a sorting algorithm in the Java version.
 
 13. Put buttons in different places, use different colors for text and background, different defaults for text fonts and sizes, etc.
+14. ***Keyboard shortcuts*** for all actions that currently require a mouse. Ideally, these would be defined in one place. The following shortcuts are important: ability to press `return` instead of an `okay` button, file uploading,loading, and saving, and toggles for visibility of weights, labels, and directedness.
 
 ## Both ends
-14. Algorithms should have the ability to move nodes. Two options for node positioning
-    - nodes can be moved by user during editing and algorithm execution; user controlled changes in node positions during algorithm execution persist when execution terminates
-    - nodes cannot be moved by the user or moved only in limited fashion; any move by the user during algorithm execution is undone by the next step, whether forward or backward; ***algorithms are capable of moving nodes***
-In the Java version an algorithm is able to specify/declare which type of node positioning is desired. The second is important for algorithms that move nodes.
+14. ***Algorithms should have the ability to move nodes.*** Two options for node positioning
+    - nodes can be moved by user during editing and algorithm execution; nodes stay in where the user puts them
+    - nodes cannot be moved by the user or moved only in limited fashion; any move by the user during algorithm execution is undone by the next step, whether forward or backward
+
