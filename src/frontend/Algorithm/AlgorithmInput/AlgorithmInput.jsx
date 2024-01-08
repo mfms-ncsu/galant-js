@@ -27,7 +27,7 @@ function AlgorithmInput(props) {
     const [tabs,setTabs] = useState([{
         'key': 0,
         'filename': 0,
-        'content': 'Upload a Graph or Edit one Here.' 
+        'content': 'Upload an Algorithm or Edit one Here.' 
     }]);
     var [currentTab, setCurrentTab] = useState(0);
     
@@ -59,7 +59,7 @@ function AlgorithmInput(props) {
         setTabs([...tabs, {
         'key': tabAmount,
         'filename': tabAmount,
-        'content': 'Upload a Graph or Edit one Here.' 
+        'content': 'Upload an Algorithm or Edit one Here.' 
         }]);
         setTabAmount(tabAmount + 1);
 
@@ -145,7 +145,7 @@ function AlgorithmInput(props) {
         <Editor
             height="60vh"
             defaultLanguage='javascript'
-            defaultValue='Upload a Algorithm or Edit one Here.
+            defaultValue='Upload an Algorithm or Edit one Here.
             
             '
             onMount={handleEditorDidMount}

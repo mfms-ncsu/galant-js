@@ -156,16 +156,16 @@ export default class Graph {
     incoming(node) {
         this.getNodeObject(node);
 
-        if (!this.directed) {
+        if ( ! this.directed ) {
             return this.incident(node);
         }
 
         let edges = [];
-        for (const edge of this.getEdges()) {
+        for ( const edge of this.incident(node) ) {
             let edgeObj = this.getEdgeObject(edge);
 
-            if (edgeObj.target === node) {
-                if (!edges.includes(edge)) {
+            if ( edgeObj.target === node ) {
+                if ( ! edges.includes(edge) ) {
                     edges.push(edge);
                 }
             }
