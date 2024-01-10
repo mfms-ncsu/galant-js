@@ -52,6 +52,10 @@ In the Java version an algorithm is able to specify/declare which type of node p
 
 4. You have to open "developer tools" in the browser to see the console and get information such as detailed error messages. And the developer messages don't give line numbers for the algorithms. Makes debugging difficult.
 
+A particular bug I have been unable to track down: If you run `dijsktra.js` on `unweighted_10.txt` and make the latter directed, the algorithm crashes with a `null` node after a few steps.
+
 5. There is no easy way to print information about various objects (nodes, edges, lists); again, debugging would be much easier if there were
 
-6. If you click Algorithm Editor or Graph Editor, the algorithm(s) or graph(s) that were uploaded go away. 
+6. If you click Algorithm Editor or Graph Editor, the algorithm(s) or graph(s) that were uploaded go away.
+
+7. The Algorithm Editor and Graph Editor windows persist after the application is terminated by closing the main window or a Ctrl-C from the terminal.
