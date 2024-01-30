@@ -59,8 +59,7 @@ step(() => {
 
     for (let edge of getEdges()) {
         if ( ! hasWeight(edge) ) {
-            // setWeight(edge, euclidian(edge));
-            display("*** edge ${edge} has no weight, setting to 1 ***")
+            display("*** edge ${edge} has no weight, setting to 1, Euclidian distance does not work ***")
             setWeight(edge, 1)
         }
     }

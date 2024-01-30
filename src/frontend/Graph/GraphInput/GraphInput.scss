@@ -1,5 +1,5 @@
 // @author Art Schell
-
+@import '~bootstrap/scss/bootstrap.scss';
 .GraphInput {
     // The component should take up the maximum available space
     width: 100%;
@@ -63,7 +63,9 @@
         button {
             width: 30%;
             margin: 1rem auto 0;
-            padding: 0.5rem 0;
+            padding: 5%;
+            top:auto;
+            
         }
     }
 }

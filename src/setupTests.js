@@ -3,3 +3,30 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
+
+window.URL.createObjectURL = function () {
+    return "";
+  };
+  if (typeof SharedWorker === "undefined") {
+    global.SharedWorker = class {
+      addEventListener() {}
+  
+      removeEventListener() {}
+  
+      dispatchEvent() {
+        return false;
+      }
+  
+      onmessage() {}
+  
+      onmessageerror() {}
+  
+      onerror() {}
+  
+      postMessage() {}
+  
+      terminate() {}
+    };
+  }
+  
+  

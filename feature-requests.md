@@ -37,7 +37,25 @@ Ones that have been accomplished by the Fall 2023 Senior Design Team of Ryan Bru
 14. ***Keyboard shortcuts*** for all actions that currently require a mouse. Ideally, these would be defined in one place. The following shortcuts are important: ability to press `return` instead of an `okay` button, file uploading,loading, and saving, and toggles for visibility of weights, labels, and directedness.
 
 ## Both ends
-14. ***Algorithms should have the ability to move nodes.*** Two options for node positioning
-    - nodes can be moved by user during editing and algorithm execution; nodes stay in where the user puts them
-    - nodes cannot be moved by the user or moved only in limited fashion; any move by the user during algorithm execution is undone by the next step, whether forward or backward
+14. Algorithms should have the ability to move nodes. Two options for node positioning
+    - nodes can be moved by user during editing and algorithm execution; user controlled changes in node positions during algorithm execution persist when execution terminates
+    - nodes cannot be moved by the user or moved only in limited fashion; any move by the user during algorithm execution is undone by the next step, whether forward or backward; ***algorithms are capable of moving nodes***
+In the Java version an algorithm is able to specify/declare which type of node positioning is desired. The second is important for algorithms that move nodes.
 
+# Annoyances
+
+1. Save file for algorithms does not work as expected. The file defaults to *Tab-Number*.txt instead of the name (and directory) of the file that was uploaded. And Cmd-S or Ctrl-S saves the website, not the file.
+
+2. When a prompt window pops up, focus does not automatically go to that window, so an extra mouse click is required.
+
+3. There are no functions that return the position of a node, e.g., getX() or getY()
+
+4. You have to open "developer tools" in the browser to see the console and get information such as detailed error messages. And the developer messages don't give line numbers for the algorithms. Makes debugging difficult.
+
+A particular bug I have been unable to track down: If you run `dijsktra.js` on `unweighted_10.txt` and make the latter directed, the algorithm crashes with a `null` node after a few steps.
+
+5. There is no easy way to print information about various objects (nodes, edges, lists); again, debugging would be much easier if there were
+
+6. If you click Algorithm Editor or Graph Editor, the algorithm(s) or graph(s) that were uploaded go away.
+
+7. The Algorithm Editor and Graph Editor windows persist after the application is terminated by closing the main window or a Ctrl-C from the terminal.

@@ -10,19 +10,52 @@ import AlgorithmTest from 'frontend_tests/AlgorithmTest';
 import PromptTest from 'frontend_tests/PromptTest';
 import Navbar from 'frontend/Navbar/Navbar';
 import StepTest from 'frontend_tests/StepTest';
+//make happy global file
+//const worker = new SharedWorket(new Uro("worker.js", ...))
+//import 'worker.js';
 
 import { Routes, Route, BrowserRouter, Link, Navigate } from 'react-router-dom';
 import { GraphProvider } from 'frontend/GraphContext';
+import GraphInput from 'frontend/Graph/GraphInput/GraphInput';
+import Algorithm from 'frontend/Algorithm/Algorithm';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+//react router ?
+if ('serviceWorker' in navigator) {
+    // Register a service worker hosted at the root of the
+    // site using the default scope.
+    navigator.serviceWorker.register(`../serviceworker.js`).then(
+        registration => {
+            console.log('Service worker registration succeeded:', registration);
+        },
+      /*catch*/ error => {
+            console.error(`Service worker registration failed: ${error}`);
+        }
+    );
+} else {
+    console.error('Service workers are not supported.');
+}
+
+
 
 root.render(
     <BrowserRouter>
         <Routes>
             <Route exact path='/' element={
                 <>
-                    <Navbar />
+                    
                     <App />
+                </>
+            }></Route>
+            <Route exact path='/grapheditor' element={ //TODO
+                <>
+                    <GraphInput />
+                </>
+            }></Route>
+            <Route exact path='/algorithmeditor' element={
+                <>
+                    <Algorithm />
                 </>
             }></Route>
             <Route exact path='/collection' element={
@@ -43,39 +76,47 @@ root.render(
                 </div>
             }></Route>
             <Route exact path='/tests/graphViewer' element={
-                <GraphProvider>
+                <>
                     <Navbar />
-                    <GraphViewerTest />
-                </GraphProvider>
+                    <GraphProvider>
+                        <GraphViewerTest />
+                    </GraphProvider>
+                </>
             }></Route>
             <Route exact path='/tests/graphInput' element={
-                <GraphProvider>
+                <>
                     <Navbar />
-                    <GraphInputTest />
-                </GraphProvider>
+                    <GraphProvider>
+                        <GraphInputTest />
+                    </GraphProvider>
+                </>
             }></Route>
             <Route exact path='/tests/algorithm' element={
-                <GraphProvider>
+                <>
                     <Navbar />
-                    <AlgorithmTest />
-                </GraphProvider>
+                    <GraphProvider>
+                        <AlgorithmTest />
+                    </GraphProvider>
+                </>
             }></Route>
-            <Route exact path='/tests/prompt' element={
-                <GraphProvider>
-                    <Navbar />
-                    <PromptTest />
-                </GraphProvider>
-            }></Route>
-            <Route exact path='/tests/step' element={
-                <GraphProvider>
-                    <Navbar />
-                    <StepTest />
-                </GraphProvider>
-            }></Route>
-            <Route exact path='/documentation' element={
-                // if you ever want to host the documentation locally you can change this!
-                <Navigate to='//drive.google.com/drive/u/1/folders/1o-Yqo1NH4WSr9GLRDciCoCvpugwhh7JB' />
-            }></Route>
+                <Route exact path='/tests/prompt' element={
+                    <>
+                        <Navbar />
+                        <GraphProvider>
+                            <PromptTest />
+                        </GraphProvider>
+                    </>
+                }></Route>
+                <Route exact path='/tests/step' element={
+                    <><Navbar /><GraphProvider>
+
+                        <StepTest />
+                    </GraphProvider></>
+                }></Route>
+                <Route exact path='/documentation' element={
+                    // if you ever want to host the documentation locally you can change this!
+                    <Navigate to='//drive.google.com/drive/u/1/folders/1o-Yqo1NH4WSr9GLRDciCoCvpugwhh7JB' />
+                }></Route>
         </Routes>
     </BrowserRouter>
 );

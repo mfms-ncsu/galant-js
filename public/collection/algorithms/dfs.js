@@ -31,17 +31,16 @@ function visit(node) {
     print(outgoing(node));
 	for ( let edge of outgoing(node) ) {
         print(edge);
-		let nextNode = other(node, edge);
-
-        if ( hasLabel(edge) ) {
-            continue;
-        }
+        if ( edge in incoming(node) ) continue; // edge points in both directions, undirected
+	    let nextNode = other(node, edge);
+            if ( hasLabel(edge) ) {
+                continue;
+            }
 
         step(() => {
             if ( ! marked(nextNode) ) { // not yet visited
                 highlight(edge);
                 color(edge, "blue");
-
                 highlight(nextNode);
                 visit(nextNode);
             } else if ( finishTimes[nextNode] == null ) { // ancestor

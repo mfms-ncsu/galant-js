@@ -1,7 +1,6 @@
 import './GraphViewer.scss';
 
 import { useState, useContext, useEffect, useRef } from 'react';
-import { nodeSize } from "backend/PredicateConverter";
 import { renderToString } from 'react-dom/server';
 import CytoscapeComponent from 'react-cytoscapejs';
 import GraphContext from 'frontend/GraphContext';
@@ -10,48 +9,150 @@ import predicateConverter from 'backend/PredicateConverter';
 
 // Enable the cose-bilkent layout which automatically lays out the graph in a reasonable configuration.
 import cytoscape from 'cytoscape';
-
-
 import nodeHtmlLabel from 'cytoscape-node-html-label';
 import coseBilkent from 'cytoscape-cose-bilkent';
 import Graph from "backend/Graph/Graph.js";
 cytoscape.use(coseBilkent);
 nodeHtmlLabel(cytoscape);
 
+// Divisor to change the border width on a node based on radius size
+const BORDER_WIDTH_DIVISOR = 10;
+// Divisor to change font size within edge and node labels based on node size
+const FONT_SIZE_DIVISOR = 2;
 /**
  * A React component that displays a graph.
- * 
+ *
  * This component recieves a graph in the form of Predicates and displays it using Cytoscape.
  * It handles the ability to move the camera, move nodes, and automatically lay out the graph.
- * 
+ *
  * @param {Object} props - The React properties of the component include:
  * @property {Predicates} predicates - The representation of the graph to display.
- * 
+ *
  * @returns {HTML} - The HTML representation of the component.
- * 
+ *
  * @author Art Schell
  */
 function GraphViewer(props) {
-	/** @var {string} - The currently enabled layout. Begins as 'preset' which keeps the nodes in the specified positions. */
-	let [layout, setLayout] = useState("preset");
-	/** @var {cytoscape.ElementDefinition[]} - The currently displayed elements, converted from the Predicates into Cytoscape form. */
 
-	let [elements, setElements] = useState(predicateConverter({}));
-	/** @var {cytoscape.Core} - The saved Cytoscape object. This is used to make direct calls to Cytoscape such as cytoscape.fit(). */
-	let [cytoscape, setCytoscape] = useState(null);
     let ref = useRef();
-    ref.current = cytoscape;
-	
-	let [nodeLabels, setNodeLabels] = useState(null);
-	let [nodeWeights, setNodeWeights] = useState(null);
-	let [edgeLabels, setEdgeLabels] = useState(null);
-	let [edgeWeights, setEdgeWeights] = useState(null);
+    ref.current = props.cytoscape;
+
 
     /* eslint-disable-next-line no-unused-vars */
-    const [graph, startGraph, loadGraph, updateGraph, registerOnLoad] = useContext(GraphContext);
+    const {graph, startGraph, loadGraph, registerOnLoad} = useContext(GraphContext);
+	console.log(props.nodeSize)
+	//connect to the other windows.
+/** @const {cytoscape.Stylesheet[]} - The stylesheet for Cytoscape, defining the default visual appearance of elements. */
+	const stylesheet = [
+		{
+			selector: 'node',
+			style: {
+				width: props.nodeSize + 'px',
+				height: props.nodeSize + 'px',
+				backgroundColor: 'white',
+				borderWidth: (props.nodeSize / BORDER_WIDTH_DIVISOR + 1) + 'px',
+				borderStyle: 'solid',
+				borderColor: 'blue',
+				label: 'data(id)',
+				textValign: 'center',
+				visibility: 'visible',
+				fontSize: props.nodeSize / FONT_SIZE_DIVISOR + 'px'
+			}
+		},
+		// Marked nodes
+		{
+			selector: 'node[!marked]',
+			style: {
+				backgroundColor: 'white',
+			}
+		},
+		{
+			selector: 'node[?marked]',
+			style: {
+				backgroundColor: 'orange',
+			}
+		},
+		// Highlighted nodes
+		{
+			selector: 'node[?highlighted]',
+			style: {
+				borderWidth: '10px',
+			}
+		},
+		// Invisible nodes
+		{
+			selector: 'node[?invisible]',
+			style: {
+				visibility: 'hidden',
+			}
+		},
+		// Invisible edges
+		{
+			selector: 'edge[?invisible]',
+			style: {
+				visibility: 'hidden',
+			}
+		},
+		// Highlighted edges
+		{
+			selector: 'edge[!highlighted]',
+			style: {
+				width: '5px',
+			}
+		},
+		{
+			selector: 'edge[?highlighted]',
+			style: {
+				width: '10px',
+			}
+		},
+		// Colored nodes
+		{
+			selector: 'node[color]',
+			style: {
+				borderColor: 'data(color)',
+			}
+		},
+		// Colored edges
+		{
+			selector: 'edge[color]',
+			style: {
+				lineColor: 'data(color)',
+				targetArrowColor: 'data(color)',
+			}
+		},
+		// Labeled edges
+		{
+			selector: 'edge[label]',
+			style: {
+				label: 'data(label)',
+				textWrap: 'wrap',
+				textBackgroundColor: 'white',
+				textBackgroundOpacity: '1.0',
+				textBackgroundPadding: '2px',
+				fontSize: props.nodeSize / FONT_SIZE_DIVISOR + 'px',
+				textBorderOpacity: '1.0',
+				textBorderStyle: 'solid',
+				textBorderWidth: '1px',
+				textBorderColor: 'black',
+			}
+		},
+		// Directed edges
+		{
+			selector: 'edge.directed',
+			style: {
+				curveStyle: 'bezier',
+
+				targetArrowShape: 'triangle',
+			}
+		},
+	];
+	//postWorker("Graph Alive");
+
 	useEffect(() => {
         registerOnLoad((graph) => {
-			setElements([]);
+			props.setElements([]);
+			console.log(ref.current);
 			ref.current.reset();
 			ref.current.zoom(ref.current.zoom() * 0.9);
 			ref.current.panBy({x: 0, y: 30});
@@ -63,65 +164,34 @@ function GraphViewer(props) {
 	useEffect(() => {
 		// Save the current positions of nodes so they can be preserved after an update.
 		let positions = {};
-		for (let element of elements) {
+		for (let element of props.elements) {
 			if (element.position && element.data && element.data.id) {
 				positions[element.data.id] = element.position;
 			}
 		}
-		let newElements = predicateConverter(graph, nodeWeights, nodeLabels, edgeWeights, edgeLabels);
+		let newElements = predicateConverter(graph, props.nodeWeights, props.nodeLabels, props.edgeWeights, props.edgeLabels);
 		// Ensure the positions of nodes are preserved in the new list of elements.
 		for (let element of newElements) {
 			if (positions[element.data.id]) {
 				element.position = positions[element.data.id]
 			}
 		}
-		setElements(newElements);
+		props.setElements(newElements);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [graph, nodeWeights, nodeLabels, edgeWeights, edgeLabels])
-	
+    }, [graph, props.nodeWeights, props.nodeLabels, props.edgeWeights, props.edgeLabels])
+
+	/* useEffect(() => {
+		createWorker();
+		console.log("created worker");
+	}, []); */
+
 	return <div className="GraphViewer">
-		{/* Button controls that allow the graph layout and camera to be updated. */}
-		<div className="GraphViewerControls">
-			<button onClick={() => { // Automatically lay out the graph with the cose-bilkent layout.
-				// Note that layouts are only executed when they change, so we must first change
-				// the layout to "preset" and then schedule it to be changed back.
-				setLayout("preset");
-				window.setTimeout(() => setLayout("cose-bilkent"), 0);
-			}}>{"Auto-Layout"}</button>
-			<button onClick={() => { // Automatically recenter the camera.
-				if (cytoscape) {
-					cytoscape.fit();
-					cytoscape.zoom(cytoscape.zoom() * 0.93);
-					cytoscape.center();
-					cytoscape.panBy({x: 0, y: 13});
-				}
-			}}>{"Auto-Camera"}</button>
-		</div>	
-		<div className='EdgeToggler'>
-			<button onClick={() => {
-				let newGraph = new Graph(startGraph.nodes, startGraph.edges, !startGraph.directed, startGraph.message);
-				loadGraph(newGraph)
-			}}>{graph.directed ? "Make Undirected" : "Make Directed"} </button>
-		</div> 
-		<div className='Node-Edge-Hide'>
-			<button onClick={() => {
-				setNodeWeights(!nodeWeights)
-			}}>{nodeWeights === null ? "Node Weight Toggle" : nodeWeights ? "Hide Node Weights" : "Show Node Weights"} </button>
-			<button onClick={() => {
-				setNodeLabels(!nodeLabels)
-			}}>{ nodeLabels === null ? "Node Label Toggle" : nodeLabels ? "Hide Node Labels" : "Show Node Labels"} </button>
-			<button onClick={() => {
-				setEdgeWeights(!edgeWeights)
-			}}>{edgeWeights === null ? "Edge Weight Toggle" : edgeWeights ? "Hide Edge Weights" : "Show Edge Weights"} </button>
-			<button onClick={() => {
-				setEdgeLabels(!edgeLabels)
-			}}>{edgeLabels === null ? "Edge Label Toggle" : edgeLabels ? "Hide Edge Labels" : "Show Edge Labels"} </button>
-		</div>
 		
+
 		<p className="GraphViewerMessage">{graph.message}</p>
-		<CytoscapeComponent elements={elements}
+		<CytoscapeComponent elements={props.elements}
 			layout={{
-				name: layout,
+				name: props.layout,
 				idealEdgeLength: 100,
 			}}
 			stylesheet={stylesheet}
@@ -149,124 +219,10 @@ function GraphViewer(props) {
 						}
 					},
 				]);
-				setCytoscape(cy);
+				props.setCytoscape(cy);
 			}}
 		/>
 	</div>;
 }
-
-
-/** @const {cytoscape.Stylesheet[]} - The stylesheet for Cytoscape, defining the default visual appearance of elements. */
-const stylesheet = [
-	{
-		selector: 'node',
-		style: {
-			width: nodeSize + 'px',
-			height: nodeSize + 'px',
-			backgroundColor: 'white',
-			borderWidth: '5px',
-			borderStyle: 'solid',
-			borderColor: 'black',
-			label: 'data(id)',
-			textValign: 'center',
-			visibility: 'visible',
-		}
-	},
-	// Marked nodes
-	{
-		selector: 'node[!marked]',
-		style: {
-			backgroundColor: 'white',
-		}
-	},
-	{
-		selector: 'node[?marked]',
-		style: {
-			backgroundColor: 'orange',
-		}
-	},
-	// Highlighted nodes
-	{
-		selector: 'node[!highlighted]',
-		style: {
-			borderWidth: '5px',
-		}
-	},
-	{
-		selector: 'node[?highlighted]',
-		style: {
-			borderWidth: '10px',
-		}
-	},
-	// Invisible nodes
-	{
-		selector: 'node[?invisible]',
-		style: {
-			visibility: 'hidden',
-		}
-	},
-	// Invisible edges
-	{
-		selector: 'edge[?invisible]',
-		style: {
-			visibility: 'hidden',
-		}
-	},
-	// Highlighted edges
-	{
-		selector: 'edge[!highlighted]',
-		style: {
-			width: '5px',
-		}
-	},
-	{
-		selector: 'edge[?highlighted]',
-		style: {
-			width: '10px',
-		}
-	},
-	// Colored nodes
-	{
-		selector: 'node[color]',
-		style: {
-			borderColor: 'data(color)',
-		}
-	},
-	// Colored edges
-	{
-		selector: 'edge[color]',
-		style: {
-			lineColor: 'data(color)',
-			targetArrowColor: 'data(color)',
-		}
-	},
-	// Labeled edges
-	{
-		selector: 'edge[label]',
-		style: {
-			label: 'data(label)',
-
-			textWrap: 'wrap',
-
-			textBackgroundColor: 'white',
-			textBackgroundOpacity: '1.0',
-			textBackgroundPadding: '2px',
-
-			textBorderOpacity: '1.0',
-			textBorderStyle: 'solid',
-			textBorderWidth: '1.5px',
-			textBorderColor: 'black',
-		}
-	},
-	// Directed edges
-	{
-		selector: 'edge.directed',
-		style: {
-			curveStyle: 'bezier',
-
-			targetArrowShape: 'triangle',
-		}
-	},
-];
 
 export default GraphViewer;
