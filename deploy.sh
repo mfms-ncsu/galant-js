@@ -19,5 +19,5 @@ sudo GIT_SSH_COMMAND="ssh -i /home/$1/.ssh/id_rsa" git pull
 # only run if that pull worked
 if [ $? == 0 ]; then
         sudo npm run build
-        sudo service apache2 restart
+#        sudo service apache2 restart
 fi
