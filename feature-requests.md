@@ -34,13 +34,16 @@ Ones that have been accomplished by the Fall 2023 Senior Design Team of Ryan Bru
 12. ***Scaling of graph based on both height and width of window.*** Cytoscape's ability to pan and Zoom is sufficient in almost all situations, but layered graphs, sorting graphs, and the corresponding algorithms require special treatment. The desired behavior is hard to explain - you need to load a layered graph or run a sorting algorithm in the Java version.
 
 13. Put buttons in different places, use different colors for text and background, different defaults for text fonts and sizes, etc.
-14. ***Keyboard shortcuts*** for all actions that currently require a mouse. Ideally, these would be defined in one place. The following shortcuts are important: ability to press `return` instead of an `okay` button, file uploading,loading, and saving, and toggles for visibility of weights, labels, and directedness.
+
+14. ***Keyboard shortcuts*** for all actions that currently require a mouse. Ideally, these would be defined in one place. The following shortcuts are important: ability to press `return` instead of an `okay` button, file uploading, loading, and saving, and toggles for visibility of weights, labels, and directedness.
 
 ## Both ends
-14. Algorithms should have the ability to move nodes. Two options for node positioning
+15. Algorithms should have the ability to move nodes. Two options for node positioning
     - nodes can be moved by user during editing and algorithm execution; user controlled changes in node positions during algorithm execution persist when execution terminates
     - nodes cannot be moved by the user or moved only in limited fashion; any move by the user during algorithm execution is undone by the next step, whether forward or backward; ***algorithms are capable of moving nodes***
 In the Java version an algorithm is able to specify/declare which type of node positioning is desired. The second is important for algorithms that move nodes.
+
+16. **Stretch goal for accessibility.** Ability to add declarations connecting logical attributes with both visual effects and speech/sound. For example, a programmer could define several different modes of highlighting for nodes and/or edges and have these mapped to both color changes and spoken text. The modes could have names such as "visited", "in_tree", etc.
 
 # Annoyances
 
