@@ -3,6 +3,7 @@
  * Currently this worker just recieves a message and broadcasts it to all the windows attached to it.
  * 
  * A potential refactor is to judge off the message attribute and only forward to the relevant port
+ * @author Christina Albores
  */
 
 // Borrowed from
@@ -27,11 +28,17 @@ onconnect = function(e) {
     var message = e.data[0];
     // send the message to ALL connected worker ports!
 
-    if(message["message"] === "graph-init") {
+    if(message.message === "graph-init") {
+      lastMessage = message;
+    }
+
+    // If the user saved changes in graph view, then we should remove the lastMessage to force the user to load graph in again
+    if (message.message === "graph-rename") {
       lastMessage = message;
     }
 
     if(message["message"] === "alive") {
+      lastMessage.message = "graph-init";
       port.postMessage(lastMessage);
     } else {
       allPorts.forEach(port => {

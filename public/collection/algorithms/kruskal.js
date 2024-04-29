@@ -60,27 +60,31 @@ for ( let edge of edgeList ) {
     let t = target(edge)
     step(() => {
         color(edge, "red")
-        mark(s); mark(t)
+        setShape(s, "star")
+        setShape(t, "star")
+        color(s, "yellow")
+        color(t, "yellow")
     })
     print(`--- find(${s}) = ${findSet(s)}, find(${t}) = ${findSet(t)}`)
-    if ( findSet(s) == findSet(t) ) {
-        step(() => {
+    step(() => {
+        if ( findSet(s) == findSet(t) ) {
             color(edge, "yellow")
             hideEdgeWeight(edge)
             display(`endpoints ${s} and ${t} are already connected`)
-            unmark(s); unmark(t)
-        })
-    }
-    else {
-        step(() => {
+        }
+        else {
             color(edge, "blue")
+            highlight(edge)
             totalWeight += weight(edge)
             numForestEdges++
             union(s, t)
             display(`current forest has weight ${totalWeight}`)
-            unmark(s); unmark(t)
-        })
-    }
+        }
+        setShape(s, "circle")
+        setShape(t, "circle")
+        color(s, "white")
+        color(t, "white")
+    })
     if ( numForestEdges == numNodes - 1 ) break
 }
 display(`--- Done, totalWeight = ${totalWeight}`)

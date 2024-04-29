@@ -18,7 +18,15 @@ Developer and User documentation can be found [here](https://galant.csc.ncsu.edu
 - Run `npm start` to run app to develop.
 
 ### Testing
-- To run all tests, in the base directory run `$ npm test -- --coverage --watchAll`.
+- To run all tests, in the base directory run `$ npm run test`.
+  - This script does the following:
+      1. Executes `npm run test:jest`
+      2. Executes `npm run test:cy`
+      3. Combines coverage from `/coverage` and `/cypress-coverage`
+      4. Create a new coverage report under directory `/total-coverage`
+
+- Total Coverage:
+  - Results are found under /total-coverage directory.
 
 ### Deployment
 To deploy a change to the production server:

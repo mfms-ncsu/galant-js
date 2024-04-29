@@ -3,7 +3,7 @@ let discoveryTimes = {};
 // time at which each node has finished being explored
 let finishTimes = {};
 // Number of steps taken
-let time = 0;
+let time = 1;
 
 print("dfs");
 step(() => {
@@ -13,14 +13,14 @@ step(() => {
     clearEdgeHighlights();
     clearEdgeColors();
     clearEdgeLabels();
+    hideAllEdgeWeights();
+})
 
-    
-    let start = promptNode("Enter start node:");
-    visit(start);
-});
+let start = promptNode("Enter start node:");
+visit(start);
 
 function visit(node) {
-    display("Visiting " + node);
+    display(`visit ${node}`);
     step(() => {
         discoveryTimes[node] = time++;
     
@@ -28,10 +28,8 @@ function visit(node) {
         label(node, discoveryTimes[node]);
     });
 
-    print(outgoing(node));
 	for ( let edge of outgoing(node) ) {
-        print(edge);
-        if ( edge in incoming(node) ) continue; // edge points in both directions, undirected
+        if ( hasColor(edge) ) continue; // seen this edge from the other end (undirected)
 	    let nextNode = other(node, edge);
             if ( hasLabel(edge) ) {
                 continue;
@@ -56,6 +54,6 @@ function visit(node) {
         });
     }
 
-    finishTimes[node] = time;
+    finishTimes[node] = time++;
     label(node, discoveryTimes[node] + "/" + finishTimes[node]);
 }

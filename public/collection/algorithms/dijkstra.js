@@ -82,11 +82,11 @@ while ( PQsize() > 0 ) {
     }
     print(current_node)
     step(() => {
-        mark(current_node);
+        color(current_node, "yellow");
+        setShape(current_node, "star")
         if ( predecessorEdge[current_node] ) {
             color(predecessorEdge[current_node], "blue")
-        }
-        if ( predecessorEdge[current_node] ) {
+            setEdgeWidth(predecessorEdge[current_node], 6)
             display(`node ${current_node} added
                      with predecessor ${other(predecessorEdge[current_node], current_node)}`)
         }
@@ -98,12 +98,13 @@ while ( PQsize() > 0 ) {
         if ( inTree[next_node ]) continue
         let next_dist = current_dist + weight(edge)
         print(next_node + " " + next_dist)
-        color(edge, "yellow")
+        color(edge, "violet")
         if ( next_dist < weight(next_node) ) {
             step(() => {
                 if ( predecessorEdge[next_node] ) {
                     color(predecessorEdge[next_node], "yellow")
                     color(edge, "green")
+                    setEdgeWidth(edge, 4)
                     display(`relax ${edge} updated distance of ${next_node} to ${next_dist}`)
                 }
                 else {

@@ -33,7 +33,6 @@ while (queue.length > 0) {
     step(() => { // Visit node
         display("Queue: " + queue);
         print(`Visiting node '${current}'`);
-
         mark(current);
     });
     
@@ -42,13 +41,18 @@ while (queue.length > 0) {
 
         step(() => { // Check outgoing edges
             print(`Checking edge '${edge}'`);
-            if (hasColor(edge)) { // seeing edge from other side
-                highlight(edge);
-            } else if (highlighted(next)) { // already visited node
-                color(edge, "red");
-            } else { // have not visited node
-                color(edge, "blue");
-                queueNode(next, weight(current) + 1);
+            if ( ! hasColor(edge) ) { // never seen this edge, only relevant for undirected
+                if (highlighted(next)) { // already visited node
+                    color(edge, "red");
+                }
+                else { // have not visited node
+                    step(() => {
+                        color(edge, "blue");
+                        highlight(edge)
+                        display(`queueing node ${next}`)
+                        queueNode(next, weight(current) + 1);
+                    })
+                }
             }
         });
     }

@@ -3,21 +3,27 @@
   "version": "1.0",
   "private": true,
   "dependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@cypress/code-coverage": "^3.12.26",
+    "@cypress/instrument-cra": "^1.4.0",
     "@datastructures-js/priority-queue": "github:datastructures-js/priority-queue",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@headlessui/react": "^1.7.18",
+    "@headlessui/tailwindcss": "^0.2.0",
+    "@heroicons/react": "^2.1.1",
     "@monaco-editor/react": "^4.5.2",
     "@mui/icons-material": "^5.14.15",
     "@mui/material": "^5.14.15",
     "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.3.2",
     "cytoscape-cose-bilkent": "^4.1.0",
     "cytoscape-node-html-label": "^1.2.2",
     "fireworks-js": "^2.10.2",
     "http-proxy-middleware": "^2.0.6",
-    "immer": "^9.0.19",
+    "immer": "^9.0.21",
+    "rc-slider": "^10.5.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.1",
     "react-cytoscapejs": "^2.0.0",
@@ -34,10 +40,24 @@
   },
   "scripts": {
     "start": "node scripts/start.js",
+    "instrument": "BROWSER=none react-scripts -r @cypress/instrument-cra start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
     "test-cli": "CI=true react-scripts test --watch=all --coverage",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "dev": "npm run instrument & cypress run",
+    "test:jest": "CI=true react-scripts test --watch=all --coverage",
+    "test:cy": "npm run instrument & cypress run && kill $(lsof -t -i:3000)",
+    "test": "npm run test:jest && npm run test:cy",
+    "pretest": "rm -rf .nyc_output || true ",
+    "posttest": "npm run report:combined",
+    "mkdir:reports": "mkdir reports || true",
+    "precopy:reports": "npm run mkdir:reports",
+    "copy:reports": "cp cypress-coverage/coverage-final.json reports/from-cypress.json && cp coverage/coverage-final.json reports/from-jest.json",
+    "precombine:reports": "npm run copy:reports && mkdir .nyc_output || true",
+    "combine:reports": "npx nyc merge reports && mv coverage.json .nyc_output/out.json",
+    "prereport:combined": "npm run combine:reports",
+    "report:combined": "npx nyc report --reporter lcov --reporter text --report-dir total-coverage",
+    "clean": "rm -rf coverage cypress-coverage total-coverage reports .nyc_output"
   },
   "eslintConfig": {
     "extends": [
@@ -62,8 +82,18 @@
     ]
   },
   "devDependencies": {
-    "cypress": "^13.6.0",
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "@testing-library/react": "^14.2.1",
+    "babel-jest": "^29.7.0",
+    "cypress": "^13.6.6",
+    "jest": "^27.5.1",
     "less": "^4.1.3",
-    "less-loader": "^11.1.0"
+    "less-loader": "^11.1.0",
+    "tailwindcss": "^3.4.1",
+    "use-immer": "^0.9.0"
+  },
+  "nyc": {
+    "report-dir": "cypress-coverage"
   }
 }

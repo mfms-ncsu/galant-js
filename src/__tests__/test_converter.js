@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import predicateConverter from 'backend/PredicateConverter'
+import predicateConverter from 'pages/GraphView/utils/PredicateConverter'
 
 /**
  * This class tests the predicate conversion to make sure the
@@ -17,10 +17,17 @@ test ("predicate with just nodes with basic information", () => {
         }
       };
 
+    // let expectedGraphData = [
+    //     {data: {id:'1', marked:false, label:'', highlighted:false, weight:null, color:'black'}, position: {x:300, y:200}},
+    //     {data: {id:'2', marked:false, label:'', highlighted:false, weight:null, color:'black'}, position: {x:100, y:200}},
+    //     {data: {id:'3', marked:false, label:'', highlighted:false, weight:null, color:'black'}, position: {x:400, y:200}}
+    // ]
+
+    // There are no default color
     let expectedGraphData = [
-        {data: {id:'1', marked:false, label:'', highlighted:false, weight:null, color:'black'}, position: {x:300, y:200}},
-        {data: {id:'2', marked:false, label:'', highlighted:false, weight:null, color:'black'}, position: {x:100, y:200}},
-        {data: {id:'3', marked:false, label:'', highlighted:false, weight:null, color:'black'}, position: {x:400, y:200}}
+        {data: {id:'1', marked:false, label:'', highlighted:false, weight:null}, position: {x:300, y:200}},
+        {data: {id:'2', marked:false, label:'', highlighted:false, weight:null}, position: {x:100, y:200}},
+        {data: {id:'3', marked:false, label:'', highlighted:false, weight:null}, position: {x:400, y:200}}
     ]
     
     let graphData = predicateConverter(predicate, null, null, null, null);
@@ -36,10 +43,17 @@ test ("predicate with just nodes with some expected information", () => {
         }
       };
 
+    // let expectedGraphData = [
+    //     {data: {id:'1', marked:false, label:'one', highlighted:false, weight:null, color:'black'}, position: {x:300, y:200}},
+    //     {data: {id:'2', marked:false, label:'', highlighted:false, weight:3, color:'black'}, position: {x:100, y:200}},
+    //     {data: {id:'3', marked:false, label:'three', highlighted:false, weight:null, color:'black'}, position: {x:400, y:200}}
+    // ]
+
+    // There are no default color
     let expectedGraphData = [
-        {data: {id:'1', marked:false, label:'one', highlighted:false, weight:null, color:'black'}, position: {x:300, y:200}},
-        {data: {id:'2', marked:false, label:'', highlighted:false, weight:3, color:'black'}, position: {x:100, y:200}},
-        {data: {id:'3', marked:false, label:'three', highlighted:false, weight:null, color:'black'}, position: {x:400, y:200}}
+        {data: {id:'1', marked:false, label:'one', highlighted:false, weight:null}, position: {x:300, y:200}},
+        {data: {id:'2', marked:false, label:'', highlighted:false, weight:3}, position: {x:100, y:200}},
+        {data: {id:'3', marked:false, label:'three', highlighted:false, weight:null}, position: {x:400, y:200}}
     ]
     
     let graphData = predicateConverter(predicate, null, null, null, null);
@@ -105,12 +119,17 @@ test ("predicate with nodes and undirected edges with some expected information"
         {data: {id:'1', marked:false, label:'one', highlighted:false, weight:3, color:'red'}, position: {x:300, y:200}},
         {data: {id:'2', marked:true, label:'two', highlighted:false, weight:1, color:'black'}, position: {x:100, y:200}},
         {data: {id:'3', marked:false, label:'three', highlighted:true, weight:0, color:'white'}, position: {x:400, y:200}},
-        {data: {label:'', source:1, target: 2, highlighted:false, color:'black', weight:null}},
-        {data: {label:'4', source:2, target:3, highlighted:false, color:'black', weight:null}},
-        {data: {label:'', source:3, target:1, highlighted:false, color:'black', weight:null}}
+        // {data: {label:'', source:1, target: 2, highlighted:false, color:'black', weight:null}},
+        // {data: {label:'4', source:2, target:3, highlighted:false, color:'black', weight:null}},
+        // {data: {label:'', source:3, target:1, highlighted:false, color:'black', weight:null}}
+
+        // There are no default color
+        {data: {label:'', source:1, target: 2, highlighted:false, weight:null}},
+        {data: {label:'4', source:2, target:3, highlighted:false, weight:null}},
+        {data: {label:'', source:3, target:1, highlighted:false, weight:null}}
     ]
     
-    let graphData = predicateConverter(predicate, null, null, null, null);
+    let graphData = predicateConverter(predicate, true, true, true, true);
 
     expect(expectedGraphData).toEqual(graphData);
 });
@@ -133,12 +152,17 @@ test ("predicate with nodes and undirected edges with all expected information",
         {data: {id:'1', marked:false, label:'one', highlighted:false, weight:3, color:'red'}, position: {x:300, y:200}},
         {data: {id:'2', marked:true, label:'two', highlighted:false, weight:1, color:'black'}, position: {x:100, y:200}},
         {data: {id:'3', marked:false, label:'three', highlighted:true, weight:0, color:'white'}, position: {x:400, y:200}},
-        {data: {label: "2\nfour", source: 1, target: 2, highlighted:false, color:'black', weight:null}},
-        {data: {label: "4\nfive", source: 2, target: 3, highlighted:false, color:'black', weight:null}},
-        {data: {label: "1\nsix", source: 3, target: 1, highlighted:false, color:'black', weight:null}}
+        // {data: {label: "2\nfour", source: 1, target: 2, highlighted:false, color:'black', weight:null}},
+        // {data: {label: "4\nfive", source: 2, target: 3, highlighted:false, color:'black', weight:null}},
+        // {data: {label: "1\nsix", source: 3, target: 1, highlighted:false, color:'black', weight:null}}
+
+        // There are no default color
+        {data: {label: "2\nfour", source: 1, target: 2, highlighted:false, weight:null}},
+        {data: {label: "4\nfive", source: 2, target: 3, highlighted:false, weight:null}},
+        {data: {label: "1\nsix", source: 3, target: 1, highlighted:false, weight:null}}
     ]
     
-    let graphData = predicateConverter(predicate, null, null, null, null);
+    let graphData = predicateConverter(predicate, true, true, true, true);
 
     expect(expectedGraphData).toEqual(graphData);
 });
@@ -162,12 +186,18 @@ test ("predicate with nodes and directed edges with some expected information", 
         {data: {id:'1', marked:false, label:'one', highlighted:false, weight:3, color:'red'}, position: {x:300, y:200}},
         {data: {id:'2', marked:true, label:'two', highlighted:false, weight:1, color:'black'}, position: {x:100, y:200}},
         {data: {id:'3', marked:false, label:'three', highlighted:true, weight:0, color:'white'}, position: {x:400, y:200}},
-        {data: {label:'', source:1, target: 2, highlighted:false, color:'black', weight:null}, classes: ['directed']},
-        {data: {label:'4', source:2, target:3, highlighted:false, color:'black', weight:null}, classes: ['directed']},
-        {data: {label:'', source:3, target:1, highlighted:false, color:'black', weight:null}, classes: ['directed']}
+
+        // {data: {label:'', source:1, target: 2, highlighted:false, color:'black', weight:null}, classes: ['directed']},
+        // {data: {label:'4', source:2, target:3, highlighted:false, color:'black', weight:null}, classes: ['directed']},
+        // {data: {label:'', source:3, target:1, highlighted:false, color:'black', weight:null}, classes: ['directed']}
+
+        //There are no default color
+        {data: {label:'', source:1, target: 2, highlighted:false, weight:null}, classes: ['directed']},
+        {data: {label:'4', source:2, target:3, highlighted:false, weight:null}, classes: ['directed']},
+        {data: {label:'', source:3, target:1, highlighted:false, weight:null}, classes: ['directed']}
     ]
     
-    let graphData = predicateConverter(predicate, null, null, null, null);
+    let graphData = predicateConverter(predicate, true, true, true, true);
 
     expect(expectedGraphData).toEqual(graphData);
 });
@@ -191,12 +221,18 @@ test ("predicate with nodes and directed edges with all expected information", (
       {data: {id:'1', marked:false, label:'one', highlighted:false, weight:3, color:'red'}, position: {x:300, y:200}},
       {data: {id:'2', marked:true, label:'two', highlighted:false, weight:1, color:'black'}, position: {x:100, y:200}},
       {data: {id:'3', marked:false, label:'three', highlighted:true, weight:0, color:'white'}, position: {x:400, y:200}},
-      {data: {label: "2\nfour", source: 1, target: 2, highlighted:false, color:'black', weight:null}, classes: ['directed']},
-      {data: {label: "4\nfive", source: 2, target: 3, highlighted:false, color:'black', weight:null}, classes: ['directed']},
-      {data: {label: "1\nsix", source: 3, target: 1, highlighted:false, color:'black', weight:null}, classes: ['directed']}
+
+      // {data: {label: "2\nfour", source: 1, target: 2, highlighted:false, color:'black', weight:null}, classes: ['directed']},
+      // {data: {label: "4\nfive", source: 2, target: 3, highlighted:false, color:'black', weight:null}, classes: ['directed']},
+      // {data: {label: "1\nsix", source: 3, target: 1, highlighted:false, color:'black', weight:null}, classes: ['directed']}
+
+      // There are no default color
+      {data: {label: "2\nfour", source: 1, target: 2, highlighted:false, weight:null}, classes: ['directed']},
+      {data: {label: "4\nfive", source: 2, target: 3, highlighted:false, weight:null}, classes: ['directed']},
+      {data: {label: "1\nsix", source: 3, target: 1, highlighted:false, weight:null}, classes: ['directed']}
   ]
   
-  let graphData = predicateConverter(predicate, null, null, null, null);
+  let graphData = predicateConverter(predicate, true, true, true, true);
 
   expect(expectedGraphData).toEqual(graphData);
 });
@@ -222,12 +258,16 @@ test ("predicate with nodes but empty directed and undirected edges", () => {
   };
 
   let expectedGraphData = [
-    {data: {id:'1', marked:false, label:'', highlighted:false, weight:null, color:'black'}, position: {x:300, y:200}},
-    {data: {id:'2', marked:false, label:'', highlighted:false, weight:null, color:'black'}, position: {x:100, y:200}},
-    {data: {id:'3', marked:false, label:'', highlighted:false, weight:null, color:'black'}, position: {x:400, y:200}}
+    // {data: {id:'1', marked:false, label:'', highlighted:false, weight:null, color:'black'}, position: {x:300, y:200}},
+    // {data: {id:'2', marked:false, label:'', highlighted:false, weight:null, color:'black'}, position: {x:100, y:200}},
+    // {data: {id:'3', marked:false, label:'', highlighted:false, weight:null, color:'black'}, position: {x:400, y:200}}
+      // There are no default color
+      {data: {id:'1', marked:false, label:'', highlighted:false, weight:null}, position: {x:300, y:200}},
+      {data: {id:'2', marked:false, label:'', highlighted:false, weight:null}, position: {x:100, y:200}},
+      {data: {id:'3', marked:false, label:'', highlighted:false, weight:null}, position: {x:400, y:200}}
   ];
   
-  let graphData = predicateConverter(predicate, null , null, null, null);
+  let graphData = predicateConverter(predicate, true, true, true, true);
 
   expect(expectedGraphData).toEqual(graphData);
 

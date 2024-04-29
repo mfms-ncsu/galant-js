@@ -50,7 +50,10 @@ function removeMax() {
 
 function checkCover() {
     for ( let edge of getEdges() ) {
-        if ( source(edge) in cover || target(edge) in cover ) continue;
+        // checking "source(edge) in cover" does not work because of the way JavaScript handles arrays
+        // the only way to tell is if the edge has been colored (green)
+        // ideally, we would be able to direct the edge at this point
+        if ( hasColor(source(edge)) || hasColor(target(edge)) ) continue;
         highlight(edge)
         color(edge, "red")
     }
@@ -69,6 +72,8 @@ step(() => {
     clearNodeMarks();
     clearNodeWeights();
     clearEdgeColors();
+    hideAllEdgeWeights();
+    //hideAllEdgeLabels(); needs to be added in Thread.js
 })
 display("queueing nodes")
 
@@ -79,11 +84,16 @@ let cover_size = 0
 while ( PQsize() > 0 ) {
     let next_node = removeMax()
     if ( weight(next_node) === 0 ) break;
-    highlight(next_node)
-    display("adding node " + next_node)
+    step(() => {
+        highlight(next_node)
+        display("adding node " + next_node)
+        color(next_node, "yellow")
+        setShape(next_node, "star")
+    })
     step(() => {
         for ( let edge of outgoing(next_node) ) {
             color(edge, "green")
+            setEdgeWidth(edge, 5)
             let neighbor = other(next_node, edge)
             if ( nodePQ[neighbor] ) {
                 // neighbor is in the queue ?

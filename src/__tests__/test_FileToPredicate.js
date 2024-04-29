@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
-import { parseText } from 'backend/FileToPredicate';
-import Graph from "backend/Graph/Graph"
+import { parseText } from 'utils/FileToPredicate';
+import Graph from "utils/Graph"
 
 /**
  * This class runs tests on different kinds of input for the conversion of graph input file to predicates

@@ -1,0 +1,22 @@
+n A 0 50 label:Ash
+n H 100 50 label:Hkr
+n S 200 0 label:W-S
+n G 250 0 label:Gre
+n D 350 0 label:Dur
+n R 400 50 label:Ral
+n C 161 104 label:Cha
+n F 350 100 label:Fay
+n W 500 200 label:Wil
+e A H 75
+e H S 72
+e A C 136
+e H C 64
+e S C 75
+e S G 33
+e C G 86
+e G D 53
+e R D 40
+e C F 169
+e R F 78
+e F W 105
+e R W 114
