@@ -15,7 +15,8 @@ import "./index.css";
 import GraphView from "pages/GraphView";
 import AlgorithmEditorView from "pages/AlgorithmEditor"
 import GraphEditorView from "pages/GraphEditor"
-import KeyboardShortcutsPage from "pages/KeyboardShortcutsPage";
+import KeyboardShortcutsPage from "pages/KeyboardShortcutsPage"
+import InstructionsPage from "pages/InstructionsPage"
 
 // Check if service workers are supported by the browser
 if ('serviceWorker' in navigator) {
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
   {
     path: '/keyboard_shortcuts',
     element: <KeyboardShortcutsPage />
+  },
+  {
+    path: '/instructions',
+    element: <InstructionsPage />
   }
 ]);
 

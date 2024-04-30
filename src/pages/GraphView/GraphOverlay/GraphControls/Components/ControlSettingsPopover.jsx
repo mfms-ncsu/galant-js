@@ -45,7 +45,7 @@ export default function ControlSettingsPopover() {
     return (
         <Popover className="relative">
             <Popover.Button ref={button} className="group h-12 w-12 p-2 rounded shadow bg-gray-100 border border-gray-200 pointer-events-auto">
-                <EyeIcon className='stroke-blue-400 stroke-2 group-focus:scale-105'/>
+                <EyeIcon className='stroke-black stroke-2 group-focus:scale-105'/>
             </Popover.Button>
 
             <Popover.Panel className="absolute z-10 right-1/2 translate-x-1/2 w-max p-4 pt-2 mt-4 rounded min-h-24 bg-white border border-gray-200 shadow pointer-events-auto min-w-52">

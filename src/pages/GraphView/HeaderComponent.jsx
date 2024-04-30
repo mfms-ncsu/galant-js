@@ -24,7 +24,11 @@ function openAlgorithmEditor() {
 }
 
 function openKeyboardShortcutsPage() {
-    window.open('/keyboard_shortcuts', 'Keyboard Shortcuts - GalantJS', 'width=600,height=1000');
+    window.open('/keyboard_shortcuts', 'Keyboard Shortcuts: Galant-JS', 'width=600,height=1000');
+}
+
+function openInstructionsPage() {
+    window.open('/instructions', 'Getting started with Galant-JS', 'width=600,height=1000');
 }
 
 /**
@@ -41,9 +45,10 @@ export default function HeaderComponent() {
             if (event.key === 'g') openGraphEditor();
             // If user enters 'a' open the algorithm editor pop up
             if (event.key === 'a') openAlgorithmEditor();
-            // If user enters 'h' open up the help/keyboard shortcuts pop up
-            if (event.key === 'h') openKeyboardShortcutsPage();
-                
+            // If user enters 'k' open up the help/keyboard shortcuts pop up
+            if (event.key === 'k') openKeyboardShortcutsPage();
+            // Keyboard shortcut for a simple help page is 'h'
+            if (event.key === 'h') openInstructionsPage();
         }
 
         document.addEventListener('keydown', handleKeyPress, true)
