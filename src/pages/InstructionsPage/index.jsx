@@ -65,6 +65,18 @@ export default function InstructionsPage() {
                             </li>
                         </ol>
                     </li>
+                    <li>
+                        <strong>Run additional algorithms or use different graphs.</strong>
+                        <ol>
+                            <li>
+                                To run a different algorithm on the same graph simply go to the algorithm editor, choose another algorithm, and load it.
+                            </li>
+                            <li>
+                                To run the same algorithm on a different graph, go to the graph editor, choose and load another graph, and then reload the algorithm.
+                            </li>
+
+                        </ol>
+                    </li>
                 </ol>
             </div>
         </div>
