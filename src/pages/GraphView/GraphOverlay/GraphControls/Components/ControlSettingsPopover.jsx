@@ -51,9 +51,9 @@ export default function ControlSettingsPopover() {
             <Popover.Panel className="absolute z-10 right-1/2 translate-x-1/2 w-max p-4 pt-2 mt-4 rounded min-h-24 bg-white border border-gray-200 shadow pointer-events-auto min-w-52">
                 <p className='text-lg font-semibold text-center'>Controls</p>
 
-                <button className='block p-2 mt-4 w-full rounded font-semibold bg-blue-500 text-white hover:bg-blue-700' onClick={autoCamera}>Auto Camera</button>
+                <button className='block p-2 mt-4 w-full rounded font-semibold bg-gray-300 text-black hover:bg-blue-700' onClick={autoCamera}>Auto Camera</button>
 
-                <button className='block p-2 mt-2 w-full rounded font-semibold bg-blue-500 text-white hover:bg-blue-700' onClick={autoLayout}>Auto Layout</button>
+                <button className='block p-2 mt-2 w-full rounded font-semibold bg-gray-300 text-black hover:bg-blue-700' onClick={autoLayout}>Auto Layout</button>
 
             </Popover.Panel>
         </Popover>

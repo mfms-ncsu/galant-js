@@ -60,18 +60,22 @@ export default function HeaderComponent() {
         <header className="absolute flex justify-between align-middle px-4 h-12 z-10">
             {/* <img src="img/galant_full_logo_without_words.svg" alt="galant logo" className="pt-1"/> */}
             <div className="flex space-x-2 py-2 w-full sm:w-fit font-semibold whitespace-nowrap">
+                <button className="flex items-center space-x-2 px-2 py-1 bg-gray-300 text-black rounded shadow-lg hover:bg-blue-100 cursor-alias" onClick={openInstructionsPage}>
+                    <label><span>Get Started (h)</span></label> 
+                </button>
+
                 <button className="flex items-center space-x-2 px-2 py-1 bg-gray-300 text-black rounded shadow-lg hover:bg-blue-100 cursor-alias" onClick={openKeyboardShortcutsPage}>
-                    <label><span>&#63;</span></label> 
+                    <label><span>Keys (k)</span></label> 
                 </button>
 
-                <button className="flex items-center space-x-4 px-2 py-1 bg-blue-500 text-white rounded shadow-lg hover:bg-blue-600 cursor-alias" onClick={openGraphEditor}>
-                    <label>Graph Editor</label>
-                    <ArrowTopRightOnSquareIcon className="h-4 fill-white" />
+                <button className="flex items-center space-x-4 px-2 py-1 bg-gray-300 text-black rounded shadow-lg hover:bg-gray-300 cursor-alias" onClick={openGraphEditor}>
+                    <label>Graph Editor (g)</label>
+                    <ArrowTopRightOnSquareIcon className="h-4 fill-black" />
                 </button>
 
-                <button className="flex items-center space-x-2 px-2 py-1 bg-blue-500 text-white rounded shadow-lg hover:bg-blue-600 cursor-alias" onClick={openAlgorithmEditor}>
-                    <label>Algorithm Editor</label>
-                    <ArrowTopRightOnSquareIcon className="h-4 fill-white" />
+                <button className="flex items-center space-x-2 px-2 py-1 bg-gray-300 text-black rounded shadow-lg hover:bg-gray-300 cursor-alias" onClick={openAlgorithmEditor}>
+                    <label>Algorithm Editor (a)</label>
+                    <ArrowTopRightOnSquareIcon className="h-4 fill-black" />
                 </button>
 
             </div>

@@ -10,8 +10,8 @@ export default function InstructionsPage() {
     return (
         <>
         <div>
-            <p className="font-mono">
-                <h1 className="font-bold text-3xl">Instructions for using Galant-JS:</h1> <br />
+            <h1 className="font-bold text-3xl">Quick Start Guide to using Galant-JS</h1>
+            <div>
                 <ol>
                     <li>
                         <strong>Load a Graph.</strong>
@@ -22,10 +22,51 @@ export default function InstructionsPage() {
                             <li>
                                 Click the <code>New</code> tab in the graph editor window
                             </li>
+                            <li>
+                                Select a graph in the drop down menu;
+                                the sorting graphs are for sorting algorithms only.
+                            </li>
+                            <li>
+                                Click <code>Load Graph</code> or use the <code>Ctrl-L</code> (<code>Cmd-L</code> on a Mac) key.
+                            </li>
+                        </ol>
+                    </li>
+                    <li>
+                        <strong>Load an Algorithm.</strong>
+                        <ol>
+                            <li>
+                                Go back to the main window and click <code>Algorithm Editor</code> or use the <code>a</code> key
+                            </li>
+                            <li>
+                                Click the <code>New</code> tab in the algorithm editor window
+                            </li>
+                            <li>
+                                Select an algorithm from the drop down menu                                
+                            </li>
+                            <li>
+                                Click <code>Load Algorithm</code> or use the <code>Ctrl-L</code> (<code>Cmd-L</code> on a Mac) key.
+                            </li>
+                        </ol>
+                    </li>
+                    <li>
+                        <strong>Run the Algorithm.</strong>
+                        <ol>
+                            <li>
+                                Go back to the main window
+                            </li>
+                            <li>
+                                Use the left and right arrow keys or click on the arrows at the bottom of the display to step forward and backward
+                            </li>
+                            <li>
+                                Use the <code>Esc</code> key or click on the <code>x</code> to exit the algorithm
+                            </li>
+                            <li>
+                                If you want to start over, go back to the algorithm editor and load the algorithm again
+                            </li>
                         </ol>
                     </li>
                 </ol>
-            </p>
+            </div>
         </div>
         </>
     )
