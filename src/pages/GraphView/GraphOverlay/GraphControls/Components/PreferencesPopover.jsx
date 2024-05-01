@@ -78,8 +78,9 @@ export default function PreferencesPopover() {
 
     return (
     <Popover className="">
-        <Popover.Button ref={button} className="group w-12 h-12 p-2 rounded bg-gray-100 shadow pointer-events-auto">
-            <AdjustmentsHorizontalIcon className='fill-blue-400 group-focus:scale-105' />
+        <Popover.Button ref={button} className="group w-15 h-8 p-1 rounded bg-gray-100 shadow pointer-events-auto">
+            <label>Prefs (p)</label>
+            {/* <AdjustmentsHorizontalIcon className='fill-blue-400 group-focus:scale-105' /> */}
         </Popover.Button>
 
         <Popover.Overlay className="absolute inset-0 m-4 mt-1 rounded-lg bg-black/30" />
