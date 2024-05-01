@@ -58,7 +58,7 @@ export default function GraphEditOverlay({graphEditHistory}) {
             if (event.target.tagName.toLowerCase() === 'input') return; // If user is typing into an input field, ignore.
 
             if (key === 'z') undo();
-            else if (key === 'x') redo();
+            else if (key === 'y') redo();
             else if (key === 'r') revert();
             else if (key === 's') save();
         }
@@ -81,12 +81,12 @@ export default function GraphEditOverlay({graphEditHistory}) {
                 <div className="flex space-x-12 w-fit mx-auto">
                     <button className="relative p-1 pointer-events-auto stroke-0 stroke-black hover:stroke-1" onClick={undo}>
                         <ArrowUturnLeftIcon className="w-6 h-6"/>
-                        <label className="absolute -bottom-2 left-0 text-sm">Z</label>
+                        <label className="absolute -bottom-2 left-0 text-sm">z</label>
                     </button>
                     <span>{graphEditHistory.current} / {graphEditHistory.history.length - 1}</span>
                     <button className="relative p-1 pointer-events-auto stroke-0 stroke-black hover:stroke-1" onClick={redo}>
                         <ArrowUturnRightIcon className="w-6 h-6"/>
-                        <label className="absolute -bottom-2 right-0 text-sm">X</label>
+                        <label className="absolute -bottom-2 right-0 text-sm">y</label>
                     </button>
                 </div>
                 <button className="block mt-4 mx-auto p-2 rounded-full font-semibold bg-gradient-to-r from-indigo-500 to-blue-500 text-white ring-indigo-500 pointer-events-auto shadow-sm hover:shadow-lg" onClick={save}>Save Changes</button>

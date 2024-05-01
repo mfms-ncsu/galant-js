@@ -119,9 +119,7 @@ export default function AlgorithmControls() {
                     <label><span>Exit (x)</span></label>
                 </button> */}
 
-                 <XCircleIcon id="terminate-algorithm" onClick={terminateAlgorithm} className="h-5 fill-gray-500 pointer-events-auto cursor-pointer hover:fill-black"/>
                     {/* <XCircleIcon className="h-4 fill-black" /> */}
-                <p id="exit" className="text-lg text-black whitespace-nowrap bg-gray-300">* Exit (x)</p>
 
                 {/* <button id="terminate-algorithm" onClick={terminateAlgorithm} className="h-5 fill-gray-500 pointer-events-auto cursor-pointer hover:fill-black"/>
                 <XCircleIcon id="terminate-algorithm" onClick={terminateAlgorithm} className="h-5 fill-gray-500 pointer-events-auto cursor-pointer hover:fill-black"/> */}
@@ -144,7 +142,13 @@ export default function AlgorithmControls() {
 
 
             <button id="export-graph" className={`${(algorithm.currentIndex <= 0 || !algorithm.configuration.controlNodePosition) && 'hidden'} absolute bottom-0 right-0 py-2 px-4 bg-gradient-to-r from-indigo-500 to-blue-500 shadow rounded-full font-semibold text-white pointer-events-auto`} onClick={exportGraph}>Export Graph</button>
-            <button id="skip-to-end" className="h-120 w-120 p-3 rounded bg-green-100 pointer-events-auto" disabled={!algorithm.canStepForward()} onClick={() => algorithm.skipToEnd()}>Skip to End</button>
+
+            <button id="terminate-algorithm" className="flex items-center h-6 w-15 space-x-4 px-2 py-1 bg-red-100 text-black rounded shadow-lg hover:bg-gray-300 cursor-alias" onClick={() => algorithm.terminateAlgorithm()}>
+                    <label><span>Exit (x)</span></label>
+                    <XCircleIcon id="terminate-algorithm" onClick={terminateAlgorithm} className="h-5 fill-gray-500 pointer-events-auto cursor-pointer hover:fill-black"/>
+            </button>
+
+            <button id="skip-to-end" className="h-6 w-15 p-1 rounded bg-green-100 pointer-events-auto" disabled={!algorithm.canStepForward()} onClick={() => algorithm.skipToEnd()}>Skip to End</button>
         </div>
     );
 }
