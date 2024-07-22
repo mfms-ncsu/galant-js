@@ -32,3 +32,8 @@ body {
     display: inline-block;
     margin-right: 10px;
   }
+
+  .help-button {
+    font-size: 16px;
+    background-color:greenyellow;
+  }

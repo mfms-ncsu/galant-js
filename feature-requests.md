@@ -98,13 +98,17 @@ A related issue is the ***ability to get the position of a node.*** This is usef
 
 5. If you do auto-layout and then move a node manually, weird things happen, i.e., all the nodes move unpredicatably; maybe the auto-layout algorithm runs again. There appears to be no way to save the positions of an auto-layout. This is vary annoying if the coordinates of the nodes are initially random, as they are for some graphs.
 
-6. The menu when you right click a node sometimes goes off screen and you have to move the node to see all of it.
+A workaround is to start an algorithm after you do auto-layout and then move the nodes.
 
-7. There is no indication whether a graph or algorithm has been saved. So the user has to remember to download if they make changes.
+6. Somewhat related to (5): If you do delete nodes before starting an algorithm, the algorithm starts with the original graph. You probably have to save the graph first, which is not that bad.
 
-8. In Firefox (not the case in other browsers and not always true) the left and right arrow keys also move the focus of the window, shifting the graph in the opposite direction.
+7. The menu when you right click a node sometimes goes off screen and you have to move the node to see all of it.
 
-9. When you bring up the graph or algorithm editor, it brings you to the same tab each time, not the one for the most recently loaded graph or algorithm.
+8. There is no indication whether a graph or algorithm has been saved. So the user has to remember to download if they make changes.
+
+9. In Firefox (not the case in other browsers and not always true) the left and right arrow keys also move the focus of the window, shifting the graph in the opposite direction.
+
+10. When you bring up the graph or algorithm editor, it brings you to the same tab each time, not the one for the most recently loaded graph or algorithm.
 
 # minor adjustments, easy fixes
 
