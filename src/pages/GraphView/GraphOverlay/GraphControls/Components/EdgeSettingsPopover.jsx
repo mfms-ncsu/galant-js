@@ -95,9 +95,8 @@ export default function EdgeSettingsPopover() {
    
     return (
         <Popover className="relative">
-            <Popover.Button ref={button} className="group h-8 w-15 p-1 rounded shadow bg-gray-100 border border-gray-200 pointer-events-auto">
+            <Popover.Button ref={button} className="group h-8 w-15 p-1 pointer-events-auto preference-button">
                 <label>Edges (e)</label>
-                {/* <img src='img/EdgeIcon.svg' alt='edge settings icon' className='group-focus:scale-105' /> */}
             </Popover.Button>
 
             <Popover.Panel className="absolute z-10 right-1/2 translate-x-1/4 w-max p-4 pt-2 mt-4 rounded min-h-24 bg-white border border-gray-200 shadow pointer-events-auto">

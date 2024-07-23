@@ -78,7 +78,7 @@ export default function PreferencesPopover() {
 
     return (
     <Popover className="">
-        <Popover.Button ref={button} className="group w-15 h-8 p-1 rounded bg-gray-100 shadow pointer-events-auto">
+        <Popover.Button ref={button} className="group w-15 h-8 p-1 pointer-events-auto preference-button">
             <label>Prefs (p)</label>
             {/* <AdjustmentsHorizontalIcon className='fill-blue-400 group-focus:scale-105' /> */}
         </Popover.Button>

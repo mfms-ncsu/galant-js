@@ -6,11 +6,13 @@ import PreferencesPopover from "./Components/PreferencesPopover"
 
 export default function GraphControlsComponent() {
     return (
-        <div className="flex justify-end space-x-4 m-2 mb-0">
-            <ControlSettingsPopover />
-            <NodeSettingsPopover />
-            <EdgeSettingsPopover />
-            <PreferencesPopover />
+        <div className="absolute right-1 top-1">
+            <div className="flex-col space-y-1">
+                <div><ControlSettingsPopover /></div>
+                <div><NodeSettingsPopover /></div>
+                <div><EdgeSettingsPopover /></div>
+                <div><PreferencesPopover /></div>
+            </div>
         </div>
     )
 }

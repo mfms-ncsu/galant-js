@@ -99,7 +99,7 @@ export default function NodeSettingsPopover() {
     
     return (
         <Popover className="relative">
-            <Popover.Button ref={button} className="group h-8 w-15 p-1 rounded bg-gray-100 border shadow border-gray-200 pointer-events-auto">
+            <Popover.Button ref={button} className="group h-8 w-15 p-1 pointer-events-auto preference-button">
                 <label>Nodes (n)</label>
                 {/* <img src='img/NodeIcon.svg' alt='node settings icon' className='group-focus:scale-105' /> */}
             </Popover.Button>

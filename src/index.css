@@ -37,3 +37,13 @@ body {
     font-size: 16px;
     background-color:greenyellow;
   }
+
+  .to-editor-button {
+    font-size: 16px;
+    background-color: yellow;
+  }
+
+  .preference-button {
+    font-size: 16px;
+    background-color: aqua;
+  }
