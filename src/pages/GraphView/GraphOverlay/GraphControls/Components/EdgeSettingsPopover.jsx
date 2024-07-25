@@ -99,7 +99,7 @@ export default function EdgeSettingsPopover() {
                 <label>Edges (e)</label>
             </Popover.Button>
 
-            <Popover.Panel className="absolute z-10 right-1/2 translate-x-1/4 w-max p-4 pt-2 mt-4 rounded min-h-24 bg-white border border-gray-200 shadow pointer-events-auto">
+            <Popover.Panel className="absolute z-10 right-1/2 translate-x-1/8 w-max p-4 pt-2 mt-4 rounded min-h-24 bg-white border border-gray-200 shadow pointer-events-auto">
                 <p className='text-lg font-semibold text-center'>Edge Settings</p>
 
                 <div className="flex flex-col space-y-4 mt-4">

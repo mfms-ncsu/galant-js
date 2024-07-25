@@ -6,6 +6,9 @@ import { useRef, useEffect } from 'react'
 /**
  * PreferencesPopover component renders a popover for graph preferences.
  * @returns {JSX.Element} - Returns the JSX for PreferencesPopover component.
+ * 
+ * @todo These preferences are not really useful.
+ *       For now, it's not really clear what sort of preferences might be.
  */
 export default function PreferencesPopover() {
     const graphContext = useGraphContext();
@@ -85,7 +88,7 @@ export default function PreferencesPopover() {
 
         <Popover.Overlay className="absolute inset-0 m-4 mt-1 rounded-lg bg-black/30" />
         <div className='absolute inset-0 flex justify-center items-center'>
-            <Popover.Panel className="absolute z-10 p-4 pr-1 min-w-72 shadow rounded-lg bg-white pointer-events-auto">
+            <Popover.Panel className="absolute z-10 translate-x-1/8 translate-y-20 right-1/2 p-4 pr-1 min-w-72 shadow rounded-lg bg-white pointer-events-auto">
                 <h1 className='text-lg font-semibold text-center pr-3'>Graph Preferences</h1>
 
                 <div className='flex flex-col space-y-4 mt-8 max-h-72 overflow-y-auto py-2 pr-3'>

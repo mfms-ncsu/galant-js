@@ -185,7 +185,13 @@ export default function GraphView() {
             <AlgorithmContext.Provider value={algorithmContext}>
                 <GraphContext.Provider value={graphContext}>
                     <PromptContext.Provider value={PromptService}>
-                        <PromptComponent />
+{/* having trouble figuring out how to get placement of prompts set up the way
+    I want; maybe the w-full, h-full at the top is messing things up.
+    It took a while to get the context menus right
+    and I'm not sure why they now work okay */}
+                    <div className="absolute z-10 left-1/4 top-1/4">
+                        <div><PromptComponent /></div>
+                    </div>
                         <CytoscapeComponent />
                         <GraphOverlay />
                         <GraphEditOverlay graphEditHistory={graphEditHistory}/>
@@ -195,7 +201,6 @@ export default function GraphView() {
                     </PromptContext.Provider>
                 </GraphContext.Provider>
             </AlgorithmContext.Provider>
-
         </div>
     </>);
 }

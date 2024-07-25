@@ -104,7 +104,7 @@ export default function NodeSettingsPopover() {
                 {/* <img src='img/NodeIcon.svg' alt='node settings icon' className='group-focus:scale-105' /> */}
             </Popover.Button>
 
-            <Popover.Panel unmount={false} className="absolute z-10 right-1/2 translate-x-1/2 w-max p-4 pt-2 mt-4 rounded min-h-24 bg-white border border-gray-200 shadow pointer-events-auto">
+            <Popover.Panel unmount={false} className="absolute z-10 right-1/2 translate-x-1/8 w-max p-4 pt-2 mt-4 rounded min-h-24 bg-white border border-gray-200 shadow pointer-events-auto">
                 <p className='text-lg font-semibold text-center'>Node Settings</p>
 
                 <div className="flex flex-col space-y-4 mt-4">
