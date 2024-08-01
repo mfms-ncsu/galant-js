@@ -113,7 +113,7 @@ export default function AlgorithmControls() {
         <div>
             <div id="algorithm-controls" className="absolute bottom-1 left-1 mt-auto mb-2">
                 <div className="flex justify-left items-center space-x-1">
-                    <p id="algorithm-name" className="text-lg text-black whitespace-nowrap">{algorithm.name}</p>
+                    <p id="algorithm-name" className="text-black whitespace-nowrap">{algorithm.name}</p>
 
                 {/* <button id="terminate-algorithm" className="flex items-center h-6 space-x-4 px-2 py-1 bg-gray-300 text-black rounded shadow-lg hover:bg-gray-300 cursor-alias" onClick={terminateAlgorithm}>
                     <label><span>Exit (x)</span></label>
@@ -126,12 +126,12 @@ export default function AlgorithmControls() {
 
                 </div>
                 <div className="flex justify-center items-center space-x-4 mt-auto">
-                    <button id="step-back" className="h-10 w-12 p-3 rounded bg-blue-300 pointer-events-auto disabled:opacity-75" disabled={!algorithm.canStepBack()} onClick={() => backButtonPress()}>
+                    <button id="step-back" className="h-8 w-8 p-3 rounded bg-blue-300 pointer-events-auto disabled:opacity-75" disabled={!algorithm.canStepBack()} onClick={() => backButtonPress()}>
                     <ArrowLeftIcon className="fill-black stroke-1 stroke-black" />
                     </button>
                 
-                    <p className="p-2 px-3 bg-gray-200 text-xl pointer-events-auto">{stepText}</p>
-                    <button id="step-forward" className={`relative h-10 w-12 p-3 rounded bg-blue-300 pointer-events-auto disabled:opacity-75 ${algorithm.fetchingSteps && 'cursor-progress'}`} disabled={!algorithm.canStepForward()} onClick={() => frontButtonPress()}>
+                    <p className="p-2 px-3 bg-gray-200 pointer-events-auto">{stepText}</p>
+                    <button id="step-forward" className={`relative h-8 w-8 p-3 rounded bg-blue-300 pointer-events-auto disabled:opacity-75 ${algorithm.fetchingSteps && 'cursor-progress'}`} disabled={!algorithm.canStepForward()} onClick={() => frontButtonPress()}>
                         {!algorithm.fetchingSteps ?
                         <ArrowRightIcon className="fill-black stroke-1 stroke-black"/>
                     :

@@ -77,6 +77,11 @@ Algorithm.configure({
 ```
 
 A related issue is the ***ability to get the position of a node.*** This is useful not only for algorithms that move nodes, but also for computing Euclidian distance when an algorithm that requires edge weights is run on a graph that does not specify them.
+See the line
+```
+const transformedPositions = transformPositions(positions, 1 / graphSnapshot.scalar);
+```
+in `AlgorithmControlsComponent.jsx`
 
 16. Algorithms should have the ability to add/delete nodes and edges (true in the Java version). This, along with ability to move nodes, would make it possible to animate data structures such as search trees and heaps.
 
@@ -97,6 +102,9 @@ A related issue is the ***ability to get the position of a node.*** This is usef
 4. The Algorithm Editor and Graph Editor windows persist after the application is terminated by closing the main window or a Ctrl-C from the terminal.
 
 5. If you do auto-layout and then move a node manually, weird things happen, i.e., all the nodes move unpredicatably; maybe the auto-layout algorithm runs again. There appears to be no way to save the positions of an auto-layout. This is vary annoying if the coordinates of the nodes are initially random, as they are for some graphs.
+Note: If user moves an individual node, a new edit state is created, see
+pages/GraphView/GraphEditOverlay/ContextMenus/ContextMenu.jsx
+This should also happen when an auto-layout is performed.
 
 A workaround is to start an algorithm after you do auto-layout and then move the nodes.
 
