@@ -21,11 +21,12 @@ This should also happen when an auto-layout is performed.
 I anticipate being closely involved in the development and will produce some of this documentation as we go, as well as making suggestions about code style and commenting.
 Also desirable is a log of design and implementation decisions and the reasoning behind them.
 
-* Better handling of errors. Currently, you have to open "developer tools" in the browser to see the console and get information such as detailed error messages. And the developer messages don't give line numbers for the algorithms. Makes debugging difficult (actually, the browser will pop up a window that highlights the location of the error). Syntax errors in graph text simply result in the graph not being loaded - no explanation is given.
+* Better handling of errors. Currently, you have to open "developer tools" in the browser to see the console and get information such as detailed error messages. And the developer messages don't give line numbers for the source code or the input files. Makes debugging difficult (actually, the browser will pop up a window that highlights the location of the error). Syntax errors in graph text simply result in the graph not being loaded - no explanation is given.
+On the other hand, runtime errors during algorithm execution are handled well - the graph window gives a line number with a description of the error and marks the offending line; the only quibble I have with it is that the window may need to be expanded and the message window replaces the graph window rather than being a separate popup (as in the Java version)
 
 ## Secondary but important
 
-* Most (if not all) of the keyboard shortcuts based on Cmd or Ctrl keys (Mac/Windows) are hijacked by the browser when focus is on the text edit windows; these should work as Galant commands, e.g., Cmd-S should save the file, Cmd-O should open one, and Cmd-Q should exit Galant.
+* Most (if not all) of the keyboard shortcuts based on Cmd or Ctrl keys (Mac/Windows) are hijacked by the browser when focus is on a text edit window; these should work as Galant commands, e.g., Cmd-S should save the file, Cmd-O should open one, and Cmd-Q should exit Galant.
 
 * Many of the styles for buttons and menus are ad-hoc rather than being standardized and the buttons are not in the most desirable locations; some of this has been taken care of in the dev branch.
 
@@ -45,7 +46,9 @@ Location of popups during and at the end of algorithm execution is difficult to 
 
 ## Other desirable features
 
-### Algorithm execution
+### Animation implementation and execution
+
+* `JavaScript` is used directly as the language to implement algorithms; the Java version uses a macro preprocessor that translates a language resembling pseudocode to Java. Some sort of preprocessing would be useful, since Galant is intended for animators with limited programming skills. `JavaScript`, in particular, has syntactic and semantic quirks that present challenges for programmers familiar with traditional languages such as `Java`, `C`, and `Python`. 
 
 * Ability to add or delete nodes/edges during algorithm execution. For most animations this is emulated by hinding and showing. But addition and deletion along with node movement would allow animations of data structures such as search trees and heaps
 
