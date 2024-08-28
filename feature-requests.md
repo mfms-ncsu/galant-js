@@ -26,9 +26,9 @@ On the other hand, runtime errors during algorithm execution are handled well - 
 
 ## Secondary but important
 
-* Most (if not all) of the keyboard shortcuts based on Cmd or Ctrl keys (Mac/Windows) are hijacked by the browser when focus is on a text edit window; these should work as Galant commands, e.g., Cmd-S should save the file, Cmd-O should open one, and Cmd-Q should exit Galant.
+* Most (if not all) of the keyboard shortcuts based on Cmd or Ctrl keys (Mac/Windows) are hijacked by the browser when focus is on a **text edit window** (as opposed to the graph window); these should work as Galant commands, e.g., Cmd-S should save the file, Cmd-O should open one, and Cmd-Q should exit Galant.
 
-* Many of the styles for buttons and menus are ad-hoc rather than being standardized and the buttons are not in the most desirable locations; some of this has been taken care of in the dev branch.
+* Many of the styles for buttons and menus are ad-hoc rather than being standardized and the buttons are not in the most desirable locations; some of this has been taken care of in the this `dev` branch.
 
 * Some problems with drop downs and popups have serious impact on usability
 - drop down menus are not always in expected locations and the way their locations are specified is mysterious
@@ -38,7 +38,7 @@ On the other hand, runtime errors during algorithm execution are handled well - 
 See the two `.jpg` files for desired locations of buttons.
 Location of popups during and at the end of algorithm execution is difficult to control, probably because of the nested contexts in `pages/GraphView/index.jxs`
 
-* Use of keyboard to navigate drop downs or popups with buttons is awkward; direct shortcuts for some operations on nodes and edges might be useful, e.g., the following exist in the Java version: (a) show and hide of weights/labels; (b) add or delete nodes and edges.
+* Use of keyboard to navigate drop downs or popups with buttons is awkward; direct shortcuts for some operations on nodes and edges might be useful, e.g., the following exist in the Java version: (a) showing and hiding of weights/labels; (b) adding or deleting nodes and edges.
 
 * Editor windows persist when the main browser window is closed; they should go away.
 
@@ -50,7 +50,7 @@ Location of popups during and at the end of algorithm execution is difficult to 
 
 * `JavaScript` is used directly as the language to implement algorithms; the Java version uses a macro preprocessor that translates a language resembling pseudocode to Java. Some sort of preprocessing would be useful, since Galant is intended for animators with limited programming skills. `JavaScript`, in particular, has syntactic and semantic quirks that present challenges for programmers familiar with traditional languages such as `Java`, `C`, and `Python`. 
 
-* Ability to add or delete nodes/edges during algorithm execution. For most animations this is emulated by hinding and showing. But addition and deletion along with node movement would allow animations of data structures such as search trees and heaps
+* Ability to add or delete nodes/edges during algorithm execution. For most animations this is emulated by hiding and showing. But addition and deletion along with node movement would allow animations of data structures such as search trees and heaps
 
 * The ability for an algorithm to direct an edge, whether or not the graph is currently directed. This would be useful in at least two settings:
 - vertex_cover: direct an edge toward a vertex that covers it
