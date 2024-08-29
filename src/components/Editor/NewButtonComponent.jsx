@@ -46,6 +46,13 @@ export default function NewButtonComponent({addTab, examples}) {
     }, []);
 
     return (
+        /**
+         * @todo SD 2024-8
+         * I think this is where the style for a drop down menu is defined.
+         * There's a lot of clutter here.
+         * It may be useful to define a uniform style in index.css.
+         * I'm not happy with the positioning of some drop downs or popups; it would be good to understand how to control these.
+         */
         <div className="relative">
             <Menu>
                 <Menu.Button ref={button} id="new-button" className="flex items-center space-x-2 px-2 py-1 rounded-t font-semibold bg-blue-400 text-white hover:bg-blue-500">

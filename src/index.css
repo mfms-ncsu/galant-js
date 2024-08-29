@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/**
+ * @todo SD 2024-8
+ * All of the style declarations are here. Some more should probably be added.
+ */
 
 body {
     margin: 0;

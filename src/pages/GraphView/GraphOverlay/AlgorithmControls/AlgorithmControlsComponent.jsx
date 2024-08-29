@@ -36,6 +36,11 @@ export default function AlgorithmControls() {
         const algorithmSnapshot = algorithm.steps[algorithm.currentIndex];
         const graphSnapshot = algorithmSnapshot.graph;
         const positions = extractPositions(graphSnapshot);
+        /**
+         * @todo SD 2024-8
+         * Figure out how to use this when transforming back and forth between logical and physical positions.
+         * It looks like it's used here to calculate positions when the graph is saved.
+         */
         const transformedPositions = transformPositions(positions, 1 / graphSnapshot.scalar);
         const finalPositions = roundPositions(transformedPositions);
         const finalGraph = applyPositions(graphSnapshot, finalPositions);

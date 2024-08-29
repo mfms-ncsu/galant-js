@@ -56,6 +56,11 @@ function LoadAlgorithmComponent({tab}) {
     }
 
     return (
+        /**
+         * @todo SD 2024-8
+         * This is pretty crazy. There should be a uniform style for all buttons in the editors, defined in index.css
+         * A style for various icons is needed as well - probably should be black on white.
+         */
         <button className="flex items-center justify-evenly space-x-2 px-3 py-2 rounded-full font-semibold shadow bg-gradient-to-r from-indigo-500 to-blue-500 text-white outline-2 outline-blue-200 hover:outline" onClick={loadAlgorithm}>
             <ArrowUpRightIcon className="w-4 h-4 stroke-2 stroke-white"/>
             <span>Load Algorithm</span>

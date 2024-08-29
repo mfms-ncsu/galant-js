@@ -38,9 +38,13 @@ On the other hand, runtime errors during algorithm execution are handled well - 
 See the two `.jpg` files for desired locations of buttons.
 Location of popups during and at the end of algorithm execution is difficult to control, probably because of the nested contexts in `pages/GraphView/index.jxs`
 
+The `buttons.txt` file list all of the places in the code that impact buttons, drop downs and popups. These come from the code in the main branch. There are some changes in the dev branch, mostly to establish some uniform styles and achieve the desired position for the buttons.
+
 * Use of keyboard to navigate drop downs or popups with buttons is awkward; direct shortcuts for some operations on nodes and edges might be useful, e.g., the following exist in the Java version: (a) showing and hiding of weights/labels; (b) adding or deleting nodes and edges.
 
 * Editor windows persist when the main browser window is closed; they should go away.
+
+* If user presses the Algorithm (editor) button, a new editor window appears even if one already exists. Ideally, the current window should move to the foreground. Same with the graph editor.
 
 * User should be alerted and prompted to save when there are unsaved changes in any of the editor windows (or tabs thereon).
 

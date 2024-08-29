@@ -48,6 +48,11 @@ export default function ContextMenu({graphEditHistory}) {
         if (!cytoscapeInstance) return;
 
 		function onNodeMoved(event) {
+			/**
+			 * @todo SD 2024-8
+			 * Thus should also happen when an auto-layout is performed.
+			 * In that case the positions of all the nodes need to be part of the new edit state
+			 */
 			const node = event.target;
 
 			const graph = graphEditHistory.getCurrentSnapshot();

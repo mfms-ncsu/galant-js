@@ -69,6 +69,10 @@ export default function TabListComponent({tabs, setTabs, acceptFileType, example
 
     
     return (
+        /**
+         * @todo SD 2024-8
+         * I'm not sure what a tab component is. You may want to see where this is used and/or play around with changes and see what effect they have.
+         */
     <div className="flex items-end space-x-[2px] max-w-[98%]">
         <div className="flex overflow-x-auto space-x-[2px] pt-1">
             {tabs.map((tab) => <TabComponent key={tab.name} tab={tab} onClick={onTabClick} onRename={onTabRename} onRemove={onTabRemove} />)}
