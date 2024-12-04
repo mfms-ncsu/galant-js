@@ -1,5 +1,23 @@
 # The following are desired in future versions of `galant-js`
 
+## Notes for Spring 2025 Senior Design
+If there are two teams, they could work independently on the following two aspects of the project.
+
+### More direct interaction with Cytoscape
+* write some smaller programs that feed graphs directly into Cytoscape, modify the graphs, and respond to user interactions with the graph display
+* see if the existing code base can be made to interact with Cytoscape directly, starting with minimal functionality
+* depending on how the previous steps go, work on a cleaner graph representation
+* gradually add features of original implementation
+
+### Fix various aspects of the user interface, correct bugs, etc.
+* keyboard shortcuts
+* saving graph and algorithm files with a file browser instead of downloading them
+* positioning of query popups
+* display of messages and using change records for these
+* fixing various annoyances of the display
+
+Both teams can move in the direction of handling layered graphs with sorting graphs as a special case.
+
 ## High priority
 
 * Maintaining a mapping between physical screen positions of nodes and logical positions recorded in a text file. This will facilitate the following

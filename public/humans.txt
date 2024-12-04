@@ -21,5 +21,13 @@ This site has been edited by subsequent NC State Senior Design Team's. We are:
     - Neha Ramesh
     - Minghong Zou
 
+This site has been edited by subsequent NC State Senior Design Team's. We are:
+- Fall 2024
+	- Harshica Balu
+	- Shlok Dave
+	- Ethan Godwin
+	- Andrew Lanning
+	- Somya Pandey
+
 /* THANKS */
 Senior Design Sponsor and Original Galant Sponsor: Dr. Matthias Stallmann.
