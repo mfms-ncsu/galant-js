@@ -92,12 +92,14 @@ export default function GraphEditOverlay({ setMode }) {
 
         function onKeyDown(event) {
             const key = event.key;
+            console.log("-> onKeyDown, key =", key)
             if (event.target.tagName.toLowerCase() === 'input') return;
 
             if (key === 'z') undo();
             else if (key === 'y') redo();
             else if (key === 'r') revert();
             else if (key === 's') save();
+            console.log("<- onKeyDown")
         }
 
         document.addEventListener('keydown', onKeyDown);

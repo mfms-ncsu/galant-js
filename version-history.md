@@ -1,9 +1,15 @@
 # Version history of galant-js
 
-Ones that have been accomplished by the Fall 2023 Senior Design Team of Ryan Bruce, Charlie Fligg, Emma Holincheck, and Sudhanshu Moghe are marked F23. This is a prerelease, v0.9.
+Features and bug fixes implemented by the Fall 2024 Senior Design Team of Harshica Balu, Shlok Dave, Ethan Godwin, Andrew Lanning, and Somya Pandey are marked F24. The major accomplishment of this team was on the back end: the implementation of ***change records***, which make the code more transparent and allow separation of logical and physical representation of the graph.
 
-Those that have been implemented as v1.0 by the Spring 2024 Senior Design Team of Christina Albores, Vitesh Kambara, Julian Madrigal, Neha Ramesh, and Minghong Zou are marked S24.
+Features and bug fixes implemented as v1.0 by the Spring 2024 Senior Design Team of Christina Albores, Vitesh Kambara, Julian Madrigal, Neha Ramesh, and Minghong Zou are marked S24.
 
+Features in the original galant-js implemented by the Fall 2023 Senior Design Team of Ryan Bruce, Charlie Fligg, Emma Holincheck, and Sudhanshu Moghe are marked F23. This is a prerelease, v0.9.
+
+------------------------
+(1) (F24) Auto layout is now treated as a single edit step. This also fixes a bug wherein an auto layout followed by movement of a node led to strange rearrangement of the graph.
+
+------------------------
 (1) (S24) Galant-js now has popup windows for algorithms and graphs; each popup has tabs for different algorithms/graphs. The main graph window is resized as a browser window.
 
 (2) (S24) Additional display attributes such as radius and shading (fill) for nodes, thickness for both nodes and edges (of boundary in case of nodes), and shapes.
