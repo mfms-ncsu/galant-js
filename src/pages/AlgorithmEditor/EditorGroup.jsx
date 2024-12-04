@@ -25,6 +25,9 @@ import { ArrowUpRightIcon } from "@heroicons/react/24/solid";
  */
 function LoadAlgorithmComponent({tab}) {
     const sharedWorker = useMemo(() => new SharedWorker('./worker.js'), []);
+    const [showLoadedMessage, setShowLoadedMessage] = useState(false);  // State for showing the success message
+    const [loadError, setLoadError] = useState(''); // State for showing the error message
+
     // Effect hook to handle keyboard shortcut for loading graph/algorithm
     useEffect(() => {
 
@@ -41,6 +44,7 @@ function LoadAlgorithmComponent({tab}) {
     }, [loadAlgorithm]);
 
     if (!tab) return;
+
     // loads in an algorithm into a shared worker by sending a message to its port and preparing the necessary data
     function loadAlgorithm() {
         
@@ -50,21 +54,48 @@ function LoadAlgorithmComponent({tab}) {
                 'algorithm': tab.content,
                 'name': tab.name
             }]);
+
+            // Show the "Algorithm loaded" message
+            setShowLoadedMessage(true);
+            setLoadError(''); // Clear any existing error
+
+            // Hide the message after 3 seconds
+            setTimeout(() => {
+                setShowLoadedMessage(false);
+            }, 3000);
+
         } catch (e) {
             console.error(e.message);
+            setLoadError('Failed to load'); // Set error message
         }
     }
 
+    function clearError() {
+        setLoadError(''); // Clear the error message
+    }
+
     return (
-        /**
-         * @todo SD 2024-8
-         * This is pretty crazy. There should be a uniform style for all buttons in the editors, defined in index.css
-         * A style for various icons is needed as well - probably should be black on white.
-         */
-        <button className="flex items-center justify-evenly space-x-2 px-3 py-2 rounded-full font-semibold shadow bg-gradient-to-r from-indigo-500 to-blue-500 text-white outline-2 outline-blue-200 hover:outline" onClick={loadAlgorithm}>
-            <ArrowUpRightIcon className="w-4 h-4 stroke-2 stroke-white"/>
-            <span>Load Algorithm</span>
-        </button>
+        <div>
+            {/* Conditionally render the "Algorithm loaded" message */}
+            {showLoadedMessage && (
+                <div className="absolute top-0 left-0 right-0 p-2 bg-green-500 text-white text-center">
+                    Algorithm loaded!
+                </div>
+            )}
+
+            {/* Persistently display the error message until cleared */}
+            {loadError && (
+                <div className="absolute top-0 left-0 right-0 p-2 bg-red-500 text-white text-center">
+                    {loadError}
+                    <button onClick={clearError} className="ml-4 px-2 py-1 bg-red-700 rounded">Clear</button>
+                </div>
+            )}
+
+            <button className="flex items-center justify-evenly space-x-2 px-3 py-2 rounded-full font-semibold shadow bg-gradient-to-r from-indigo-500 to-blue-500 text-white outline-2 outline-blue-200 hover:outline" onClick={loadAlgorithm}>
+                <ArrowUpRightIcon className="w-4 h-4 stroke-2 stroke-white"/>
+                <span>Load Algorithm</span>
+            </button>
+        </div>
     )
 }
 
@@ -138,15 +169,13 @@ export default function EditorGroup() {
             setSaved(true);
         }
 
-
         if (tabs.length <= 0) {
             addTab({name: `New Algorithm`}, tabs, setTabs);
         }
 
-        setSaved(false); // Set to false to inform 'saving' is occuring 
+        setSaved(false); // Set to false to inform 'saving' is occurring 
         const timeOut = setTimeout(saveToStorage, 500); // If 'tab's doesn't change for 2 sec, tabs will be saved.
 
-        
         return () => clearTimeout(timeOut);//If tabs changes, this function will be called.
     }, [tabs]);
 

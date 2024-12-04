@@ -1,10 +1,12 @@
 import { useFloating } from "@floating-ui/react-dom";
 import { Menu, Popover } from "@headlessui/react";
 import produce from "immer";
+import ChangeObject from "pages/GraphView/utils/ChangeObject";
 import { useGraphContext } from "pages/GraphView/utils/GraphContext";
 import GraphEditHistory from "pages/GraphView/utils/GraphEditHistory";
 import { useRef, useEffect, useState } from "react";
 import Graph from "utils/Graph";
+import ChangeRecord from "pages/GraphView/utils/ChangeRecord";
 
 
 
@@ -19,20 +21,20 @@ import Graph from "utils/Graph";
  * @param {GraphEditHistory} props.graphEditHistory 
  * @returns {React.ReactElement} React component
  */
-export default function NodeContextMenu({graphEditHistory}) {
+export default function NodeContextMenu({ graphEditHistory }) {
 	const graphContext = useGraphContext();
+	const changeRecord = ChangeRecord.getInstance();
 	const cytoscapeInstance = graphContext.cytoscape.instance;
 	const [visible, setVisible] = useState(false);
 	const [node, setNode] = useState(null);
-	const [renderedPosition, setRenderedPosition] = useState({x: 0, y: 0});
+	const [renderedPosition, setRenderedPosition] = useState({ x: 0, y: 0 });
 	const [values, setValues] = useState({});
 
 
 	useEffect(() => {
-        if (!cytoscapeInstance) return;
+		if (!cytoscapeInstance) return;
 
 		function onContextClick(event) {
-			console.log(event);
 			setVisible(false);
 			event.preventDefault();
 
@@ -44,35 +46,35 @@ export default function NodeContextMenu({graphEditHistory}) {
 			})
 			setNode(event.target);
 			setVisible(true);
-			event.renderedPosition = event.renderedPosition || {x: 0, y: 0}; // During cypress, renderedPosition is null
-			setRenderedPosition({x: event.renderedPosition.x + 50, y: event.renderedPosition.y + 60});
-			
+			event.renderedPosition = event.renderedPosition || { x: 0, y: 0 }; // During cypress, renderedPosition is null
+			setRenderedPosition({ x: event.renderedPosition.x + 50, y: event.renderedPosition.y + 60 });
+
 
 			document.addEventListener('click', () => setVisible(false), { once: true });
 		}
 
-        cytoscapeInstance.on('cxttap', 'node', onContextClick);
+		cytoscapeInstance.on('cxttap', 'node', onContextClick);
 
 		return (() => cytoscapeInstance.removeListener('cxttap', onContextClick));
-    }, [cytoscapeInstance])
+	}, [cytoscapeInstance])
 
 	const data = node && node.data();
 	const nodeId = node && node.id();
 
 	function onChangeValue(value, newValue) {
-		const newValues = {...values};
+		const newValues = { ...values };
 		newValues[value] = newValue;
 		setValues(newValues);
 	}
 
 	function update() {
 		const label = values.label.trim();
-        const weight = values.weight.trim();
+		const weight = values.weight.trim();
 
 		const graph = graphEditHistory.getCurrentSnapshot();
 
 		const newGraph = produce(graph, draft => {
-			const node = draft.getNodeOrEdgeObject(nodeId);
+			const node = draft.getGraphObject(nodeId);
 			node.label = label.length > 0 ? label : null;
 			node.weight = weight.length > 0 ? weight : null;
 		})
@@ -81,18 +83,9 @@ export default function NodeContextMenu({graphEditHistory}) {
 	}
 
 	function deleteNode() {
-		const graph = graphEditHistory.getCurrentSnapshot();
-
-		const newGraph = produce(graph, draft => {
-			const edgeIds = draft.incident(nodeId);
-			delete draft.nodes[nodeId];
-			for (const edgeId of edgeIds) {
-				console.log(edgeId);
-				delete draft.edges[edgeId];
-			}
-		})
-
-		graphEditHistory.add(newGraph);
+		const graph = graphContext.graph;
+		let change = new ChangeObject("remove", "node", nodeId, { node: graph.getNodeObject(nodeId), edges: graph.incident(nodeId) }, null);
+		changeRecord.addChangeObject([change]);
 		setVisible(false);
 	}
 
@@ -101,21 +94,21 @@ export default function NodeContextMenu({graphEditHistory}) {
 		event.target.blur();
 	}
 
-	return (visible && 
-		<div id="node-context-menu" className="p-2 ring-1 rounded bg-white shadow-lg ring-gray-300" style={{position: 'fixed', top: renderedPosition.y + 'px', left: renderedPosition.x + 'px'}} onClick={(event) => event.stopPropagation()}>
-            <div>
-                <label className="block text-gray-500">ID</label>
-                <input id="node-id" className="bg-gray-200 p-1 rounded disabled:text-gray-500" disabled value={values.id} onChange={(event) => onChangeValue('id', event.target.value)} placeholder="Enter ID"/>
-            </div>
-
-            <div>
-                <label className="block text-gray-500">Weight</label>
-                <input id="node-weight" className="p-1 rounded bg-gray-200" value={values.weight} onChange={(event) => onChangeValue('weight', event.target.value)} onBlur={update} onKeyDown={onEnterPressed} placeholder="Enter weight"/>
-            </div>
+	return (visible &&
+		<div id="node-context-menu" className="p-2 ring-1 rounded bg-white shadow-lg ring-gray-300" style={{ position: 'fixed', top: renderedPosition.y + 'px', left: renderedPosition.x + 'px' }} onClick={(event) => event.stopPropagation()}>
+			<div>
+				<label className="block text-gray-500">ID</label>
+				<input id="node-id" className="bg-gray-200 p-1 rounded disabled:text-gray-500" disabled value={values.id} onChange={(event) => onChangeValue('id', event.target.value)} placeholder="Enter ID" />
+			</div>
 
 			<div>
-            	<label className="block text-gray-500">Label</label>
-            	<input id="node-label" className="p-1 rounded bg-gray-200" value={values.label} onChange={(event) => onChangeValue('label', event.target.value)} onBlur={update} onKeyDown={onEnterPressed} placeholder="Enter label"/>
+				<label className="block text-gray-500">Weight</label>
+				<input id="node-weight" className="p-1 rounded bg-gray-200" value={values.weight} onChange={(event) => onChangeValue('weight', event.target.value)} onBlur={update} onKeyDown={onEnterPressed} placeholder="Enter weight" />
+			</div>
+
+			<div>
+				<label className="block text-gray-500">Label</label>
+				<input id="node-label" className="p-1 rounded bg-gray-200" value={values.label} onChange={(event) => onChangeValue('label', event.target.value)} onBlur={update} onKeyDown={onEnterPressed} placeholder="Enter label" />
 			</div>
 
 			<button id="node-delete" className="block w-full p-1 mt-2 rounded bg-red-500 text-white hover:bg-red-700" onClick={deleteNode}>Delete Node</button>

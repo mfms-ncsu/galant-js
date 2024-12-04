@@ -22,6 +22,10 @@ export default function ControlSettingsPopover() {
             // If user is typing into an input field, ignore.
             if (event.target.tagName.toLowerCase() === 'input') return;
 
+            if (event.key === 'i') {
+                autoLayout();  // Call the auto-layout function directly when 'i' is pressed
+            }
+            
             // Only if the user enters the designated keyboard shortcut - c - the button is clicked
             if (event.key !== 'v') return;
             button.current.click();

@@ -1,5 +1,8 @@
 import produce from "immer";
 import Graph from "utils/Graph";
+import ChangeObject from "./ChangeObject";
+import ChangeRecord from "./ChangeRecord";
+import NodeObject from "./NodeObject";
 
 export function calculateGraphScalar(nodes) {
     let maxCoord = 1;
@@ -26,10 +29,9 @@ export function applyScalar(nodes, scalar) {
  */
 export function extractPositions(graph) {
     const positions = {};
-    console.log(graph.nodes);
     for (const nodeId in graph.nodes) {
         const node = graph.nodes[nodeId];
-        positions[nodeId] = {x: node.x, y: node.y}
+        positions[nodeId] = { x: node.x, y: node.y }
     }
 
     return positions;
@@ -37,17 +39,29 @@ export function extractPositions(graph) {
 
 /**
  * Given a graph and positions, update the graph to apply positions to the graph. 
+ * @param {Graph} graph the graph containing the nodes to update
  * @param {*} positions 
  * @author Julian Madrigal
  */
 export function applyPositions(graph, positions) {
-    return produce(graph, draft => {
-        for (const nodeId in positions) {
-            draft.nodes[nodeId].x = positions[nodeId].x;
-            draft.nodes[nodeId].y = positions[nodeId].y;
+    const newNodes = Object.values(graph.nodes).map((node) => {
+        const updatedNode = { ...node };
+        if (positions[updatedNode.id]) {
+            updatedNode.x = positions[updatedNode.id].x;
+            updatedNode.y = positions[updatedNode.id].y;
         }
-    })
+        return updatedNode;
+    });
+    return new Graph(
+        newNodes,
+        graph.edges,
+        graph.directed,
+        graph.message,
+        graph.name,
+        graph.scalar
+    );
 }
+
 
 /**
  * Given node positions, transform the positions based on a scalar.

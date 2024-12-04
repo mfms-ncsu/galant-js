@@ -1,3 +1,6 @@
+import Graph from "utils/Graph";
+import EdgeObject from "./EdgeObject";
+
 // Default node size when converting the radius of the node to Cytoscape
 const nodeSize = 30;
 
@@ -5,7 +8,7 @@ const nodeSize = 30;
  * Helper function for predicateConverter which handles the directed and undirected objects.
  *
  * @param elements - the elements list to push newly created graph objects to.
- * @param edges - the list of directed or undirected.
+ * @param {EdgeObject[]} edges the list of edges in the graph 
  * @param isDirected - boolean True or False telling the function whether to include a `classes: ['directed']` clause in the graph object.
  *
  * @returns - The converted elements
@@ -13,48 +16,37 @@ const nodeSize = 30;
  * @author Andrew Watson
  * @author Noah Alexander
  * @author Rishabh Karwa
+ * @author Andrew Lanning
  */
-function convertEdges(elements, edges, isDirected, edgeWeights, edgeLabels) {
-    //Loops through all keys inside of the edges
-    for (let id in edges) {
-        //Gets the edge
-        let edge = edges[id];
-
-        //Specifies the format for a graph object to display edges
+function convertEdges(predicate, elements, edges, isDirected, edgeWeights, edgeLabels) {
+    if (!edges || edges.length === 0) return;
+    //Loops through all keys inside of the edges dictionary and gets all the pieces
+    edges.forEach((edge) => {
         let element = {
-            data: {
-                source: '',
-                target: '',
-                highlighted: false,
-                label: '',
-                weight: null,
-            }
-        }
-
+            data: {}
+        };
+        // Go through each "attribute" in the object and assign a matching name and value key-pair to data
+        Object.entries(edge).forEach(([name, value]) => {
+            element.data[name] = value;
+        });
+  
         if (isDirected) {
             element.classes = ['directed'];
         }
 
-        //Loops through all keys inside of the edge
-        for (let key in edge) {
-            //If the predicate for an edge has a weightm it gets added later to a label to be displayed. Ignore it for now.
-            //Transfer all other key value pairs to the edge
-            if (key !== 'weight' && key !== 'label' && edge[key] !== undefined) {
-                element.data[key] = edge[key];
-            }
-        }
-
+        // Makes a list of edgeLabels and their values
         const edgeLabelValues = [];
 
-        if (edgeWeights && edge.weight) edgeLabelValues.push(edge.weight);
-        if (edgeLabels && edge.label) edgeLabelValues.push(edge.label);
+        // Checks if there is an edge object and weight. Pushes it onto the list if there is. 
+        if (edgeWeights && predicate.getEdgeObject(edge).weight) edgeLabelValues.push(predicate.getEdgeObject(edge).weight);
+
+        // Same as previous but with a label 
+        if (edgeLabels && predicate.getEdgeObject(edge).labelx) edgeLabelValues.push(predicate.getEdgeObject(edge).label);
+
+        //Joins the label and pushes this element onto the list
         element.data.label = edgeLabelValues.join('\n');
-
-        console.log(element.data.label, edgeWeights, edgeLabels, edge.weight, edge.label);
-        //Add the edge to the list of elements
         elements.push(element);
-
-    }
+    });
 }
 
 /**
@@ -63,62 +55,39 @@ function convertEdges(elements, edges, isDirected, edgeWeights, edgeLabels) {
  * object
  *
  * @author Noah Alexander ngalexa2
- * @param {Object} predicate - the predicates that had been converted from a test file
+ * @param {Graph} predicate - the predicates that had been converted from a test file
  * @returns returns a graph object in the cytoscape format
  */
 export default function predicateConverter(predicate, nodeWeights, nodeLabels, edgeWeights, edgeLabels) {
     //A predicate will have up to three objects, nodes, undirected edges, and directed edges
-    let nodes = predicate.nodes;
-    let edges = predicate.edges;
+    let nodes = predicate.nodes || [];
+    let edges = predicate.edges || [];
 
     //Holds all the formats for the graph
     let elements = [];
 
-    //Loops through every key in the nodes dictionary
-    for (let ident in nodes) {
-        //Grabs the node object
-        let node = nodes[ident];
-        //Creates an object that is formatted to the graph display format
+    //Loops through every key in the nodes list
+    nodes.forEach((node) => {
         let element = {
-            data: {
-                //All nodes will have an id and a parent identity filed
-                id: ident,
-                marked: false,
-                highlighted: false,
-                label: '',
-                weight: null,
-            },
+            data: {},
             //All nodes will have a position
-            position: {}
+            position: { x: node.x, y: node.y }
 
         }
-
-        //Loop through all the keys in the node
-        for (let key in node) {
-            //x and y coordinates are held in a seperate dictionary in the element object
-            if (key === 'x' || key === 'y') {
-                element.position[key] = node[key];
+        // Go through each "attribute" in the object and assign a matching name and value key-pair to data
+        Object.entries(node).forEach(([name, value]) => {
+            //Position is already set so ignore x and y
+            if(name !== 'x' && name !== 'y') {
+                element.data[name] = value;
             }
-            else if (node[key] === "") {
-                element.data[key] = "true";
-            }
-            else if ((key === 'weight' && (nodeWeights === null || nodeWeights)) || (key === 'label' && (nodeLabels === null || nodeLabels))) {
-                //All other key value paris will transfer to the element object in the data
-                element.data[key] = node[key];
-            }
-            else if (key !== 'weight' && key !== 'label') {
-                element.data[key] = node[key];
-            }
-        }
-
+        });
         //Adds them to the list of elements
         elements.push(element);
 
-    }
-
-
+    });
     //Convert the edges to graph elements.
-    convertEdges(elements, edges, predicate.directed, edgeWeights, edgeLabels);
+    
+    convertEdges(predicate, elements, edges, predicate.directed, edgeWeights, edgeLabels);
     return(elements);
 
 }

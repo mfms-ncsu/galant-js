@@ -26,19 +26,36 @@ export default class Predicates {
         return this.state;
     }
 
-    /**
-     * Updates the state using a specified update function.
-     * @param {Function} update - The update function that modifies the state.
-     * @returns {Object} An object containing apply and revert functions to apply or revert the update.
-     */
     update(update) {
-        let rule;
-        this.state = produce(this.state, update, (apply, revert) => {
-            rule = { apply: apply, revert: revert };
-        });
-        return rule;
+        const prevState = this.deepCopy(this.state);
+        const changes = [];
+        update(prevState, changes);
+        this.state = prevState;
+        return {
+            apply: changes,
+            revert: [],
+        }
     }
 
+    deepCopy(obj) {
+        if (obj === null || typeof obj !== 'object') {
+            return obj; // Return the value if obj is not an object
+        }
+
+        // Handle array
+        if (Array.isArray(obj)) {
+            return obj.map(item => this.deepCopy(item));
+        }
+
+        // Handle object
+        const copy = Object.create(Object.getPrototypeOf(obj)); // Create a new object with the same prototype
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                copy[key] = this.deepCopy(obj[key]); // Recursively copy properties
+            }
+        }
+        return copy;
+    }
     /**
      * Applies an array of patches to the state.
      * @param {Array} patches - An array of patches to apply to the state.

@@ -1,103 +1,201 @@
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom';
 import { parseText } from 'utils/FileToPredicate';
-import Graph from "utils/Graph"
+import Graph from "utils/Graph";
+import NodeObject from "pages/GraphView/utils/NodeObject";
+import EdgeObject from "pages/GraphView/utils/EdgeObject";
 
 /**
  * This class runs tests on different kinds of input for the conversion of graph input file to predicates
- * @author rskarwa
  */
 
+// Helper function to convert arrays of nodes and edges to dictionaries keyed by their IDs
+function convertArrayToObject(array) {
+    const obj = {};
+    array.forEach(item => {
+        obj[item.id] = item;
+    });
+    return obj;
+}
+
 test("String to Predicate With Weights No Special Key/Value Pairs", () => {
-    //Make a dictionary to Test
-    var nodes = {}
-    nodes['a'] = { 'x': 10, 'y': 10, 'weight': 20,'highlighted': false, 'marked': false, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false}
-    nodes['b'] = { 'x': 15, 'y': 10, 'weight': 20, 'highlighted': false, 'marked': false, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false}
-    var edges = {}
-    edges["a b"] = { 'highlighted': false, 'source': 'a', 'target': 'b', 'weight': 20, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
-    edges["a a"] = { 'highlighted': false, 'source': 'a', 'target': 'a', 'weight': 20, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
-    var graph = new Graph(nodes, edges, false, "")
-    //create a string to Test
-    var text = `n a 10 10 20
+    const nodes = {
+        'a': new NodeObject(undefined, 'a', 10, 10, false, undefined, undefined, undefined, undefined),
+        'b': new NodeObject(undefined, 'b', 15, 10, false, undefined, undefined, undefined, undefined)
+    };
+    nodes['a'].weight = 20;
+    nodes['b'].weight = 20;
+
+    const edges = {
+        'a b': new EdgeObject(undefined, 'a b', 'a', 'b', undefined),
+        'a a': new EdgeObject(undefined, 'a a', 'a', 'a', undefined)
+    };
+    edges['a b'].weight = 20;
+    edges['a b'].shouldBeInvisible = undefined; // Explicitly set to undefined
+    edges['a a'].weight = 20;
+    edges['a a'].shouldBeInvisible = undefined; // Explicitly set to undefined
+
+    const graph = new Graph(nodes, edges, false, "");
+
+    const text = `n a 10 10 20
 n b 15 10 20
 e a b 20
-e a a 20`
-    //check if it matched
-    var converted = parseText(text)
-    expect(converted.nodes).toEqual(graph.nodes)
-    expect(converted.edges).toEqual(graph.edges)
-    expect(converted.directed).toEqual(graph.directed)
-    expect(converted.message).toEqual(graph.message)
+e a a 20`;
 
+    const converted = parseText(text);
+    
+    const convertedNodes = convertArrayToObject(converted.nodes);
+    const convertedEdges = convertArrayToObject(converted.edges);
+
+    expect(convertedNodes).toEqual(graph.nodes);
+    expect(convertedEdges).toEqual(graph.edges);
+    expect(converted.directed).toEqual(graph.directed);
+    expect(converted.message).toEqual(graph.message);
 });
-
 
 test("String to Predicate Without Weights No Special Key/Value Pairs", () => {
-    //Make a dictionary to Test
-    var nodes = {}
-    nodes['a'] = { 'x': 10, 'y': 10, 'weight': undefined,'highlighted': false, 'marked': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
-    nodes['b'] = { 'x': 15, 'y': 10, 'weight': undefined, 'highlighted': false, 'marked': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
-    var edges = {}
-    edges["a b"] = { 'source': 'a', 'target': 'b', 'weight': undefined, 'highlighted': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
-    edges["a a"] = { 'source': 'a', 'target': 'a', 'weight': undefined, 'highlighted': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
-    var graph = new Graph(nodes, edges, false, "")
-    //create a string to Test
-    var text = `n a 10 10
+    const nodes = {
+        'a': new NodeObject(undefined, 'a', 10, 10, false, undefined, undefined, undefined, undefined),
+        'b': new NodeObject(undefined, 'b', 15, 10, false, undefined, undefined, undefined, undefined)
+    };
+
+    const edges = {
+        'a b': new EdgeObject(undefined, 'a b', 'a', 'b', undefined),
+        'a a': new EdgeObject(undefined, 'a a', 'a', 'a', undefined)
+    };
+    edges['a b'].shouldBeInvisible = undefined; // Explicitly set to undefined
+    edges['a a'].shouldBeInvisible = undefined; // Explicitly set to undefined
+
+    const graph = new Graph(nodes, edges, false, "");
+
+    const text = `n a 10 10
 n b 15 10
 e a b
-e a a`
-    //check if it matched
-    var converted = parseText(text)
-    expect(converted.nodes).toEqual(graph.nodes)
-    expect(converted.edges).toEqual(graph.edges)
-    expect(converted.directed).toEqual(graph.directed)
-    expect(converted.message).toEqual(graph.message)
+e a a`;
 
+    const converted = parseText(text);
+    
+    const convertedNodes = convertArrayToObject(converted.nodes);
+    const convertedEdges = convertArrayToObject(converted.edges);
+
+    expect(convertedNodes).toEqual(graph.nodes);
+    expect(convertedEdges).toEqual(graph.edges);
+    expect(converted.directed).toEqual(graph.directed);
+    expect(converted.message).toEqual(graph.message);
 });
 
-test("String to Predicate With Weights And Special Key/Value Pairs", () => {
-    //Make a dictionary to Test
-    var nodes = {}
-    nodes['a'] = { 'x': 10, 'y': 10, 'weight': 5, 'color': 'brown','highlighted': false, 'marked': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
-    nodes['b'] = { 'x': 15, 'y': 10, 'weight': 5, 'color': 'red', 'highlighted': false, 'marked': false, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false}
-    var edges = {}
-    edges["a b"] = { 'source': 'a', 'target': 'b', 'weight': 5, 'color': 'white', 'highlighted': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false  }
-    edges["a b 2"] = { 'source': 'a', 'target': 'b', 'weight': 5, 'color': 'yellow', 'highlighted': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
-    var graph = new Graph(nodes, edges, true, "")
-    //create a string to Test
-    var text = `n a 10 10 5 color:brown
-n b 15 10 5 color:red
-e a b 5 color:white
-e a b 5 color:yellow
-directed`
-    //check if it matched
-    var converted = parseText(text)
-    expect(converted.nodes).toEqual(graph.nodes)
-    expect(converted.edges).toEqual(graph.edges)
-    expect(converted.directed).toEqual(graph.directed)
-    expect(converted.message).toEqual(graph.message)
 
-});
 
 test("String to Predicate Without Weights But With Special Key/Value Pairs", () => {
-    //Make a dictionary to Test
-    var nodes = {}
-    nodes['a'] = { 'x': 10, 'y': 10, 'weight': undefined, 'color': 'brown','highlighted': false, 'marked': false,  'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
-    nodes['b'] = { 'x': 15, 'y': 10, 'weight': undefined, 'color': 'brown', 'highlighted': false, 'marked': false, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false }
-    var edges = {}
-    edges["a b"] = { 'source': 'a', 'target': 'b', 'weight': undefined, 'color': 'white', 'highlighted': false, 'invisible': false, 'invisibleLabel': false, 'invisibleWeight': false, 'shouldBeInvisible': false }
-    edges["a a"] = { 'source': 'a', 'target': 'a', 'weight': undefined, 'color': 'yellow', 'highlighted': false,  'invisible': false, 'invisibleLabel': false,'invisibleWeight': false, 'shouldBeInvisible': false }
-    var graph = new Graph(nodes, edges, true, "")
-    //create a string to Test
-    var text = `n a 10 10 color:brown
+    const nodes = {
+        'a': new NodeObject(undefined, 'a', 10, 10, false, undefined, undefined, undefined, undefined),
+        'b': new NodeObject(undefined, 'b', 15, 10, false, undefined, undefined, undefined, undefined)
+    };
+    nodes['a'].color = 'brown';
+    nodes['b'].color = 'brown';
+
+    const edges = {
+        'a b': new EdgeObject(undefined, 'a b', 'a', 'b', undefined),
+        'a a': new EdgeObject(undefined, 'a a', 'a', 'a', undefined)
+    };
+    edges['a b'].color = 'white'; // Explicitly set color
+    edges['a b'].shouldBeInvisible = undefined; // Explicitly set to undefined
+    edges['a a'].color = 'yellow'; // Explicitly set color
+    edges['a a'].shouldBeInvisible = undefined; // Explicitly set to undefined
+
+    const graph = new Graph(nodes, edges, true, "");
+
+    const text = `n a 10 10 color:brown
 n b 15 10 color:brown
 e a b color:white
 e a a color:yellow
-directed`
-    //check if it matched
-    var converted = parseText(text)
-    expect(converted.nodes).toEqual(graph.nodes)
-    expect(converted.edges).toEqual(graph.edges)
-    expect(converted.directed).toEqual(graph.directed)
-    expect(converted.message).toEqual(graph.message)
+directed`;
 
+    const converted = parseText(text);
+    
+    const convertedNodes = convertArrayToObject(converted.nodes);
+    const convertedEdges = convertArrayToObject(converted.edges);
+
+    expect(convertedNodes).toEqual(graph.nodes);
+    expect(convertedEdges).toEqual(graph.edges);
+    expect(converted.directed).toEqual(graph.directed);
+    expect(converted.message).toEqual(graph.message);
+});
+
+test("Empty Graph", () => {
+    const nodes = {};
+    const edges = {};
+
+    const graph = new Graph(nodes, edges, false, "");
+
+    const text = ``;  // Empty input
+
+    const converted = parseText(text);
+    
+    const convertedNodes = convertArrayToObject(converted.nodes);
+    const convertedEdges = convertArrayToObject(converted.edges);
+
+    expect(convertedNodes).toEqual(graph.nodes);
+    expect(convertedEdges).toEqual(graph.edges);
+    expect(converted.directed).toEqual(graph.directed);
+    expect(converted.message).toEqual(graph.message);
+});
+
+test("Self-loop with Attributes", () => {
+    const nodes = {
+        'a': new NodeObject(undefined, 'a', 10, 10, false, undefined, undefined, undefined, undefined)
+    };
+    nodes['a'].weight = 5;
+    nodes['a'].color = 'blue';
+
+    const edges = {
+        'a a': new EdgeObject(undefined, 'a a', 'a', 'a', undefined)
+    };
+    edges['a a'].weight = 10;
+    edges['a a'].color = 'green';
+    edges['a a'].shouldBeInvisible = undefined; // Explicitly set to undefined
+
+    const graph = new Graph(nodes, edges, true, "");
+
+    const text = `n a 10 10 5 color:blue
+e a a 10 color:green
+directed`;
+
+    const converted = parseText(text);
+    
+    const convertedNodes = convertArrayToObject(converted.nodes);
+    const convertedEdges = convertArrayToObject(converted.edges);
+
+    expect(convertedNodes).toEqual(graph.nodes);
+    expect(convertedEdges).toEqual(graph.edges);
+    expect(converted.directed).toEqual(graph.directed);
+    expect(converted.message).toEqual(graph.message);
+});
+
+test("Directed Graph without Weights", () => {
+    const nodes = {
+        'a': new NodeObject(undefined, 'a', 10, 10, false, undefined, undefined, undefined, undefined),
+        'b': new NodeObject(undefined, 'b', 15, 10, false, undefined, undefined, undefined, undefined)
+    };
+
+    const edges = {
+        'a b': new EdgeObject(undefined, 'a b', 'a', 'b', undefined)
+    };
+    edges['a b'].shouldBeInvisible = undefined; // Explicitly set to undefined
+
+    const graph = new Graph(nodes, edges, true, "");
+
+    const text = `n a 10 10
+n b 15 10
+e a b
+directed`;
+
+    const converted = parseText(text);
+    
+    const convertedNodes = convertArrayToObject(converted.nodes);
+    const convertedEdges = convertArrayToObject(converted.edges);
+
+    expect(convertedNodes).toEqual(graph.nodes);
+    expect(convertedEdges).toEqual(graph.edges);
+    expect(converted.directed).toEqual(graph.directed);
+    expect(converted.message).toEqual(graph.message);
 });

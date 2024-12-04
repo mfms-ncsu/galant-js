@@ -62,20 +62,21 @@ export default class Algorithm {
         this.stepBuilder = new StepBuilder(initialStep);
         this.configuration = new AlgorithmConfiguration();
 
-    var threadHandlerImport = "./Thread/ThreadHandler";
-    if (testFlag) {
-        threadHandlerImport += 'Demo';
-    }
 
-    import(`${threadHandlerImport}`).then(module => {
-        console.log(module);
-        const ThreadHandler = module.default;
-        const initialStep = new AlgorithmStepSnapshot(baseGraph);
-        this.stepBuilder = new StepBuilder(initialStep);
-        this.threadHandler = new ThreadHandler(baseGraph, algorithmCode, (message) => this.#onMessage(message));
+        var threadHandlerImport = "./Thread/ThreadHandler";
+        if (testFlag) {
+            threadHandlerImport += 'Demo';
+        }
 
-        this.threadHandler.startThread();
-    }).catch(error => console.log(error));
+        import(`${threadHandlerImport}`).then(module => {
+            //console.log(module);
+            const ThreadHandler = module.default;
+            const initialStep = new AlgorithmStepSnapshot(baseGraph);
+            this.stepBuilder = new StepBuilder(initialStep);
+            this.threadHandler = new ThreadHandler(baseGraph, algorithmCode, (message) => this.#onMessage(message));
+
+            this.threadHandler.startThread();
+        }).catch(error => console.log(error));
     }
 
 
@@ -98,26 +99,30 @@ export default class Algorithm {
         if (["step", "error", "complete", "prompt"].includes(message.type.toString())) {
             clearTimeout(this.#timeoutID);
         }
-        
-        if (message.type === "rule") {
+
+        if (message.type === "change") {
+            console.log("RULE CONTENT: ", message.content);
             this.stepBuilder.addRule(message.content);
         } else if (message.type === "step") {
+            //Step will be a new graph
+            //console.log("STEP TRIGGERED");
             const step = this.stepBuilder.build();
+            //console.log("step", step);
             this.steps.push(step);
             this.stepBuilder = new StepBuilder(step);
             if (this.onStepAdded) this.onStepAdded();
         } else if (message.type === "error") {
-            this.services.PromptService.addPrompt({type: 'algorithmError', errorObject: message.content, algorithmCode: this.algorithmCode}, () => {});
+            this.services.PromptService.addPrompt({ type: 'algorithmError', errorObject: message.content, algorithmCode: this.algorithmCode }, () => { });
         } else if (message.type === "prompt") {
             this.services.PromptService.addPrompt(
-                {type: 'input',label: message.content[0]},
+                { type: 'input', label: message.content[0] },
                 (value) => {
                     this.threadHandler.enterPromptResult(value);
                     this.#setupTimeout();
                 }
             );
         } else if (message.type === "config") {
-            console.log(message.config);
+            //console.log(message.config);
             this.configuration.applyOptions(message.config);
         } else if (message.type === "complete") {
             this.threadHandler.killThread()
@@ -125,7 +130,7 @@ export default class Algorithm {
             this.fetchingSteps = false;
             this.#updateStatus();
         } else if (message.type === "console") {
-            console.log("[Algorithm]: ", message.content);
+            //console.log("[Algorithm]: ", message.content);
         }
         else if (this.onMessage != null) { // console messages
             this.onMessage(message.content);
@@ -143,11 +148,11 @@ export default class Algorithm {
             }
             var errorToSend = new Error("Timeout has occurred.");
             errorToSend.lineNumber = -1;
-            this.services.PromptService.addPrompt({type: 'algorithmError', errorObject: errorToSend, algorithmCode: this.algorithmCode}, () => {});
+            this.services.PromptService.addPrompt({ type: 'algorithmError', errorObject: errorToSend, algorithmCode: this.algorithmCode }, () => { });
         }, this.#timeoutPeriod);
     }
 
-    
+
     /**
      * Checks if the algorithm can step forward
      * If algo complete, and at final step.

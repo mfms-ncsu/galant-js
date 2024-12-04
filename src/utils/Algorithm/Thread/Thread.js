@@ -5,6 +5,7 @@
  */
 import Predicates from "utils/Predicates.js";
 import Graph from "utils/Graph.js";
+import ChangeObject from "pages/GraphView/utils/ChangeObject";
 
 // The array has one purpose: telling the thread to run or wait with Atomics.wait().
 // If sharedArray[0] is 0, that means the Thread should wait. Once it is changed, the Thread wakes up from Atoimics.notify() from the Handler.
@@ -134,7 +135,7 @@ function prompt(message, error="") {
  * 
  * @param {string} message The prompt message
  * @param {string} error The error message to display if input is invalid
- * @param {string} list The list of options
+ * @param {NodeObject[]} list The list of options
  * @returns {string} promptResult 
  */
 function promptFrom(message, list, error) {
@@ -145,7 +146,8 @@ function promptFrom(message, list, error) {
         error = "Must enter a value from " + list;
     }
     let promptResult = prompt(message);
-    while (!list.includes(promptResult)) {
+    while(!list.includes(promptResult)) {
+        console.log("NOT FOUND - REPROMPTING");
         promptResult = prompt(message, error);
     }
     return promptResult;
@@ -224,12 +226,37 @@ function promptEdge(message) {
  * 
  * @param {string} node The ID of the node to hide
  */
-function hideNode(node) {
-    // hide the node (getting an updated copy of the graph), then wait for a resume command
-    let rule = predicates.update((graph) => {
-        graph.hideNode(node);
+function hideNode(nodeId) {
+    let graph = predicates.state;
+    let incidentEdges = graph.incident(nodeId);
+    let changeObjects = [];
+
+    //First hide the node and create the change object for that
+    let oldNodeState = structuredClone(graph.nodes.find(node => node.id === nodeId));
+    graph.hideNode(nodeId)
+    let newState = graph.nodes.find(node => node.id === nodeId);
+    changeObjects.push(new ChangeObject(
+        'update',
+        'node',
+        oldNodeState.id,
+        oldNodeState,
+        newState
+    ));
+
+    //Next iterate over each incident edge and hide it
+    incidentEdges.forEach(edgeId => {
+        let oldEdgeState = structuredClone(graph.getEdgeObject(edgeId));
+        graph.hideEdge(edgeId);
+        let newEdgeState = graph.getEdgeObject(edgeId)
+        changeObjects.push(new ChangeObject(
+            'update',
+            'edge',
+            oldEdgeState.id,
+            oldEdgeState,
+            newEdgeState
+        ))
     });
-    postMessage({type: "rule", content: rule});
+    postMessage({type: "change", content: changeObjects});
     autoStep();
 }
 
@@ -447,9 +474,47 @@ function incrementPosition(nodeId, increment) {
 function generateGetter(fnName) {
     return (...args) => {
         let graph = predicates.get();
+        
         return graph[fnName].apply(graph, args);
     }
 }
+
+const functionMetadata = {
+    setNodeColor: { type: 'node', args: 1 },
+    setEdgeWidth: { type: 'edge', args: 1 },
+    setSize: { type: 'node', args: 1 },
+    setWeight: { type: 'both', args: 1 },
+    setShape: { type: 'node', args: 1 },
+    setBackgroundOpacity: { type: 'node', args: 1 },
+    setBorderWidth: { type: 'node', args: 1 },
+    label: { type: 'both', args: 2 }, // Accepts node or edge ID and a label
+    unlabel: { type: 'both', args: 1 }, // Accepts node or edge ID
+    color: { type: 'both', args: 2 }, // Accepts node or edge ID and a color
+    uncolor: { type: 'both', args: 1 }, // Accepts node or edge ID
+    clearNodeWeights: { type: 'node', args: 0, appliesToAll: true },
+    clearEdgeWidth: { type: 'edge', args: 0 },
+    clearSize: { type: 'node', args: 1 },
+    clearShape: { type: 'node', args: 1 },
+    clearBackgroundOpacity: { type: 'node', args: 1 },
+    clearBorderWidth: { type: 'node', args: 1 },
+    mark: { type: 'both', args: 1 },
+    unmark: { type: 'both', args: 1 },
+    highlight: { type: 'both', args: 1 },
+    unhighlight: { type: 'both', args: 1 },
+    clearNodeMarks: { type: 'node', args: 0, appliesToAll: true },
+    clearNodeHighlights: { type: 'node', args: 0, appliesToAll: true },
+    clearNodeColors: { type: 'node', args: 0, appliesToAll: true },
+    clearNodeShapes: { type: 'node', args: 0, appliesToAll: true},
+    clearNodeBorderWidth: { type: 'node', args: 0, appliesToAll: true},
+    clearNodeBackgroundOpacity: { type: 'node', args: 0, appliesToAll: true },
+    setPosition: {type: 'node', args: 2},
+    incrementPosition: {type: 'node', args: 2},
+    hideNode: {type: 'node', args: 1},
+    hideNodeWeight: {type: 'node', args: 1},
+    clearNodeLabels: {type: 'node', args: 0, appliesToAll: true},
+    clearEdgeColors: {type: 'edge', args: 0, appliesToAll: true}
+    // Add more functions as needed
+};
 
 /**
  * Generates a setter function for the specified method of the graph.
@@ -457,13 +522,94 @@ function generateGetter(fnName) {
  * @param {string} fnName The name of the method to generate a setter for
  * @returns {Function} The generated setter function
  */
+
 function generateSetter(fnName) {
     return (...args) => {
-        let rule = predicates.update((graph) => {
-            let method = graph[fnName]
-            graph[fnName].apply(graph, args);
-        });
-        postMessage({type: "rule", content: rule});
+        let graph = predicates.state;
+        let method = graph[fnName]
+        if (typeof method !== "function") {
+            console.error(`setter fnName: ${fnName} is not a valid function`);
+            return; // Exit if method is not valid
+        }
+        const meta = functionMetadata[fnName];
+        let changeObjects = []
+        let targetType;
+        let targetId;
+        let oldState;
+        let newState;
+        if(meta) {
+            if(meta.appliesToAll) {
+                if(meta.type === "node") {
+                    targetType = 'node';
+                    oldState = {nodes: graph.nodes.map(node => structuredClone(node))};
+                    method.apply(graph, args);
+                    graph.nodes.forEach(graphNode => {
+                        const oldNodeState = oldState.nodes.find(oldStateNode => oldStateNode.id === graphNode.id);
+                        changeObjects.push(new ChangeObject(
+                            'update',
+                            'node',
+                            graphNode.id,
+                            oldNodeState,
+                            graphNode
+                        ));
+                    })
+                } else {
+                    targetType = 'edge';
+                    oldState = {edges: graph.edges.map(edge => structuredClone(edge))};
+                    method.apply(graph, args);
+                    graph.edges.forEach(edge => {
+                        const oldEdgeState = oldState.edges.find(oldStateEdge => oldStateEdge.id === edge.id);
+                        changeObjects.push(new ChangeObject(
+                            'update',
+                            'edge',
+                            edge.id,
+                            oldEdgeState,
+                            edge
+                        ));
+                    })
+                }
+                postMessage({type: "change", content: changeObjects});
+            } else {
+                if(meta.type === "node") {
+                    targetType = 'node';
+                    targetId = args[0];
+                    oldState = structuredClone(graph.nodes.find(node => node.id === targetId));
+                    method.apply(graph, args);
+                    newState = graph.nodes.find(node => node.id === targetId);
+                } else if(meta.type === 'edge') {
+                    targetType = 'edge';
+                    targetId = args[0];
+                    oldState = structuredClone(graph.edges.find(edge => edge.id === targetId));
+                    method.apply(graph, args);
+                    newState = graph.edges.find(edge => edge.id === targetId);
+                } else if(meta.type === 'both') {
+                    // Sometimes a node or edge object is passed here, need to check and set id accordingly
+                    targetId = args[0].id === undefined ? args[0] : args[0].id;
+                    if(targetId.includes(" ")) {
+                        targetType = 'edge';
+                        oldState = structuredClone(graph.edges.find(edge => edge.id === targetId));
+                        method.apply(graph, args);
+                        newState = graph.edges.find(edge => edge.id === targetId);    
+                    } else { 
+                        targetType = 'node';
+                        oldState = structuredClone(graph.nodes.find(node => node.id === targetId));
+                        method.apply(graph, args);
+                        newState = graph.nodes.find(node => node.id === targetId);  
+                    }  
+                } else {
+                    console.error('Invalid target type for mark function');
+                    return;
+                }
+                changeObjects.push(new ChangeObject(
+                    "update", 
+                    targetType, 
+                    targetId, 
+                    oldState, 
+                    newState
+                ));
+                postMessage({type: "change", content: changeObjects});
+            }              
+        }
         autoStep();
     }
 }
@@ -581,6 +727,7 @@ function onMessage(message) {/* eslint-disable-line no-restricted-globals */
     else if (message[0] === 'graph/algorithm') {
         let jsonGraph = message[1];
         let graph = new Graph(jsonGraph.nodes, jsonGraph.edges, jsonGraph.directed, jsonGraph.message, jsonGraph.name, jsonGraph.scalar);
+        Object.setPrototypeOf(graph, Graph.prototype);
         predicates = new Predicates(graph);
         print("Algorithm initialized");
         wait();
@@ -592,7 +739,7 @@ function onMessage(message) {/* eslint-disable-line no-restricted-globals */
         } catch (error) {
             let matches = error.stack.match(/eval:([0-9]+):[0-9]+\n/);
             if (matches != null) {
-                error.lineNumber = parseInt(matches[1]);
+                // error.lineNumber = parseInt(matches[1]);
             }
             // if there's an error, send a message with the error
             postMessage({type: "error", content: error});
@@ -619,6 +766,8 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
     }
     else if (message[0] === 'graph/algorithm') {
         let jsonGraph = message[1];
+        console.log(jsonGraph.nodes);
+        console.log(jsonGraph.edges);
         let graph = new Graph(jsonGraph.nodes, jsonGraph.edges, jsonGraph.directed, jsonGraph.message, jsonGraph.name, jsonGraph.scalar);
         predicates = new Predicates(graph);
         print("Algorithm initialized");
@@ -631,7 +780,7 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         } catch (error) {
             let matches = error.stack.match(/eval:([0-9]+):[0-9]+\n/);
             if (matches != null) {
-                error.lineNumber = parseInt(matches[1]);
+                // error.lineNumber = parseInt(matches[1]);
             }
             // if there's an error, send a message with the error
             postMessage({type: "error", content: error});

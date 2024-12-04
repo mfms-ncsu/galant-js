@@ -36,6 +36,7 @@ export default function KeyboardShortcutsPage() {
                 - Left Arrow - Step Back <br />
                 - Right Arrow - Step Forward <br />
                 - Escape Key - Terminate Algorithm <br />
+                - I - Autolayout <br />
                 - 'S' Key - Export Graph <br />
                 - Windows/Cmd + Right Arrow - Skip To End<br />
                 <br />

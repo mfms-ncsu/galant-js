@@ -1,4 +1,4 @@
-/**
+    /**
  * @fileoverview Contains and returns {@link NewButtonComponent}
  * @author Julian Madrigal
  * @author Vitesh Kambara
@@ -53,34 +53,63 @@ export default function NewButtonComponent({addTab, examples}) {
          * It may be useful to define a uniform style in index.css.
          * I'm not happy with the positioning of some drop downs or popups; it would be good to understand how to control these.
          */
-        <div className="relative">
-            <Menu>
-                <Menu.Button ref={button} id="new-button" className="flex items-center space-x-2 px-2 py-1 rounded-t font-semibold bg-blue-400 text-white hover:bg-blue-500">
-                    <PlusIcon className="h-4 w-4"/>
-                    <span>New</span>
-                </Menu.Button>
-                <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-100"
-                    enterFrom="transform opacity-0 scale-95"
-                    enterTo="transform opacity-100 scale-100"
-                >
-                    <Menu.Items id="examples-dropdown" className="absolute z-20 -left-4 mt-2 min-w-56 overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
-                        <Menu.Item>
-                            <button className="block w-full p-2 text-left ui-active:bg-blue-500 ui-active:text-white ui-active:font-semibold" onClick={() => {addTab({'name':'Blank'})}}>Blank</button>
-                        </Menu.Item>
+         <div className="relative">
+         <Menu>
+             <Menu.Button ref={button} id="new-button" className="menu-button">
+                 <PlusIcon className="h-4 w-4" />
+                 <span>New</span>
+             </Menu.Button>
+             <Transition
+                 as={Fragment}
+                 enter="transition ease-out duration-100"
+                 enterFrom="transform opacity-0 scale-95"
+                 enterTo="transform opacity-100 scale-100"
+             >
+                 <Menu.Items id="examples-dropdown" className="dropdown-menu">
+                     <Menu.Item>
+                         <button 
+                             className="dropdown-item" 
+                             onClick={() => { 
+                                 try {
+                                     console.log('Adding a blank tab...');
+                                     addTab({ 'name': 'Blank' });
+                                     console.log('Blank tab added successfully.');
+                                 } catch (error) {
+                                     console.error('Error adding a blank tab:', error);
+                                     alert('An error occurred while adding the blank tab. Please try again.');
+                                 }
+                             }}
+                         >
+                             Blank
+                         </button>
+                     </Menu.Item>
+     
+                     <div className="dropdown-section">
+                         <span className="dropdown-section-header">Examples</span>
+                         {examples.map(data => (
+                             <Menu.Item key={data.name}>
+                                 <button 
+                                     className="dropdown-item" 
+                                     onClick={() => {
+                                         try {
+                                             console.log(`Adding tab for example: ${data.name}`);
+                                             addTab(data);
+                                             console.log(`Tab for example ${data.name} added successfully.`);
+                                         } catch (error) {
+                                             console.error(`Error adding tab for example ${data.name}:`, error);
+                                             alert(`An error occurred while adding the tab for ${data.name}. Please try again.`);
+                                         }
+                                     }}
+                                 >
+                                     {data.name}
+                                 </button>
+                             </Menu.Item>
+                         ))}
+                     </div>
+                 </Menu.Items>
+             </Transition>
+         </Menu>
+     </div>
 
-                        <div className="space-y">
-                            <span className="block w-auto mx-2 mt-1 pb-1 text-sm font-semibold border-b text-gray-700 border-gray-100">Examples</span>
-                            {examples.map(data => (
-                                <Menu.Item key={data.name}>
-                                    <button className="block w-full p-2 text-left from-indigo-500 to-blue-500 ui-active:bg-gradient-to-r ui-active:text-white ui-active:font-semibold" onClick={() => addTab(data)}>{data.name}</button>
-                                </Menu.Item>
-                            ))}
-                        </div>
-                    </Menu.Items>
-                </Transition>
-            </Menu>
-        </div>
     )
 }

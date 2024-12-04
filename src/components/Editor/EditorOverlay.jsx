@@ -29,31 +29,33 @@ function downloadFile(name, content) {
  * @param {Tab} props.tab 
  * @returns {React.ReactElement}
  */
-function DownloadComponent({tab}) {
+function DownloadComponent({ tab }) {
     // Keyboard shortcut for downloading file
     useEffect(() => {
 
         function onKeyPress(event) {
-            // If user is typing into the text editor, ignore.
             if (event.target.tagName.toLowerCase() === 'textarea') return;
 
-            // Only if user enters designated keyboard shortcut - s - the file is downloaded
-            // if (!event.metaKey) return;
-            if (event.key === 's') {
-                downloadFile(tab.name, tab.content);
+            // Check for Command + S or Control + S
+            if ((event.metaKey || event.ctrlKey) && event.key === 's') {
+                event.preventDefault(); // Prevent the default browser behavior
+                if (tab) {
+                    downloadFile(tab.name, tab.content);
+                }
             }
-            
         }
 
         document.addEventListener('keydown', onKeyPress);
         return () => document.removeEventListener('keydown', onKeyPress);
-    }, [tab])
+    }, [tab]);
+
+
 
     if (!tab || tab.content.length <= 0) return;
 
     return (
         <button onClick={() => downloadFile(tab.name, tab.content)} className="flex items-center justify-evenly space-x-2 px-3 py-2 rounded-full font-semibold shadow bg-gradient-to-r from-indigo-500 to-blue-500 text-white outline-2 outline-blue-200 hover:outline">
-            <ArrowDownTrayIcon className="w-4 h-4 stroke-2 stroke-white"/>
+            <ArrowDownTrayIcon className="w-4 h-4 stroke-2 stroke-white" />
             <span>Download File</span>
         </button>
     )
@@ -69,20 +71,20 @@ function DownloadComponent({tab}) {
  * @param {function} props.saved Whether the changes have been saved to localstorage
  * @param {React.ReactElement} props.LoadComponent Component to display for loading
  */
-export default function EditorOverlayComponent({onLoad, tab, saved, LoadComponent}) {
+export default function EditorOverlayComponent({ onLoad, tab, saved, LoadComponent }) {
     return (
         <div className="absolute bottom-0 right-0 p-2">
             <div className="flex flex-col space-y-2 pr-3 pb-3">
                 <div className={`flex items-center space-x-2 h-6 w-fit ml-auto px-2 py-1 rounded-full ${saved ? 'fill-green-500 text-green-700' : 'font-semibold'}`}>
-                    {saved ? 
+                    {saved ?
                         <CheckIcon className="h-full" />
-                    : 
-                        <ArrowPathIcon className="h-full animate-spin"/>
+                        :
+                        <ArrowPathIcon className="h-full animate-spin" />
                     }
                     <span>{saved ? 'Saved' : 'Saving'}</span>
                 </div>
-                <LoadComponent tab={tab}/>
-                <DownloadComponent tab={tab}/>
+                <LoadComponent tab={tab} />
+                <DownloadComponent tab={tab} />
             </div>
         </div>
     )

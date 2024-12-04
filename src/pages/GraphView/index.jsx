@@ -4,9 +4,9 @@
  * graph edit history, and various context providers for child components.
  * @author Christina Albores
  */
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { createGraphContextObject } from "pages/GraphView/utils/GraphContext";
-import {enablePatches} from "immer";
+import { enablePatches } from "immer";
 import GraphClass from 'utils/Graph';
 import { GraphContext } from "pages/GraphView/utils/GraphContext";
 import { defaultStylePreferences } from "./utils/CytoscapeStylesheet";
@@ -30,31 +30,41 @@ import { useImmer } from "use-immer";
 import { applyPositions, applyScalar, calculateGraphScalar } from "./utils/GraphUtils";
 import { parseText } from "utils/FileToPredicate";
 import { parseSGFText } from "utils/SGFileToPredicate";
+import ChangeRecord from "./utils/ChangeRecord";
 enablePatches();
 
 export default function GraphView() {
     // Define state variables using React hooks
     const [PromptService] = useState(new PromptServiceObject(useState([])));
 
-    const [baseGraph, setBaseGraph] = useState(new GraphClass({}, {}, false, ""));
+    const [baseGraph, setBaseGraph] = useState(new Graph([], [], false, ""));
     const [graph, setGraph] = useState(baseGraph);
     const [currentAlgorithm, setCurrentAlgorithm] = useState(null);
     const [algorithmStatus, setAlgorithmStatus] = useState(null);
 
-    const [cytoscapeStyleSheetPreferences, setCytoscapeStyleSheetPreferences] = useState(defaultStylePreferences);
-	const [cytoscapeLayoutPreferences, setCytoscapeLayoutPreferences] = useState(defaultLayout);
-    
-	const [cytoscapeInstance, setCytoscapeInstance] = useState(null); // If we move cytoscape into here, we won't need setCytoscape anymore (aka no useState at all)
+    const [changeRecordIndex, setChangeRecordIndex] = useState(0);
 
-	const graphContext = createGraphContextObject(graph, setGraph, baseGraph, setBaseGraph, cytoscapeStyleSheetPreferences, setCytoscapeStyleSheetPreferences, cytoscapeLayoutPreferences, setCytoscapeLayoutPreferences, cytoscapeInstance, setCytoscapeInstance);
+    const [cytoscapeStyleSheetPreferences, setCytoscapeStyleSheetPreferences] = useState(defaultStylePreferences);
+    const [cytoscapeLayoutPreferences, setCytoscapeLayoutPreferences] = useState(defaultLayout);
+
+    const [cytoscapeInstance, setCytoscapeInstance] = useState(null); // If we move cytoscape into here, we won't need setCytoscape anymore (aka no useState at all)
+
+    /** @type {ChangeRecord} */
+    const changeRecord = new ChangeRecord();
+    changeRecord.setOnUpdateCallback((index) => {
+        setChangeRecordIndex(index);
+    });
+
+    const [mode, setMode] = useState('normal') //'normal', 'undo', 'redo'
+
+    const graphContext = createGraphContextObject(graph, setGraph, baseGraph, setBaseGraph, cytoscapeStyleSheetPreferences, setCytoscapeStyleSheetPreferences, cytoscapeLayoutPreferences, setCytoscapeLayoutPreferences, cytoscapeInstance, setCytoscapeInstance);
     const algorithmContext = createAlgorithmContextObject(currentAlgorithm, setCurrentAlgorithm);
-    
+
     const [graphEditHistoryData, updateGraphEditHistory] = useImmer({
         history: [baseGraph],
         current: 0
     })
     const graphEditHistory = new GraphEditHistory(graphEditHistoryData, updateGraphEditHistory);
-    
     const sentAliveMessage = useRef();
     /**
      * Creates SharedWorker instance on mount.
@@ -63,12 +73,12 @@ export default function GraphView() {
     useEffect(() => {
         if (!sentAliveMessage.current) {
             sentAliveMessage.current = true;
-            SharedWorker.postMessage({message: "alive"});
+            SharedWorker.postMessage({ message: "alive" });
         }
 
         function onGraphLoad(data, isInit) {
             console.log("Got shared worker data", data);
-            const {name: graphName, graph: graphText} = data;
+            const { name: graphName, graph: graphText } = data;
             if (!graphText) return;
             let graphData;
             if (graphName != null && graphName.endsWith('.sgf')) {
@@ -78,28 +88,29 @@ export default function GraphView() {
             }
             const scalar = Math.max(1, calculateGraphScalar(Object.values(graphData.nodes)));
             applyScalar(graphData.nodes, scalar);
-            
+
             const newGraph = new Graph(graphData.nodes, graphData.edges, graphData.directed, graphData.message, graphName, scalar);
-            setBaseGraph(newGraph); // This also automatically resets edit history
+            const newBaseGraph = new Graph(graphData.nodes, graphData.edges, graphData.directed, graphData.message, graphName, scalar);
+            setBaseGraph(newBaseGraph); // This also automatically resets edit history
             setGraph(newGraph);
-            
+
+
 
             // We have to wait for cytoscape to read graph changes, and add graph. In the future, perhaps have a attribute in graph called 'autoFit' to inform cy to fit on loading of graph.
             if (isInit && cytoscapeInstance) setTimeout(() => cytoscapeInstance.fit(), 75);
         }
 
         function onAlgorithmLoad(data) {
-            const newAlgo = new Algorithm(data.name, data.algorithm, baseGraph, {PromptService}, [algorithmStatus, setAlgorithmStatus]);
-            graphEditHistory.revert();
+            new ChangeRecord('algorithm');
+            const newAlgo = new Algorithm(data.name, data.algorithm, baseGraph, { PromptService }, [algorithmStatus, setAlgorithmStatus]);
             setCurrentAlgorithm(newAlgo);
-            setGraph(baseGraph);
         }
 
         SharedWorker.on('graph-init', data => onGraphLoad(data, true));
         SharedWorker.on('graph-rename', onGraphLoad);
         SharedWorker.on('algo-init', onAlgorithmLoad);
         return () => SharedWorker.remove(onGraphLoad, onAlgorithmLoad);
-    // eslint-disable-next-line
+        // eslint-disable-next-line
     }, [baseGraph, currentAlgorithm, cytoscapeInstance]);
 
 
@@ -140,24 +151,25 @@ export default function GraphView() {
         }
     }, [algorithmStatus])
 
-    /**
-     * Effect to update the graph based on changes in the graph edit history.
-     * If a current algorithm is active, the effect does nothing.
-     * If the graph edit history has only one entry or is empty, it sets the graph state to the base graph.
-     * Otherwise, it sets the graph state to the current snapshot from the graph edit history.
-     */
     useEffect(() => {
-        // Check if a current algorithm is active
-        if (currentAlgorithm) return;
-        // Check if the graph edit history has only one entry or is empty
-        if (graphEditHistory.history.length <= 1) {
-            // Set the graph state to the base graph
+        let newGraph;
+        if (changeRecord.list.length < 1) {
+            console.log("SET BG")
+            console.log(baseGraph.getNodes())
             setGraph(baseGraph);
-        };
-        // Set the graph state to the current snapshot from the graph edit history
-        setGraph(graphEditHistory.getCurrentSnapshot());
-    }, [graphEditHistory])
-
+        }
+        if (mode === 'undo') {
+            console.log("UNDO");
+            newGraph = changeRecord.undoChange(changeRecord.list[changeRecordIndex], graph)
+        } else {
+            //Need to apply previous change to get to next graph state. Example: must apply change object at index 0 to get to state in index 1
+            newGraph = changeRecord.applyChangeToGraph(changeRecord.list[changeRecord.index - 1], graph)
+        }
+        if (newGraph !== undefined) {
+            setGraph(newGraph);
+        }
+        setMode('normal');
+    }, [changeRecordIndex])
 
     /**
      * Effect triggered when the base graph changes.
@@ -173,34 +185,34 @@ export default function GraphView() {
         // Check if a current algorithm is active
         if (currentAlgorithm) {
             // Reinitialize the current algorithm with the new base graph
-            setCurrentAlgorithm(new Algorithm(currentAlgorithm.name, currentAlgorithm.algorithmCode, baseGraph, {PromptService}, [algorithmStatus, setAlgorithmStatus]));
+            setCurrentAlgorithm(new Algorithm(currentAlgorithm.name, currentAlgorithm.algorithmCode, baseGraph, { PromptService }, [algorithmStatus, setAlgorithmStatus]));
         }
     }, [baseGraph])
 
     return (
-    <>
-        <link rel="manifest" id="manifest-placeholder" href="./manifest.webmanifest"  />
-        <HeaderComponent />
-        <div className="relative w-full h-full">
-            <AlgorithmContext.Provider value={algorithmContext}>
-                <GraphContext.Provider value={graphContext}>
-                    <PromptContext.Provider value={PromptService}>
-{/* having trouble figuring out how to get placement of prompts set up the way
+        <>
+            <link rel="manifest" id="manifest-placeholder" href="./manifest.webmanifest" />
+            <HeaderComponent />
+            <div className="relative w-full h-full">
+                <AlgorithmContext.Provider value={algorithmContext}>
+                    <GraphContext.Provider value={graphContext}>
+                        <PromptContext.Provider value={PromptService}>
+                            {/* having trouble figuring out how to get placement of prompts set up the way
     I want; maybe the w-full, h-full at the top is messing things up.
     It took a while to get the context menus right
     and I'm not sure why they now work okay */}
-                    <div className="absolute z-10 left-1/4 top-1/4">
-                        <div><PromptComponent /></div>
-                    </div>
-                        <CytoscapeComponent />
-                        <GraphOverlay />
-                        <GraphEditOverlay graphEditHistory={graphEditHistory}/>
-                        <ContextMenu graphEditHistory={graphEditHistory}/>
-                        <NodeContextMenu graphEditHistory={graphEditHistory}/>
-                        <EdgeContextMenu graphEditHistory={graphEditHistory}/>
-                    </PromptContext.Provider>
-                </GraphContext.Provider>
-            </AlgorithmContext.Provider>
-        </div>
-    </>);
+                            <div className="absolute z-10 left-1/4 top-1/4">
+                                <div><PromptComponent /></div>
+                            </div>
+                            <CytoscapeComponent graphEditHistory={graphEditHistory} />
+                            <GraphOverlay />
+                            <GraphEditOverlay setMode={setMode} />
+                            <ContextMenu graphEditHistory={graphEditHistory} changeRecord={changeRecord} />
+                            <NodeContextMenu graphEditHistory={graphEditHistory} />
+                            <EdgeContextMenu graphEditHistory={graphEditHistory} />
+                        </PromptContext.Provider>
+                    </GraphContext.Provider>
+                </AlgorithmContext.Provider>
+            </div>
+        </>);
 }

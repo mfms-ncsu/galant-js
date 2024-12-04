@@ -1,5 +1,6 @@
 import { applyPatches } from "immer";
 import { AlgorithmStepSnapshot } from "./AlgorithmStepSnapshot";
+import ChangeRecord from "pages/GraphView/utils/ChangeRecord";
 
 
 /**
@@ -17,7 +18,7 @@ export class StepBuilder {
      * @param {AlgorithmStepSnapshot} prevStep The previous step to build with
      */
     constructor(prevStep) {
-        this.rules = [];
+        this.changes = [];
         this.prevStep = prevStep;
     }
 
@@ -26,8 +27,8 @@ export class StepBuilder {
      * 
      * @param {Object} rule The rule to add
      */
-    addRule(rule) {
-        this.rules.push(rule);
+    addRule(change) {
+        this.changes.push(change);
     }
 
     /**
@@ -36,8 +37,6 @@ export class StepBuilder {
      * @returns {AlgorithmStepSnapshot} The newly built step
      */
     build() {
-        let patches = this.rules.flatMap((rule) => rule.apply);
-        const newStep = new AlgorithmStepSnapshot(applyPatches(this.prevStep.graph, patches));
-        return newStep;
+        return {graph: ChangeRecord.getInstance('algorithm').applyChangeToGraph(this.changes.flat(), this.prevStep.graph)};
     }
 }

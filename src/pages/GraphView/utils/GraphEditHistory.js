@@ -77,10 +77,12 @@ export default class GraphEditHistory {
      */
     revert() {
         this.update(draft => {
+            // Revert to the initial graph snapshot (base graph)
             draft.history = draft.history.slice(0, 1);
             draft.current = 0;
-        })
+        });
     }
+
 
     /**
      * Gets the graph snapshot at the current index.

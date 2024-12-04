@@ -36,7 +36,7 @@ export default function EdgeContextMenu({graphEditHistory}) {
             const edge = event.target;
             const graph = graphContext.graph;
             const graphOb = new Graph(graph.nodes, graph.edges, graph.directed, '');
-            const edgeObject = graphOb.getNodeOrEdgeObject(`${edge.data().source} ${edge.data().target}`);
+            const edgeObject = graphOb.getGraphObject(`${edge.data().source} ${edge.data().target}`);
 
 			setValues({
 				id: edgeObject.id,
@@ -72,8 +72,7 @@ export default function EdgeContextMenu({graphEditHistory}) {
 		const graph = graphEditHistory.getCurrentSnapshot();
 
 		const newGraph = produce(graph, draft => {
-			const edge = draft.getNodeOrEdgeObject(`${data.source} ${data.target}`);
-			console.log(edge);
+			const edge = draft.getGraphObject(`${data.source} ${data.target}`);
 			edge.label = label.length > 0 ? label : null;
 			edge.weight = weight.length > 0 ? weight : null;
 		})

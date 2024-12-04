@@ -12,7 +12,7 @@ import Graph from "utils/Graph"
  * @author Minghong Zhou
  */
 export function parseSGFText(graphText) {
-    let graph = new Graph({}, {}, false, "");
+    let graph = new Graph([], [], false, "");
 
     var lines = graphText.split('\n')
     for (var line = 0; line < lines.length; line++) {
@@ -128,7 +128,7 @@ for (let bool_key of boolean_keys) {
 //go ahead store this node predicate among all nodes in the node_map
 for (var j = 0; j < keys.length; j++) {
         node_map[node_id][keys[j]] = values[j]
-}
+    }
 }
 
 /**

@@ -1,3 +1,5 @@
+import NodeObject from "pages/GraphView/utils/NodeObject";
+import EdgeObject from "pages/GraphView/utils/EdgeObject";
 import Graph from "utils/Graph"
 
 /**
@@ -10,9 +12,11 @@ import Graph from "utils/Graph"
  * 
  * @author Rishab Karwa
  * @author Andrew Watson
+ * @author Andrew Lanning
+ * @author Ethan Godwin
  */
 export function parseText(graphText) {
-    let graph = new Graph({}, {}, false, "");
+    let graph = new Graph([], [], false, "");
 
     var lines = graphText.split('\n')
     for (var line = 0; line < lines.length; line++) {
@@ -49,86 +53,89 @@ export function parseText(graphText) {
  * This function parses a given string for a node predicate
  * @author rskarwa
  * @param {string} node_string - the line of the node predicate
- * @param {dictionary} node_map - the map of all the current nodes
+ * @param {NodeObject[]} nodeList - the list of all the current nodes
  */
-function nodeParser(node_string, node_map) {
-    //the id of the node
-    var node_id = false
+function nodeParser(node_string, nodeList) {
     //trim the end whitespace
     var trimmed = node_string.trimEnd()
     //split string to an array using whitespace as a delimiter
     var all_values = trimmed.split(/\s+/)
     //keys and values of all values of the node
-    var keys = ['weight', 'x', 'y']
-    var boolean_keys = ['invisibleLabel', 'invisibleWeight', 'invisible', 'highlighted', 'marked']
-    var values = [undefined]
+    var boolean_attrs = ['invisibleLabel', 'invisibleWeight', 'invisible', 'highlighted', 'marked']
+    let newNode = new NodeObject(undefined);
+    let parsedIds = [];
+    //console.log("all values: ", all_values);
 
-    //start with the second item; the first should be 'n'
-    for (var i = 1; i < all_values.length; i++) {
-        //id value
-        if (node_id === false) {
-            node_id = all_values[i]
-            if (node_id in node_map) {
-                throw Error(`Duplicate node ID: '${node_id}'`)
+    if(all_values.length < 4) {
+        throw new Error("Invalid node format, missing information");
+    }
+    //Setting node id
+    if(parsedIds.includes(all_values[1])) {
+        throw Error(`Duplicate node ID: '${newNode.id}'`);
+    }
+    //Setting node x pos
+    newNode.id = all_values[1];
+    if(!isNumeric(all_values[2])) {
+        throw Error(`x position is NaN: ${all_values[2]}`);
+    }
+    newNode.x = parseFloat(all_values[2]);
+    //Setting node y pos
+    if(!isNumeric(all_values[3])) {
+        throw Error(`y position is NaN: ${all_values[3]}`);
+    }
+    newNode.y = parseFloat(all_values[3]);
+    let enteredAttributes = [];
+    for(var i = 4; i < all_values.length; i++) {
+        if(isNumeric(all_values[4]) && newNode.weight === undefined) {
+            newNode.weight = parseFloat(all_values[4]);
+        }    
+        if(all_values[i].includes(":")) {
+            let attr_name = all_values[i].split(":")[0];
+            let attr_value = all_values[i].split(":")[1];
+            if(enteredAttributes.includes(attr_name)) {
+                throw Error(`Duplicate attribute entry: ${attr_name}`);
             }
-        }
-        //x value
-        else if (values.length === 1 && isNumeric(all_values[i])) {
-            values.push(parseFloat(all_values[i]))
-        }
-        //y value
-        else if (values.length === 2 && isNumeric(all_values[i])) {
-            values.push(parseFloat(all_values[i]))
-        }
-        //the weight field was entered
-        else if (values.length === 3 && isNumeric(all_values[i])) {
-            values[0] = parseFloat(all_values[i])
-        }
-        //the weight field was not entered
-        else if (values.length >= 3 && all_values[i].includes(":")) {
-            var key_val = all_values[i].split(":")
-            if (keys.includes(key_val[0])) {
-                // If the user tries to use a key that is one of the default keys, throw error
-                throw Error(`Duplicate key-value pair: '${key_val[0]}:${key_val[1]}'`)
+            //Users can not set values for boolean attributes
+            if(boolean_attrs.includes(attr_name) && attr_value !== '') {
+                throw Error(`Cannot set value for boolean attributes: '${attr_name}:${attr_value}'`)
             }
-            if (boolean_keys.includes(key_val[0]) && key_val[1] !== '') {
-                // If the user tries to set a value to a boolean attribute, throw error
-                throw Error(`Invalid key-value pair: '${key_val[0]}:${key_val[1]}'`)
+            if(attr_name === 'color') {
+                if(!isColor(attr_value)) {
+                    throw Error(`Invalid color: ${attr_value}`);
+                }
+                newNode.setColor(attr_value);
+            } else if(attr_name === 'shape') {
+                let shapes = ['ellipse', 'triangle', 'round-triangle', 'rectangle', 'round-rectangle', 'bottom-round-rectangle', 'cut-rectangle', 'barrel', 'rhomboid', 'right-rhomboid', 'diamond', 'square', 
+                    'round-diamond', 'pentagon', 'round-pentagon', 'hexagon', 'round-hexagon', 'concave-hexagon', 'heptagon', 'round-heptagon', 'octagon', 'round-octagon', 'star', 'tag', 'round-tag', 'vee'];
+                if(!shapes.includes(attr_value.toLowerCase())) {
+                    throw new Error(`Invalid shape: ${attr_value}`);
+                }
+                newNode.shape = attr_value;
+            /**
+             *  For any other attribute specified in the file, add it without an error check.
+             *  This should be enough to allow an arbitrary attribute to be specified and added.
+             * 
+             *  Uses the flexibility of javascript objects to dynamically create fields and assign values.
+             */
+            } else if(attr_name !== undefined && attr_value !== undefined) {
+                Object.defineProperty(newNode, attr_name, {
+                    value: attr_value,
+                    writable: true,
+                    enumerable: true,
+                    configurable: true,
+                });
             }
-            if (key_val[0] === 'color' && !isColor(key_val[1])) {
-                // If color attribute is not a valid color string, throw error
-                throw Error(`Invalid color: '${key_val[0]}:${key_val[1]}'`)
-            }
-            keys.push(key_val[0])
-            values.push(key_val[1])
-        }
-        //the key value pairs were not created correctly or the x, y fields were not set
-        else {
-            throw Error(`Incorrect node format, ID: '${node_id}'`)
+            enteredAttributes.push(attr_name);
         }
     }
-    //one last error check: values needs weight, x and y and the minimum
-    if (values.length < 3) {
-        throw Error(`Incorrect node format, ID: '${node_id}'`)
+    //one last error check: nodes need values for id, x, and y at the minimum
+    if (newNode.id === undefined || newNode.x === undefined || newNode.y === undefined) {
+        throw Error(`Incorrect node format, ID: '${newNode.id}'`);
     }
-    //set the node map of the id equal to dictionary
-    node_map[node_id] = {}
-
-    //ensure all boolean keys have an assigned boolean value
-    for (let bool_key of boolean_keys) {
-        let index = keys.findIndex((element) => element===bool_key);
-        if (index >= 0) {
-            values[index] = true;
-        } else {
-            keys.push(bool_key);
-            values.push(false);
-        }
-    }
-
     //go ahead store this node predicate among all nodes in the node_map
-    for (var j = 0; j < keys.length; j++) {
-            node_map[node_id][keys[j]] = values[j]
-    }
+
+    nodeList.push(newNode);
+    
 }
 
 /**
@@ -138,78 +145,65 @@ function nodeParser(node_string, node_map) {
  * @param {dictionary} edge_map - the map of all the current undirected edges
  * @param {int} edge_id - the current id of the undirected edge
  */
-function edgeParser(edge_string, edge_map, createEdgeId) {
+function edgeParser(edge_string, edgeList, createEdgeId) {
     //trim the end whitespace
     var trimmed = edge_string.trimEnd()
     //split string to an array using whitespace as a delimiter
     var all_values = trimmed.split(/\s+/)
     //keys and values of all values of the edge
-    var keys = ['weight', 'source', 'target']
-    var boolean_keys = ['shouldBeInvisible', 'invisibleLabel', 'invisibleWeight', 'invisible', 'highlighted']
-    var values = [undefined]
-    let edge_id = "? ?";
-
-    //start with the second item; the first should be 'n'
-    for (var i = 1; i < all_values.length; i++) {
-        //source value
-        if (values.length === 1) {
-            values.push(all_values[i])
-            edge_id = `${values[1]} ?`;
+    var booleanAttrs = ['shouldBeInvisible', 'invisibleLabel', 'invisibleWeight', 'invisible', 'highlighted']
+    let newEdge = new EdgeObject();
+    let parsedIds = [];
+    if(all_values.length < 3) {
+        throw Error(`Invalid edge, missing arguments`);
+    }
+    let id = `${all_values[1]} ${all_values[2]}`;
+    if(parsedIds.includes(id)) {
+        throw Error(`Duplicate node ID: '${newEdge.id}'`);
+    }
+    newEdge.source = all_values[1];
+    newEdge.target = all_values[2];
+    newEdge.setId(newEdge.source, newEdge.target);
+    let enteredAttributes = [];
+    for(let i = 3; i < all_values.length; i++) {
+        if (newEdge.weight === undefined && isNumeric(all_values[i])) {
+            newEdge.setWeight(parseFloat(all_values[i]));
         }
-        //target value
-        else if (values.length === 2) {
-            values.push(all_values[i])
-            edge_id = createEdgeId(values[1], values[2]);
-        }
-        //the weight field was entered
-        else if (values.length === 3 && isNumeric(all_values[i])) {
-            values[0] = parseFloat(all_values[i])
-        }
-        //the weight field was not entered
-        else if (values.length >= 3 && all_values[i].includes(":")) {
-            var key_val = all_values[i].split(":")
-            if (keys.includes(key_val[0])) {
-                // If the user tries to use a key that is one of the default keys, throw error
-                throw Error(`Duplicate key-value pair: '${key_val[0]}:${key_val[1]}'`)
+        if(all_values[i].includes(':')) {
+            let attr_name = all_values[i].split(":")[0];
+            let attr_value = all_values[i].split(":")[1];
+            if(enteredAttributes.includes(attr_name)) {
+                throw Error(`Duplicate attribute entry: ${attr_name}`);
             }
-            if (boolean_keys.includes(key_val[0]) && key_val[1] !== '') {
-                // If the user tries to set a value to a boolean attribute, throw error
-                throw Error(`Invalid key-value pair: '${key_val[0]}:${key_val[1]}'`)
+            //Users can not set values for boolean attributes
+            if(booleanAttrs.includes(attr_name) && attr_value !== '') {
+                throw Error(`Cannot set value for boolean attributes: '${attr_name}:${attr_value}'`)
+            }  
+            //Check if color is valid before adding
+            if(attr_name === 'color') {
+                if(!isColor(attr_value)) {
+                    throw Error(`Invalid color: '${attr_value}'`);
+                }
+                newEdge.setColor(attr_value);
+            /**
+             *  For any other attribute specified in the file, add it without an error check.
+             *  This should be enough to allow an arbitrary attribute to be specified and added.
+             * 
+             *  Uses the flexibility of javascript objects to dynamically create fields and assign values.
+             */
+            } else if(attr_name !== undefined && attr_value !== undefined) {
+                Object.defineProperty(newEdge, attr_name, {
+                    value: attr_value,
+                    writable: true,
+                    enumerable: true,
+                    configurable: true,
+                });
             }
-            if (key_val[0] === 'color' && !isColor(key_val[1])) {
-                // If color attribute is not a valid color string, throw error
-                throw Error(`Invalid color: '${key_val[0]}:${key_val[1]}'`)
-            }
-            keys.push(key_val[0])
-            values.push(key_val[1])
-        }
-        //the key value pairs were not created correctly or the source, target fields were not set
-        else {
-            throw Error(`Incorrect edge format, ID: '${edge_id}'`);
+            enteredAttributes.push(attr_name);
         }
     }
-     //one last error check: values needs weight, source and target and the minimum
-    if (values.length < 3) {
-        throw Error(`Incorrect edge format, ID: '${edge_id}'`);
-    }
-
-    //ensure all boolean keys have an assigned boolean value
-    for (let bool_key of boolean_keys) {
-        let index = keys.findIndex((element) => element===bool_key);
-        if (index >= 0) {
-            values[index] = true;
-        } else {
-            keys.push(bool_key);
-            values.push(false);
-        }
-    }
-
-    //the edge map of the edge id is a dictionary
-    edge_map[edge_id] = {}
     //go ahead store this edge predicate among all edges in the edge_map
-    for (var j = 0; j < keys.length; j++) {
-        edge_map[edge_id][keys[j]] = values[j];
-    }
+    edgeList.push(newEdge);
 }
 
 
