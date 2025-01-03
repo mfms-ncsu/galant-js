@@ -4,14 +4,16 @@
 If there are two teams, they could work independently on the following two aspects of the project.
 
 ### More direct interaction with Cytoscape
-* write some smaller programs that feed graphs directly into Cytoscape, modify the graphs, and respond to user interactions with the graph display
+* write some smaller standalone apps that feed graphs directly into Cytoscape, modify the graphs, and respond to user interactions with the graph display
 * see if the existing code base can be made to interact with Cytoscape directly, starting with minimal functionality
 * depending on how the previous steps go, work on a cleaner graph representation
 * gradually add features of original implementation
+* **Possible deliverable:** a standalone graph editor that handles both gph and sgf files
 
 ### Fix various aspects of the user interface, correct bugs, etc.
+* going back to original state, except for node movements, when an algorithm is completed: see `animation_and_edit_states.pptx`
 * keyboard shortcuts
-* saving graph and algorithm files with a file browser instead of downloading them
+* saving graph and algorithm files with a file browser instead of downloading them: StackOverflow has some examples of code
 * positioning of query popups
 * display of messages and using change records for these
 * fixing various annoyances of the display
