@@ -22,7 +22,7 @@ Both teams can move in the direction of handling layered graphs with sorting gra
 
 ## High priority
 
-* Maintaining a mapping between physical screen positions of nodes and logical positions recorded in a text file. This will facilitate the following
+* (Team 2) Maintaining a mapping between physical screen positions of nodes and logical positions recorded in a text file. This will facilitate the following
 - allowing an algorithm to query the position of a node to compute, for example, the Euclidian distance of an edge
 - implementing algorithms for sorting and layered graphs; these would call for a mapping where logical positions correspond to integer grid points
 - ensuring that positions are saved in a edit state when an auto-layout takes place
@@ -34,15 +34,15 @@ A mapping, scale factor, is apparently maintained to save positions of nodes mov
 ```
 for a potential clue.
 
-* The text produced by the `display` function does not appear in this version. Furthermore a `display` call during algorithm execution should generate a change record so that the text is always in sync with the animation. The Java version handled this by making the text display a graph object on par with a node or edge.
+* (Team 1) The text produced by the `display` function does not appear in this version. Furthermore a `display` call during algorithm execution should generate a change record so that the text is always in sync with the animation. The Java version handled this by making the text display a graph object on par with a node or edge.
 
-* Edits to node/edge labels/weights do not work; nor does adding an edge or deleting a node that has incident edges; these are probably simple oversights.
+* (Team 1) Edits to node/edge labels/weights do not work; nor does adding an edge or deleting a node that has incident edges; these are probably simple oversights.
 
 * More detailed documentation for animators and developers, in the form of Google docs for ease of modification. For the developer, pointers to locations in the code for important functionalities are essential; some of these already exist.
 I anticipate being closely involved in the development and will produce some of this documentation as we go, as well as making suggestions about code style and commenting.
 Also desirable is a log of design and implementation decisions and the reasoning behind them.
 
-* Better handling of errors. Currently, you have to open "developer tools" in the browser to see the console and get information such as detailed error messages. And the developer messages don't give line numbers for the source code or the input files. Makes debugging difficult (actually, the browser will pop up a window that highlights the location of the error). Syntax errors in graph text simply result in the graph not being loaded - no explanation is given.
+* (Team 1) Better handling of errors. Currently, you have to open "developer tools" in the browser to see the console and get information such as detailed error messages. And the developer messages don't give line numbers for the source code or the input files. Makes debugging difficult (actually, the browser will pop up a window that highlights the location of the error). Syntax errors in graph text simply result in the graph not being loaded - no explanation is given.
 On the other hand, runtime errors during algorithm execution are handled well - the graph window gives a line number with a description of the error and marks the offending line; the only quibble I have with it is that the window may need to be expanded and the message window replaces the graph window rather than being a separate popup (as in the Java version)
 
 ## Code organization and refactoring
