@@ -2,7 +2,7 @@ import GraphElement from "./GraphElement.js";
 
 /**
  * Node is a GraphElement with a unique id, an xy-position, and an
- * adjacency list of edges.
+ * adjacency list of edges stored in a map.
  * 
  * @author Henry Morris
  */
@@ -37,7 +37,7 @@ export default class Node extends GraphElement {
             y: y
         }
 
-        // Create a list of adjacent edges
-        this.edges = [];
+        // Create a map between adjacent nodes and their edge objects
+        this.edges = new Map();
     }
 }
