@@ -1,3 +1,5 @@
+import ChangeManager from "./ChangeManager/ChangeManager.js";
+
 /**
  * Graph stores the representation of the current graph and has an interface
  * to retrieve adjacency information as well as exporting the graph to a file
@@ -23,8 +25,8 @@ class Graph {
         this.fileParser = undefined;
 
         // Create two change managers --- one for user changes and one for algorithm changes.
-        this.userChangeManager = undefined;
-        this.algorithmChangeManager = undefined;
+        this.userChangeManager = new ChangeManager(this, this.#privateMethods);
+        this.algorithmChangeManager = new ChangeManager(this, this.#privateMethods);
     }
 
     /** Public methods */
