@@ -16,7 +16,17 @@ export default class Node extends GraphElement {
      */
     constructor(nodeId, x, y) {
         // Call the super constructor with the map of attributes
-        super(new Map());
+        super(new Map([
+            ["backgroundOpacity", undefined],
+            ["borderWidth", undefined],
+            ["color", undefined],
+            ["highlight", false],
+            ["label", undefined],
+            ["mark", false],
+            ["shape", undefined],
+            ["size", undefined],
+            ["weight", undefined]
+        ]));
 
         // Set the id
         this.id = nodeId;
