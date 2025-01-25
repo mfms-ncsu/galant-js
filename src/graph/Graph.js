@@ -37,9 +37,55 @@ class Graph {
     getAllEdges(nodeId) {}
     toCytoscape() {}
 
-    /** Private methods */
-    #addNode(x, y, nodeId, attributes) {}
-    #addEdge(source, target, attributes) {}
+    
+    /**
+     * Adds a new node to the graph at the specified position.
+     * @param {Number} x X position
+     * @param {Number} y Y position
+     * @param {String} nodeId Optional argument for setting a predetermined 
+     * @param {Object} attributes Initial attributes of the node
+     */
+    #addNode(x, y, nodeId, attributes) {
+        // If the nodeId argument is passed, use that, otherwise generate an id
+        nodeId = nodeId || generateId(this.#nodes);
+
+        // Create the node
+        let node = new Node(nodeId, x, y);
+        this.#nodes.set(nodeId, node);
+
+        // Set the attributes
+        for (let name in attributes) {
+            node.attributes.has(name) && node.attributes.set(name, attributes[name]);
+        }
+
+        // Get the smallest unused node id for automatic assigning
+        function generateId(nodes) {
+            let id = 0;
+            while (nodes.has(String(id))) id++;
+            return String(id);
+        }
+    }
+
+    /**
+     * Adds a new edge to the graph between the specified source and target nodes.
+     * @param {String} source Source node id
+     * @param {String} target Target node id
+     * @param {Object} attributes Initial attributes of the edge
+     */
+    #addEdge(source, target, attributes) {
+        // Create the edge object
+        let edge = new Edge(source, target);
+
+        // Set the attributes
+        for (let name in attributes) {
+            edge.attributes.has(name) && edge.attributes.set(name, attributes[name]);
+        }
+
+        // Add the edge to both the source and target's adjacency lists
+        this.#nodes.get(source).edges.set(`${source},${target}`, edge);
+        this.#nodes.get(target).edges.set(`${source},${target}`, edge);
+    }
+
     #addMessage(message) {}
     #deleteNode(nodeId) {}
     #deleteEdge(source, target) {}
