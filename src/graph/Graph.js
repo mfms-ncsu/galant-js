@@ -1,4 +1,5 @@
 import ChangeManager from "./ChangeManager/ChangeManager.js";
+import FileParser from "./FileParser/FileParser.js";
 
 /**
  * Graph stores the representation of the current graph and has an interface
@@ -22,7 +23,7 @@ class Graph {
         this.#nodes = new Map();
 
         // Create a file parser to load files into this graph
-        this.fileParser = undefined;
+        this.fileParser = new FileParser(this, this.#privateMethods);
 
         // Create two change managers --- one for user changes and one for algorithm changes.
         this.userChangeManager = new ChangeManager(this, this.#privateMethods);
