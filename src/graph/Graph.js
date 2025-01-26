@@ -1,5 +1,7 @@
 import ChangeManager from "./ChangeManager/ChangeManager.js";
+import Edge from "./GraphElement/Edge.js";
 import FileParser from "./FileParser/FileParser.js";
+import Node from "./GraphElement/Node.js";
 
 /**
  * Graph stores the representation of the current graph and has an interface
@@ -35,7 +37,62 @@ class Graph {
     getOutgoingEdges(source) {}
     getIncomingEdges(target) {}
     getAllEdges(nodeId) {}
-    toCytoscape() {}
+    
+    /**
+     * Generates an array of cytoscape elements from the current graph representation.
+     * @returns Array of cytoscape elements to display
+     */
+    toCytoscape() {
+        // Create an array of elements
+        let elements = [];
+
+        // Loop over each node
+        this.#nodes.forEach(node => {
+            elements.push(parseNode(node));
+
+            // Loop over each edge sourced at this node
+            node.edges.forEach(edge => {
+                if (node.id === edge.source) {
+                    elements.push(parseEdge(edge));
+                }
+            });
+        });
+
+        return elements;
+
+        /** Helper to create an element from a node */
+        function parseNode(node) {
+            // Identifying data
+            let element = {
+                group: "nodes",
+                data: { id: node.id },
+                position: node.position
+            };
+
+            // Add attributes
+            node.attributes.forEach((value, name) => {
+                element.data[name] = value;
+            });
+
+            return element;
+        }
+
+        /** Helper to create an element from an edge */
+        function parseEdge(edge) {
+            // Identifying data
+            let element = {
+                group: "edges",
+                data: { source: edge.source, target: edge.target }
+            }
+
+            // Add attributes
+            edge.attributes.forEach((value, name) => {
+                element.data[name] = value;
+            });
+
+            return element;
+        }
+    }
 
     
     /**

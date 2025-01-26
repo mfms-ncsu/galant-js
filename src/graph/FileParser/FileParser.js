@@ -60,12 +60,12 @@ export default class FileParser {
     #parseNode(values) {
         // Get the necessary values to create a node
         let id = values[1];
-        let x = parseInt(values[2]), y = parseInt(values[3]);
+        let x = parseFloat(values[2]), y = parseFloat(values[3]);
         let attributes = {};
         
         // Get the weight, but only if it is a numeric value
         if (this.#isNumeric(values[4])) {
-            attributes["weight"] = parseInt(values[4]);
+            attributes["weight"] = parseFloat(values[4]);
         }
 
         // Loop over the rest of the values
@@ -92,7 +92,7 @@ export default class FileParser {
         
         // Get the weight, but only if it is a numeric value
         if (this.#isNumeric(values[3])) {
-            attributes["weight"] = parseInt(values[3]);
+            attributes["weight"] = parseFloat(values[3]);
         }
 
         // Loop over the rest of the values

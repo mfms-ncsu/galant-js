@@ -19,7 +19,7 @@ export default class Edge extends GraphElement {
             ["color", undefined],
             ["edgeWidth", undefined],
             ["highlight", false],
-            ["label", undefined],
+            ["label", ""],
             ["weight", undefined]
         ]));
 
