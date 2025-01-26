@@ -16,6 +16,8 @@ import Node from "./GraphElement/Node.js";
 class Graph {
     /** Map of nodes in the graph */
     #nodes;
+    /** Scale */
+    #scalar;
 
     /**
      * Creates a new graph with nodes, file parser, and change managers.
@@ -23,6 +25,9 @@ class Graph {
     constructor() {
         // Create a new map to store a list of the nodes
         this.#nodes = new Map();
+
+        // Use this scalar in toCytoscape
+        this.#scalar = 1;
 
         // Create a file parser to load files into this graph
         this.fileParser = new FileParser(this, this.#privateMethods);
@@ -37,26 +42,6 @@ class Graph {
     getOutgoingEdges(source) {}
     getIncomingEdges(target) {}
     getAllEdges(nodeId) {}
-
-    scale() {
-        // Get the scalar value
-        let scalar = calcularScalar(this.#nodes);
-
-        // Multiply each coordinate by the scalar
-        this.#nodes.forEach(node => {
-            node.position.x *= scalar;
-            node.position.y *= scalar;
-        });
-
-        /** Helper to calculate the scalar for the graph */
-        function calcularScalar(nodes) {
-            let max = 1;
-            nodes.forEach(node => {
-                max = Math.max(max, Math.abs(node.position.x), Math.abs(node.position.y));
-            });
-            return 500 / max;
-        }
-    }
     
     /**
      * Generates an array of cytoscape elements from the current graph representation.
@@ -68,7 +53,7 @@ class Graph {
 
         // Loop over each node
         this.#nodes.forEach(node => {
-            elements.push(parseNode(node));
+            elements.push(parseNode(node, this.#scalar));
 
             // Loop over each edge sourced at this node
             node.edges.forEach(edge => {
@@ -81,12 +66,15 @@ class Graph {
         return elements;
 
         /** Helper to create an element from a node */
-        function parseNode(node) {
+        function parseNode(node, scalar) {
             // Identifying data
             let element = {
                 group: "nodes",
                 data: { id: node.id },
-                position: node.position
+                position: {
+                    x: scalar * node.position.x, // Scale the position
+                    y: scalar * node.position.y
+                }
             };
 
             // Add attributes
@@ -118,8 +106,19 @@ class Graph {
     /**
      * Removes all nodes from the graph.
      */
-    #clearGraph() {
+    #clear() {
         this.#nodes = new Map();
+    }
+
+    /**
+     * Generates a scale for the graph after being loaded
+     */
+    #scale() {
+        let max = 1;
+        this.#nodes.forEach(node => {
+            max = Math.max(max, Math.abs(node.position.x), Math.abs(node.position.y));
+        });
+        this.#scalar = 500 / max;
     }
     
     /**
@@ -184,7 +183,8 @@ class Graph {
      * and change managers so they can access them.
      */
     #privateMethods = {
-        clearGraph: this.#clearGraph,
+        clear: this.#clear,
+        scale: this.#scale,
         addNode: this.#addNode,
         addEdge: this.#addEdge,
         addMessage: this.#addMessage,

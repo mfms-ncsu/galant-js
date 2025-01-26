@@ -29,11 +29,14 @@ export default class FileParser {
      */
     loadGraph(file) {
         // Clear the graph before adding in nodes
-        this.#graph.clearGraph();
+        this.#graph.clear();
 
         // Split the file on the new line character and parse each line
         const lines = file.split("\n");
         lines.forEach(line => { this.#parseLine(line) });
+
+        // Generate a scale for the graph based on the node positions
+        this.#graph.scale();
     }
 
     /**
