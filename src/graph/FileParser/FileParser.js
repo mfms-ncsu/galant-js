@@ -28,6 +28,9 @@ export default class FileParser {
      * @param {String} file File text
      */
     loadGraph(file) {
+        // Clear the graph before adding in nodes
+        this.#graph.clearGraph();
+
         // Split the file on the new line character and parse each line
         const lines = file.split("\n");
         lines.forEach(line => { this.#parseLine(line) });

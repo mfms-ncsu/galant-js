@@ -114,6 +114,13 @@ class Graph {
         }
     }
 
+
+    /**
+     * Removes all nodes from the graph.
+     */
+    #clearGraph() {
+        this.#nodes = new Map();
+    }
     
     /**
      * Adds a new node to the graph at the specified position.
@@ -177,6 +184,7 @@ class Graph {
      * and change managers so they can access them.
      */
     #privateMethods = {
+        clearGraph: this.#clearGraph,
         addNode: this.#addNode,
         addEdge: this.#addEdge,
         addMessage: this.#addMessage,
@@ -186,7 +194,7 @@ class Graph {
         setNodeAttribute: this.#setNodeAttribute,
         setEdgeAttribute: this.#setEdgeAttribute,
         undoChange: this.#undoChange,
-        redoChange: this.#redoChange
+        redoChange: this.#redoChange,
     }
 }
 
