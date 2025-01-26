@@ -1,4 +1,5 @@
 import ChangeManager from "./ChangeManager/ChangeManager.js";
+import CytoscapeManager from "./CytoscapeManager/CytoscapeManager.js";
 import Edge from "./GraphElement/Edge.js";
 import FileParser from "./FileParser/FileParser.js";
 import Node from "./GraphElement/Node.js";
@@ -32,74 +33,12 @@ class Graph {
         // Create a file parser to load files into this graph
         this.fileParser = new FileParser(this, this.#privateMethods);
 
-        // Create two change managers --- one for user changes and one for algorithm changes.
+        // Create two change managers --- one for user changes and one for algorithm changes
         this.userChangeManager = new ChangeManager(this, this.#privateMethods);
         this.algorithmChangeManager = new ChangeManager(this, this.#privateMethods);
-    }
 
-    /** Public methods */
-    getEdge(source, target) {}
-    getOutgoingEdges(source) {}
-    getIncomingEdges(target) {}
-    getAllEdges(nodeId) {}
-    
-    /**
-     * Generates an array of cytoscape elements from the current graph representation.
-     * @returns Array of cytoscape elements to display
-     */
-    toCytoscape() {
-        // Create an array of elements
-        let elements = [];
-
-        // Loop over each node
-        this.#nodes.forEach(node => {
-            elements.push(parseNode(node, this.#scalar));
-
-            // Loop over each edge sourced at this node
-            node.edges.forEach(edge => {
-                if (node.id === edge.source) {
-                    elements.push(parseEdge(edge));
-                }
-            });
-        });
-
-        return elements;
-
-        /** Helper to create an element from a node */
-        function parseNode(node, scalar) {
-            // Identifying data
-            let element = {
-                group: "nodes",
-                data: { id: node.id },
-                position: {
-                    x: scalar * node.position.x, // Scale the position
-                    y: scalar * node.position.y
-                }
-            };
-
-            // Add attributes
-            node.attributes.forEach((value, name) => {
-                element.data[name] = value;
-            });
-
-            return element;
-        }
-
-        /** Helper to create an element from an edge */
-        function parseEdge(edge) {
-            // Identifying data
-            let element = {
-                group: "edges",
-                data: { source: edge.source, target: edge.target }
-            }
-
-            // Add attributes
-            edge.attributes.forEach((value, name) => {
-                element.data[name] = value;
-            });
-
-            return element;
-        }
+        // Create a cytoscape manager to generate element and style arrays of the graph
+        this.cytoscapeManager = new CytoscapeManager(this, this.#privateMethods);
     }
 
 
@@ -119,6 +58,14 @@ class Graph {
             max = Math.max(max, Math.abs(node.position.x), Math.abs(node.position.y));
         });
         this.#scalar = 500 / max;
+    }
+
+    #getScalar() {
+        return this.#scalar;
+    }
+
+    #getNodes() {
+        return this.#nodes;
     }
     
     /**
@@ -185,6 +132,8 @@ class Graph {
     #privateMethods = {
         clear: this.#clear,
         scale: this.#scale,
+        getScalar: this.#getScalar,
+        getNodes: this.#getNodes,
         addNode: this.#addNode,
         addEdge: this.#addEdge,
         addMessage: this.#addMessage,

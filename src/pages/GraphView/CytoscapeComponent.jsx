@@ -80,14 +80,11 @@ export default function CytoscapeComponent({ graphEditHistory }) {
 	// Update elements when graph changes
 	useEffect(() => {
 		if (!cytoscapeInstance) return;
-		cytoscapeInstance.elements().remove();
+		cytoscapeInstance.elements().remove();// Remove elements
+		cytoscapeInstance.add(NewGraph.cytoscapeManager.getElements()); // Get new elements
 
-		cytoscapeInstance.add(NewGraph.toCytoscape());
-
-		cytoscapeInstance.style().resetToDefault();
-		cytoscapeInstance.style(createCytoscapeStyleSheet(graphContext.preferences.style)).update();
-
-		// cytoscapeInstance.add(predicateConverter(graph, null, null, !graphContext.preferences.style.edge.hideWeight, !graphContext.preferences.style.edge.hideLabel));
+		cytoscapeInstance.style().resetToDefault(); // Reset style
+		cytoscapeInstance.style(NewGraph.cytoscapeManager.getStyle()).update(); // Update style
 	}, [cytoscapeInstance, graph, graphContext.preferences.style]);
 
 
