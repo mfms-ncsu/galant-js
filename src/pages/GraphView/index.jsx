@@ -31,6 +31,14 @@ import { applyPositions, applyScalar, calculateGraphScalar } from "./utils/Graph
 import { parseText } from "utils/FileToPredicate";
 import { parseSGFText } from "utils/SGFileToPredicate";
 import ChangeRecord from "./utils/ChangeRecord";
+
+
+/**
+ * NEW IMPORTS
+ */
+import NewGraph from 'graph/Graph';
+
+
 enablePatches();
 
 export default function GraphView() {
@@ -93,6 +101,11 @@ export default function GraphView() {
             const newBaseGraph = new Graph(graphData.nodes, graphData.edges, graphData.directed, graphData.message, graphName, scalar);
             setBaseGraph(newBaseGraph); // This also automatically resets edit history
             setGraph(newGraph);
+
+
+
+            NewGraph.fileParser.loadGraph(graphText);
+            NewGraph.scale();
 
 
 

@@ -37,6 +37,26 @@ class Graph {
     getOutgoingEdges(source) {}
     getIncomingEdges(target) {}
     getAllEdges(nodeId) {}
+
+    scale() {
+        // Get the scalar value
+        let scalar = calcularScalar(this.#nodes);
+
+        // Multiply each coordinate by the scalar
+        this.#nodes.forEach(node => {
+            node.position.x *= scalar;
+            node.position.y *= scalar;
+        });
+
+        /** Helper to calculate the scalar for the graph */
+        function calcularScalar(nodes) {
+            let max = 1;
+            nodes.forEach(node => {
+                max = Math.max(max, Math.abs(node.position.x), Math.abs(node.position.y));
+            });
+            return 500 / max;
+        }
+    }
     
     /**
      * Generates an array of cytoscape elements from the current graph representation.

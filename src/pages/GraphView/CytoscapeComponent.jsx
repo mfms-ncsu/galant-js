@@ -12,6 +12,13 @@ import NodeObject from './utils/NodeObject';
 import ChangeObject from './utils/ChangeObject';
 import ChangeRecord from './utils/ChangeRecord';
 import Graph from 'utils/Graph';
+
+/**
+ * NEW IMPORTS
+ */
+import NewGraph from 'graph/Graph';
+
+
 cytoscape.use(coseBilkent); // This registers coseBilkent as a extension
 nodeHtmlLabel(cytoscape);
 
@@ -74,17 +81,14 @@ export default function CytoscapeComponent({ graphEditHistory }) {
 	useEffect(() => {
 		if (!cytoscapeInstance) return;
 		cytoscapeInstance.elements().remove();
-		cytoscapeInstance.add(predicateConverter(graph, null, null, !graphContext.preferences.style.edge.hideWeight, !graphContext.preferences.style.edge.hideLabel));
-		setTimeout(() => cytoscapeInstance.style().update(), 100);
-	}, [cytoscapeInstance, graph, graphContext.preferences.style]);
 
+		cytoscapeInstance.add(NewGraph.toCytoscape());
 
-	// Update stylesheet when style preferences changes
-	useEffect(() => {
-		if (!cytoscapeInstance) return;
 		cytoscapeInstance.style().resetToDefault();
 		cytoscapeInstance.style(createCytoscapeStyleSheet(graphContext.preferences.style)).update();
-	}, [cytoscapeInstance, graphContext.preferences.style])
+
+		// cytoscapeInstance.add(predicateConverter(graph, null, null, !graphContext.preferences.style.edge.hideWeight, !graphContext.preferences.style.edge.hideLabel));
+	}, [cytoscapeInstance, graph, graphContext.preferences.style]);
 
 
 	// Updates the graph's layout whenever layout preferences changes
