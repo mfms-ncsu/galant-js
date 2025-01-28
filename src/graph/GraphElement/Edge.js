@@ -18,7 +18,7 @@ export default class Edge extends GraphElement {
         super(new Map([
             ["color", undefined],
             ["edgeWidth", undefined],
-            ["highlight", false],
+            ["highlighted", false],
             ["label", ""],
             ["weight", undefined]
         ]));

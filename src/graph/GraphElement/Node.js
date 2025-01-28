@@ -20,9 +20,9 @@ export default class Node extends GraphElement {
             ["backgroundOpacity", undefined],
             ["borderWidth", undefined],
             ["color", undefined],
-            ["highlight", false],
-            ["label", undefined],
-            ["mark", false],
+            ["highlighted", false],
+            ["label", ""],
+            ["marked", false],
             ["shape", undefined],
             ["size", undefined],
             ["weight", undefined]
