@@ -53,15 +53,16 @@ export default class CytoscapeManager {
      * @returns Cytoscape node element
      */
     #parseNode(node) {
-        let scalar = this.#graph.getScalar();
+        // let scalar = this.#graph.getScalar();
+        let scalar = 1;
 
         // Identifying data
         let element = {
             group: "nodes",
             data: { id: node.id },
             position: {
-                x: node.position.x, // Scale the position
-                y: node.position.y
+                x: scalar * node.position.x, // Scale the position
+                y: scalar * node.position.y
             }
         };
 
@@ -98,6 +99,9 @@ export default class CytoscapeManager {
      * @returns Cytoscape stylesheet
      */
     getStyle() {
+        // Use a variable for node size scaling
+        let nodeSize = 25;
+
         // Get the scalar for the sizing of elements
         let scalar = this.#graph.getScalar();
         
@@ -105,30 +109,32 @@ export default class CytoscapeManager {
             {
                 "selector": "node",
                 "style": {
-                    "width": `${25 / scalar}px`,
-                    "height": `${25 / scalar}px`,
+                    "width": `${nodeSize / scalar}px`,
+                    "height": `${nodeSize / scalar}px`,
                     "backgroundColor": "#FFFFFF",
                     "color": "#000000",
-                    "borderWidth": `${2.5 / scalar}px`,
+                    "borderWidth": `${nodeSize / (10 * scalar)}px`,
                     "borderStyle": "solid",
                     "borderColor": "#AAAAAA",
                     "backgroundOpacity": 1,
                     "shape": "circle",
                     "textValign": "center",
                     "visibility": "visible",
-                    "fontSize": `${12.5 / scalar}px`
+                    "fontSize": `${nodeSize / (2 * scalar)}px`,
+                    "overlay-padding": `${nodeSize / (5 * scalar)}px`
                 }
             },
             {
                 "selector": "edge",
                 "style": {
                     "label": "data(id)",
-                    "width": 3 / scalar,
+                    "width": nodeSize / (10 * scalar),
                     "lineColor": "#444444",
                     "color": "#AA0000",
                     "targetArrowColor": "#444444",
                     "targetArrowShape": "none",
-                    "curveStyle": "bezier"
+                    "curveStyle": "bezier",
+                    "overlay-padding": `${nodeSize / (5 * scalar)}px`
                 }
             },
             {
@@ -140,7 +146,7 @@ export default class CytoscapeManager {
             {
                 "selector": "node[?highlighted]",
                 "style": {
-                    "borderWidth": `${5 / scalar}px`
+                    "borderWidth": `${nodeSize / (5 * scalar)}px`
                 }
             },
             {
@@ -158,20 +164,21 @@ export default class CytoscapeManager {
             {
                 "selector": "edge[?highlighted]",
                 "style": {
-                    "width": `${10 / scalar}px`
+                    "width": `${nodeSize / (2.5 * scalar)}px`
                 }
             },
             {
                 "selector": "edge[label]",
                 "style": {
                     "label": "data(label)",
+                    "fontSize": `${nodeSize / (2.5 * scalar)}px`,
                     "textWrap": "wrap",
                     "textBackgroundColor": "white",
                     "textBackgroundOpacity": "1.0",
-                    "textBackgroundPadding": `${2 / scalar}px`,
+                    "textBackgroundPadding": `${nodeSize / (12.5 * scalar)}px`,
                     "textBorderOpacity": "1.0",
                     "textBorderStyle": "solid",
-                    "textBorderWidth": `${1 / scalar}px`,
+                    "textBorderWidth": `${nodeSize / (25 * scalar)}px`,
                     "textBorderColor": "black"
                 }
             },
