@@ -4,10 +4,9 @@
  * graph edit history, and various context providers for child components.
  * @author Christina Albores
  */
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createGraphContextObject } from "pages/GraphView/utils/GraphContext";
 import { enablePatches } from "immer";
-import GraphClass from 'utils/Graph';
 import { GraphContext } from "pages/GraphView/utils/GraphContext";
 import { defaultStylePreferences } from "./utils/CytoscapeStylesheet";
 import { defaultLayout } from "./utils/CytoscapeLayout";
@@ -22,11 +21,9 @@ import Algorithm from "utils/Algorithm/Algorithm";
 import ContextMenu from "./GraphEditOverlay/ContextMenus/ContextMenu";
 import NodeContextMenu from "./GraphEditOverlay/ContextMenus/NodeContextMenu";
 import EdgeContextMenu from "./GraphEditOverlay/ContextMenus/EdgeContextMenu";
-import GraphEditHistory from "./utils/GraphEditHistory";
 import GraphEditOverlay from "./GraphEditOverlay/GraphEditOverlay";
 import SharedWorker from "./utils/SharedWorker";
 import Graph from "utils/Graph";
-import { useImmer } from "use-immer";
 import { applyPositions, applyScalar, calculateGraphScalar } from "./utils/GraphUtils";
 import { parseText } from "utils/FileToPredicate";
 import { parseSGFText } from "utils/SGFileToPredicate";
@@ -67,13 +64,8 @@ export default function GraphView() {
 
     const graphContext = createGraphContextObject(graph, setGraph, baseGraph, setBaseGraph, cytoscapeStyleSheetPreferences, setCytoscapeStyleSheetPreferences, cytoscapeLayoutPreferences, setCytoscapeLayoutPreferences, cytoscapeInstance, setCytoscapeInstance);
     const algorithmContext = createAlgorithmContextObject(currentAlgorithm, setCurrentAlgorithm);
-
-    const [graphEditHistoryData, updateGraphEditHistory] = useImmer({
-        history: [baseGraph],
-        current: 0
-    })
-    const graphEditHistory = new GraphEditHistory(graphEditHistoryData, updateGraphEditHistory);
     const sentAliveMessage = useRef();
+    
     /**
      * Creates SharedWorker instance on mount.
      * Whenever baseGraph or currentAlgorithm updates, onMessage is rewritten to allow reading of most current baseGraph/currentAlgorithm
@@ -85,9 +77,10 @@ export default function GraphView() {
         }
 
         function onGraphLoad(data, isInit) {
-            console.log("Got shared worker data", data);
             const { name: graphName, graph: graphText } = data;
+
             if (!graphText) return;
+            
             let graphData;
             if (graphName != null && graphName.endsWith('.sgf')) {
                 graphData = parseSGFText(graphText); // Use SGF parser for SGF files
@@ -161,7 +154,7 @@ export default function GraphView() {
         if (currentAlgorithm.configuration.controlNodePosition) {
             cytoscapeInstance.fit();
         }
-    }, [algorithmStatus])
+    }, [algorithmStatus]);
 
     useEffect(() => {
         let newGraph;
@@ -181,7 +174,7 @@ export default function GraphView() {
             setGraph(newGraph);
         }
         setMode('normal');
-    }, [changeRecordIndex])
+    }, [changeRecordIndex]);
 
     /**
      * Effect triggered when the base graph changes.
@@ -189,17 +182,12 @@ export default function GraphView() {
      * If a current algorithm is active, updates it with the new base graph.
     */
     useEffect(() => {
-        // Update the graph edit history with the new base graph
-        updateGraphEditHistory(draft => {
-            draft.history = [baseGraph];
-            draft.current = 0;
-        })
         // Check if a current algorithm is active
         if (currentAlgorithm) {
             // Reinitialize the current algorithm with the new base graph
             setCurrentAlgorithm(new Algorithm(currentAlgorithm.name, currentAlgorithm.algorithmCode, baseGraph, { PromptService }, [algorithmStatus, setAlgorithmStatus]));
         }
-    }, [baseGraph])
+    }, [baseGraph]);
 
     return (
         <>
@@ -210,18 +198,18 @@ export default function GraphView() {
                     <GraphContext.Provider value={graphContext}>
                         <PromptContext.Provider value={PromptService}>
                             {/* having trouble figuring out how to get placement of prompts set up the way
-    I want; maybe the w-full, h-full at the top is messing things up.
-    It took a while to get the context menus right
-    and I'm not sure why they now work okay */}
+                                I want; maybe the w-full, h-full at the top is messing things up.
+                                It took a while to get the context menus right
+                                and I'm not sure why they now work okay */}
                             <div className="absolute z-10 left-1/4 top-1/4">
                                 <div><PromptComponent /></div>
                             </div>
-                            <CytoscapeComponent graphEditHistory={graphEditHistory} />
+                            <CytoscapeComponent />
                             <GraphOverlay />
                             <GraphEditOverlay setMode={setMode} />
-                            <ContextMenu graphEditHistory={graphEditHistory} changeRecord={changeRecord} />
-                            <NodeContextMenu graphEditHistory={graphEditHistory} />
-                            <EdgeContextMenu graphEditHistory={graphEditHistory} />
+                            <ContextMenu changeRecord={changeRecord} />
+                            <NodeContextMenu />
+                            <EdgeContextMenu />
                         </PromptContext.Provider>
                     </GraphContext.Provider>
                 </AlgorithmContext.Provider>
