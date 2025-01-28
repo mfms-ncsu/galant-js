@@ -36,8 +36,31 @@ export default class ChangeManager {
     }
 
     /** Methods for creating new ChangeObjects */
-    addNode(x, y) {}
-    addEdge(source, target) {}
+    
+    /**
+     * Adds a new node to the graph and records the change.
+     * @param {*} x x position of the node
+     * @param {*} y y position of the node
+     * @author Ziyu Wang
+     */
+    addNode(x, y) {
+        // Record the change
+        const change = this.#graph.addNode(x,y);
+        this.#recordChange([change]);
+        return change.current.id;
+    }
+
+    /**
+     * Adds a new edge to the graph and records the change.
+     * @param {*} source Source node id
+     * @param {*} target Target node id
+     * @author Ziyu Wang
+     */
+    addEdge(source, target) {
+        // Record the state before the change
+        this.#recordChange([this.#graph.addEdge(source, target)]);
+    }
+
     addMessage(message) {}
     deleteNode(nodeId) {}
     deleteEdge(source, target) {}
@@ -50,4 +73,17 @@ export default class ChangeManager {
      */
     undo() {}
     redo() {}
+
+    /**
+     * Records a change and updates the index.
+     * @param {ChangeObject} change Change object to record
+     * @author Ziyu Wang
+     */
+    #recordChange(change) {
+        // Remove all changes after the current index
+        this.#changes = this.#changes.slice(0, this.#index);
+        this.#changes.push(change);
+        this.#index += 1;
+    }
+
 }

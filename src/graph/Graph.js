@@ -1,4 +1,5 @@
 import ChangeManager from "./ChangeManager/ChangeManager.js";
+import ChangeObject from "./ChangeManager/ChangeObject.js";
 import CytoscapeManager from "./CytoscapeManager/CytoscapeManager.js";
 import Edge from "./GraphElement/Edge.js";
 import FileParser from "./FileParser/FileParser.js";
@@ -87,6 +88,13 @@ class Graph {
         for (let name in attributes) {
             node.attributes.has(name) && node.attributes.set(name, attributes[name]);
         }
+
+        // Return a new change object
+        return new ChangeObject('addNode', null, {
+            id: nodeId,
+            x: x,
+            y: y
+        });
 
         // Get the smallest unused node id for automatic assigning
         function generateId(nodes) {
