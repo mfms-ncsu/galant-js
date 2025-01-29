@@ -216,9 +216,108 @@ class Graph {
         }, null);
     }
 
-    #setNodePosition(nodeId, x, y) {}
-    #setNodeAttribute(nodeId, name, value) {}
-    #setEdgeAttribute(source, target, name, value) {}
+    /**
+     * Updates a node's position and creates a ChangeObject for the move.
+     * @param {String} nodeId Node to move
+     * @param {Number} x New x-position
+     * @param {Number} y New y-position
+     * @returns ChangeObject representing the move
+     */
+    #setNodePosition(nodeId, x, y) {
+        // Get a reference to the node
+        const node = this.#nodes.get(nodeId);
+
+        // Store old and new values for the position
+        let oldPosition = node.position;
+        let newPosition = {
+            x: x,
+            y: y
+        };
+
+        // Update the node's position
+        node.position = newPosition;
+
+        // Return a new ChangeObject
+        return new ChangeObject("setNodePosition", {
+            id: nodeId,
+            position: oldPosition
+        }, {
+            id: nodeId,
+            position: newPosition
+        });
+    }
+
+    /**
+     * Sets a new value for an attribute within a node and creates a corresponding
+     * ChangeObject to record the change.
+     * @param {String} nodeId Node for which to set an attribute value
+     * @param {String} name Name of the attribute to set
+     * @param {Object} value Value to set for the attribute
+     * @returns A ChangeObject representing the attribute change
+     */
+    #setNodeAttribute(nodeId, name, value) {
+        // Get a reference to the node
+        const node = this.#nodes.get(nodeId);
+
+        // Store the old value
+        let oldValue = node.attributes.get(name);
+
+        // Update the node's attribute
+        node.attributes.set(name, value);
+
+        // Return a new ChangeObject
+        return new ChangeObject("setNodeAttribute", {
+            id: nodeId,
+            attribute: {
+                name: name,
+                value: oldValue
+            }
+        }, {
+            id: nodeId,
+            attribute: {
+                name: name,
+                value: value
+            }
+        });
+    }
+
+    /**
+     * Sets a new value for an attribute within an edge and creates a corresponding
+     * ChangeObject to record the change.
+     * @param {String} source Source node of the edge for which to set an attribute value
+     * @param {String} target Target node of the edge for which to set an attribute value
+     * @param {String} name Name of the attribute to set
+     * @param {Object} value Balue to set for the attribute
+     * @returns A ChangeObject representing the attribute change
+     */
+    #setEdgeAttribute(source, target, name, value) {
+        // Get a reference to the edge
+        const edge = this.#nodes.get(source).edges.get(`${source},${target}`);
+
+        // Store the old value
+        let oldValue = edge.attributes.get(name);
+
+        // Update the edge's attribute
+        edge.attributes.set(name, value);
+
+        // Return a new ChangeObject
+        return new ChangeObject("setEdgeAttribute", {
+            source: source,
+            target: target,
+            attribute: {
+                name: name,
+                value: oldValue
+            }
+        }, {
+            source: source,
+            target: target,
+            attribute: {
+                name: name,
+                value: value
+            }
+        });
+    }
+
     #undoChange(change) {}
     #redoChange(change) {}
 
