@@ -48,7 +48,7 @@ export default class FileParser {
         const values = line.trim().split(" ");
 
         // Regexes to match simple node and edge lines
-        const nodeRegex = /^n \w* \d+ \d+/;
+        const nodeRegex = /^n \w* -?\d+ -?\d+/;
         const edgeRegex = /^e \w+ \w+/;
 
         // Check which regex matches and send the values to be parsed as either a node or edge
