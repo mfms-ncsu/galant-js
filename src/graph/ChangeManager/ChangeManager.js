@@ -47,6 +47,8 @@ export default class ChangeManager {
         // Record the change
         const change = this.#graph.addNode(x,y);
         this.#recordChange([change]);
+
+        // Return the id of the new node
         return change.current.id;
     }
 

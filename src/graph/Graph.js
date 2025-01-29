@@ -3,6 +3,7 @@ import ChangeObject from "./ChangeManager/ChangeObject.js";
 import CytoscapeManager from "./CytoscapeManager/CytoscapeManager.js";
 import Edge from "./GraphElement/Edge.js";
 import FileParser from "./FileParser/FileParser.js";
+import Message from "./GraphElement/Message.js";
 import Node from "./GraphElement/Node.js";
 
 /**
@@ -75,6 +76,7 @@ class Graph {
      * @param {Number} y Y position
      * @param {String} nodeId Optional argument for setting a predetermined 
      * @param {Object} attributes Initial attributes of the node
+     * @returns ChangeObject representing adding a node
      */
     #addNode(x, y, nodeId, attributes) {
         // If the nodeId argument is passed, use that, otherwise generate an id
@@ -109,6 +111,7 @@ class Graph {
      * @param {String} source Source node id
      * @param {String} target Target node id
      * @param {Object} attributes Initial attributes of the edge
+     * @returns ChangeObject representing adding an edge
      */
     #addEdge(source, target, attributes) {
         // Create the edge object
@@ -122,9 +125,30 @@ class Graph {
         // Add the edge to both the source and target's adjacency lists
         this.#nodes.get(source).edges.set(`${source},${target}`, edge);
         this.#nodes.get(target).edges.set(`${source},${target}`, edge);
+
+        // Return a new ChangeObject
+        return new ChangeObject("addEdge", null, {
+            source: source,
+            target: target
+        });
     }
 
-    #addMessage(message) {}
+    /**
+     * Creates a new Message and returns a ChangeObject with the message.
+     * @param {String} message Message to display
+     * @returns ChangeObject containing the message
+     */
+    #addMessage(message) {
+        // Create a new message object
+        // NOTE: currently doing nothing with this
+        const message = new Message(message);
+
+        // Return a new ChangeObject
+        return new ChangeObject("message", null, {
+            message: message
+        });
+    }
+
     #deleteNode(nodeId) {}
     #deleteEdge(source, target) {}
     #setNodePosition(nodeId, x, y) {}
