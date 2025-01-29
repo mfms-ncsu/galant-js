@@ -53,8 +53,7 @@ export default class CytoscapeManager {
      * @returns Cytoscape node element
      */
     #parseNode(node) {
-        // let scalar = this.#graph.getScalar();
-        let scalar = 1;
+        let scalar = this.#graph.getScalar();
 
         // Identifying data
         let element = {
@@ -103,7 +102,7 @@ export default class CytoscapeManager {
         let nodeSize = 25;
 
         // Get the scalar for the sizing of elements
-        let scalar = this.#graph.getScalar();
+        let scalar = 1;
         
         return [
             {
