@@ -1,13 +1,9 @@
-import { React, useEffect, useRef, useState } from "react";
+import { React, useEffect, useRef } from "react";
 import { renderToString } from "react-dom/server";
 import cytoscape from "cytoscape";
 import nodeHtmlLabel from "cytoscape-node-html-label";
 import coseBilkent from "cytoscape-cose-bilkent";
-
-/**
- * NEW IMPORTS
- */
-import NewGraph from "graph/Graph";
+import Graph from "graph/Graph";
 
 
 cytoscape.use(coseBilkent); // This registers coseBilkent as a extension
@@ -32,8 +28,8 @@ export default function CytoscapeComponent() {
         // Create the cytoscape object
         const cy = cytoscape({
             container: cytoscapeElement.current,
-            elements: NewGraph.cytoscapeManager.getElements(),
-            style: NewGraph.cytoscapeManager.getStyle(),
+            elements: Graph.cytoscapeManager.getElements(),
+            style: Graph.cytoscapeManager.getStyle(),
             layout: { name: "preset" },
             autounselectify: true,
             wheelSensitivity: 0.35,
@@ -77,10 +73,10 @@ export default function CytoscapeComponent() {
     useEffect(() => {
         if (!window.cytoscape) return;
         window.cytoscape.elements().remove();// Remove elements
-        window.cytoscape.add(NewGraph.cytoscapeManager.getElements()); // Get new elements
+        window.cytoscape.add(Graph.cytoscapeManager.getElements()); // Get new elements
         window.cytoscape.style().resetToDefault(); // Reset style
-        window.cytoscape.style(NewGraph.cytoscapeManager.getStyle()).update(); // Update style
-    }, [window.cytoscape, NewGraph.getNodesCopy()]);
+        window.cytoscape.style(Graph.cytoscapeManager.getStyle()).update(); // Update style
+    }, [window.cytoscape, Graph.getNodesCopy()]);
 
     return (
         <div className="w-full h-full">
