@@ -1,6 +1,5 @@
 import { React, useEffect, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
-import { useGraphContext } from "pages/GraphView/utils/GraphContext";
 import cytoscape from "cytoscape";
 import nodeHtmlLabel from "cytoscape-node-html-label";
 import coseBilkent from "cytoscape-cose-bilkent";
@@ -21,17 +20,14 @@ nodeHtmlLabel(cytoscape);
  * @author Andrew Lanning
  */
 export default function CytoscapeComponent() {
-    const graphContext = useGraphContext();
-    const graph = graphContext.graph;
-    let cytoscapeInstance = graphContext.cytoscape.instance;
+    // Get a reference to the element into which cytoscape is loaded
     const cytoscapeElement = useRef();
-
 
     /**
      * Initialize cytoscape on mount (When cytoscapeElement ref is set to the div element)
      */
     useEffect(() => {
-        if (cytoscapeInstance) return;
+        if (window.cytoscape) return;
 
         // Create the cytoscape object
         const cy = cytoscape({
@@ -52,8 +48,8 @@ export default function CytoscapeComponent() {
                 valign: "top",
                 valignBox: "top",
                 tpl: (data) => {
-                    const hideWeight = graphContext.preferences.style.node.hideWeight;
-                    const hideLabel = graphContext.preferences.style.node.hideLabel;
+                    const hideWeight = false; // NOTE: these need to be pulled from somewhere
+                    const hideLabel = false;
 
                     if ((!hideWeight && data.weight) || (!hideLabel && data.label)) {
                         return renderToString(
@@ -67,10 +63,11 @@ export default function CytoscapeComponent() {
             },
         ]);
 
-        graphContext.cytoscape.setInstance(cy);
-
         // Allows cypress to access cytoscape via window.cytoscape and read the graph state
+        // Also allows this cytoscape instance to be referenced across the application
         window.cytoscape = cy;
+
+        // react-hooks/exhaustive-deps
     }, [cytoscapeElement])
 
 
@@ -78,17 +75,17 @@ export default function CytoscapeComponent() {
      * Update elements when the graph updates
      */
     useEffect(() => {
-        if (!cytoscapeInstance) return;
-        cytoscapeInstance.elements().remove();// Remove elements
-        cytoscapeInstance.add(NewGraph.cytoscapeManager.getElements()); // Get new elements
-        cytoscapeInstance.style().resetToDefault(); // Reset style
-        cytoscapeInstance.style(NewGraph.cytoscapeManager.getStyle()).update(); // Update style
-    }, [cytoscapeInstance, NewGraph.getNodesCopy()]);
+        if (!window.cytoscape) return;
+        window.cytoscape.elements().remove();// Remove elements
+        window.cytoscape.add(NewGraph.cytoscapeManager.getElements()); // Get new elements
+        window.cytoscape.style().resetToDefault(); // Reset style
+        window.cytoscape.style(NewGraph.cytoscapeManager.getStyle()).update(); // Update style
+    }, [window.cytoscape, NewGraph.getNodesCopy()]);
 
     return (
         <div className="w-full h-full">
             <div className="flex justify-center">
-                <p className="absolute z-10 font-semibold">{graph.message}</p>
+                <p className="absolute z-10 font-semibold">{}</p>
             </div>
             <div id="cytoscape-instance" ref={cytoscapeElement} className="w-full h-full bg-white ring-2 ring-slate-300 rounded-md" />
         </div>

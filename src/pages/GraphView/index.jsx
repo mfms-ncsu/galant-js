@@ -102,7 +102,7 @@ export default function GraphView() {
 
 
             // We have to wait for cytoscape to read graph changes, and add graph. In the future, perhaps have a attribute in graph called 'autoFit' to inform cy to fit on loading of graph.
-            if (isInit && cytoscapeInstance) setTimeout(() => cytoscapeInstance.fit(), 75);
+            if (isInit && window.cytoscape) setTimeout(() => window.cytoscape.fit(), 75);
         }
 
         function onAlgorithmLoad(data) {
