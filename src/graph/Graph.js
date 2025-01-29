@@ -141,7 +141,7 @@ class Graph {
     #addMessage(message) {
         // Create a new message object
         // NOTE: currently doing nothing with this
-        const message = new Message(message);
+        const newMessage = new Message(message);
 
         // Return a new ChangeObject
         return new ChangeObject("message", null, {
