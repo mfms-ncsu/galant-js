@@ -105,8 +105,10 @@ class Graph {
         // Return a new change object
         return new ChangeObject('addNode', null, {
             id: nodeId,
-            x: x,
-            y: y
+            position: {
+                x: x,
+                y: y
+            }
         });
 
         // Get the smallest unused node id for automatic assigning
@@ -181,8 +183,7 @@ class Graph {
         // Create a ChangeObject for the deleted node
         changeObjects.push(new ChangeObject("deleteNode", {
             id: node.id,
-            x: node.position.x,
-            y: node.position.y,
+            position: node.position,
             attributes: JSON.stringify(node.attributes)
         }, null));
 
