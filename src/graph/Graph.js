@@ -44,6 +44,17 @@ class Graph {
     }
 
 
+
+    /**
+     * Used on the frontend to trigger useEffect whenever the graph changes.
+     * @returns A deep copy of the graph's nodes
+     */
+    getNodesCopy() {
+        return JSON.parse(JSON.stringify(this.#nodes));
+    }
+
+
+
     /**
      * Removes all nodes from the graph.
      */

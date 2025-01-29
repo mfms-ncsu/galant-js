@@ -1,4 +1,4 @@
-import { React, useEffect, useRef } from "react";
+import { React, useEffect, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
 import { useGraphContext } from "pages/GraphView/utils/GraphContext";
 import cytoscape from "cytoscape";
@@ -83,7 +83,7 @@ export default function CytoscapeComponent() {
         cytoscapeInstance.add(NewGraph.cytoscapeManager.getElements()); // Get new elements
         cytoscapeInstance.style().resetToDefault(); // Reset style
         cytoscapeInstance.style(NewGraph.cytoscapeManager.getStyle()).update(); // Update style
-    }, [cytoscapeInstance, graph, graphContext.preferences.style]);
+    }, [cytoscapeInstance, NewGraph.getNodesCopy()]);
 
     return (
         <div className="w-full h-full">
