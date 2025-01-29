@@ -160,8 +160,61 @@ class Graph {
         });
     }
 
-    #deleteNode(nodeId) {}
-    #deleteEdge(source, target) {}
+    /**
+     * Deletes a node and its incident edges from the graph. Creates ChangeObjects
+     * for each deletion in the step and returns them in an array.
+     * @param {String} nodeId ID of the node to delete
+     * @returns Array of ChangeObjects for the node and its incident edges
+     */
+    #deleteNode(nodeId) {
+        // Keep an array of ChangeObjects for the delete step
+        const changeObjects = [];
+
+        // Get a reference to the node
+        const node = this.#nodes.get(nodeId);
+
+        // Delete each edge and push the change objects into the array
+        node.edges.forEach(edge => {
+            changeObjects.push(this.#deleteEdge(edge.source, edge.target));
+        });
+
+        // Create a ChangeObject for the deleted node
+        changeObjects.push(new ChangeObject("deleteNode", {
+            id: node.id,
+            x: node.position.x,
+            y: node.position.y,
+            attributes: JSON.stringify(node.attributes)
+        }, null));
+
+        // Finally, delete the node from the nodes list
+        this.#nodes.delete(nodeId);
+
+        // Return the array of ChangeObjects
+        return changeObjects;
+    }
+
+    /**
+     * Deletes the specified edge and creates the appropriate ChangeObject.
+     * @param {String} source ID of the source node
+     * @param {String} target ID of the target node
+     * @returns ChangeObject representing the deleted edge
+     */
+    #deleteEdge(source, target) {
+        // Get a copy of the attributes
+        const attributes = this.#nodes.get(source).edges.get(`${source},${target}`).attributes;
+
+        // Delete the edge in the nodes
+        this.#nodes.get(source).edges.delete(`${source},${target}`);
+        this.#nodes.get(target).edges.delete(`${source},${target}`);
+
+        // Return a new ChangeObject
+        return new ChangeObject("deleteEdge", {
+            source: source,
+            target: target,
+            attributes: JSON.stringify(attributes)
+        }, null);
+    }
+
     #setNodePosition(nodeId, x, y) {}
     #setNodeAttribute(nodeId, name, value) {}
     #setEdgeAttribute(source, target, name, value) {}
