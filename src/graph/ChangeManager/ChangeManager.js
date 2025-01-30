@@ -39,8 +39,9 @@ export default class ChangeManager {
     
     /**
      * Adds a new node to the graph and records the change.
-     * @param {*} x x position of the node
-     * @param {*} y y position of the node
+     * @param {Number} x X-position of the node
+     * @param {Number} y Y-position of the node
+     * @returns New node id
      * @author Ziyu Wang
      */
     addNode(x, y) {
@@ -54,18 +55,44 @@ export default class ChangeManager {
 
     /**
      * Adds a new edge to the graph and records the change.
-     * @param {*} source Source node id
-     * @param {*} target Target node id
+     * @param {String} source Source node id
+     * @param {String} target Target node id
      * @author Ziyu Wang
      */
     addEdge(source, target) {
-        // Record the state before the change
+        // Record the change
         this.#recordChange([this.#graph.addEdge(source, target)]);
     }
 
-    addMessage(message) {}
-    deleteNode(nodeId) {}
-    deleteEdge(source, target) {}
+    /**
+     * Adds a new message and records the change.
+     * @param {String} message Message to record
+     */
+    addMessage(message) {
+        // Record the change
+        this.#recordChange([this.#graph.addMessage(message)]);
+    }
+
+    /**
+     * Deletes a node from the graph and records the changes.
+     * @param {String} nodeId Id of the node to delee
+     */
+    deleteNode(nodeId) {
+        // Record the change
+        // Note: since deleteNode already returns an array, don't need brackets
+        this.#recordChange(this.#graph.deleteNode(nodeId));
+    }
+
+    /**
+     * Deletes an edge from the graph and records the change.
+     * @param {String} source Source node id
+     * @param {String} target Target node id
+     */
+    deleteEdge(source, target) {
+        // Record the change
+        this.#recordChange(this.#graph.deleteEdge(source, target));
+    }
+
     setNodeAttribute(nodeId, name, value) {}
     setEdgeAttribute(source, target, name, value) {}
 
@@ -84,8 +111,12 @@ export default class ChangeManager {
     #recordChange(change) {
         // Remove all changes after the current index
         this.#changes = this.#changes.slice(0, this.#index);
+
+        // Push the new change
         this.#changes.push(change);
-        this.#index += 1;
+
+        // Increment the index
+        this.#index++;
     }
 
 }
