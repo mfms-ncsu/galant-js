@@ -14,6 +14,21 @@ export default class GraphElement {
         this.attributes = attributes;
     }
 
-    getAttribute(name) {}
-    setAttribute(name, value) {}
+    /**
+     * Gets the value of a given attribute.
+     * @param {String} name Name of the attribute
+     * @returns Value for the given attribute
+     */
+    getAttribute(name) {
+        return this.attributes.get(name);
+    }
+
+    /**
+     * Sets a new value for a given attribute.
+     * @param {String} name Name of the attribute
+     * @param {Object} value New attribute value
+     */
+    setAttribute(name, value) {
+        this.attributes.set(name, value);
+    }
 }
