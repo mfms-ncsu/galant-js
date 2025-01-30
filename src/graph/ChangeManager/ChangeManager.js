@@ -117,11 +117,34 @@ export default class ChangeManager {
     }
 
     /**
-     * Methods for traversing the existing ChangeObjects Should pass the appropriate 
-     * ChangeObject to undo/redoChange in the graph and update the index.
+     * Undoes the last change made to the graph
+     * @author Ziyu Wang
      */
-    undo() {}
-    redo() {}
+    undo() {
+        // Check if there are any changes to undo
+        if (this.#index > 0) {
+            // Get the previous change
+            const change = this.#changes[--this.#index];
+
+            // Undo the change
+            this.#graph.undoChange(change);
+        }
+    }
+
+    /**
+     * Redoes the last change that was undone
+     * @author Ziyu Wang
+     */
+    redo() {
+        // Check if there are any changes to redo
+        if (this.#index < this.#changes.length) {
+            // Get the next change
+            const change = this.#changes[++this.#index];
+
+            // Redo the change
+            this.#graph.redoChange(change);
+        }
+    }
 
     /**
      * Records a change and updates the index.
