@@ -53,6 +53,65 @@ export class Graph {
         return JSON.parse(JSON.stringify(this.#nodes));
     }
 
+    /**
+     * Gets the edge between a given source and a given target node.
+     * @param {String} source Source node id
+     * @param {String} target Target node id
+     * @returns Edge between source and target
+     */
+    getEdge(source, target) {
+        return this.#nodes.get(source).edges.get(`${source},${target}`);
+    }
+
+    /**
+     * Gets all edges into and out of the given node.
+     * @param {String} nodeId Node id
+     * @returns Array of all edges incident to nodeId
+     */
+    getAllEdges(nodeId) {
+        return [...this.#nodes.get(nodeId).edges.values()];
+    }
+
+    /**
+     * Gets all edges incoming to the given node.
+     * @param {String} target Target node id
+     * @returns Array of edges incoming to target
+     */
+    getIncomingEdges(target) {
+        // Keep an array of edges
+        const edges = [];
+
+        // Iterate over all edges
+        this.#nodes.get(target).edges.forEach(edge => {
+            // Only push if the given node is the target
+            if (edge.target === target) {
+                edges.push(edge);
+            }
+        });
+
+        return edges;
+    }
+
+    /**
+     * Gets all edges ougoing from the given node.
+     * @param {String} source Source node id
+     * @returns Array of edges outgoing from source
+     */
+    getOutgoingEdges(source) {
+        // Keep an array of edges
+        const edges = [];
+
+        // Iterate over all edges
+        this.#nodes.get(source).edges.forEach(edge => {
+            // Only push if the given node is the source
+            if (edge.source === source) {
+                edges.push(edge);
+            }
+        });
+
+        return edges;
+    }
+
 
 
     /**
