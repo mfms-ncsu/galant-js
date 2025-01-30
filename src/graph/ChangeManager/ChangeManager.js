@@ -90,11 +90,31 @@ export default class ChangeManager {
      */
     deleteEdge(source, target) {
         // Record the change
-        this.#recordChange(this.#graph.deleteEdge(source, target));
+        this.#recordChange([this.#graph.deleteEdge(source, target)]);
     }
 
-    setNodeAttribute(nodeId, name, value) {}
-    setEdgeAttribute(source, target, name, value) {}
+    /**
+     * Sets an attribute for a node and records the change.
+     * @param {String} nodeId Id of the node
+     * @param {String} name Name of the attribute
+     * @param {Object} value Value of the attribute
+     */
+    setNodeAttribute(nodeId, name, value) {
+        // Record the change
+        this.#recordChange([this.#graph.setNodeAttribute(nodeId, name, value)]);
+    }
+
+    /**
+     * Sets an attribute for an edge and records the change.
+     * @param {String} source Source node id
+     * @param {String} target Target node id
+     * @param {String} name Name of the attribute
+     * @param {Object} value Value of the attribute
+     */
+    setEdgeAttribute(source, target, name, value) {
+        // Record the change
+        this.#recordChange([this.#graph.setEdgeAttribute(source, target, name, value)]);
+    }
 
     /**
      * Methods for traversing the existing ChangeObjects Should pass the appropriate 
