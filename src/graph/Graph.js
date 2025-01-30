@@ -16,7 +16,7 @@ import Node from "./GraphElement/Node.js";
  * 
  * @author Henry Morris
  */
-class Graph {
+export class Graph {
     /** Map of nodes in the graph */
     #nodes;
     /** Scale */
@@ -318,8 +318,67 @@ class Graph {
         });
     }
 
-    #undoChange(change) {}
-    #redoChange(change) {}
+    /** Breifly implemented, debugging and polishing needed */
+    #undoChange(change) {
+        switch (change.type) {
+            case "addNode":
+                this.#nodes.delete(change.new.id);
+                break;
+            case "deleteNode":
+                this.#nodes.set(change.old.id, new Node(change.old.id, change.old.position.x, change.old.position.y));
+                break;
+            case "addEdge":
+                this.#nodes.get(change.new.source).edges.delete(`${change.new.source},${change.new.target}`);
+                this.#nodes.get(change.new.target).edges.delete(`${change.new.source},${change.new.target}`);
+                break;
+            case "deleteEdge":
+                this.#nodes.get(change.old.source).edges.set(`${change.old.source},${change.old.target}`, new Edge(change.old.source, change.old.target));
+                this.#nodes.get(change.old.target).edges.set(`${change.old.source},${change.old.target}`, new Edge(change.old.source, change.old.target));
+                break;
+            case "setNodePosition":
+                this.#nodes.get(change.old.id).position = change.old.position;
+                break;
+            case "setNodeAttribute":
+                this.#nodes.get(change.old.id).attributes.set(change.old.attribute.name, change.old.attribute.value);
+                break;
+            case "setEdgeAttribute":
+                this.#nodes.get(change.old.source).edges.get(`${change.old.source},${change.old.target}`).attributes.set(change.old.attribute.name, change.old.attribute.value);
+                break;
+            default:
+                break;
+        }
+    }
+    
+    /** Breifly implemented, debugging and polishing needed */
+    #redoChange(change) {
+        switch (change.type) {
+            case "addNode":
+                this.#nodes.set(change.new.id, new Node(change.new.id, change.new.position.x, change.new.position.y));
+                break;
+            case "deleteNode":
+                this.#nodes.delete(change.old.id);
+                break;
+            case "addEdge":
+                this.#nodes.get(change.new.source).edges.set(`${change.new.source},${change.new.target}`, new Edge(change.new.source, change.new.target));
+                this.#nodes.get(change.new.target).edges.set(`${change.new.source},${change.new.target}`, new Edge(change.new.source, change.new.target));
+                break;
+            case "deleteEdge":
+                this.#nodes.get(change.old.source).edges.delete(`${change.old.source},${change.old.target}`);
+                this.#nodes.get(change.old.target).edges.delete(`${change.old.source},${change.old.target}`);
+                break;
+            case "setNodePosition":
+                this.#nodes.get(change.new.id).position = change.new.position;
+                break;
+            case "setNodeAttribute":
+                this.#nodes.get(change.new.id).attributes.set(change.new.attribute.name, change.new.attribute.value);
+                break;
+            case "setEdgeAttribute":
+                this.#nodes.get(change.new.source).edges.get(`${change.new.source},${change.new.target}`).attributes.set(change.new.attribute.name, change.new.attribute.value);
+                break;
+            default:
+                break;
+        }
+    }
 
     /**
      * Private object containing all private methods for passing into file parser
