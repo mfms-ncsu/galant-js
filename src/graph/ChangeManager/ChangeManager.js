@@ -139,7 +139,7 @@ export default class ChangeManager {
         // Check if there are any changes to redo
         if (this.#index < this.#changes.length) {
             // Get the next change
-            const change = this.#changes[++this.#index];
+            const change = this.#changes[this.#index++];
 
             // Redo the change
             this.#graph.redoChange(change);
