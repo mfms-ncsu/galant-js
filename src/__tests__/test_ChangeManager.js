@@ -2,12 +2,6 @@ import { Graph } from "graph/Graph";
 import Edge from "graph/GraphElement/Edge";
 import ChangeManager from "graph/ChangeManager/ChangeManager";
 
-// TODO: Test with invalid inputs, whenever we decide what those should
-//       be
-
-// TODO: When the implementation of the ChangeManager is complete, add
-//       more tests to ensure branch coverage is good.
-
 /**
  * Test file for the ChangeManager class.
  *
@@ -17,9 +11,6 @@ describe("ChangeManager tests", () => {
     
     /** Graph with no edges or nodes for testing */
     let graph;
-
-    // TODO: Try with different graphs? Maybe a directed graph
-    //       or one loaded from a file?
 
     /** Sets up Graph objects before each test */
     beforeEach(() => {
@@ -63,7 +54,6 @@ describe("ChangeManager tests", () => {
 
         // Add an edge between the two nodes
         graph.userChangeManager.addEdge(node1, node2);
-        graph.userChangeManager.addEdge(node1, node2);
 
         // Make sure the edge between the two nodes exists
         let edge = graph.getEdge(node1, node2);
@@ -73,19 +63,7 @@ describe("ChangeManager tests", () => {
         expect(edge).toBeInstanceOf(Edge);
         expect(edge.source).toBe(node1);
         expect(edge.target).toBe(node2);
-    });
-    
-    /** 
-     * Test the addMessage method
-     */
-    test("Testing ChangeManager.addMessage", () => {
-        let message = graph.addMessage("Displayed message");
-
-        // TODO: ???
-        // I don't really know how to test that this call was a
-        // successful. There's no getMessage() function in
-        // ChangeManager or Graph.
-    });
+    }); 
     
     /** 
      * Test the deleteNode method
@@ -114,11 +92,14 @@ describe("ChangeManager tests", () => {
         // Remove node1
         graph.userChangeManager.deleteNode(node1);
 
-        // All calls to getEdge() should fail now
-
-        // TODO: Finish this method when we have implemented getEdge.
-        //       Right now, I'm not sure if this should throw an error,
-        //       return some kind of null value, or do something else.
+        // Test that the associated edges of the node are removed
+        expect(graph.getEdge(node1, node2)).toBeUndefined();
+        expect(graph.getEdge(node1, node3)).toBeUndefined();
+        expect(graph.getEdge(node1, node4)).toBeUndefined();
+ 
+        // We should no longer allow the node to be used in making edges
+        expect(graph.userChangeManager.addEdge(node1, node2)).toThrow();
+        expect(graph.userChangeManager.addEdge(node2, node1)).toThrow();
     });
     
     /** 
@@ -140,7 +121,14 @@ describe("ChangeManager tests", () => {
         graph.userChangeManager.addEdge(node2, node4);
         graph.userChangeManager.addEdge(node3, node4);
 
-        // 
+        // Make sure the edge was created properly
+        expect(graph.getEdge(node1, node2)).toBeInstanceOf(Edge);
+
+        // Delete one of the edges, then make sure it does not exist anymore
+        graph.userChangeManager.deleteEdge(node1, node2);
+
+        expect(graph.getEdge(node1, node2)).toBeUndefined();
+
     });
     
     /** 
@@ -208,23 +196,31 @@ describe("ChangeManager tests", () => {
         graph.userChangeManager.undo();
 
         expect(graph.getEdge(node1, node2)).toBeInstanceOf(Edge);
-        // TODO: Check that the attribute has been removed. I'm not sure
-        //       if calling getAttribute is supposed to throw an error
-        //       or return a null value if there is no attribute with
-        //       the given name
+        expect(graph.getEdge(node1, node2).getAttribute("color")).toBeUndefined();
 
         // Call undo again, the edge should be removed
         graph.userChangeManager.undo();
+        
+        // Make sure the edge is no longer there
+        expect(graph.getEdge(node1, node2)).toBeUndefined(); 
 
-        // TODO: Check that the edge was removed. Again, not sure what
-        //       the expected behavior should be yet.
+        // Undo both of the nodes
+        graph.userChangeManager.undo();
+        graph.userChangeManager.undo();
 
+        // Now that the graph is empty, calling undo() again should have no effect
+        graph.userChangeManager.undo();
+
+        // Redo both nodes
+        graph.userChangeManager.redo();
+        graph.userChangeManager.redo();
+            
         // Redo the edge
         graph.userChangeManager.redo();
 
         // The edge should be back, but with no attribute
         expect(graph.getEdge(node1, node2)).toBeInstanceOf(Edge);
-        // TODO: Check that the edge has no attribute.
+        expect(graph.getEdge(node1, node2).getAttribute("color")).toBeUndefined();
 
         // Redo the attribute
         graph.userChangeManager.redo();
@@ -232,6 +228,9 @@ describe("ChangeManager tests", () => {
         // Make sure that the edge has it's attribute back
         expect(graph.getEdge(node1, node2).getAttribute("color"))
             .toBe("red");
+
+        // Calling redo now should have no effect, but should not throw any error
+        graph.userChangeManager.redo();
 
     });
 });
