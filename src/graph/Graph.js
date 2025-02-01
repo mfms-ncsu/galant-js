@@ -502,66 +502,79 @@ export class Graph {
         });
     }
 
-    /** Breifly implemented, debugging and polishing needed */
-    #undoChange(change) {
-        switch (change.type) {
-            case "addNode":
-                this.#nodes.delete(change.currrent.id);
-                break;
-            case "deleteNode":
-                this.#nodes.set(change.previous.id, new Node(change.previous.id, change.previous.position.x, change.previous.position.y));
-                break;
-            case "addEdge":
-                this.#nodes.get(change.currrent.source).edges.delete(`${change.currrent.source},${change.currrent.target}`);
-                this.#nodes.get(change.currrent.target).edges.delete(`${change.currrent.source},${change.currrent.target}`);
-                break;
-            case "deleteEdge":
-                this.#nodes.get(change.previous.source).edges.set(`${change.previous.source},${change.previous.target}`, new Edge(change.previous.source, change.previous.target));
-                this.#nodes.get(change.previous.target).edges.set(`${change.previous.source},${change.previous.target}`, new Edge(change.previous.source, change.previous.target));
-                break;
-            case "setNodePosition":
-                this.#nodes.get(change.previous.id).position = change.previous.position;
-                break;
-            case "setNodeAttribute":
-                this.#nodes.get(change.previous.id).attributes.set(change.previous.attribute.name, change.previous.attribute.value);
-                break;
-            case "setEdgeAttribute":
-                this.#nodes.get(change.previous.source).edges.get(`${change.previous.source},${change.previous.target}`).attributes.set(change.previous.attribute.name, change.previous.attribute.value);
-                break;
-            default:
-                break;
-        }
+    /**
+     * Undoes the ChangeObjects in a given step
+     * @param {Array[ChangeObject]} changes Array of ChangeObjects in the step
+     */
+    #undoStep(changes) {
+        // Reverse the changes to go through them backwards
+        changes = changes.toReversed();
+
+        changes.forEach(change => {
+            switch (change.action) {
+                case "addNode":
+                    this.#nodes.delete(change.current.id);
+                    break;
+                case "deleteNode":
+                    this.#nodes.set(change.previous.id, new Node(change.previous.id, change.previous.position.x, change.previous.position.y));
+                    break;
+                case "addEdge":
+                    this.#nodes.get(change.current.source).edges.delete(`${change.current.source},${change.current.target}`);
+                    this.#nodes.get(change.current.target).edges.delete(`${change.current.source},${change.current.target}`);
+                    break;
+                case "deleteEdge":
+                    this.#nodes.get(change.previous.source).edges.set(`${change.previous.source},${change.previous.target}`, new Edge(change.previous.source, change.previous.target));
+                    this.#nodes.get(change.previous.target).edges.set(`${change.previous.source},${change.previous.target}`, new Edge(change.previous.source, change.previous.target));
+                    break;
+                case "setNodePosition":
+                    this.#nodes.get(change.previous.id).position = change.previous.position;
+                    break;
+                case "setNodeAttribute":
+                    this.#nodes.get(change.previous.id).attributes.set(change.previous.attribute.name, change.previous.attribute.value);
+                    break;
+                case "setEdgeAttribute":
+                    this.#nodes.get(change.previous.source).edges.get(`${change.previous.source},${change.previous.target}`).attributes.set(change.previous.attribute.name, change.previous.attribute.value);
+                    break;
+                default:
+                    break;
+            }
+        });
     }
     
-    /** Breifly implemented, debugging and polishing needed */
-    #redoChange(change) {
-        switch (change.type) {
-            case "addNode":
-                this.#nodes.set(change.currrent.id, new Node(change.currrent.id, change.currrent.position.x, change.currrent.position.y));
-                break;
-            case "deleteNode":
-                this.#nodes.delete(change.previous.id);
-                break;
-            case "addEdge":
-                this.#nodes.get(change.currrent.source).edges.set(`${change.currrent.source},${change.currrent.target}`, new Edge(change.currrent.source, change.currrent.target));
-                this.#nodes.get(change.currrent.target).edges.set(`${change.currrent.source},${change.currrent.target}`, new Edge(change.currrent.source, change.currrent.target));
-                break;
-            case "deleteEdge":
-                this.#nodes.get(change.previous.source).edges.delete(`${change.previous.source},${change.previous.target}`);
-                this.#nodes.get(change.previous.target).edges.delete(`${change.previous.source},${change.previous.target}`);
-                break;
-            case "setNodePosition":
-                this.#nodes.get(change.currrent.id).position = change.currrent.position;
-                break;
-            case "setNodeAttribute":
-                this.#nodes.get(change.currrent.id).attributes.set(change.currrent.attribute.name, change.currrent.attribute.value);
-                break;
-            case "setEdgeAttribute":
-                this.#nodes.get(change.currrent.source).edges.get(`${change.currrent.source},${change.currrent.target}`).attributes.set(change.currrent.attribute.name, change.currrent.attribute.value);
-                break;
-            default:
-                break;
-        }
+    /**
+     * Redoes the ChangeObjects in a given step
+     * @param {Array[ChangeObject]} changes Array of ChangeObjects in the step
+     */
+    #redoStep(changes) {
+        changes.forEach(change => {
+            switch (change.action) {
+                case "addNode":
+                    this.#nodes.set(change.current.id, new Node(change.current.id, change.current.position.x, change.current.position.y));
+                    break;
+                case "deleteNode":
+                    this.#nodes.delete(change.previous.id);
+                    break;
+                case "addEdge":
+                    this.#nodes.get(change.current.source).edges.set(`${change.current.source},${change.current.target}`, new Edge(change.current.source, change.current.target));
+                    this.#nodes.get(change.current.target).edges.set(`${change.current.source},${change.current.target}`, new Edge(change.current.source, change.current.target));
+                    break;
+                case "deleteEdge":
+                    this.#nodes.get(change.previous.source).edges.delete(`${change.previous.source},${change.previous.target}`);
+                    this.#nodes.get(change.previous.target).edges.delete(`${change.previous.source},${change.previous.target}`);
+                    break;
+                case "setNodePosition":
+                    this.#nodes.get(change.current.id).position = change.current.position;
+                    break;
+                case "setNodeAttribute":
+                    this.#nodes.get(change.current.id).attributes.set(change.current.attribute.name, change.current.attribute.value);
+                    break;
+                case "setEdgeAttribute":
+                    this.#nodes.get(change.current.source).edges.get(`${change.current.source},${change.current.target}`).attributes.set(change.current.attribute.name, change.current.attribute.value);
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
     /**
@@ -581,8 +594,8 @@ export class Graph {
         setNodePosition: this.#setNodePosition,
         setNodeAttribute: this.#setNodeAttribute,
         setEdgeAttribute: this.#setEdgeAttribute,
-        undoChange: this.#undoChange,
-        redoChange: this.#redoChange,
+        undoStep: this.#undoStep,
+        redoStep: this.#redoStep,
     }
 }
 

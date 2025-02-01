@@ -123,11 +123,11 @@ export default class ChangeManager {
     undo() {
         // Check if there are any changes to undo
         if (this.#index > 0) {
-            // Get the previous change
-            const change = this.#changes[--this.#index];
+            // Get the previous step
+            const step = this.#changes[--this.#index];
 
             // Undo the change
-            this.#graph.undoChange(change);
+            this.#graph.undoStep(step);
         }
     }
 
@@ -138,11 +138,11 @@ export default class ChangeManager {
     redo() {
         // Check if there are any changes to redo
         if (this.#index < this.#changes.length) {
-            // Get the next change
-            const change = this.#changes[this.#index++];
+            // Get the next step
+            const step = this.#changes[this.#index++];
 
             // Redo the change
-            this.#graph.redoChange(change);
+            this.#graph.redoStep(step);
         }
     }
 
