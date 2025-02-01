@@ -57,27 +57,46 @@ export class Graph {
      * Gets the edge between a given source and a given target node.
      * @param {String} source Source node id
      * @param {String} target Target node id
-     * @returns Edge between source and target
+     * @returns Edge between source and target, undefined if it doesn't exist
      */
     getEdge(source, target) {
-        return this.#nodes.get(source).edges.get(`${source},${target}`);
+        // Check if the source node exists
+        if (this.#nodes.has(source)) {
+            // If it does, try to get the edge from source to target
+            return this.#nodes.get(source).edges.get(`${source},${target}`);
+        } else {
+            // If the source node doesn't exist, return undefined
+            return undefined;
+        }
     }
 
     /**
      * Gets all edges into and out of the given node.
      * @param {String} nodeId Node id
-     * @returns Array of all edges incident to nodeId
+     * @returns Array of all edges incident to nodeId, undefined if nodeId doesn't exist
      */
     getAllEdges(nodeId) {
-        return [...this.#nodes.get(nodeId).edges.values()];
+        // Check if the node exists
+        if (this.#nodes.has(nodeId)) {
+            // If it does, return an array of all of its edges
+            return [...this.#nodes.get(nodeId).edges.values()];
+        } else {
+            // If the node doesn't exist, return undefined
+            return undefined;
+        }
     }
 
     /**
      * Gets all edges incoming to the given node.
      * @param {String} target Target node id
-     * @returns Array of edges incoming to target
+     * @returns Array of edges incoming to target, undefined if the target doesn't exist
      */
     getIncomingEdges(target) {
+        // Return undefined if the node doesn't exist
+        if (!this.#nodes.has(target)) {
+            return undefined;
+        }
+
         // Keep an array of edges
         const edges = [];
 
@@ -95,9 +114,14 @@ export class Graph {
     /**
      * Gets all edges ougoing from the given node.
      * @param {String} source Source node id
-     * @returns Array of edges outgoing from source
+     * @returns Array of edges outgoing from source, undefined if source doesn't exist
      */
     getOutgoingEdges(source) {
+        // Return undefined if the node doesn't exist
+        if (!this.#nodes.has(source)) {
+            return undefined;
+        }
+
         // Keep an array of edges
         const edges = [];
 
@@ -147,8 +171,14 @@ export class Graph {
      * @param {String} nodeId Optional argument for setting a predetermined 
      * @param {Object} attributes Initial attributes of the node
      * @returns ChangeObject representing adding a node
+     * @throws Error if nodeId already exists in nodes
      */
     #addNode(x, y, nodeId, attributes) {
+        // Throw an error if the id is a duplicate
+        if (nodeId && this.#nodes.has(nodeId)) {
+            throw "Cannot add node with duplicate ID";
+        }
+
         // If the nodeId argument is passed, use that, otherwise generate an id
         nodeId = nodeId || generateId(this.#nodes);
 
@@ -184,8 +214,14 @@ export class Graph {
      * @param {String} target Target node id
      * @param {Object} attributes Initial attributes of the edge
      * @returns ChangeObject representing adding an edge
+     * @throws Error if either source or target do not exist in nodes
      */
     #addEdge(source, target, attributes) {
+        // Check if both source and target exist, throw an error if not
+        if (!(this.#nodes.has(source) && this.#nodes.has(target))) {
+            throw "Source and target nodes must exist";
+        }
+
         // Create the edge object
         let edge = new Edge(source, target);
 
