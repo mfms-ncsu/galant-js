@@ -136,6 +136,45 @@ export class Graph {
         return edges;
     }
 
+    /**
+     * Gets an attribute value for a given node.
+     * @param {String} nodeId Node id
+     * @param {String} name Attribute name
+     * @returns Attribute value
+     */
+    getNodeAttribute(nodeId, name) {
+        // Get the node
+        let node = this.#nodes.get(nodeId);
+
+        if (node) {
+            return node.getAttribute(name);
+        } else {
+            // If the node doesn't exist, return undefined
+            return undefined;
+        }
+    }
+
+    /**
+     * Gets an attribute value for a given edge.
+     * @param {String} source Source node id
+     * @param {String} target Target node id
+     * @param {String} name Attribute name
+     * @returns Attribute value
+     */
+    getEdgeAttribute(source, target, name) {
+        // Verify the edge exists and get it
+        let sourceNode = this.#nodes.get(source);
+        let targetNode = this.#nodes.get(target);
+        let edge = sourceNode && targetNode && sourceNode.edges.get(`${source},${target}`);
+
+        if (edge) {
+            return edge.getAttribute(name);
+        } else {
+            // If the edge doesn't exist, return undefined
+            return undefined;
+        }
+    }
+
 
 
     /**
@@ -467,27 +506,27 @@ export class Graph {
     #undoChange(change) {
         switch (change.type) {
             case "addNode":
-                this.#nodes.delete(change.new.id);
+                this.#nodes.delete(change.currrent.id);
                 break;
             case "deleteNode":
-                this.#nodes.set(change.old.id, new Node(change.old.id, change.old.position.x, change.old.position.y));
+                this.#nodes.set(change.previous.id, new Node(change.previous.id, change.previous.position.x, change.previous.position.y));
                 break;
             case "addEdge":
-                this.#nodes.get(change.new.source).edges.delete(`${change.new.source},${change.new.target}`);
-                this.#nodes.get(change.new.target).edges.delete(`${change.new.source},${change.new.target}`);
+                this.#nodes.get(change.currrent.source).edges.delete(`${change.currrent.source},${change.currrent.target}`);
+                this.#nodes.get(change.currrent.target).edges.delete(`${change.currrent.source},${change.currrent.target}`);
                 break;
             case "deleteEdge":
-                this.#nodes.get(change.old.source).edges.set(`${change.old.source},${change.old.target}`, new Edge(change.old.source, change.old.target));
-                this.#nodes.get(change.old.target).edges.set(`${change.old.source},${change.old.target}`, new Edge(change.old.source, change.old.target));
+                this.#nodes.get(change.previous.source).edges.set(`${change.previous.source},${change.previous.target}`, new Edge(change.previous.source, change.previous.target));
+                this.#nodes.get(change.previous.target).edges.set(`${change.previous.source},${change.previous.target}`, new Edge(change.previous.source, change.previous.target));
                 break;
             case "setNodePosition":
-                this.#nodes.get(change.old.id).position = change.old.position;
+                this.#nodes.get(change.previous.id).position = change.previous.position;
                 break;
             case "setNodeAttribute":
-                this.#nodes.get(change.old.id).attributes.set(change.old.attribute.name, change.old.attribute.value);
+                this.#nodes.get(change.previous.id).attributes.set(change.previous.attribute.name, change.previous.attribute.value);
                 break;
             case "setEdgeAttribute":
-                this.#nodes.get(change.old.source).edges.get(`${change.old.source},${change.old.target}`).attributes.set(change.old.attribute.name, change.old.attribute.value);
+                this.#nodes.get(change.previous.source).edges.get(`${change.previous.source},${change.previous.target}`).attributes.set(change.previous.attribute.name, change.previous.attribute.value);
                 break;
             default:
                 break;
@@ -498,27 +537,27 @@ export class Graph {
     #redoChange(change) {
         switch (change.type) {
             case "addNode":
-                this.#nodes.set(change.new.id, new Node(change.new.id, change.new.position.x, change.new.position.y));
+                this.#nodes.set(change.currrent.id, new Node(change.currrent.id, change.currrent.position.x, change.currrent.position.y));
                 break;
             case "deleteNode":
-                this.#nodes.delete(change.old.id);
+                this.#nodes.delete(change.previous.id);
                 break;
             case "addEdge":
-                this.#nodes.get(change.new.source).edges.set(`${change.new.source},${change.new.target}`, new Edge(change.new.source, change.new.target));
-                this.#nodes.get(change.new.target).edges.set(`${change.new.source},${change.new.target}`, new Edge(change.new.source, change.new.target));
+                this.#nodes.get(change.currrent.source).edges.set(`${change.currrent.source},${change.currrent.target}`, new Edge(change.currrent.source, change.currrent.target));
+                this.#nodes.get(change.currrent.target).edges.set(`${change.currrent.source},${change.currrent.target}`, new Edge(change.currrent.source, change.currrent.target));
                 break;
             case "deleteEdge":
-                this.#nodes.get(change.old.source).edges.delete(`${change.old.source},${change.old.target}`);
-                this.#nodes.get(change.old.target).edges.delete(`${change.old.source},${change.old.target}`);
+                this.#nodes.get(change.previous.source).edges.delete(`${change.previous.source},${change.previous.target}`);
+                this.#nodes.get(change.previous.target).edges.delete(`${change.previous.source},${change.previous.target}`);
                 break;
             case "setNodePosition":
-                this.#nodes.get(change.new.id).position = change.new.position;
+                this.#nodes.get(change.currrent.id).position = change.currrent.position;
                 break;
             case "setNodeAttribute":
-                this.#nodes.get(change.new.id).attributes.set(change.new.attribute.name, change.new.attribute.value);
+                this.#nodes.get(change.currrent.id).attributes.set(change.currrent.attribute.name, change.currrent.attribute.value);
                 break;
             case "setEdgeAttribute":
-                this.#nodes.get(change.new.source).edges.get(`${change.new.source},${change.new.target}`).attributes.set(change.new.attribute.name, change.new.attribute.value);
+                this.#nodes.get(change.currrent.source).edges.get(`${change.currrent.source},${change.currrent.target}`).attributes.set(change.currrent.attribute.name, change.currrent.attribute.value);
                 break;
             default:
                 break;
