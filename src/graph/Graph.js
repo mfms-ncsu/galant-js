@@ -217,10 +217,9 @@ export class Graph {
      * @throws Error if either source or target do not exist in nodes
      */
     #addEdge(source, target, attributes) {
-        // Check if both source and target exist, throw an error if not
-        if (!(this.#nodes.has(source) && this.#nodes.has(target))) {
-            throw "Source and target nodes must exist";
-        }
+        
+        // Error checking
+        this.#verifyNodes(source, target, "create edge");
 
         // Create the edge object
         let edge = new Edge(source, target);
@@ -264,6 +263,11 @@ export class Graph {
      * @returns Array of ChangeObjects for the node and its incident edges
      */
     #deleteNode(nodeId) {
+        
+        // Error checking
+        if (!this.#nodes.has(nodeId)) {
+            throw "Cannot delete node " + nodeId + " because it does not exist in the graph";
+        }
         // Keep an array of ChangeObjects for the delete step
         const changeObjects = [];
 
@@ -290,12 +294,44 @@ export class Graph {
     }
 
     /**
+     * Verifies that the nodes source and target exist. If they do not both exist,
+     * an exception with a detailed error message is thrown.
+     *
+     * @param {String} source the first node to check
+     * @param {String} target the second node to check
+     * @param {String} action the action to show in the error message. For example,
+     *                        if you are trying to add an edge, this string should
+     *                        be "add an edge", so that the exception message will
+     *                        be shown as "Cannot add an edge because ..."
+     * @throws exception if either the source or target nodes do not exist
+     */
+    #verifyNodes(source, target, action) {
+        // Error checking
+        if (!this.#nodes.has(source) && !this.#nodes.has(target)) {
+            throw "Cannot " + action + " because neither the source (" + source + ") nor the" +
+                  " target (" + target + ") node exist in the graph";
+        }
+        if (!this.#nodes.has(source)) {
+            throw "Cannot " + action + " because the source node (" + source + ")" +
+                  " does not exist in the graph";
+        }
+        if (!this.#nodes.has(target)) {
+            throw "Cannot " + action + " because the target node (" + target + ")" +
+                  " does not exist in the graph";
+        }
+    }
+
+    /**
      * Deletes the specified edge and creates the appropriate ChangeObject.
      * @param {String} source ID of the source node
      * @param {String} target ID of the target node
      * @returns ChangeObject representing the deleted edge
      */
     #deleteEdge(source, target) {
+        
+        // Error checking
+        this.#verifyNodes(source, target, "delete edge");
+
         // Get a copy of the attributes
         const attributes = this.#nodes.get(source).edges.get(`${source},${target}`).attributes;
 
@@ -319,6 +355,11 @@ export class Graph {
      * @returns ChangeObject representing the move
      */
     #setNodePosition(nodeId, x, y) {
+
+        // Error checking
+        if (!this.#nodes.has(nodeId)) {
+            throw "Cannot set position of node " + nodeId + " because it does not exist in the graph"
+        }
         // Get a reference to the node
         const node = this.#nodes.get(nodeId);
 
@@ -351,6 +392,11 @@ export class Graph {
      * @returns A ChangeObject representing the attribute change
      */
     #setNodeAttribute(nodeId, name, value) {
+
+        if (!this.#nodes.has(nodeId)) {
+            throw "Cannot set attribute of node " + nodeId + " because the node does not exist in the graph"
+        }
+
         // Get a reference to the node
         const node = this.#nodes.get(nodeId);
 
@@ -386,6 +432,10 @@ export class Graph {
      * @returns A ChangeObject representing the attribute change
      */
     #setEdgeAttribute(source, target, name, value) {
+        
+        // Error checking
+        this.#verifyNodes(source, target, "set attribute of edge");
+
         // Get a reference to the edge
         const edge = this.#nodes.get(source).edges.get(`${source},${target}`);
 

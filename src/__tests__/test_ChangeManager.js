@@ -65,8 +65,15 @@ describe("ChangeManager tests", () => {
         expect(edge.target).toBe(node2);
 
         // Make sure that we cannot add edges between nodes that do not exist
-        expect(graph.addEdge(node1, "bad input")).toThrow();
-        expect(graph.addEdge("bad input", node1)).toThrow();
+        expect( () => {
+            graph.userChangeManager.addEdge(node1, "bad input");
+        }).toThrow();
+        expect( () => {
+            graph.userChangeManager.addEdge("bad input", node1);
+        }).toThrow();
+        expect( () => {
+            graph.userChangeManager.addEdge("bad input", "bad input");
+        }).toThrow();
     }); 
     
     /** 
@@ -102,8 +109,12 @@ describe("ChangeManager tests", () => {
         expect(graph.getEdge(node2, node4)).toBeUndefined();
  
         // We should no longer allow the node to be used in making edges
-        expect(graph.userChangeManager.addEdge(node1, node2)).toThrow();
-        expect(graph.userChangeManager.addEdge(node2, node1)).toThrow();
+        expect( () => {
+            graph.userChangeManager.addEdge(node1, node2);
+        }).toThrow();
+        expect( () => {
+            graph.userChangeManager.addEdge(node2, node1);
+        }).toThrow();
 
         // Any adjacency lists containing the edge should be updated
         let incoming = graph.getIncomingEdges(node3);
