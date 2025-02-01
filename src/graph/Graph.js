@@ -176,7 +176,7 @@ export class Graph {
     #addNode(x, y, nodeId, attributes) {
         // Throw an error if the id is a duplicate
         if (nodeId && this.#nodes.has(nodeId)) {
-            throw "Cannot add node with duplicate ID";
+            throw new Error("Cannot add node with duplicate ID");
         }
 
         // If the nodeId argument is passed, use that, otherwise generate an id
@@ -188,7 +188,7 @@ export class Graph {
 
         // Set the attributes
         for (let name in attributes) {
-            node.attributes.has(name) && node.attributes.set(name, attributes[name]);
+            node.attributes.set(name, attributes[name]);
         }
 
         // Return a new change object
@@ -226,7 +226,7 @@ export class Graph {
 
         // Set the attributes
         for (let name in attributes) {
-            edge.attributes.has(name) && edge.attributes.set(name, attributes[name]);
+            edge.attributes.set(name, attributes[name]);
         }
 
         // Add the edge to both the source and target's adjacency lists
@@ -266,7 +266,7 @@ export class Graph {
         
         // Error checking
         if (!this.#nodes.has(nodeId)) {
-            throw "Cannot delete node " + nodeId + " because it does not exist in the graph";
+            throw new Error("Cannot delete node " + nodeId + " because it does not exist in the graph");
         }
         // Keep an array of ChangeObjects for the delete step
         const changeObjects = [];
@@ -308,16 +308,16 @@ export class Graph {
     #verifyNodes(source, target, action) {
         // Error checking
         if (!this.#nodes.has(source) && !this.#nodes.has(target)) {
-            throw "Cannot " + action + " because neither the source (" + source + ") nor the" +
-                  " target (" + target + ") node exist in the graph";
+            throw new Error("Cannot " + action + " because neither the source (" + source + ") nor the" + 
+                  " target (" + target + ") node exist in the graph");
         }
         if (!this.#nodes.has(source)) {
-            throw "Cannot " + action + " because the source node (" + source + ")" +
-                  " does not exist in the graph";
+            throw new Error("Cannot " + action + " because the source node (" + source + ")" +
+                  " does not exist in the graph");
         }
         if (!this.#nodes.has(target)) {
-            throw "Cannot " + action + " because the target node (" + target + ")" +
-                  " does not exist in the graph";
+            throw new Error("Cannot " + action + " because the target node (" + target + ")" +
+                  " does not exist in the graph");
         }
     }
 
@@ -358,7 +358,7 @@ export class Graph {
 
         // Error checking
         if (!this.#nodes.has(nodeId)) {
-            throw "Cannot set position of node " + nodeId + " because it does not exist in the graph"
+            throw new Error("Cannot set position of node " + nodeId + " because it does not exist in the graph");
         }
         // Get a reference to the node
         const node = this.#nodes.get(nodeId);
@@ -394,7 +394,7 @@ export class Graph {
     #setNodeAttribute(nodeId, name, value) {
 
         if (!this.#nodes.has(nodeId)) {
-            throw "Cannot set attribute of node " + nodeId + " because the node does not exist in the graph"
+            throw new Error("Cannot set attribute of node " + nodeId + " because the node does not exist in the graph");
         }
 
         // Get a reference to the node

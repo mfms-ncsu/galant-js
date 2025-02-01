@@ -1,4 +1,5 @@
-import Graph from "graph/Graph";
+import  { Graph } from "graph/Graph";
+import Edge from "graph/GraphElement/Edge";
 
 /**
  * Test methods for the FileParser, which is responsible
@@ -7,13 +8,59 @@ import Graph from "graph/Graph";
  * @author Krisjian Smith
  */
 describe("FileParser tests", () => {
+    
+    /** Graph object used in each test */
+    let graph;
+    
+    /** Sets up Graph objects before each test */
+    beforeEach(() => {
         
+        graph = new Graph();
+
+    });
+
     /**
      * Test reading in a few valid files
      */
-    test("Testing FileParser with a valid file", () => {
+    test("Testing FileParser with valid files", () => {
         
-        // TODO: This method
+        // Load a test graph. This is a graph that I made that should test just about
+        // everything. It has arbitrary node ids, arbitrary weights and values, and some
+        // edges have weights and some don't
+        let graphText = "n 0 0 0 1 color:red shape:star highlighted:yes\n" +
+            "n 1 1 0 color:black\n" +
+            "n abc 1 1\n" +
+            "n n 0 1 -1\n" +
+            "n 2 -1 -1 -5\n" +
+            "n -1 100 -1000 -754\n" +
+            "e 0 1 2 bold:true\n" +
+            "e 1 abc squiggly:true\n" +
+            "e n -1 -4\n";
+        graph.fileParser.loadGraph(graphText);
+ 
+        // TODO: Finish this test when we can retrieve node attributes and coordinates. As of yet,
+        //       there is no way to know if the graph is successfully reading the node's attributes
+        //       or coordinates.
+        
+        // Check that each edge was created
+        expect(graph.getEdge("0", "1")).toBeInstanceOf(Edge);
+        expect(graph.getEdge("1", "abc")).toBeInstanceOf(Edge);
+        expect(graph.getEdge("n", "-1")).toBeInstanceOf(Edge);
+        
+        // Check that the edges have the appropriate attributes
+        expect(graph.getEdge("0", "1").getAttribute("bold")).toBe("true");
+        expect(graph.getEdge("1", "abc").getAttribute("squiggly")).toBe("true");
+        expect(graph.getEdge("n", "-1").getAttribute("weight")).toBe(-4);
+
+        // TODO: Check the node weights
+
+        // TODO: Check the node attributes
+        
+        // TODO: Check the node coordinates
+
+        // TODO: Check that node with id=2 was successfully created. Since it has no edges,
+        //       there is currently no way to tell if it exists.
+
     });
     
     /**
@@ -21,7 +68,72 @@ describe("FileParser tests", () => {
      */
     test("Testing FileParser with invalid files", () => {
         
-        // TODO: This method
+        // Testing with incomplete lines
+        expect( () => {
+            let graphText = "n";
+            graph.fileParser.loadGraph(graphText);
+        }).toThrow();
+        expect( () => {
+            let graphText = "n 0";
+            graph.fileParser.loadGraph(graphText);
+        }).toThrow();
+        expect( () => {
+            let graphText = "n 0 0";
+            graph.fileParser.loadGraph(graphText);
+        }).toThrow();
+        expect( () => {
+            let graphText = "e";
+            graph.fileParser.loadGraph(graphText);
+        }).toThrow();
+        expect( () => {
+            let graphText = "n 0 0 1\nn 1 1 0\ne 0";
+            graph.fileParser.loadGraph(graphText);
+        }).toThrow();
+        expect( () => {
+            let graphText = "n 0 0 1\nn 1 1 0\ne a";
+            graph.fileParser.loadGraph(graphText);
+        }).toThrow();
+
+        // Test with invalid weights
+        expect( () => {
+            let graphText = "n 0 0 abc";
+            graph.fileParser.loadGraph(graphText);
+        }).toThrow();
+        expect( () => {
+            let graphText = "n 0 0 1\nn 1 1 0\ne 0 1 invalid";
+            graph.fileParser.loadGraph(graphText);
+        }).toThrow();
+
+        // Test with bad attributes
+        expect( () => {
+            let graphText = "n 0 1 abc::123";
+            graph.fileParser.loadGraph(graphText);
+        }).toThrow();
+        expect( () => {
+            let graphText = "n 0 0 4 abc:";
+            graph.fileParser.loadGraph(graphText);
+        }).toThrow();
+        expect( () => {
+            let graphText = "n 0 0 :abc";
+            graph.fileParser.loadGraph(graphText);
+        }).toThrow();
+        expect( () => {
+            let graphText = "n 0 0 1\nn 1 1 0\ne 0 1 2 abc";
+            graph.fileParser.loadGraph(graphText);
+        }).toThrow();
+        expect( () => {
+            let graphText = "n 0 0 1\nn 1 1 0\ne 0 1 abc:";
+            graph.fileParser.loadGraph(graphText);
+        }).toThrow();
+        expect( () => {
+            let graphText = "n 0 0 1\nn 1 1 0\ne 0 1 2 :abc";
+            graph.fileParser.loadGraph(graphText);
+        }).toThrow();
+        expect( () => {
+            let graphText = "n 0 0 1\nn 1 1 0\ne 0 1 2 abc::abc";
+            graph.fileParser.loadGraph(graphText);
+        }).toThrow();
+        
     });
     
 });
