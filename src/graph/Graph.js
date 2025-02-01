@@ -136,6 +136,45 @@ export class Graph {
         return edges;
     }
 
+    /**
+     * Gets an attribute value for a given node.
+     * @param {String} nodeId Node id
+     * @param {String} name Attribute name
+     * @returns Attribute value
+     */
+    getNodeAttribute(nodeId, name) {
+        // Get the node
+        let node = this.#nodes.get(nodeId);
+
+        if (node) {
+            return node.getAttribute(name);
+        } else {
+            // If the node doesn't exist, return undefined
+            return undefined;
+        }
+    }
+
+    /**
+     * Gets an attribute value for a given edge.
+     * @param {String} source Source node id
+     * @param {String} target Target node id
+     * @param {String} name Attribute name
+     * @returns Attribute value
+     */
+    getEdgeAttribute(source, target, name) {
+        // Verify the edge exists and get it
+        let sourceNode = this.#nodes.get(source);
+        let targetNode = this.#nodes.get(target);
+        let edge = sourceNode && targetNode && sourceNode.edges.get(`${source},${target}`);
+
+        if (edge) {
+            return edge.getAttribute(name);
+        } else {
+            // If the edge doesn't exist, return undefined
+            return undefined;
+        }
+    }
+
 
 
     /**
