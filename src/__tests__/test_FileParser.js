@@ -51,15 +51,21 @@ describe("FileParser tests", () => {
         expect(graph.getEdge("0", "1").getAttribute("bold")).toBe("true");
         expect(graph.getEdge("1", "abc").getAttribute("squiggly")).toBe("true");
         expect(graph.getEdge("n", "-1").getAttribute("weight")).toBe(-4);
-
-        // TODO: Check the node weights
-
-        // TODO: Check the node attributes
         
-        // TODO: Check the node coordinates
+        // Check that the weights of the nodes were set properly
+        expect(graph.getNodeAttribute("0", "weight")).toBe(1);
+        expect(graph.getNodeAttribute("1", "weight")).toBeUndefined();
+        expect(graph.getNodeAttribute("-1", "weight")).toBe(-754);
+        expect(graph.getNodeAttribute("2", "weight")).toBe(-5);
 
-        // TODO: Check that node with id=2 was successfully created. Since it has no edges,
-        //       there is currently no way to tell if it exists.
+        // Check the attributes of the nodes
+        expect(graph.getNodeAttribute("0", "color")).toBe("red");
+        expect(graph.getNodeAttribute("0", "shape")).toBe("star");
+        expect(graph.getNodeAttribute("0", "highlighted")).toBe("yes");
+        expect(graph.getNodeAttribute("1", "color")).toBe("black");
+ 
+        // TODO: Check the node coordinates. We still have no way to
+        //       read the coordinates of a node.
 
     });
     

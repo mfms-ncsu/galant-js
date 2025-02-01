@@ -164,9 +164,11 @@ describe("ChangeManager tests", () => {
         // Set an attribute
         graph.userChangeManager.setNodeAttribute(node,
                                                  "marked", true);
+        // Test that the attribute exists
+        expect(graph.getNodeAttribute(node, "marked")).toBe(true);
 
-        // TODO: Test that this function was successful. Currently,
-        //       there's no way to get the attribute from a node.
+        // Test that invalid inputs return undefined
+        expect(graph.getNodeAttribute("bad input", "marked")).toBeUndefined();
     });
     
     /** 
@@ -188,6 +190,13 @@ describe("ChangeManager tests", () => {
         // Make sure that the edge's attribute was properly saved
         expect(graph.getEdge(node1, node2).getAttribute("color"))
             .toBe("red");
+
+        // Make sure that the edge's attribute can be retrieved through
+        // the graph interface as well
+        expect(graph.getEdgeAttribute(node1, node2, "color")).toBe("red");
+
+        // Make sure that invalid inputs return undefined
+        expect(graph.getEdgeAttribute(node1, "bad input", "abc")).toBeUndefined();
     });
     
     /** 
@@ -200,6 +209,7 @@ describe("ChangeManager tests", () => {
         // Make a simple graph
         let node1 = graph.userChangeManager.addNode(0, 0);
         let node2 = graph.userChangeManager.addNode(1, 1);
+        graph.userChangeManager.setNodeAttribute(node1, "color", "black");
         graph.userChangeManager.addEdge(node1, node2);
         
         // TODO: Add calls to setNodeAttribute once there is a way to
@@ -227,6 +237,13 @@ describe("ChangeManager tests", () => {
         expect(graph.getEdge(node1, node2)).toBeUndefined(); 
 
         // Undo both of the nodes
+
+        // Undo the node's attribute. It should exist before the undo, but not after
+        expect(graph.getNodeAttribute(node1, "color")).toBe("black");
+        graph.userChangeManager.undo();
+        expect(graph.getNodeAttribute(node1, "color")).toBeUndefined();
+
+        // Undo the last two nodes
         graph.userChangeManager.undo();
         graph.userChangeManager.undo();
 
@@ -236,6 +253,10 @@ describe("ChangeManager tests", () => {
         // Redo both nodes
         graph.userChangeManager.redo();
         graph.userChangeManager.redo();
+
+        // Redo the attribute
+        graph.userChangeManager.redo();
+        expect(graph.getNodeAttribute(node1, "color")).toBe("black");
             
         // Redo the edge
         graph.userChangeManager.redo();
