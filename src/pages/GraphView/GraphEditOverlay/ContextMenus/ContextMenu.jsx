@@ -73,6 +73,7 @@ export default function ContextMenu() {
         const source = values.source;
         const destination = values.destination;
         Graph.userChangeManager.addEdge(source, destination);
+        setVisible(false);
     }
 
     // Updates value state when input is made
