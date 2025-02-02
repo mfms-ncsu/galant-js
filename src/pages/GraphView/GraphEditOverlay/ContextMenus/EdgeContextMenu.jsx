@@ -1,10 +1,5 @@
-import { useGraphContext } from "pages/GraphView/utils/GraphContext";
-import GraphEditHistory from "pages/GraphView/utils/GraphEditHistory";
 import { useEffect, useState } from "react";
-import Graph from "utils/Graph";
-import produce from "immer";
-
-
+import Graph from "graph/Graph";
 
 /**
  * EdgeContextMenu defines the React Component that should be displayed when a user right clicks an edge in cytoscape.
@@ -13,109 +8,97 @@ import produce from "immer";
  * 
  * @author Julian Madrigal
  * @param {Object} props
- * @param {GraphEditHistory} props.graphEditHistory
  * @returns {React.ReactElement}
  */
-export default function EdgeContextMenu({graphEditHistory}) {
-	const graphContext = useGraphContext();
-	const cytoscapeInstance = graphContext.cytoscape.instance;
-	const [visible, setVisible] = useState(false);
-	const [edge, setEdge] = useState(null);
-	const [renderedPosition, setRenderedPosition] = useState({x: 0, y: 0});
-	const [values, setValues] = useState({});
+export default function EdgeContextMenu() {
+    const [visible, setVisible] = useState(false);
+    const [edge, setEdge] = useState(null);
+    const [renderedPosition, setRenderedPosition] = useState({x: 0, y: 0});
+    const [values, setValues] = useState({});
 
 
-	useEffect(() => {
-        if (!cytoscapeInstance) return;
+    useEffect(() => {
+        if (!window.cytoscape) return;
+        function onContextClick(event) {
+            // Initially hide the menu and prevent default functionality
+            setVisible(false);
+            event.preventDefault();
 
-		function onContextClick(event) {
-			setVisible(false);
-			event.preventDefault();
-
-
+            // Get the edge from cytoscape
             const edge = event.target;
-            const graph = graphContext.graph;
-            const graphOb = new Graph(graph.nodes, graph.edges, graph.directed, '');
-            const edgeObject = graphOb.getGraphObject(`${edge.data().source} ${edge.data().target}`);
 
-			setValues({
-				id: edgeObject.id,
-				label: edgeObject.label || "",
-				weight: edgeObject.weight ? edgeObject.weight.toString() : "",
-			})
-			setEdge(event.target);
-			event.renderedPosition = event.renderedPosition || {x: 0, y: 0}; // During cypress, renderedPosition is null
-			setRenderedPosition({x: event.renderedPosition.x + 50, y: event.renderedPosition.y + 60});
-			setVisible(true);
+            // Set the values to display
+            const edgeObject = Graph.getEdge(edge.data().source, edge.data().target);
+            setValues({
+                label: edgeObject.getAttribute("label") || "",
+                weight: edgeObject.getAttribute("weight") ? edgeObject.getAttribute("weight").toString() : "",
+            });
 
-			document.addEventListener('click', () => setVisible(false), { once: true });
-		}
+            // Set the edge state and show the menu
+            setEdge(event.target);
+            setVisible(true);
 
-        cytoscapeInstance.on('cxttap', 'edge', onContextClick);
+            // Set the rendering position
+            event.renderedPosition = event.renderedPosition || {x: 0, y: 0}; // During cypress, renderedPosition is null
+            setRenderedPosition({x: event.renderedPosition.x + 50, y: event.renderedPosition.y + 60});
 
-		return (() => cytoscapeInstance.removeListener('cxttap', onContextClick));
-    }, [cytoscapeInstance, graphContext.graph])
+            // Use click to hide the menu
+            document.addEventListener('click', () => setVisible(false), { once: true });
+        }
+        window.cytoscape.on('cxttap', 'edge', onContextClick);
+        return (() => window.cytoscape.removeListener('cxttap', onContextClick));
+    }, [window.cytoscape])
 
-	const data = edge && edge.data();
+    const data = edge && edge.data();
 
-	// Updates the values state whenever an input is changed
-	function onChangeValue(value, newValue) {
-		const newValues = {...values};
-		newValues[value] = newValue;
-		setValues(newValues);
-	}
+    // Updates the values state whenever an input is changed
+    function onChangeValue(value, newValue) {
+        const newValues = {...values};
+        newValues[value] = newValue;
+        setValues(newValues);
+    }
 
-	// This function runs whenever update is called, and updates the values in the graph.
-	function update() {
-		const label = values.label.trim();
+    // This function runs whenever update is called, and updates the values in the graph.
+    function update() {
+        // Get the new label and weight
+        const label = values.label.trim();
         const weight = values.weight.trim();
-		const graph = graphEditHistory.getCurrentSnapshot();
 
-		const newGraph = produce(graph, draft => {
-			const edge = draft.getGraphObject(`${data.source} ${data.target}`);
-			edge.label = label.length > 0 ? label : null;
-			edge.weight = weight.length > 0 ? weight : null;
-		})
+        // Set the changes
+        Graph.userChangeManager.setEdgeAttribute(data.source, data.target, "label", label);
+        Graph.userChangeManager.setEdgeAttribute(data.source, data.target, "weight", weight);
+    }
 
-		graphEditHistory.add(newGraph);
-	}
+    // Deletes the edge and closes the context menu
+    function deleteEdge() {
+        setVisible(false);
+        Graph.userChangeManager.deleteEdge(data.source, data.target);
+    }
 
-	// Deletes the edge and closes the context menu
-	function deleteEdge() {
-		const graph = graphEditHistory.getCurrentSnapshot();
+    // Label/Weight is already updated on blur, so enter should just blur to apply changes.
+    function onEnterPressed(event) {
+        if (event.key !== 'Enter') return;
+        event.target.blur();
+    }
 
-		const newGraph = produce(graph, draft => {
-			delete draft.edges[`${data.source} ${data.target}`];
-		})
+    return (visible && 
+        // This div contains the position settings, and onClick, to stop propagation to document.
+        <div id="edge-context-menu" className="p-2 ring-1 rounded bg-white shadow-lg ring-gray-300"  onClick={(event) => event.stopPropagation()} style={{position: 'fixed', top: renderedPosition.y + 'px', left: renderedPosition.x + 'px'}}>
 
-		graphEditHistory.add(newGraph);
-		setVisible(false);
-	}
-
-	// Label/Weight is already updated on blur, so enter should just blur to apply changes.
-	function onEnterPressed(event) {
-		if (event.key !== 'Enter') return;
-		event.target.blur();
-	}
-
-	return (visible && 
-		// This div contains the position settings, and onClick, to stop propagation to document.
-		<div id="edge-context-menu" className="p-2 ring-1 rounded bg-white shadow-lg ring-gray-300"  onClick={(event) => event.stopPropagation()} style={{position: 'fixed', top: renderedPosition.y + 'px', left: renderedPosition.x + 'px'}}>
-
-			<div>
+            <div>
                 <label className="block text-gray-500">Weight</label>
                 <input id="edge-weight" className="p-1 rounded bg-gray-200" value={values.weight} onChange={(event) => onChangeValue('weight', event.target.value)} onBlur={update} onKeyDown={onEnterPressed} placeholder="Enter weight"/>
             </div>
 
-			
+            
             <div>
                 <label className="block text-gray-500">Label</label>
                 <input id="edge-label" className="p-1 rounded bg-gray-200" value={values.label} onChange={(event) => onChangeValue('label', event.target.value)} onBlur={update} onKeyDown={onEnterPressed} placeholder="Enter label"/>
             </div>
-			
-			<button id="edge-delete-button" className="block w-full p-1 mt-2 rounded bg-red-500 text-white font-semibold hover:bg-red-700" onClick={deleteEdge}>Delete Edge</button>
-		</div>
+            
+            <button id="edge-delete-button" className="block w-full p-1 mt-2 rounded bg-red-500 text-white font-semibold hover:bg-red-700" onClick={deleteEdge}>Delete Edge</button>
+        </div>
 
 
-	)
+    )
 }

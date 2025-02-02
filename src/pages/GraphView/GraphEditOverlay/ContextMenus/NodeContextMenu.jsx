@@ -53,12 +53,14 @@ export default function NodeContextMenu() {
     const data = node && node.data();
     const nodeId = node && node.id();
 
+    // Updates the values state whenever an input is changed
     function onChangeValue(value, newValue) {
         const newValues = { ...values };
         newValues[value] = newValue;
         setValues(newValues);
     }
 
+    // This function runs whenever update is called, and updates the values in the graph.
     function update() {
         // Get the new label and weight
         const label = values.label.trim();
@@ -69,6 +71,7 @@ export default function NodeContextMenu() {
         Graph.userChangeManager.setNodeAttribute(nodeId, "weight", weight);
     }
 
+    // Deletes the node and closes the context menu
     function deleteNode() {
         setVisible(false); // Hide the menu
         Graph.userChangeManager.deleteNode(nodeId); // Delete the node
