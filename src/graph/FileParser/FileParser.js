@@ -45,7 +45,8 @@ export default class FileParser {
      */
     #parseLine(line) {
         // Trim the line string to remove leading/trailing whitespace and split along spacez
-        const values = line.trim().split(" ");
+        line = line.trim();
+        const values = line.split(" ");
 
         // Regexes to match simple node and edge lines
         const nodeRegex = /^n \S+ -?\d+ -?\d+( -?\d+)?( [^ \n\t:]+:[^ \n\t:]+)*$/;
