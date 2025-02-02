@@ -45,17 +45,48 @@ export default class FileParser {
      */
     #parseLine(line) {
         // Trim the line string to remove leading/trailing whitespace and split along spacez
-        const values = line.trim().split(" ");
+        line = line.trim();
+        const values = line.split(" ");
 
         // Regexes to match simple node and edge lines
-        const nodeRegex = /^n \w* -?\d+ -?\d+/;
-        const edgeRegex = /^e \w+ \w+/;
+        const nodeRegex = /^n \S+ -?\d+ -?\d+( -?\d+)?( [^ \n\t:]+:[^ \n\t:]+)*$/;
+        /*
+            nodeRegex documentation:
+            
+            A line representing a node must have each of the following, separated by a space:
+                - The letter 'n' as the first letter
+                - An id (any amount of non-whitespace characters)
+                - An integer x coordinate
+                - An integer y coordinate
+                - Optionally, an integer weight
+                - Any amount of attributes. Attributes are specified as follows:
+                    any amount of non-whitespace, non-colon characters, followed by a colon (no space),
+                    followed by any amount of non-whitespace, non-colon characters.
+        */
+        const edgeRegex = /^e \S+ \S+( -?\d+)?( [^ \n\t:]+:[^ \n\t:]+)*$/;
+        /*
+            edgeRegex documentation:
+            
+            A line representing an edge must have each of the following, separated by a space:
+                - The letter 'e' as the first letter
+                - A source node id (any amount of non-whitespace characters)
+                - A target node id (any amount of non-whitespace characters)
+                - Optionally, an integer weight
+                - Any amount of attributes. Attributes are specified as follows:
+                    any amount of non-whitespace, non-colon characters, followed by a colon (no space),
+                    followed by any amount of non-whitespace, non-colon characters.
+        */
 
         // Check which regex matches and send the values to be parsed as either a node or edge
         if (line.match(nodeRegex)) {
             this.#parseNode(values);
         } else if (line.match(edgeRegex)) {
             this.#parseEdge(values);
+        } else if (line.length != 0) { // This was breaking when the file ended with an empty line.
+                                       // A bit hacky, but we just ignore all empty lines to fix it
+
+            // If the line was not a node or an edge, throw an exception
+            throw new Error("input line from file: \"" + line + "\" is not a valid node or edge.");
         }
     }
 

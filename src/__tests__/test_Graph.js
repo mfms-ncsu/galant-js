@@ -1,14 +1,6 @@
 import { Graph } from "graph/Graph";
 import Edge from "graph/GraphElement/Edge";
 
-// TODO: Test with invalid inputs
-// TODO: Test with undirected graphs, when we figure out how we want
-//       those to be implemented
-// TODO: Test that the getIncomingEdges, getOutgoingEdges, and
-//       getAllEdges return an empty list or throw an error when there
-//       are no such edges. We haven't decided how this should be
-//       implemented yet, though.
-
 /**
  * Test methods for the Graph class.
  *
@@ -26,8 +18,6 @@ describe("Graph tests", () => {
      * The node ID strings for each of the nodes in the graph
      */
     let node1, node2, node3, node4;
-
-    // TODO: Test with directed graphs
     
     /** Sets up the Graph objects before each test */
     beforeEach(() => {
@@ -71,6 +61,16 @@ describe("Graph tests", () => {
         expect(graph.getEdge(node1, node2)).toBeInstanceOf(Edge);
         expect(graph.getEdge(node1, node2).source).toBe(node1);
         expect(graph.getEdge(node1, node2).target).toBe(node2);
+
+        // Try with bad input
+        expect(graph.getEdge("bad input", node1)).toBeUndefined();
+        expect(graph.getEdge(node1, "bad input")).toBeUndefined();
+        expect(graph.getEdge("bad input", "bad input")).toBeUndefined();
+
+        // Try with valid inputs, when there is no edge
+        let newNode = graph.userChangeManager.addNode(2, 2);
+        expect(graph.getEdge(node1, newNode)).toBeUndefined();
+        expect(graph.getEdge(newNode, node1)).toBeUndefined();
     });
     
     /**
@@ -87,6 +87,14 @@ describe("Graph tests", () => {
         expect(graph.getEdge(node2, node3)).toBe(outgoingEdges[0]);
         expect(graph.getEdge(node2, node4)).toBe(outgoingEdges[1]);
 
+        // Try with node with no edges. It should return an empty list.
+        let newNode = graph.userChangeManager.addNode(2, 2);
+        let newNodeEdges = graph.getOutgoingEdges(newNode);
+        expect(newNodeEdges.length).toBe(0);
+
+        // Try with invalid input
+        expect(graph.getOutgoingEdges("bad input")).toBeUndefined();
+
     });
     
     /**
@@ -102,12 +110,20 @@ describe("Graph tests", () => {
         expect(incomingEdges.length).toBe(2);
         expect(graph.getEdge(node1, node3)).toBe(incomingEdges[0]);
         expect(graph.getEdge(node2, node3)).toBe(incomingEdges[1]);
+
+        // Try with node with no edges. It should return an empty list.
+        let newNode = graph.userChangeManager.addNode(2, 2);
+        let newNodeEdges = graph.getIncomingEdges(newNode);
+        expect(newNodeEdges.length).toBe(0);
+
+        // Try with invalid input
+        expect(graph.getIncomingEdges("bad input")).toBeUndefined();
     });
     
     /**
      * Test method for Graph.getAllEdges
      */
-    test("Testing the Graph.getEdge method", () => {
+    test("Testing the Graph.getAllEdges method", () => {
         
         // Get all the edges for node2. This should be the edge
         // from 1 to 2, from 2 to 3, and from 2 to 4.
@@ -119,16 +135,13 @@ describe("Graph tests", () => {
         expect(graph.getEdge(node1, node2)).toBe(edges[0]);
         expect(graph.getEdge(node2, node3)).toBe(edges[1]);
         expect(graph.getEdge(node2, node4)).toBe(edges[2]);
-    });
-    
-    /**
-     * Test method for Graph.toCytoscape
-     */
-    test("Testing the Graph.toCytoscape method", () => {
         
-        // TODO: This method. I'm still unsure what the
-        //       object that Cytoscape is expecting is supposed
-        //       to look like.
-    });
+        // Try with node with no edges. It should return an empty list.
+        let newNode = graph.userChangeManager.addNode(2, 2);
+        let newNodeEdges = graph.getAllEdges(newNode);
+        expect(newNodeEdges.length).toBe(0);
 
+        // Try with invalid input
+        expect(graph.getAllEdges("bad input")).toBeUndefined();
+    });
 });
