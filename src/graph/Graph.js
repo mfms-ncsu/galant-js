@@ -3,7 +3,6 @@ import ChangeObject from "./ChangeManager/ChangeObject.js";
 import CytoscapeManager from "./CytoscapeManager/CytoscapeManager.js";
 import Edge from "./GraphElement/Edge.js";
 import FileParser from "./FileParser/FileParser.js";
-import Message from "./GraphElement/Message.js";
 import Node from "./GraphElement/Node.js";
 
 /**
@@ -300,10 +299,6 @@ export class Graph {
      * @returns ChangeObject containing the message
      */
     #addMessage(message) {
-        // Create a new message object
-        // NOTE: currently doing nothing with this
-        const newMessage = new Message(message);
-
         // Return a new ChangeObject
         return new ChangeObject("message", null, {
             message: message
@@ -611,4 +606,5 @@ export class Graph {
 }
 
 /** Export a single instance of Graph */
-export default new Graph();
+const graphInstance = new Graph();
+export default graphInstance;

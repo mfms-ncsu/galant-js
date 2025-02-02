@@ -85,7 +85,7 @@ export default class FileParser {
             this.#parseNode(values);
         } else if (line.match(edgeRegex)) {
             this.#parseEdge(values);
-        } else if (line.length != 0) { // This was breaking when the file ended with an empty line.
+        } else if (line.length !== 0) { // This was breaking when the file ended with an empty line.
                                        // A bit hacky, but we just ignore all empty lines to fix it
 
             // If the line was not a node or an edge, throw an exception
@@ -156,6 +156,6 @@ export default class FileParser {
      */
     #isNumeric(str) {
         if (typeof str !== "string") return false;
-        return !isNaN(str) && !isNaN(parseFloat(str));
+        return !Number.isNaN(Number(str)) && !Number.isNaN(parseFloat(str));
     }
 }
