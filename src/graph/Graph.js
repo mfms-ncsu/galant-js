@@ -5,6 +5,7 @@ import Edge from "./GraphElement/Edge.js";
 import FileParser from "./FileParser/FileParser.js";
 import Message from "./GraphElement/Message.js";
 import Node from "./GraphElement/Node.js";
+import { positions } from "@mui/system";
 
 /**
  * Graph stores the representation of the current graph and has an interface
@@ -137,6 +138,23 @@ export class Graph {
     }
 
     /**
+     * Gets the position of a given node.
+     * @param {String} nodeId Node id
+     * @returns Node position
+     */
+    getNodePosition(nodeId) {
+        // Get the node
+        let node = this.#nodes.get(nodeId);
+
+        if (node) {
+            return node.position;
+        } else {
+            // If the node doesn't exist, return undefined
+            return undefined;
+        }
+    }
+
+    /**
      * Gets an attribute value for a given node.
      * @param {String} nodeId Node id
      * @param {String} name Attribute name
@@ -256,7 +274,6 @@ export class Graph {
      * @throws Error if either source or target do not exist in nodes
      */
     #addEdge(source, target, attributes) {
-        
         // Error checking
         this.#verifyNodes(source, target, "create edge");
 
@@ -302,16 +319,16 @@ export class Graph {
      * @returns Array of ChangeObjects for the node and its incident edges
      */
     #deleteNode(nodeId) {
-        
-        // Error checking
-        if (!this.#nodes.has(nodeId)) {
-            throw new Error("Cannot delete node " + nodeId + " because it does not exist in the graph");
-        }
         // Keep an array of ChangeObjects for the delete step
         const changeObjects = [];
 
         // Get a reference to the node
         const node = this.#nodes.get(nodeId);
+
+        // Error checking
+        if (!node) {
+            throw new Error("Cannot delete node " + nodeId + " because it does not exist in the graph");
+        }
 
         // Delete each edge and push the change objects into the array
         node.edges.forEach(edge => {
@@ -367,7 +384,6 @@ export class Graph {
      * @returns ChangeObject representing the deleted edge
      */
     #deleteEdge(source, target) {
-        
         // Error checking
         this.#verifyNodes(source, target, "delete edge");
 
@@ -394,13 +410,13 @@ export class Graph {
      * @returns ChangeObject representing the move
      */
     #setNodePosition(nodeId, x, y) {
-
-        // Error checking
-        if (!this.#nodes.has(nodeId)) {
-            throw new Error("Cannot set position of node " + nodeId + " because it does not exist in the graph");
-        }
         // Get a reference to the node
         const node = this.#nodes.get(nodeId);
+
+        // Error checking
+        if (!node) {
+            throw new Error("Cannot set position of node " + nodeId + " because it does not exist in the graph");
+        }
 
         // Store old and new values for the position
         let oldPosition = node.position;
@@ -431,7 +447,6 @@ export class Graph {
      * @returns A ChangeObject representing the attribute change
      */
     #setNodeAttribute(nodeId, name, value) {
-
         if (!this.#nodes.has(nodeId)) {
             throw new Error("Cannot set attribute of node " + nodeId + " because the node does not exist in the graph");
         }
@@ -471,7 +486,6 @@ export class Graph {
      * @returns A ChangeObject representing the attribute change
      */
     #setEdgeAttribute(source, target, name, value) {
-        
         // Error checking
         this.#verifyNodes(source, target, "set attribute of edge");
 

@@ -94,6 +94,17 @@ export default class ChangeManager {
     }
 
     /**
+     * Sets a new node position and records the change.
+     * @param {String} nodeId Node to move
+     * @param {Number} x New x-position
+     * @param {Number} y New y-position
+     */
+    setNodePosition(nodeId, x, y) {
+        // Record the change
+        this.#recordChange([this.#graph.setNodePosition(nodeId, x, y)]);
+    }
+
+    /**
      * Sets an attribute for a node and records the change.
      * @param {String} nodeId Id of the node
      * @param {String} name Name of the attribute
