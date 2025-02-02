@@ -1,10 +1,5 @@
-import produce from "immer";
-import ChangeObject from "pages/GraphView/utils/ChangeObject";
-import ChangeRecord from "pages/GraphView/utils/ChangeRecord";
-import { useGraphContext } from "pages/GraphView/utils/GraphContext";
-import GraphEditHistory from "pages/GraphView/utils/GraphEditHistory";
-import NodeObject from "pages/GraphView/utils/NodeObject";
 import { useEffect, useState } from "react";
+import Graph from "graph/Graph";
 
 
 /**
@@ -16,129 +11,91 @@ import { useEffect, useState } from "react";
  * 
  * @author Julian Madrigal
  * @param {Object} props
- * @param {GraphEditHistory} props.graphEditHistory 
- * @param {ChangeRecord} changeRecord 
  * @returns {React.ReactElement}
  */
-export default function ContextMenu({ graphEditHistory }) {
-	const graphContext = useGraphContext();
-	const changeRecord = ChangeRecord.getInstance();
-	const cytoscapeInstance = graphContext.cytoscape.instance;
-	const [visible, setVisible] = useState(false);
-	const [position, setPosition] = useState({ x: 0, y: 0 });
-	const [renderedPosition, setRenderedPosition] = useState({ x: 0, y: 0 });
-	const [values, setValues] = useState({});
+export default function ContextMenu() {
+    const [visible, setVisible] = useState(false);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [renderedPosition, setRenderedPosition] = useState({ x: 0, y: 0 });
+    const [values, setValues] = useState({});
 
 
-	// Display the popup on right-click to graph
-	useEffect(() => {
-		if (!cytoscapeInstance) return;
+    // Display the popup on right-click to graph
+    useEffect(() => {
+        if (!window.cytoscape) return;
+        window.cytoscape.on('cxttap', (event) => {
+            // Don't show popup if right clicked on a node/edge.
+            if (event.target !== window.cytoscape) return;
+            event.preventDefault();
 
-		cytoscapeInstance.on('cxttap', (event) => {
-			if (event.target !== cytoscapeInstance) return; // Don't show popup if right clicked on a node/edge.
-			event.preventDefault();
+            // Position the menu
+            setPosition(event.position);
+            setRenderedPosition({ x: event.renderedPosition.x + 40, y: event.renderedPosition.y + 50 });
+            setValues({});
+            setVisible(true);
 
-			setPosition(event.position);
-			setRenderedPosition({ x: event.renderedPosition.x + 40, y: event.renderedPosition.y + 50 });
-			setValues({});
-			setVisible(true);
+            // Click away to hide
+            document.addEventListener('mousedown', () => setVisible(false), { once: true });
+        });
+    }, [window.cytoscape])
 
-			document.addEventListener('mousedown', () => setVisible(false), { once: true });
-		});
+    // Update the edit history when a node is moved
+    useEffect(() => {
+        if (!window.cytoscape) return;
+        function onNodeMoved(event) {
+            // Get the node, its id, and position
+            const node = event.target;
+            const id = node.id();
+            const newPosition = node.position();
 
-	}, [cytoscapeInstance])
+            // Set the node position
+            Graph.userChangeManager.setNodePosition(id, newPosition.x / Graph.getScalar(), newPosition.y / Graph.getScalar());
+        }
 
-	// Update the edit history when a node is moved
-	useEffect(() => {
-		if (!cytoscapeInstance) return;
+        let timeOut = null;
+        function onPositionMoved(event) {
+            if (timeOut) clearTimeout(timeOut);
+            timeOut = setTimeout(() => onNodeMoved(event), 0);
+        }
 
-		function onNodeMoved(event) {
-			/**
-			 * @todo SD 2024-8
-			 * Thus should also happen when an auto-layout is performed.
-			 * In that case the positions of all the nodes need to be part of the new edit state
-			 */
-			const node = event.target;
+        window.cytoscape.on('free', 'node', onPositionMoved);
+        return () => window.cytoscape.removeListener('free', onPositionMoved);
+    }, [window.cytoscape])
 
-			const id = node.id();
-			const newPosition = node.position();
+    // Add a new node to the graph
+    function addNode() {
+        Graph.userChangeManager.addNode(position.x / Graph.getScalar(), position.y / Graph.getScalar());
+        setVisible(false);
+    }
 
-			const oldRef = graphContext.graph.getGraphObject(id);
-			const nodeObject = structuredClone(graphContext.graph.getGraphObject(id));
-			nodeObject.x = newPosition.x;
-			nodeObject.y = newPosition.y;
-			changeRecord.addChangeObject([new ChangeObject("update", "node", id, oldRef, nodeObject)]);
-		}
+    // Add an edge to the graph
+    function addEdge() {
+        const source = values.source;
+        const destination = values.destination;
+        Graph.userChangeManager.addEdge(source, destination);
+    }
 
-		let timeOut = null;
-
-		function onPositionMoved(event) {
-			if (timeOut) clearTimeout(timeOut);
-			timeOut = setTimeout(() => onNodeMoved(event), 0);
-		}
-
-		cytoscapeInstance.on('free', 'node', onPositionMoved);
-
-		return () => cytoscapeInstance.removeListener('free', onPositionMoved);
-	}, [cytoscapeInstance, graphContext.graph, graphEditHistory])
-
-	function addNode() {
-		const graph = graphContext.graph;
-
-		let id = 0;
-		while (graph.nodes.find((node) => Number.parseInt(node.id) === id)) id++;
-		let newNode = new NodeObject(undefined, id.toString(), position.x, position.y);
-		// graph.nodes.push(newNode);
-		let change = new ChangeObject("add", "node", id.toString(), null, newNode);
-
-		changeRecord.addChangeObject([change]);
-		setVisible(false);
-	}
-
-	function addEdge() {
-		// const source = values.source;
-		// const destination = values.destination;
-		// if (!source || source.length <= 0) return;
-		// if (!destination || destination.length <= 0) return;
-		// const cy = graphContext.cytoscape.instance;
-
-		// const graph = graphContext.graph;
-
-		// const id = `${source} ${destination}`;
-
-		// newEdge = new EdgeObject();
-		// newEdge.id = id;
-		// newEdge.source = source;
-		// newEdge.target = target;
-		// graph.edges.push(newEdge);
+    // Updates value state when input is made
+    function changeValue(value, newValue) {
+        const newValues = { ...values };
+        newValues[value] = newValue;
+        setValues(newValues);
+    }
 
 
-		// //Todo: Change Record Implementation
-		// graphEditHistory.add(newGraph);
-		// setVisible(false);
-	}
+    return (visible &&
+        <div id="edit-context-menu" className="p-2 ring-1 rounded bg-white ring-gray-300 shadow-lg" style={{ position: 'fixed', top: renderedPosition.y + 'px', left: renderedPosition.x + 'px' }} onMouseDown={(event) => event.stopPropagation()}>
+            <button className="block w-full p-1 rounded bg-blue-500 text-white font-semibold hover:bg-blue-700" onClick={addNode}>New Node</button>
+
+            <div className="h-[1px] w-full my-2 bg-gray-200" />
+
+            <div className="mt-2">
+                <input className="p-1 rounded bg-gray-200" size={12} placeholder="Source" value={values.source} onChange={(event) => changeValue('source', event.target.value)} />
+                <input className="p-1 ml-2 rounded bg-gray-200" size={12} placeholder="Destionation" onChange={(event) => changeValue('destination', event.target.value)} />
+                <button className="block w-full p-1 mt-1 rounded bg-blue-500 text-white font-semibold" onClick={addEdge}>New Edge</button>
+            </div>
+        </div>
 
 
-	function changeValue(value, newValue) {
-		const newValues = { ...values };
-		newValues[value] = newValue;
-		setValues(newValues);
-	}
-
-
-	return (visible &&
-		<div id="edit-context-menu" className="p-2 ring-1 rounded bg-white ring-gray-300 shadow-lg" style={{ position: 'fixed', top: renderedPosition.y + 'px', left: renderedPosition.x + 'px' }} onMouseDown={(event) => event.stopPropagation()}>
-			<button className="block w-full p-1 rounded bg-blue-500 text-white font-semibold hover:bg-blue-700" onClick={addNode}>New Node</button>
-
-			<div className="h-[1px] w-full my-2 bg-gray-200" />
-
-			<div className="mt-2">
-				<input className="p-1 rounded bg-gray-200" size={12} placeholder="Source" value={values.source} onChange={(event) => changeValue('source', event.target.value)} />
-				<input className="p-1 ml-2 rounded bg-gray-200" size={12} placeholder="Destionation" onChange={(event) => changeValue('destination', event.target.value)} />
-				<button className="block w-full p-1 mt-1 rounded bg-blue-500 text-white font-semibold" onClick={addEdge}>New Edge</button>
-			</div>
-		</div>
-
-
-	)
+    )
 }

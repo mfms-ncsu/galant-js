@@ -44,6 +44,13 @@ export class Graph {
     }
 
 
+    /**
+     * Gets this graph's scalar
+     * @returns This graph's scalar
+     */
+    getScalar() {
+        return this.#scalar;
+    }
 
     /**
      * Gets the edge between a given source and a given target node.
@@ -204,10 +211,10 @@ export class Graph {
         this.#scalar = 500 / max;
     }
 
-    #getScalar() {
-        return this.#scalar;
-    }
-
+    /**
+     * Gets this graph's nodes
+     * @returns This graph's nodes
+     */
     #getNodes() {
         return this.#nodes;
     }
@@ -589,7 +596,6 @@ export class Graph {
     #privateMethods = {
         clear: this.#clear,
         scale: this.#scale,
-        getScalar: this.#getScalar,
         getNodes: this.#getNodes,
         addNode: this.#addNode,
         addEdge: this.#addEdge,
