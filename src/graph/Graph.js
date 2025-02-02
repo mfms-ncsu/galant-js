@@ -5,7 +5,6 @@ import Edge from "./GraphElement/Edge.js";
 import FileParser from "./FileParser/FileParser.js";
 import Message from "./GraphElement/Message.js";
 import Node from "./GraphElement/Node.js";
-import { positions } from "@mui/system";
 
 /**
  * Graph stores the representation of the current graph and has an interface
@@ -45,14 +44,6 @@ export class Graph {
     }
 
 
-
-    /**
-     * Used on the frontend to trigger useEffect whenever the graph changes.
-     * @returns A deep copy of the graph's nodes
-     */
-    getNodesCopy() {
-        return JSON.parse(JSON.stringify(this.#nodes));
-    }
 
     /**
      * Gets the edge between a given source and a given target node.

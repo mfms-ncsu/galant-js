@@ -37,6 +37,9 @@ export default class FileParser {
 
         // Generate a scale for the graph based on the node positions
         this.#graph.scale();
+
+        // Update cytoscape to show the newly loaded graph
+        window.updateCytoscape();
     }
 
     /**

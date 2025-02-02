@@ -1,4 +1,4 @@
-import { React, useEffect, useRef } from "react";
+import { React, useEffect, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
 import cytoscape from "cytoscape";
 import nodeHtmlLabel from "cytoscape-node-html-label";
@@ -64,19 +64,18 @@ export default function CytoscapeComponent() {
         window.cytoscape = cy;
 
         // react-hooks/exhaustive-deps
-    }, [cytoscapeElement])
-
+    }, [cytoscapeElement]);
 
     /**
-     * Update elements when the graph updates
+     * Create a function to call whenever cytoscape needs to be updated
      */
-    useEffect(() => {
+    window.updateCytoscape = () => {
         if (!window.cytoscape) return;
         window.cytoscape.elements().remove();// Remove elements
         window.cytoscape.add(Graph.cytoscapeManager.getElements()); // Get new elements
         window.cytoscape.style().resetToDefault(); // Reset style
         window.cytoscape.style(Graph.cytoscapeManager.getStyle()).update(); // Update style
-    }, [window.cytoscape, Graph.getNodesCopy()]);
+    };
 
     return (
         <div className="w-full h-full">

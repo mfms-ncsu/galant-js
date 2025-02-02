@@ -3,12 +3,13 @@ import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from "@heroicons/react/24/sol
 import GraphEditHistory from "../utils/GraphEditHistory";
 import { useGraphContext } from "../utils/GraphContext";
 import { useAlgorithmContext } from "../utils/AlgorithmContext";
-import { StringifyGraphSnapshot } from '../utils/PredicateToFile';
-import { saveGraph } from '../utils/SharedWorker';
 import ChangeRecord from '../utils/ChangeRecord';
-import ChangeObject from '../utils/ChangeObject';
-
 import Graph from '../../../utils/Graph';
+
+/**
+ * NEW IMPORTS
+ */
+import NewGraph from 'graph/Graph';
 
 
 /**
@@ -65,19 +66,13 @@ export default function GraphEditOverlay({ setMode }) {
 
     // Function to perform undo operation
     function undo() {
-        let didUpdate = changeRecord.undo();
-        if (didUpdate) {
-            setMode("undo");
-            changeRecord.onUpdate(changeRecord.index);
-        }
+        NewGraph.userChangeManager.undo();
+        setMode("undo");
     }
 
     // Function to perform redo operation
     function redo() {
-        let didUpdate = changeRecord.redo();
-        if (didUpdate) {
-            changeRecord.onUpdate(changeRecord.index);
-        }
+        NewGraph.userChangeManager.redo();
     }
 
     // Effect hook to handle keyboard shortcuts for undo, redo, revert, and save

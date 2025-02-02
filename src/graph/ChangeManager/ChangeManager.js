@@ -139,6 +139,9 @@ export default class ChangeManager {
 
             // Undo the change
             this.#graph.undoStep(step);
+
+            // Update cytoscape
+            window.updateCytoscape();
         }
     }
 
@@ -154,6 +157,9 @@ export default class ChangeManager {
 
             // Redo the change
             this.#graph.redoStep(step);
+
+            // Update cytoscape
+            window.updateCytoscape();
         }
     }
 
@@ -171,6 +177,9 @@ export default class ChangeManager {
 
         // Increment the index
         this.#index++;
+
+        // Update cytoscape
+        window.updateCytoscape();
     }
 
 }
