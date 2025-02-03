@@ -332,7 +332,7 @@ export class Graph {
         changeObjects.push(new ChangeObject("deleteNode", {
             id: node.id,
             position: node.position,
-            attributes: JSON.stringify(node.attributes)
+            attributes: node.attributes
         }, null));
 
         // Finally, delete the node from the nodes list
@@ -524,6 +524,10 @@ export class Graph {
                     break;
                 case "deleteNode":
                     this.#nodes.set(change.previous.id, new Node(change.previous.id, change.previous.position.x, change.previous.position.y));
+                    let node = this.#nodes.get(change.previous.id);
+                    change.previous.attributes.forEach((value, key) => {
+                        node.attributes.set(key, value);
+                    });
                     break;
                 case "addEdge":
                     this.#nodes.get(change.current.source).edges.delete(`${change.current.source},${change.current.target}`);
