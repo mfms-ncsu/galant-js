@@ -391,7 +391,7 @@ export class Graph {
         return new ChangeObject("deleteEdge", {
             source: source,
             target: target,
-            attributes: JSON.stringify(attributes)
+            attributes: attributes
         }, null);
     }
 
@@ -532,6 +532,10 @@ export class Graph {
                 case "deleteEdge":
                     this.#nodes.get(change.previous.source).edges.set(`${change.previous.source},${change.previous.target}`, new Edge(change.previous.source, change.previous.target));
                     this.#nodes.get(change.previous.target).edges.set(`${change.previous.source},${change.previous.target}`, new Edge(change.previous.source, change.previous.target));
+                    let edge = this.#nodes.get(change.previous.source).edges.get(`${change.previous.source},${change.previous.target}`);
+                    change.previous.attributes.forEach((value, key) => {
+                        edge.attributes.set(key, value);
+                    });
                     break;
                 case "setNodePosition":
                     this.#nodes.get(change.previous.id).position = change.previous.position;
