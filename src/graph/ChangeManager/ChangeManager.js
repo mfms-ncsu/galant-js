@@ -140,8 +140,9 @@ export default class ChangeManager {
             // Undo the change
             this.#graph.undoStep(step);
 
-            // Update cytoscape
+            // Update cytoscape and the step counter in user edit mode
             window.updateCytoscape();
+            window.updateStep();
         }
     }
 
@@ -158,9 +159,24 @@ export default class ChangeManager {
             // Redo the change
             this.#graph.redoStep(step);
 
-            // Update cytoscape
+            // Update cytoscape and the step counter in user edit mode
             window.updateCytoscape();
+            window.updateStep();
         }
+    }
+
+    /**
+     * Gets the length of changes
+     */
+    get length() {
+        return this.#changes.length;
+    }
+
+    /**
+     * Gets the current index in changes
+     */
+    get index() {
+        return this.#index;
     }
 
     /**
@@ -178,8 +194,9 @@ export default class ChangeManager {
         // Increment the index
         this.#index++;
 
-        // Update cytoscape
+        // Update cytoscape and the step counter in user edit mode
         window.updateCytoscape();
+        window.updateStep();
     }
 
 }

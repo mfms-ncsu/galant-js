@@ -1,4 +1,4 @@
-import { React, useEffect, useRef } from "react";
+import { React, useEffect, useRef, useState } from "react";
 import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from "@heroicons/react/24/solid";
 import Graph from "graph/Graph";
 
@@ -52,8 +52,17 @@ export default function GraphEditOverlay({ setMode }) {
         }
     }, []);
 
+    const [index, setIndex] = useState(0);
+    const [length, setLength] = useState(0);
+    window.updateStep = () => {
+        let newIndex = Graph.userChangeManager.index;
+        let newLength = Graph.userChangeManager.length;
+        setIndex(newIndex);
+        setLength(newLength);
+    };
 
-    return (
+
+    return length > 0 && (
         <div id="edit-overlay" className="absolute inset-0 flex flex-col p-4 pointer-events-none">
             <div className="w-fit mx-auto">
                 <p className="p-2 rounded shadow backdrop-blur bg-gradient-to-r from-indigo-500/90 to-blue-500/75 text-white">You"re in edit mode</p>
@@ -65,7 +74,7 @@ export default function GraphEditOverlay({ setMode }) {
                         <ArrowUturnLeftIcon className="w-6 h-6" />
                         <label className="absolute -bottom-2 left-0 text-sm">z</label>
                     </button>
-                    <span>? / ?</span>
+                    <span>{index} / {length}</span>
                     <button className="relative p-1 pointer-events-auto stroke-0 stroke-black hover:stroke-1" onClick={redo}>
                         <ArrowUturnRightIcon className="w-6 h-6" />
                         <label className="absolute -bottom-2 right-0 text-sm">y</label>
