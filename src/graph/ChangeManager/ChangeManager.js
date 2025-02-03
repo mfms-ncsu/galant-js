@@ -166,6 +166,15 @@ export default class ChangeManager {
     }
 
     /**
+     * Undoes all changes back to the original graph.
+     */
+    revert() {
+        while (this.#index > 0) {
+            this.undo();
+        }
+    }
+
+    /**
      * Gets the length of changes
      */
     get length() {

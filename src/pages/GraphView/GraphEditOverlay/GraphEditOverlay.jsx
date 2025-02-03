@@ -19,7 +19,7 @@ export default function GraphEditOverlay({ setMode }) {
 
     // Function to revert graph edits (node movements, etc.)
     function revert() {
-        // TODO
+        Graph.userChangeManager.revert();
         setMode("revert");
     }
 
