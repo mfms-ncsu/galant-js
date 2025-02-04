@@ -593,6 +593,37 @@ export class Graph {
     }
 
     /**
+     * Converts the graph to a string representation for exporting to a file.
+     * @returns String representation of the current graph
+     * @author Ziyu Wang
+     */
+    toGraphString() {
+        let content = "";
+
+        this.#nodes.forEach(node => {
+            let attributesString = "";
+            if (node.attributes.size > 0) {
+                attributesString = " " + [...node.attributes.entries()]
+                    .filter(([_,value]) => value !== undefined && value !==false && value !== "")
+                    .map(([key, value]) => `${key}:${value}`)
+                    .join(" ");
+            }
+            // eslint-disable-next-line no-undef
+            content += `n ${node.id} ${node.position.x} ${node.position.y} ${attributesString}\n`;
+        });
+
+        this.#nodes.forEach(node => {
+            node.edges.forEach(edge => {
+                if (edge.source === node.id) {
+                    content += `e ${edge.source} ${edge.target}\n`;
+                }
+            });
+        });
+
+        return content;
+    }
+
+    /**
      * Private object containing all private methods for passing into file parser
      * and change managers so they can access them.
      */
@@ -610,6 +641,7 @@ export class Graph {
         setEdgeAttribute: this.#setEdgeAttribute,
         undoStep: this.#undoStep,
         redoStep: this.#redoStep,
+        toGraphString: this.toGraphString,
     }
 }
 
