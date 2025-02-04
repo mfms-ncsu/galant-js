@@ -6,7 +6,6 @@
  */
 import { useState, useEffect, useRef } from "react";
 import { createGraphContextObject } from "pages/GraphView/utils/GraphContext";
-import { enablePatches } from "immer";
 import { GraphContext } from "pages/GraphView/utils/GraphContext";
 import { defaultStylePreferences } from "./utils/CytoscapeStylesheet";
 import { defaultLayout } from "./utils/CytoscapeLayout";
@@ -32,8 +31,6 @@ import ChangeRecord from "./utils/ChangeRecord";
  */
 import NewGraph from "graph/Graph";
 
-
-enablePatches();
 
 export default function GraphView() {
     // Define state variables using React hooks
