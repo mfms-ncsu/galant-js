@@ -22,9 +22,8 @@ function wait() {
 }
 
 function addNode(x, y, nodeId) {
-    console.log("\n\n\nAdd Node\n\n\n");
-
     postMessage({
+        action: "addNode",
         nodeId: nodeId,
         x: x,
         y: y
@@ -62,7 +61,7 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         wait();
 
         try {
-            eval(message[2]); /* eslint-disable-line no-eval */
+            eval(message[1]); /* eslint-disable-line no-eval */
             console.log("Algorithm completed");
             postMessage({type: "complete"});
 
