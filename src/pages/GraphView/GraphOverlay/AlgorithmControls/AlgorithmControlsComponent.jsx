@@ -87,23 +87,14 @@ export default function AlgorithmControls() {
     // Effect hook to handle keyboard shortcuts for stepping through algorithm
     useEffect(() => {
         function handleKeyPress(event) {
-            // If user is typing into an input field, ignore.
             if (event.target.tagName.toLowerCase() === 'input') return;
-            // Left Arrow to step back in the algorithm
             if (event.key === 'ArrowLeft') backButtonPress();
-            // Right arrow to step forward in the algorithm
             else if (!event.metaKey && event.key === 'ArrowRight') frontButtonPress();
-            // Esc key to terminate algorithm
             else if (event.key === 'x') terminateAlgorithm();
-            // S Key to export graph
             else if (event.key === 's') exportGraph();
-            // Cmd + Right arrow to skip to end of the algorithm
             else if (event.metaKey && event.key === 'ArrowRight') algorithm.skipToEnd();
         }
-
         document.addEventListener('keydown', handleKeyPress, true)
-
-        
         return () => document.removeEventListener('keydown', handleKeyPress, true);
     }, [algorithm]);
 

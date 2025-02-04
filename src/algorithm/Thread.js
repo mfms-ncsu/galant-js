@@ -11,6 +11,43 @@
  */
 let sharedArray;
 
+let graph;
+
+/**
+ * This function uses Atomics to cause the algorithm to wait for user input before continuing
+ */
+function wait() {
+    Atomics.store(sharedArray, 0, 0);
+    Atomics.wait(sharedArray, 0, 0);
+}
+
+function addNode(x, y, nodeId) {
+    console.log("\n\n\nAdd Node\n\n\n");
+
+    postMessage({
+        nodeId: nodeId,
+        x: x,
+        y: y
+    });
+}
+
+function setNodeAttribute(nodeId, name, value) {
+    postMessage({
+        action: "setNodeAttribute",
+        nodeId: nodeId,
+        name: name,
+        value: value
+    });
+}
+
+function setNodeAttributeAll(name, value) {
+    postMessage({
+        action: "setNodeAttributeAll",
+        name: name,
+        value: value
+    });
+}
+
 /**
  * Receives the shared array reference and a copy of the algorithm code from
  * the Algorithm which created this thread.
@@ -23,14 +60,16 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
 
     } else if (message[0] === "algorithm") {
         wait();
+
+        try {
+            eval(message[2]); /* eslint-disable-line no-eval */
+            console.log("Algorithm completed");
+            postMessage({type: "complete"});
+
+        } catch (error) {
+            // if there's an error, send a message with the error
+            postMessage({type: "error", content: error});
+            throw error
+        }
     }
 }
-
-/**
- * This function uses Atomics to cause the algorithm to wait for user input before continuing
- */
-function wait() {
-    Atomics.store(sharedArray, 0, 0);
-    Atomics.wait(sharedArray, 0, 0);
-}
-

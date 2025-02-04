@@ -79,13 +79,11 @@ export default function GraphView() {
          * Load a new algorithm.
          */
         function onAlgorithmLoad(data) {
-            new ChangeRecord("algorithm");
-            const newAlgorithm = new Algorithm(data.name, data.algorithm, baseGraph, { PromptService }, [algorithmStatus, setAlgorithmStatus]);
-            setCurrentAlgorithm(newAlgorithm);
-
-
             // INITIALIZE THE NEW ALGORITHM IN PARALLEL
-            let na = new NewAlgorthm(data.name, data.algorithm);
+            let na = new NewAlgorthm(data.name, data.algorithm, [algorithmStatus, setAlgorithmStatus]);
+
+            const newAlgorithm = new Algorithm(data.name, data.algorithm, baseGraph, { PromptService }, [algorithmStatus, setAlgorithmStatus]);
+            setCurrentAlgorithm(na);
         }
 
         SharedWorker.on("graph-init", data => onGraphLoad(data, true));

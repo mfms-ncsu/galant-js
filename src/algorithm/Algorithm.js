@@ -1,3 +1,5 @@
+import Graph from "graph/Graph";
+
 /**
  * 
  * 
@@ -9,24 +11,22 @@ export default class Algorithm {
      * @param {String} name Algorithm name
      * @param {String} code Algorithm code
      */
-    constructor(name, code) {
+    constructor(name, code, stateVar) {
         this.name = name;
         this.code = code;
         this.array = new Int32Array(new SharedArrayBuffer(1024));
 
-        // Imitialize the thread worker
+        const [status, setStatus] = stateVar;
+        this.status = status;
+        this.setStatus = setStatus;
+        this.currentIndex = 0;
+        this.fetchingSteps = false;
+
+        // Initialize the thread worker
         this.worker = new Worker(new URL("./Thread.js", import.meta.url));
         this.worker.onmessage = this.onMessage;
         this.worker.postMessage(["shared", this.array]);
         this.worker.postMessage(["algorithm", this.code]);
-    }
-
-    /**
-     * Receives a message from the thread worker
-     * @param {String} message 
-     */
-    onMessage(message) {
-        console.log(message);
     }
 
     /**
@@ -45,6 +45,38 @@ export default class Algorithm {
     killThread() {
         if (this.worker) {
             this.worker.terminate();
+        }
+    }
+
+    canStepBack() {
+        return Graph.algorithmChangeManager.index > 0;
+    }
+
+    canStepForward() {
+        return (Graph.algorithmChangeManager.length === 0) || (Graph.algorithmChangeManager.index === (Graph.algorithmChangeManager.length-1));
+    }
+
+    stepBack() {
+        Graph.algorithmChangeManager.undo();
+    }
+
+    stepForward() {
+        if (!this.canStepForward()) return;
+        if (Graph.algorithmChangeManager.index === Graph.algorithmChangeManager.length) {
+            this.resumeThread();
+        }
+    }
+
+    onMessage(message) {
+        message = message.data;
+
+        switch (message.action) {
+            case "addNode":
+                Graph.algorithmChangeManager.addNode(message.x, message.y, message.nodeId);
+                break;
+            case "setNodeAttribute":
+                Graph.algorithmChangeManager.setNodeAttribute(message.nodeId, message.name, message.value);
+                break;
         }
     }
 }
