@@ -30,6 +30,7 @@ import ChangeRecord from "./utils/ChangeRecord";
  * NEW IMPORTS
  */
 import NewGraph from "graph/Graph";
+import NewAlgorthm from "algorithm/Algorithm";
 
 
 export default function GraphView() {
@@ -81,6 +82,10 @@ export default function GraphView() {
             new ChangeRecord("algorithm");
             const newAlgorithm = new Algorithm(data.name, data.algorithm, baseGraph, { PromptService }, [algorithmStatus, setAlgorithmStatus]);
             setCurrentAlgorithm(newAlgorithm);
+
+
+            // INITIALIZE THE NEW ALGORITHM IN PARALLEL
+            let na = new NewAlgorthm(data.name, data.algorithm);
         }
 
         SharedWorker.on("graph-init", data => onGraphLoad(data, true));
