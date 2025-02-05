@@ -16,14 +16,12 @@ import AlgorithmContext, { createAlgorithmContextObject } from "./utils/Algorith
 import { PromptContext } from "./utils/PromptService";
 import PromptServiceObject from "./utils/PromptService";
 import PromptComponent from "./GraphOverlay/Prompts/PromptComponent";
-import Algorithm from "utils/Algorithm/Algorithm";
 import ContextMenu from "./GraphEditOverlay/ContextMenus/ContextMenu";
 import NodeContextMenu from "./GraphEditOverlay/ContextMenus/NodeContextMenu";
 import EdgeContextMenu from "./GraphEditOverlay/ContextMenus/EdgeContextMenu";
 import GraphEditOverlay from "./GraphEditOverlay/GraphEditOverlay";
 import SharedWorker from "./utils/SharedWorker";
 import Graph from "utils/Graph";
-import ChangeRecord from "./utils/ChangeRecord";
 
 
 /**
@@ -79,11 +77,9 @@ export default function GraphView() {
          * Load a new algorithm.
          */
         function onAlgorithmLoad(data) {
-            // INITIALIZE THE NEW ALGORITHM IN PARALLEL
-            let na = new NewAlgorthm(data.name, data.algorithm, [algorithmStatus, setAlgorithmStatus]);
-
-            const newAlgorithm = new Algorithm(data.name, data.algorithm, baseGraph, { PromptService }, [algorithmStatus, setAlgorithmStatus]);
-            setCurrentAlgorithm(na);
+            // Load the algorithm
+            let newAlgorthm = new NewAlgorthm(data.name, data.algorithm, [algorithmStatus, setAlgorithmStatus]);
+            setCurrentAlgorithm(newAlgorthm);
         }
 
         SharedWorker.on("graph-init", data => onGraphLoad(data, true));
