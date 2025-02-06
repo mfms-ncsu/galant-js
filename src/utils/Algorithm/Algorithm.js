@@ -13,7 +13,7 @@
 import { AlgorithmStepSnapshot } from "./AlgorithmStepSnapshot";
 import { StepBuilder } from "./StepBuilder";
 import { AlgorithmConfiguration } from "./AlgorithmConfiguration";
-import { enablePatches, applyPatches } from "immer";
+import { enablePatches } from "immer";
 
 enablePatches();
 
@@ -182,7 +182,7 @@ export default class Algorithm {
      */
     stepForward(callback) {
         if (!this.canStepForward()) return;
-        if (this.currentIndex == this.steps.length - 1) {
+        if (this.currentIndex === this.steps.length - 1) {
             this.fetchingSteps = true;
             this.threadHandler.resumeThread();
             this.#setupTimeout();
@@ -208,7 +208,7 @@ export default class Algorithm {
      */
     skipToEndStep(callback) {
         if (!this.canStepForward()) return;
-        if (this.currentIndex == this.steps.length - 1) {
+        if (this.currentIndex === this.steps.length - 1) {
             this.fetchingSteps = true;
             this.threadHandler.resumeThread();
             this.#setupTimeout();

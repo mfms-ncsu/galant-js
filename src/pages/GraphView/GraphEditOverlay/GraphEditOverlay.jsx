@@ -14,7 +14,13 @@ export default function GraphEditOverlay({ setMode }) {
 
     // Function to save the graph state
     function save() {
-        // TODO
+        const graphData = {
+            name: "Saved Graph",
+            content: Graph.toGraphString(),
+        };
+    
+        console.log("Graph Saved:", JSON.stringify(graphData, null, 2));
+        
     }
 
     // Function to revert graph edits (node movements, etc.)
@@ -65,7 +71,7 @@ export default function GraphEditOverlay({ setMode }) {
     return length > 0 && (
         <div id="edit-overlay" className="absolute inset-0 flex flex-col p-4 pointer-events-none">
             <div className="w-fit mx-auto">
-                <p className="p-2 rounded shadow backdrop-blur bg-gradient-to-r from-indigo-500/90 to-blue-500/75 text-white">You"re in edit mode</p>
+                <p className="p-2 rounded shadow backdrop-blur bg-gradient-to-r from-indigo-500/90 to-blue-500/75 text-white">You're in edit mode</p>
                 <button className="block mx-auto pointer-events-auto backdrop-blur-sm hover:font-semibold hover:underline" onClick={revert}>Revert</button>
             </div>
             <div className="mt-auto mb-4">

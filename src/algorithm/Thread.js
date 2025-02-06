@@ -22,9 +22,8 @@ function wait() {
 }
 
 function addNode(x, y, nodeId) {
-    console.log("\n\n\nAdd Node\n\n\n");
-
     postMessage({
+        action: "addNode",
         nodeId: nodeId,
         x: x,
         y: y
