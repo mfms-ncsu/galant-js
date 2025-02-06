@@ -48,6 +48,16 @@ function setNodeAttributeAll(name, value) {
     });
 }
 
+function getNodeAttribute(nodeId, name) {
+    let attr = postMessage({
+        action: "getNodeAttribute",
+        nodeId: nodeId,
+        name: name
+    });
+
+    console.log(attr)
+}
+
 /**
  * Receives the shared array reference and a copy of the algorithm code from
  * the Algorithm which created this thread.
@@ -62,7 +72,7 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         wait();
 
         try {
-            eval(message[2]); /* eslint-disable-line no-eval */
+            eval(message[1]); /* eslint-disable-line no-eval */
             console.log("Algorithm completed");
             postMessage({type: "complete"});
 

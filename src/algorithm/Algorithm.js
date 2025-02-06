@@ -69,13 +69,16 @@ export default class Algorithm {
 
     onMessage(message) {
         message = message.data;
-
+        
         switch (message.action) {
             case "addNode":
-                Graph.algorithmChangeManager.addNode(message.x, message.y, message.nodeId);
+                return Graph.algorithmChangeManager.addNode(message.x, message.y, message.nodeId);
                 break;
             case "setNodeAttribute":
                 Graph.algorithmChangeManager.setNodeAttribute(message.nodeId, message.name, message.value);
+                break;
+            case "getNodeAttribute":
+                return Graph.getNodeAttribute(message.nodeId, message.name);
                 break;
         }
     }
