@@ -42,6 +42,36 @@ export class Graph {
         this.cytoscapeManager = new CytoscapeManager(this, this.#privateMethods);
     }
 
+    /**
+     * Converts the graph to a string representation for exporting to a file.
+     * @returns String representation of the current graph
+     * @author Ziyu Wang
+     */
+    toGraphString() {
+        let content = "";
+
+        this.#nodes.forEach(node => {
+            let attributesString = "";
+            if (node.attributes.size > 0) {
+                attributesString = " " + [...node.attributes.entries()]
+                    .filter(([_,value]) => value !== undefined && value !== false && value !== "")
+                    .map(([key, value]) => `${key}:${value}`)
+                    .join(" ");
+            }
+            // eslint-disable-next-line no-undef
+            content += `n ${node.id} ${node.position.x} ${node.position.y} ${attributesString}\n`;
+        });
+
+        this.#nodes.forEach(node => {
+            node.edges.forEach(edge => {
+                if (edge.source === node.id) {
+                    content += `e ${edge.source} ${edge.target}\n`;
+                }
+            });
+        });
+
+        return content;
+    }
 
     /**
      * Gets this graph's scalar
@@ -590,37 +620,6 @@ export class Graph {
                     break;
             }
         });
-    }
-
-    /**
-     * Converts the graph to a string representation for exporting to a file.
-     * @returns String representation of the current graph
-     * @author Ziyu Wang
-     */
-    toGraphString() {
-        let content = "";
-
-        this.#nodes.forEach(node => {
-            let attributesString = "";
-            if (node.attributes.size > 0) {
-                attributesString = " " + [...node.attributes.entries()]
-                    .filter(([_,value]) => value !== undefined && value !==false && value !== "")
-                    .map(([key, value]) => `${key}:${value}`)
-                    .join(" ");
-            }
-            // eslint-disable-next-line no-undef
-            content += `n ${node.id} ${node.position.x} ${node.position.y} ${attributesString}\n`;
-        });
-
-        this.#nodes.forEach(node => {
-            node.edges.forEach(edge => {
-                if (edge.source === node.id) {
-                    content += `e ${edge.source} ${edge.target}\n`;
-                }
-            });
-        });
-
-        return content;
     }
 
     /**

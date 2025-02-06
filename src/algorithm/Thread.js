@@ -1,3 +1,5 @@
+import { Graph } from "graph/Graph";
+
 /**
  * 
  * 
@@ -11,7 +13,8 @@
  */
 let sharedArray;
 
-let graph;
+let nodes;
+let graph = new Graph();
 
 /**
  * This function uses Atomics to cause the algorithm to wait for user input before continuing
@@ -21,6 +24,12 @@ function wait() {
     Atomics.wait(sharedArray, 0, 0);
 }
 
+function step(code=null) {
+    (code !== null) && code();
+    postMessage({type: "step"});
+    // wait();
+}
+
 function addNode(x, y, nodeId) {
     postMessage({
         action: "addNode",
@@ -28,23 +37,8 @@ function addNode(x, y, nodeId) {
         x: x,
         y: y
     });
-}
 
-function setNodeAttribute(nodeId, name, value) {
-    postMessage({
-        action: "setNodeAttribute",
-        nodeId: nodeId,
-        name: name,
-        value: value
-    });
-}
-
-function setNodeAttributeAll(name, value) {
-    postMessage({
-        action: "setNodeAttributeAll",
-        name: name,
-        value: value
-    });
+    step();
 }
 
 /**
@@ -57,11 +51,15 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
     if (message[0] === "shared") {
         sharedArray = message[1];
 
-    } else if (message[0] === "algorithm") {
+    } else if (message[0] === "graph/algorithm") {
+        graph.fileParser.loadGraph(message[1], false);
+
+        console.log(graph.getNodes());
+
         wait();
 
         try {
-            eval(message[1]); /* eslint-disable-line no-eval */
+            eval(message[2]); /* eslint-disable-line no-eval */
             console.log("Algorithm completed");
             postMessage({type: "complete"});
 
