@@ -94,6 +94,11 @@ export class Graph {
      * @returns All edges in the graph
      */
     getEdges() {
+        
+        // NOTE: This function returns the key of each edge (for edge a->b,
+        //       returns the string "a,b". However, for all of our other
+        //       edge functions (getAllEdges, getIncomingEdges, etc.) we
+        //       return the edge object itself. Why is this one different?
         const edges = [];
 
         this.#nodes.forEach(node => {
@@ -171,6 +176,20 @@ export class Graph {
         });
 
         return edges;
+    }
+
+    /**
+     * Returns a string representing a list of edges
+     * @param {Edge[]} edges the list of edges to convert
+     * @return {String[]} A string representation of the edges. For an edge
+     *                    a->b, the string will be "a,b"
+     */
+    edgeArrToStringArr(edges) {
+        let retArr = [];
+        for (let edge of edges) {
+            retArr.push(edge.source + "," + edge.target); 
+        }
+        return retArr;
     }
 
     /**

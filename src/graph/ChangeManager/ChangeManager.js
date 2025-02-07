@@ -116,6 +116,28 @@ export default class ChangeManager {
     }
 
     /**
+     * Sets the attribute for every node in the graph. Needed for Algorithm functions
+     * such as clearNodeMarks or clearNodeWeights, where we need to change every attribute
+     * for a node in a single change record
+     * @param {String} name the name of the attribute to set
+     * @param {String} value the vlue to set the attribute to. Can be undefined.
+     */
+    setEveryNodeAttribute(name, value) {
+        
+        // List of changes
+        let changes = [];
+
+        // Set the attribute of each node
+        let nodes = this.#graph.getNodeArray();
+        for (let node of nodes) {
+            changes.push(this.#graph.setNodeAttribute(node, name, value));
+        }
+
+        // Record the list of change records
+        this.#recordChange(changes);
+    }
+
+    /**
      * Sets an attribute for an edge and records the change.
      * @param {String} source Source node id
      * @param {String} target Target node id

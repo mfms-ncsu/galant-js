@@ -116,6 +116,9 @@ function deleteEdge(edgeId) {
  * @param {Object} value Value of the attribute
  */
 function setAttribute(id, name, value) {
+    if (id == null) {
+        console.error("id is null! name: " + name + ", value: " + value);
+    }
     if (id.includes(",")) {
         // Handle edge attribute
         let split = id.split(",");
@@ -169,6 +172,81 @@ function weight(id) {
 
 function setWeight(id, weight) {
     setAttribute(id, "weight", weight);
+}
+
+/**
+ * Adds a node at the given x, y position.
+ *
+ * @param {Integer} x the x position to add the new node at
+ * @param {Integer} y the y position to add the new node at
+ * @return {String} the ID of the new node
+ */
+function addNode(x, y) {
+    let id = graph.algorithmChangeManager.addNode(x, y);
+    postMessage({ action: "addNode", x: x, y: y });
+    step();
+    return id;
+}
+
+/**
+ * Removes the "marked" attribute from every node
+ */
+function clearNodeMarks() {
+    
+    // FIXME: This function for some reason sets every node to be orange. No idea why.
+    // graph.algorithmChangeManager.setEveryNodeAttribute("marked", "false");
+    // postMessage({ action: "setEveryNodeAttribute", name: "marked", value: "false"});
+    step();
+}
+
+/**
+ * Sets the weight of every node to undefined
+ */
+function clearNodeWeights() {
+    graph.algorithmChangeManager.setEveryNodeAttribute("weight", undefined);
+    postMessage({ action: "setEveryNodeAttribute", name: "weight", value: undefined});
+    step();
+}
+
+/**
+ * Set the "color" attribute of each node to undefined
+ */
+function clearEdgeColors() {
+    graph.algorithmChangeManager.setEveryNodeAttribute("color", undefined);
+    postMessage({ action: "setEveryNodeAttribute", name: "color", value: undefined});
+    step();
+}
+
+/**
+ * Returns true if the given edge has a defined weight
+ *
+ * @param {String} edge a string representation of the edge. The string must be in
+ *                      form "src,dest", where src is the id of the source ndoe and
+ *                      dest is the id of the destination node.
+ * @return {Boolean} true if the edge has a defined weight (including 0), or false if
+ *                   the weight is undefined
+ */
+function hasWeight(edge) {
+    let arr = edge.split(",");
+    return graph.getEdgeAttribute(arr[0], arr[1], "weight") == undefined;
+}
+
+/**
+ * This function should prompt the user to enter the id of a node, and should
+ * return whatever the user enters. Currently, it just returns the first node in
+ * the getNodeArray() array for testing.
+ */
+function promptNode(message, errMessage) {
+    return graph.getNodeArray()[0];
+}
+
+/**
+ * Returns a list of all the outgoing edges of a specified node
+ * @param {String} id the id of the node to return the outgoing nodes of
+ * @return {String[]} An array representing all the outgoing edges of the graph
+ */
+function outgoing(node) {
+    return graph.edgeArrToStringArr(graph.getOutgoingEdges(node)); 
 }
 
 
