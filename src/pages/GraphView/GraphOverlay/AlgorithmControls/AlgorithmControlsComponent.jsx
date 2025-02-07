@@ -22,6 +22,8 @@ export default function AlgorithmControls() {
     // Function to handle pressing the front button
     function frontButtonPress() {
         if (!algorithm || !algorithm.canStepForward) return;
+        console.log("stepForward pressed");
+        console.log(algorithm);
         algorithm.stepForward();
     } 
 

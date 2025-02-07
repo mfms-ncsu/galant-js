@@ -23,6 +23,18 @@ export default class Algorithm {
         this.setStatus = setStatus;
         this.currentIndex = 0;
         this.fetchingSteps = false;
+        
+        /**
+         * The size of each step. For example, if stepSizes[1] = 2, then step 1 in
+         * the algorithm did two things (ie, it highlighted two edges)
+         */
+        this.stepSizes = [];
+
+        /**
+         * Used to record the size of a step. Starts at 0, and increments with
+         * each action of that step until the step ends.
+         */
+        this.tempStepSize = 0;
 
         // Initialize the thread worker
         this.worker = new Worker(new URL("./Thread.js", import.meta.url));
@@ -41,6 +53,7 @@ export default class Algorithm {
     resumeThread() {
         Atomics.store(this.array, 0, 1);
         Atomics.notify(this.array, 0);
+        this.currentIndex++;
     }
 
     /**
@@ -61,7 +74,9 @@ export default class Algorithm {
     }
 
     stepBack() {
+        if (this.currentIndex == 0) return;
         Graph.algorithmChangeManager.undo();
+        this.currentIndex--;
     }
 
     stepForward() {
@@ -92,6 +107,7 @@ export default class Algorithm {
         switch (message.action) {
             case "addNode":
                 Graph.algorithmChangeManager.addNode(message.x, message.y);
+                this.tempStepSize++;
             case "prompt":
                 this.PromptService.addPrompt(
                     { type: 'input', label: message.content[0] },
@@ -99,27 +115,43 @@ export default class Algorithm {
                         this.enterPromptResult(value);
                     }
                 );
+                this.tempStepSize++;
                 break;
             case "message":
+                this.tempStepSize++;
                 break;
             case "deleteNode":
                 Graph.algorithmChangeManager.deleteNode(message.nodeId);
+                this.tempStepSize++;
                 break;
             case "deleteEdge":
                 Graph.algorithmChangeManager.deleteEdge(message.source, message.target);
+                this.tempStepSize++;
                 break;
             case "setNodeAttribute":
                 Graph.algorithmChangeManager.setNodeAttribute(message.nodeId, message.name, message.value);
+                this.tempStepSize++;
                 break;
             case "setNodeAttributeAll":
                 Graph.algorithmChangeManager.setNodeAttributeAll(message.name, message.value);
+                this.tempStepSize++;
                 break;
             case "setEdgeAttribute":
                 Graph.algorithmChangeManager.setEdgeAttribute(message.source, message.target, message.name, message.value);
+                this.tempStepSize++;
                 break;
             case "setEdgeAttributeAll":
                 Graph.algorithmChangeManager.setEdgeAttributeAll(message.name, message.value);
+                this.tempStepSize++;
                 break;
+            case "stepStart":
+                this.tempStepSize = 0;
+                break;
+            case "stepEnd":
+                this.stepSizes.push(this.tempStepSize);
+                this.tempStepSize = 0;
+                break;
+                
         }
     }
 }

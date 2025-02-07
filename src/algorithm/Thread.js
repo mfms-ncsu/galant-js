@@ -30,8 +30,9 @@ function wait() {
  * Tells the thread to wait after running a step.
  */
 function step(code=null) {
+    postMessage({type: "stepStart"});
     (code !== null) && code();
-    postMessage({type: "step"});
+    postMessage({type: "stepEnd"});
     wait();
 }
 
