@@ -39,7 +39,9 @@ export default class FileParser {
         this.#graph.scale();
 
         // Update cytoscape to show the newly loaded graph
-        window.updateCytoscape();
+        if (typeof window !== "undefined" && window.self === window.top) {
+            window.updateCytoscape();
+        }
     }
 
     /**

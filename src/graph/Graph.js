@@ -42,6 +42,36 @@ export class Graph {
         this.cytoscapeManager = new CytoscapeManager(this, this.#privateMethods);
     }
 
+    /**
+     * Converts the graph to a string representation for exporting to a file.
+     * @returns String representation of the current graph
+     * @author Ziyu Wang
+     */
+    toGraphString() {
+        let content = "";
+
+        this.#nodes.forEach(node => {
+            let attributesString = "";
+            if (node.attributes.size > 0) {
+                attributesString = " " + [...node.attributes.entries()]
+                    .filter(([_,value]) => value !== undefined && value !== false && value !== "")
+                    .map(([key, value]) => `${key}:${value}`)
+                    .join(" ");
+            }
+            // eslint-disable-next-line no-undef
+            content += `n ${node.id} ${node.position.x} ${node.position.y} ${attributesString}\n`;
+        });
+
+        this.#nodes.forEach(node => {
+            node.edges.forEach(edge => {
+                if (edge.source === node.id) {
+                    content += `e ${edge.source} ${edge.target}\n`;
+                }
+            });
+        });
+
+        return content;
+    }
 
     /**
      * Gets this graph's scalar
@@ -52,20 +82,29 @@ export class Graph {
     }
 
     /**
-     * Gets the edge between a given source and a given target node.
-     * @param {String} source Source node id
-     * @param {String} target Target node id
-     * @returns Edge between source and target, undefined if it doesn't exist
+     * Gets this graph's nodes in an array.
+     * @returns This graph's nodes in an array
      */
-    getEdge(source, target) {
-        // Check if the source node exists
-        if (this.#nodes.has(source)) {
-            // If it does, try to get the edge from source to target
-            return this.#nodes.get(source).edges.get(`${source},${target}`);
-        } else {
-            // If the source node doesn't exist, return undefined
-            return undefined;
-        }
+    getNodeArray() {
+        return [...this.#nodes.keys()];
+    }
+
+    /**
+     * Gets an array of all edges in the graph.
+     * @returns All edges in the graph
+     */
+    getEdges() {
+        const edges = [];
+
+        this.#nodes.forEach(node => {
+            node.edges.forEach((edge, key) => {
+                if (edge.source === node.id) {
+                    edges.push(key);
+                }
+            });
+        });
+
+        return edges;
     }
 
     /**
@@ -77,7 +116,7 @@ export class Graph {
         // Check if the node exists
         if (this.#nodes.has(nodeId)) {
             // If it does, return an array of all of its edges
-            return [...this.#nodes.get(nodeId).edges.values()];
+            return [...this.#nodes.get(nodeId).edges.keys()];
         } else {
             // If the node doesn't exist, return undefined
             return undefined;
@@ -132,6 +171,26 @@ export class Graph {
         });
 
         return edges;
+    }
+
+    /**
+     * Gets the node opposite the given on the given edge.
+     * @param {String} nodeId Id of the node to check for
+     * @param {String} edgeId Id of the edge to check (Source,Target format)
+     * @returns Id of the node opposite the given
+     */
+    getOppositeNode(nodeId, edgeId) {
+        // Ensure the node exists
+        if (!this.#nodes.has(nodeId)) {
+            return undefined;
+        }
+
+        // Get the edge
+        let edge = this.#nodes.get(nodeId).edges.get(edgeId);
+        if (!edge) return undefined;
+
+        // Return the id of the opposite node
+        return (edge.source === nodeId) ? edge.target : edge.source;
     }
 
     /**
@@ -590,37 +649,6 @@ export class Graph {
                     break;
             }
         });
-    }
-
-    /**
-     * Converts the graph to a string representation for exporting to a file.
-     * @returns String representation of the current graph
-     * @author Ziyu Wang
-     */
-    toGraphString() {
-        let content = "";
-
-        this.#nodes.forEach(node => {
-            let attributesString = "";
-            if (node.attributes.size > 0) {
-                attributesString = " " + [...node.attributes.entries()]
-                    .filter(([_,value]) => value !== undefined && value !==false && value !== "")
-                    .map(([key, value]) => `${key}:${value}`)
-                    .join(" ");
-            }
-            // eslint-disable-next-line no-undef
-            content += `n ${node.id} ${node.position.x} ${node.position.y} ${attributesString}\n`;
-        });
-
-        this.#nodes.forEach(node => {
-            node.edges.forEach(edge => {
-                if (edge.source === node.id) {
-                    content += `e ${edge.source} ${edge.target}\n`;
-                }
-            });
-        });
-
-        return content;
     }
 
     /**

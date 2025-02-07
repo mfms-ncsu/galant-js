@@ -24,8 +24,10 @@ export default class Algorithm {
 
         // Initialize the thread worker
         this.worker = new Worker(new URL("./Thread.js", import.meta.url));
-        this.worker.onmessage = this.onMessage;
+        let handleMessage = (message) => { this.#onMessage(message.data) }
+        this.worker.onmessage = handleMessage;
         this.worker.postMessage(["shared", this.array]);
+        this.worker.postMessage(["graph/algorithm", Graph.toGraphString(), this.code]);
         this.worker.postMessage(["algorithm", this.code]);
     }
 
@@ -53,7 +55,7 @@ export default class Algorithm {
     }
 
     canStepForward() {
-        return (Graph.algorithmChangeManager.length === 0) || (Graph.algorithmChangeManager.index === (Graph.algorithmChangeManager.length-1));
+        return true;
     }
 
     stepBack() {
@@ -64,21 +66,26 @@ export default class Algorithm {
         if (!this.canStepForward()) return;
         if (Graph.algorithmChangeManager.index === Graph.algorithmChangeManager.length) {
             this.resumeThread();
+        } else {
+            Graph.algorithmChangeManager.redo();
         }
     }
 
-    onMessage(message) {
-        message = message.data;
-        
+    #onMessage(message) {
         switch (message.action) {
-            case "addNode":
-                Graph.algorithmChangeManager.addNode(message.x, message.y, message.nodeId);
+            case "deleteNode":
+                Graph.algorithmChangeManager.deleteNode(message.nodeId);
+                break;
+            case "deleteEdge":
+                Graph.algorithmChangeManager.deleteEdge(message.source, message.target);
                 break;
             case "setNodeAttribute":
                 Graph.algorithmChangeManager.setNodeAttribute(message.nodeId, message.name, message.value);
                 break;
             case "getNodeAttribute":
                 return Graph.getNodeAttribute(message.nodeId, message.name);
+            case "setEdgeAttribute":
+                Graph.algorithmChangeManager.setEdgeAttribute(message.source, message.target, message.name, message.value);
                 break;
         }
     }
