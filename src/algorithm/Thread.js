@@ -120,6 +120,22 @@ function setAttribute(id, name, value) {
 }
 
 /**
+ * Sets a new attribute for the given class of graph element.
+ * @param {String} type Either nodes or edges
+ * @param {String} name Attribute name
+ * @param {Object} value Attribute value
+ */
+function setAttributeAll(type, name, value) {
+    if (type === "nodes") {
+        postMessage({ action: "setNodeAttributeAll", name: name, value: value });
+
+    } else {
+        postMessage({ action: "setEdgeAttributeAll", name: name, value: value });
+    }
+    step();
+}
+
+/**
  * Gets the value of an attribute for a given graph element.
  * @param {String} id Id of the graph element
  * @param {*} name Name of the attribute
@@ -145,8 +161,28 @@ function uncolor(id) {
     setAttribute(id, "color", undefined);
 }
 
+function clearEdgeColors() {
+    setAttributeAll("edges", "color", undefined);
+}
+
 function setEdgeWidth(id, width) {
     setAttribute(id, "edgeWidth", width);
+}
+
+function mark(nodeId) {
+    setAttribute(nodeId, "marked", true);
+}
+
+function unmark(nodeId) {
+    setAttribute(nodeId, "marked", false);
+}
+
+function marked(nodeId) {
+    getAttribute(nodeId, "marked");
+}
+
+function clearNodeMarks() {
+    setAttributeAll("nodes", "marked", false);
 }
 
 function setShape(id, shape) {
@@ -159,6 +195,14 @@ function weight(id) {
 
 function setWeight(id, weight) {
     setAttribute(id, "weight", weight);
+}
+
+function clearNodeWeights() {
+    setAttributeAll("nodes", "weight", undefined);
+}
+
+function hasWeight(id) {
+    return getAttribute(id, "weight") === undefined;
 }
 
 

@@ -82,8 +82,14 @@ export default class Algorithm {
             case "setNodeAttribute":
                 Graph.algorithmChangeManager.setNodeAttribute(message.nodeId, message.name, message.value);
                 break;
+            case "setNodeAttributeAll":
+                Graph.algorithmChangeManager.setNodeAttributeAll(message.name, message.value);
+                break;
             case "setEdgeAttribute":
                 Graph.algorithmChangeManager.setEdgeAttribute(message.source, message.target, message.name, message.value);
+                break;
+            case "setEdgeAttributeAll":
+                Graph.algorithmChangeManager.setEdgeAttributeAll(message.name, message.value);
                 break;
         }
     }

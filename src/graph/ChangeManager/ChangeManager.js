@@ -116,6 +116,17 @@ export default class ChangeManager {
     }
 
     /**
+     * Sets an attribute for all nodes and records the change.
+     * @param {String} name Attribute name
+     * @param {Object} value Attribute value
+     */
+    setNodeAttributeAll(name, value) {
+        // Record the change
+        // Note: since setNodeAttributeAll returns an array, don't need brackets
+        this.#recordChange(this.#graph.setNodeAttributeAll(name, value));
+    }
+
+    /**
      * Sets an attribute for an edge and records the change.
      * @param {String} source Source node id
      * @param {String} target Target node id
@@ -125,6 +136,17 @@ export default class ChangeManager {
     setEdgeAttribute(source, target, name, value) {
         // Record the change
         this.#recordChange([this.#graph.setEdgeAttribute(source, target, name, value)]);
+    }
+
+    /**
+     * Sets an attribute for all edges and records the change.
+     * @param {String} name Attribute name
+     * @param {Object} value Attribute value
+     */
+    setEdgeAttributeAll(name, value) {
+        // Record the change
+        // Note: since setEdgeAttributeAll returns an array, don't need brackets
+        this.#recordChange(this.#graph.setEdgeAttributeAll(name, value));
     }
 
     /**
