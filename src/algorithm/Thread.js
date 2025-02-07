@@ -52,6 +52,111 @@ function print(message) {
 }
 
 /**
+ * Prompts the user for input.
+ * @param {string} message The prompt message
+ * @param {string} error The error message to display if input is invalid
+ * @returns {string} The user input
+ */
+function prompt(message, error="") {
+    if (message === null || message === "") {
+        message = "Prompt";
+    }
+    postMessage({action: "prompt", content: [message, error]})
+    wait();
+    let len = Atomics.load(sharedArray, 1);
+    let promptResult = "";
+    for (let i = 0; i < len; i++) {
+        promptResult += String.fromCharCode(Atomics.load(sharedArray, i + 2));
+    }
+    return promptResult;
+}
+
+/**
+ * Recieving the prompt and options
+ * @param {string} message The prompt message
+ * @param {string} error The error message to display if input is invalid
+ * @param {NodeObject[]} list The list of options
+ * @returns {string} promptResult 
+ */
+function promptFrom(message, list, error) {
+    if (list.length === 0) {
+        throw new Error("Cannot prompt when no valid options exist.");
+    }
+    if (error === null) {
+        error = "Must enter a value from " + list;
+    }
+    let promptResult = prompt(message);
+    while(!list.includes(promptResult)) {
+        console.log("NOT FOUND - REPROMPTING");
+        promptResult = prompt(message, error);
+    }
+    return promptResult;
+}
+
+/**
+ * Returns message for checking boolean value
+ * @param {string} message The prompt message
+ * @returns {string} message of checking boolean value  
+ */
+function promptBoolean(message) {
+    return promptFrom(message, ["true", "false"], "Must enter a boolean value (true/false)") === "true";
+}
+
+/**
+ * Returns message for checking integer value
+ * @param {string} message The prompt message
+ * @returns {string} promptResult of checking integer value  
+ */
+function promptInteger(message) {
+    let promptResult = parseInt(prompt(message));
+    while (isNaN(promptResult)) {
+        promptResult = parseInt(prompt(message, "Must enter an integer"));
+    }
+    return promptResult;
+}
+
+/**
+ * Returns message for checking float number value
+ * @param {string} message The prompt message
+ * @returns {string} promptResult of checking float number value  
+ */
+function promptNumber(message) {
+    let promptResult = parseFloat(prompt(message));
+    while (isNaN(promptResult)) {
+        promptResult = parseFloat(prompt(message, "Must enter a number"));
+    }
+    return promptResult;
+}
+
+/**
+ * Prompts the user to select a node from the graph.
+ * @param {string} message The prompt message
+ * @returns {string} The ID of the selected node
+ * @throws {Error} If there are no valid nodes in the graph
+ */
+function promptNode(message) {
+    let nodes = getNodes();
+    if (nodes.length === 0) {
+        throw new Error("Cannot prompt for a node when no valid nodes exist.");
+    }
+    return promptFrom(message, nodes, "Must enter a valid Node ID. The valid nodes are " + nodes);
+}
+
+/**
+ * Prompts the user to select an edge from the graph.
+ * @param {string} message The prompt message
+ * @returns {string} The ID of the selected edge
+ * @throws {Error} If there are no valid edges in the graph
+ */
+function promptEdge(message) {
+    let edges = getEdges();
+    if (edges.length === 0) {
+        throw new Error("Cannot prompt for an edge when no valid edges exist.");
+    }
+    return promptFrom(message, edges, "Must enter a valid Edge ID. The valid edges are " + edges);
+}
+
+/**
  * Gets the ids of all nodes in an array
  * @returns Ids of all nodes
  */

@@ -11,10 +11,12 @@ export default class Algorithm {
      * @param {String} name Algorithm name
      * @param {String} code Algorithm code
      */
-    constructor(name, code, stateVar) {
+    constructor(name, code, PromptService, stateVar) {
         this.name = name;
         this.code = code;
         this.array = new Int32Array(new SharedArrayBuffer(1024));
+
+        this.PromptService = PromptService;
 
         const [status, setStatus] = stateVar;
         this.status = status;
@@ -71,8 +73,35 @@ export default class Algorithm {
         }
     }
 
+    /**
+     * This stores in the shared array the length of the promptResult at index 1
+     * and then puts each character of the promptResult in the shared array starting
+     * at index 2.
+     * @param {Object} promptResult the result from prompting the user for input
+     */
+    enterPromptResult(promptResult) {
+        let len = Math.min(promptResult.length, 254)
+        Atomics.store(this.array, 1, len);
+        for (let i = 0; i < len; i++) {
+            Atomics.store(this.array, i + 2, promptResult.charCodeAt(i));
+        }
+        this.resumeThread();
+    }
+
     #onMessage(message) {
         switch (message.action) {
+            case "prompt":
+                console.log(message);
+
+                this.PromptService.addPrompt(
+                    { type: 'input', label: message.content[0] },
+                    (value) => {
+                        this.enterPromptResult(value);
+                    }
+                );
+                break;
+            case "message":
+                break;
             case "deleteNode":
                 Graph.algorithmChangeManager.deleteNode(message.nodeId);
                 break;

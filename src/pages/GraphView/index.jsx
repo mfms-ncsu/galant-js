@@ -78,7 +78,7 @@ export default function GraphView() {
          */
         function onAlgorithmLoad(data) {
             // Load the algorithm
-            let newAlgorthm = new NewAlgorthm(data.name, data.algorithm, [algorithmStatus, setAlgorithmStatus]);
+            let newAlgorthm = new NewAlgorthm(data.name, data.algorithm, PromptService, [algorithmStatus, setAlgorithmStatus]);
             setCurrentAlgorithm(newAlgorthm);
         }
 
