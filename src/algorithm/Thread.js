@@ -173,6 +173,24 @@ function getEdges() {
 }
 
 /**
+ * Gets the ids of all outgoing edges from source.
+ * @param {String} nodeId Source node
+ * @returns Array of outgoing edges
+ */
+function outgoing(nodeId) {
+    return graph.getOutgoingEdges(nodeId);
+}
+
+/**
+ * Gets the ids of all incoming edges from source.
+ * @param {String} nodeId Source node
+ * @returns Array of incoming edges
+ */
+function incoming(nodeId) {
+    return graph.getIncomingEdges(nodeId);
+}
+
+/**
  * Gets the opposite node on the given edge.
  * @param {String} nodeId Node id
  * @param {String} edgeId Edge id (Source,Target format)
@@ -215,13 +233,14 @@ function setAttribute(id, name, value) {
         // Handle edge attribute
         let split = id.split(",");
         let source = split[0], target = split[1];
+        graph.algorithmChangeManager.setEdgeAttribute(source, target, name, value);
         postMessage({ action: "setEdgeAttribute", source: source, target: target, name: name, value: value });
     
     } else {
         // Handle node attribute
+        graph.algorithmChangeManager.setNodeAttribute(id, name, value);
         postMessage({ action: "setNodeAttribute", nodeId: id, name: name, value: value });
     }
-    step();
 }
 
 /**
@@ -232,29 +251,30 @@ function setAttribute(id, name, value) {
  */
 function setAttributeAll(type, name, value) {
     if (type === "nodes") {
+        graph.algorithmChangeManager.setEdgeAttributeAll(name, value);
         postMessage({ action: "setNodeAttributeAll", name: name, value: value });
 
     } else {
+        graph.algorithmChangeManager.setNodeAttributeAll(name, value);
         postMessage({ action: "setEdgeAttributeAll", name: name, value: value });
     }
-    step();
 }
 
 /**
  * Gets the value of an attribute for a given graph element.
  * @param {String} id Id of the graph element
- * @param {*} name Name of the attribute
+ * @param {String} name Name of the attribute
  */
 function getAttribute(id, name) {
     if (id.includes(",")) {
         // Handle edge attribute
         let split = id.split(",");
         let source = split[0], target = split[1];
-        graph.getEdgeAttribute(source, target, name);
+        return graph.getEdgeAttribute(source, target, name);
 
     } else {
         // Handle node attribute
-        graph.getNodeAttribute(id, name);
+        return graph.getNodeAttribute(id, name);
     }
 }
 
@@ -266,12 +286,40 @@ function uncolor(id) {
     setAttribute(id, "color", undefined);
 }
 
+function hasColor(id) {
+    return getAttribute(id, "color") !== undefined;
+}
+
 function clearEdgeColors() {
     setAttributeAll("edges", "color", undefined);
 }
 
 function setEdgeWidth(id, width) {
     setAttribute(id, "edgeWidth", width);
+}
+
+function highlight(id) {
+    setAttribute(id, "highlighted", true);
+}
+
+function highlighted(id) {
+    return getAttribute(id, "highlighted");
+}
+
+function clearEdgeHighlights() {
+    setAttributeAll("edges", "highlighted", false);
+}
+
+function clearNodeHighlights() {
+    setAttributeAll("nodes", "highlighted", false);
+}
+
+function label(id, label) {
+    setAttribute(id, "label", label);
+}
+
+function clearNodeLabels() {
+    setAttributeAll("nodes", "label", "");
 }
 
 function mark(nodeId) {
@@ -283,7 +331,7 @@ function unmark(nodeId) {
 }
 
 function marked(nodeId) {
-    getAttribute(nodeId, "marked");
+    return getAttribute(nodeId, "marked");
 }
 
 function clearNodeMarks() {
@@ -295,7 +343,7 @@ function setShape(id, shape) {
 }
 
 function weight(id) {
-    getAttribute(id, "weight");
+    return getAttribute(id, "weight");
 }
 
 function setWeight(id, weight) {
@@ -303,11 +351,11 @@ function setWeight(id, weight) {
 }
 
 function clearNodeWeights() {
-    setAttributeAll("nodes", "weight", undefined);
+    setAttributeAll("nodes", "weight", 0);
 }
 
 function hasWeight(id) {
-    return getAttribute(id, "weight") === undefined;
+    return getAttribute(id, "weight") !== 0;
 }
 
 

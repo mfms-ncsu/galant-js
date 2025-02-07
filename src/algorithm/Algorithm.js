@@ -91,8 +91,6 @@ export default class Algorithm {
     #onMessage(message) {
         switch (message.action) {
             case "prompt":
-                console.log(message);
-
                 this.PromptService.addPrompt(
                     { type: 'input', label: message.content[0] },
                     (value) => {

@@ -59,7 +59,7 @@ export class Graph {
                     .join(" ");
             }
             // eslint-disable-next-line no-undef
-            content += `n ${node.id} ${node.position.x} ${node.position.y} ${attributesString}\n`;
+            content += `n ${node.id} ${node.position.x} ${node.position.y}${attributesString}\n`;
         });
 
         this.#nodes.forEach(node => {
@@ -74,7 +74,7 @@ export class Graph {
     }
 
     /**
-     * Gets this graph's scalar
+     * Gets this graph's scalar.
      * @returns This graph's scalar
      */
     getScalar() {
@@ -138,10 +138,10 @@ export class Graph {
         const edges = [];
 
         // Iterate over all edges
-        this.#nodes.get(target).edges.forEach(edge => {
+        this.#nodes.get(target).edges.forEach((edge, key) => {
             // Only push if the given node is the target
             if (edge.target === target) {
-                edges.push(edge);
+                edges.push(key);
             }
         });
 
@@ -163,10 +163,10 @@ export class Graph {
         const edges = [];
 
         // Iterate over all edges
-        this.#nodes.get(source).edges.forEach(edge => {
+        this.#nodes.get(source).edges.forEach((edge, key) => {
             // Only push if the given node is the source
             if (edge.source === source) {
-                edges.push(edge);
+                edges.push(key);
             }
         });
 
@@ -221,7 +221,7 @@ export class Graph {
         let node = this.#nodes.get(nodeId);
 
         if (node) {
-            return node.getAttribute(name);
+            return node.attributes.get(name);
         } else {
             // If the node doesn't exist, return undefined
             return undefined;
