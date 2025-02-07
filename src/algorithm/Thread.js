@@ -36,6 +36,22 @@ function step(code=null) {
 }
 
 /**
+ * Displays a new message to the user.
+ * @param {String} message Message to display
+ */
+function display(message) {
+    postMessage({ action: "message", message: message });
+}
+
+/**
+ * Prints a new message to the console.
+ * @param {String} message Message to print
+ */
+function print(message) {
+    console.log(message);
+}
+
+/**
  * Gets the ids of all nodes in an array
  * @returns Ids of all nodes
  */
@@ -49,6 +65,16 @@ function getNodes() {
  */
 function getEdges() {
     return graph.getEdges();
+}
+
+/**
+ * Gets the opposite node on the given edge.
+ * @param {String} nodeId Node id
+ * @param {String} edgeId Edge id (Source,Target format)
+ * @returns Opposite node
+ */
+function other(nodeId, edgeId) {
+    return graph.getOppositeNode(nodeId, edgeId);
 }
 
 /**
@@ -94,12 +120,45 @@ function setAttribute(id, name, value) {
 }
 
 /**
- * Sets a new color for a given graph element.
+ * Gets the value of an attribute for a given graph element.
  * @param {String} id Id of the graph element
- * @param {String} color Color to set
+ * @param {*} name Name of the attribute
  */
+function getAttribute(id, name) {
+    if (id.includes(",")) {
+        // Handle edge attribute
+        let split = id.split(",");
+        let source = split[0], target = split[1];
+        graph.getEdgeAttribute(source, target, name);
+
+    } else {
+        // Handle node attribute
+        graph.getNodeAttribute(id, name);
+    }
+}
+
 function color(id, color) {
     setAttribute(id, "color", color);
+}
+
+function uncolor(id) {
+    setAttribute(id, "color", undefined);
+}
+
+function setEdgeWidth(id, width) {
+    setAttribute(id, "edgeWidth", width);
+}
+
+function setShape(id, shape) {
+    setAttribute(id, "shape", shape);
+}
+
+function weight(id) {
+    getAttribute(id, "weight");
+}
+
+function setWeight(id, weight) {
+    setAttribute(id, "weight", weight);
 }
 
 

@@ -89,6 +89,10 @@ export class Graph {
         return [...this.#nodes.keys()];
     }
 
+    /**
+     * Gets an array of all edges in the graph.
+     * @returns All edges in the graph
+     */
     getEdges() {
         const edges = [];
 
@@ -167,6 +171,26 @@ export class Graph {
         });
 
         return edges;
+    }
+
+    /**
+     * Gets the node opposite the given on the given edge.
+     * @param {String} nodeId Id of the node to check for
+     * @param {String} edgeId Id of the edge to check (Source,Target format)
+     * @returns Id of the node opposite the given
+     */
+    getOppositeNode(nodeId, edgeId) {
+        // Ensure the node exists
+        if (!this.#nodes.has(nodeId)) {
+            return undefined;
+        }
+
+        // Get the edge
+        let edge = this.#nodes.get(nodeId).edges.get(edgeId);
+        if (!edge) return undefined;
+
+        // Return the id of the opposite node
+        return (edge.source === nodeId) ? edge.target : edge.source;
     }
 
     /**
