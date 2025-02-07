@@ -82,20 +82,25 @@ export class Graph {
     }
 
     /**
-     * Gets the edge between a given source and a given target node.
-     * @param {String} source Source node id
-     * @param {String} target Target node id
-     * @returns Edge between source and target, undefined if it doesn't exist
+     * Gets this graph's nodes in an array.
+     * @returns This graph's nodes in an array
      */
-    getEdge(source, target) {
-        // Check if the source node exists
-        if (this.#nodes.has(source)) {
-            // If it does, try to get the edge from source to target
-            return this.#nodes.get(source).edges.get(`${source},${target}`);
-        } else {
-            // If the source node doesn't exist, return undefined
-            return undefined;
-        }
+    getNodeArray() {
+        return [...this.#nodes.keys()];
+    }
+
+    getEdges() {
+        const edges = [];
+
+        this.#nodes.forEach(node => {
+            node.edges.forEach((edge, key) => {
+                if (edge.source === node.id) {
+                    edges.push(key);
+                }
+            });
+        });
+
+        return edges;
     }
 
     /**
@@ -107,7 +112,7 @@ export class Graph {
         // Check if the node exists
         if (this.#nodes.has(nodeId)) {
             // If it does, return an array of all of its edges
-            return [...this.#nodes.get(nodeId).edges.values()];
+            return [...this.#nodes.get(nodeId).edges.keys()];
         } else {
             // If the node doesn't exist, return undefined
             return undefined;

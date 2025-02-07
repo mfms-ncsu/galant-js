@@ -13,7 +13,9 @@ import { Graph } from "graph/Graph";
  */
 let sharedArray;
 
-let nodes;
+/**
+ * This thread's copy of the graph
+ */
 let graph = new Graph();
 
 /**
@@ -24,26 +26,90 @@ function wait() {
     Atomics.wait(sharedArray, 0, 0);
 }
 
+/**
+ * Tells the thread to wait after running a step.
+ */
 function step(code=null) {
     (code !== null) && code();
     postMessage({type: "step"});
-    // wait();
+    wait();
 }
 
-function addNode(x, y, nodeId) {
-    postMessage({
-        action: "addNode",
-        nodeId: nodeId,
-        x: x,
-        y: y
-    });
+/**
+ * Gets the ids of all nodes in an array
+ * @returns Ids of all nodes
+ */
+function getNodes() {
+    return graph.getNodeArray();
+}
 
+/**
+ * Gets the ids of all edges in an array
+ * @returns Ids of all edges (Source,Target format)
+ */
+function getEdges() {
+    return graph.getEdges();
+}
+
+/**
+ * Deletes the given nodes.
+ * @param {String} nodeId Node to delete
+ */
+function deleteNode(nodeId) {
+    graph.algorithmChangeManager.deleteNode(nodeId);
+    postMessage({ action: "deleteNode", nodeId: nodeId });
     step();
 }
 
 /**
- * Receives the shared array reference and a copy of the algorithm code from
- * the Algorithm which created this thread.
+ * Deletes the given edge.
+ * @param {String} edgeId Edge to delete (Source,Target format)
+ */
+function deleteEdge(edgeId) {
+    let split = edgeId.split(",");
+    let source = split[0], target = split[1];
+    graph.algorithmChangeManager.deleteEdge(source, target);
+    postMessage({ action: "deleteEdge", source: source, target: target });
+    step();
+}
+
+/**
+ * Sets a new attribute value for a given graph element.
+ * @param {String} id Id of the graph element to modify
+ * @param {String} name Name of the attribute
+ * @param {Object} value Value of the attribute
+ */
+function setAttribute(id, name, value) {
+    if (id.includes(",")) {
+        // Handle edge attribute
+        let split = id.split(",");
+        let source = split[0], target = split[1];
+        postMessage({ action: "setEdgeAttribute", source: source, target: target, name: name, value: value });
+    
+    } else {
+        // Handle node attribute
+        postMessage({ action: "setNodeAttribute", nodeId: id, name: name, value: value });
+    }
+    step();
+}
+
+/**
+ * Sets a new color for a given graph element.
+ * @param {String} id Id of the graph element
+ * @param {String} color Color to set
+ */
+function color(id, color) {
+    setAttribute(id, "color", color);
+}
+
+
+
+
+
+
+/**
+ * Receives the shared array reference, graph string to parse, and a copy of the 
+ * algorithm code from the Algorithm which created this thread.
  * @param {Array} message Array containing a message type and message content
  */
 self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
@@ -52,12 +118,13 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         sharedArray = message[1];
 
     } else if (message[0] === "graph/algorithm") {
-        graph.fileParser.loadGraph(message[1], false);
+        // Load the graph
+        graph.fileParser.loadGraph(message[1]);
 
-        console.log(graph.getNodes());
-
+        // Wait for the user to resume the algorithm
         wait();
 
+        // Evaluate the algorithm
         try {
             eval(message[2]); /* eslint-disable-line no-eval */
             console.log("Algorithm completed");

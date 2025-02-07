@@ -141,8 +141,10 @@ export default class ChangeManager {
             this.#graph.undoStep(step);
 
             // Update cytoscape and the step counter in user edit mode
-            window.updateCytoscape();
-            window.updateStep();
+            if (typeof window !== "undefined" && window.self === window.top) {
+                window.updateCytoscape();
+                window.updateStep();
+            }
         }
     }
 
@@ -160,8 +162,10 @@ export default class ChangeManager {
             this.#graph.redoStep(step);
 
             // Update cytoscape and the step counter in user edit mode
-            window.updateCytoscape();
-            window.updateStep();
+            if (typeof window !== "undefined" && window.self === window.top) {
+                window.updateCytoscape();
+                window.updateStep();
+            }
         }
     }
 
@@ -204,8 +208,10 @@ export default class ChangeManager {
         this.#index++;
 
         // Update cytoscape and the step counter in user edit mode
-        window.updateCytoscape();
-        window.updateStep();
+        if (typeof window !== "undefined" && window.self === window.top) {
+            window.updateCytoscape();
+            window.updateStep();
+        }
     }
 
 }

@@ -26,9 +26,8 @@ export default class FileParser {
     /**
      * Loads the given file text into the graph.
      * @param {String} file File text
-     * @param {Boolean} isMainThread Is main thread
      */
-    loadGraph(file, isMainThread) {
+    loadGraph(file) {
         // Clear the graph before adding in nodes
         this.#graph.clear();
 
@@ -40,7 +39,9 @@ export default class FileParser {
         this.#graph.scale();
 
         // Update cytoscape to show the newly loaded graph
-        isMainThread && window.updateCytoscape();
+        if (typeof window !== "undefined" && window.self === window.top) {
+            window.updateCytoscape();
+        }
     }
 
     /**

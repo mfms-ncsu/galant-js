@@ -67,7 +67,7 @@ export default function GraphView() {
             if (!graphText) return;
 
             // Load the graph
-            NewGraph.fileParser.loadGraph(graphText, true);
+            NewGraph.fileParser.loadGraph(graphText);
 
             // We have to wait for cytoscape to read graph changes, and add graph.
             if (isInit && window.cytoscape) setTimeout(() => window.cytoscape.fit(), 75);

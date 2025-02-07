@@ -73,14 +73,18 @@ export default class Algorithm {
 
     #onMessage(message) {
         switch (message.action) {
-            case "addNode":
-                Graph.algorithmChangeManager.addNode(message.x, message.y, message.nodeId);
+            case "deleteNode":
+                Graph.algorithmChangeManager.deleteNode(message.nodeId);
+                break;
+            case "deleteEdge":
+                Graph.algorithmChangeManager.deleteEdge(message.source, message.target);
                 break;
             case "setNodeAttribute":
                 Graph.algorithmChangeManager.setNodeAttribute(message.nodeId, message.name, message.value);
                 break;
+            case "setEdgeAttribute":
+                Graph.algorithmChangeManager.setEdgeAttribute(message.source, message.target, message.name, message.value);
+                break;
         }
-
-        this.worker.postMessage(["nodes", Graph.toBase64()]);
     }
 }
