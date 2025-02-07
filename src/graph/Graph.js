@@ -59,7 +59,7 @@ export class Graph {
                     .join(" ");
             }
             // eslint-disable-next-line no-undef
-            content += `n ${node.id} ${node.position.x} ${node.position.y} ${attributesString}\n`;
+            content += `n ${node.id} ${node.position.x} ${node.position.y}${attributesString}\n`;
         });
 
         this.#nodes.forEach(node => {
@@ -74,7 +74,7 @@ export class Graph {
     }
 
     /**
-     * Gets this graph's scalar
+     * Gets this graph's scalar.
      * @returns This graph's scalar
      */
     getScalar() {
@@ -143,10 +143,10 @@ export class Graph {
         const edges = [];
 
         // Iterate over all edges
-        this.#nodes.get(target).edges.forEach(edge => {
+        this.#nodes.get(target).edges.forEach((edge, key) => {
             // Only push if the given node is the target
             if (edge.target === target) {
-                edges.push(edge);
+                edges.push(key);
             }
         });
 
@@ -168,10 +168,10 @@ export class Graph {
         const edges = [];
 
         // Iterate over all edges
-        this.#nodes.get(source).edges.forEach(edge => {
+        this.#nodes.get(source).edges.forEach((edge, key) => {
             // Only push if the given node is the source
             if (edge.source === source) {
-                edges.push(edge);
+                edges.push(key);
             }
         });
 
@@ -179,29 +179,23 @@ export class Graph {
     }
 
     /**
-     * Returns a string representing a list of edges
-     * @param {Edge[]} edges the list of edges to convert
-     * @return {String[]} A string representation of the edges. For an edge
-     *                    a->b, the string will be "a,b"
-     */
-    edgeArrToStringArr(edges) {
-        let retArr = [];
-        for (let edge of edges) {
-            retArr.push(edge.source + "," + edge.target); 
-        }
-        return retArr;
-    }
-
-    /**
      * Gets the node opposite the given on the given edge.
      * @param {String} nodeId Id of the node to check for
      * @param {String} edgeId Id of the edge to check (Source,Target format)
+     * @throws if nodeId does not exist in the graph, or if the given edge does not exist
      * @returns Id of the node opposite the given
      */
     getOppositeNode(nodeId, edgeId) {
-        // Ensure the node exists
+        
+        // Error checking
+        // Note that for getters, we usually just return undefined if the node or edge doesn't exist. I am adding
+        // detailed error messages in an attempt to debug some Algorithm functions. Feel free to change these to just
+        // return undefined to make it consistent with the rest of the graph functions
         if (!this.#nodes.has(nodeId)) {
-            return undefined;
+            throw new Error("Cannot get opposite node of node \"" + nodeId + "\" because it does not exist in the graph");
+        }
+        if (!this.#nodes.get(nodeId).edges.has(edgeId)) {
+            throw new Error("Cannot get the opposite of edge \"" + edgeId + "\" because it does not exist in the graph");
         }
 
         // Get the edge
@@ -240,7 +234,7 @@ export class Graph {
         let node = this.#nodes.get(nodeId);
 
         if (node) {
-            return node.getAttribute(name);
+            return node.attributes.get(name);
         } else {
             // If the node doesn't exist, return undefined
             return undefined;
@@ -303,7 +297,7 @@ export class Graph {
      * @param {String} nodeId Optional argument for setting a predetermined 
      * @param {Object} attributes Initial attributes of the node
      * @returns ChangeObject representing adding a node
-     * @throws Error if nodeId already exists in nodes
+     * @throw new Errorhrows Error if nodeId already exists in nodes
      */
     #addNode(x, y, nodeId, attributes) {
         // Throw an error if the id is a duplicate
@@ -548,6 +542,43 @@ export class Graph {
     }
 
     /**
+     * Sets a new value for an attribute for all nodes and creates an array
+     * of corresponding ChangeObjects.
+     * @param {String} name Name of the attribute to set
+     * @param {*} value Value to set for the attribute
+     * @returns An array of ChangeObjects representing the changes
+     */
+    #setNodeAttributeAll(name, value) {
+        // Keep an array of ChangeObjects for the delete step
+        const changeObjects = [];
+
+        this.#nodes.forEach(node => {
+            // Store the old value
+            let oldValue = node.attributes.get(name);
+
+            // Update the node's attribute
+            node.attributes.set(name, value);
+
+            // Push a new change object
+            changeObjects.push(new ChangeObject("setNodeAttribute", {
+                id: node.id,
+                attribute: {
+                    name: name,
+                    value: oldValue
+                }
+            }, {
+                id: node.id,
+                attribute: {
+                    name: name,
+                    value: value
+                }
+            }));
+        });
+
+        return changeObjects;
+    }
+
+    /**
      * Sets a new value for an attribute within an edge and creates a corresponding
      * ChangeObject to record the change.
      * @param {String} source Source node of the edge for which to set an attribute value
@@ -585,6 +616,55 @@ export class Graph {
                 value: value
             }
         });
+    }
+
+    /**
+     * Sets a new value for an attribute for all edges and creates an array
+     * of corresponding ChangeObjects.
+     * @param {String} name Name of the attribute to set
+     * @param {*} value Value to set for the attribute
+     * @returns An array of ChangeObjects representing the changes
+     */
+    #setEdgeAttributeAll(name, value) {
+        // Keep an array of ChangeObjects for the delete step
+        const changeObjects = [];
+
+        // Get the edges
+        const edges = [];
+        this.#nodes.forEach(node => {
+            node.edges.forEach((edge) => {
+                if (edge.source === node.id) {
+                    edges.push(edge);
+                }
+            });
+        });
+
+        edges.forEach(edge => {
+            // Store the old value
+            let oldValue = edge.attributes.get(name);
+
+            // Update the edge's attribute
+            edge.attributes.set(name, value);
+
+            // Push a new change object
+            changeObjects.push(new ChangeObject("setEdgeAttribute", {
+                source: edge.source,
+                target: edge.target,
+                attribute: {
+                    name: name,
+                    value: oldValue
+                }
+            }, {
+                source: edge.source,
+                target: edge.target,
+                attribute: {
+                    name: name,
+                    value: value
+                }
+            }));
+        });
+
+        return changeObjects;
     }
 
     /**
@@ -685,10 +765,11 @@ export class Graph {
         deleteEdge: this.#deleteEdge,
         setNodePosition: this.#setNodePosition,
         setNodeAttribute: this.#setNodeAttribute,
+        setNodeAttributeAll: this.#setNodeAttributeAll,
         setEdgeAttribute: this.#setEdgeAttribute,
+        setEdgeAttributeAll: this.#setEdgeAttributeAll,
         undoStep: this.#undoStep,
-        redoStep: this.#redoStep,
-        toGraphString: this.toGraphString,
+        redoStep: this.#redoStep
     }
 }
 

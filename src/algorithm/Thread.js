@@ -50,6 +50,8 @@ function getNodeAttribute(nodeId, name) {
  * @param {String} message Message to display
  */
 function display(message) {
+    // This console.log is for debugging purposes. Feel free to remove.
+    console.log("Displayed a message: " + message);
     postMessage({ action: "message", message: message });
 }
 
@@ -59,6 +61,111 @@ function display(message) {
  */
 function print(message) {
     console.log(message);
+}
+
+/**
+ * Prompts the user for input.
+ * @param {string} message The prompt message
+ * @param {string} error The error message to display if input is invalid
+ * @returns {string} The user input
+ */
+function prompt(message, error="") {
+    if (message === null || message === "") {
+        message = "Prompt";
+    }
+    postMessage({action: "prompt", content: [message, error]})
+    wait();
+    let len = Atomics.load(sharedArray, 1);
+    let promptResult = "";
+    for (let i = 0; i < len; i++) {
+        promptResult += String.fromCharCode(Atomics.load(sharedArray, i + 2));
+    }
+    return promptResult;
+}
+
+/**
+ * Recieving the prompt and options
+ * @param {string} message The prompt message
+ * @param {string} error The error message to display if input is invalid
+ * @param {NodeObject[]} list The list of options
+ * @returns {string} promptResult 
+ */
+function promptFrom(message, list, error) {
+    if (list.length === 0) {
+        throw new Error("Cannot prompt when no valid options exist.");
+    }
+    if (error === null) {
+        error = "Must enter a value from " + list;
+    }
+    let promptResult = prompt(message);
+    while(!list.includes(promptResult)) {
+        console.log("NOT FOUND - REPROMPTING");
+        promptResult = prompt(message, error);
+    }
+    return promptResult;
+}
+
+/**
+ * Returns message for checking boolean value
+ * @param {string} message The prompt message
+ * @returns {string} message of checking boolean value  
+ */
+function promptBoolean(message) {
+    return promptFrom(message, ["true", "false"], "Must enter a boolean value (true/false)") === "true";
+}
+
+/**
+ * Returns message for checking integer value
+ * @param {string} message The prompt message
+ * @returns {string} promptResult of checking integer value  
+ */
+function promptInteger(message) {
+    let promptResult = parseInt(prompt(message));
+    while (isNaN(promptResult)) {
+        promptResult = parseInt(prompt(message, "Must enter an integer"));
+    }
+    return promptResult;
+}
+
+/**
+ * Returns message for checking float number value
+ * @param {string} message The prompt message
+ * @returns {string} promptResult of checking float number value  
+ */
+function promptNumber(message) {
+    let promptResult = parseFloat(prompt(message));
+    while (isNaN(promptResult)) {
+        promptResult = parseFloat(prompt(message, "Must enter a number"));
+    }
+    return promptResult;
+}
+
+/**
+ * Prompts the user to select a node from the graph.
+ * @param {string} message The prompt message
+ * @returns {string} The ID of the selected node
+ * @throws {Error} If there are no valid nodes in the graph
+ */
+function promptNode(message) {
+    let nodes = getNodes();
+    if (nodes.length === 0) {
+        throw new Error("Cannot prompt for a node when no valid nodes exist.");
+    }
+    return promptFrom(message, nodes, "Must enter a valid Node ID. The valid nodes are " + nodes);
+}
+
+/**
+ * Prompts the user to select an edge from the graph.
+ * @param {string} message The prompt message
+ * @returns {string} The ID of the selected edge
+ * @throws {Error} If there are no valid edges in the graph
+ */
+function promptEdge(message) {
+    let edges = getEdges();
+    if (edges.length === 0) {
+        throw new Error("Cannot prompt for an edge when no valid edges exist.");
+    }
+    return promptFrom(message, edges, "Must enter a valid Edge ID. The valid edges are " + edges);
 }
 
 /**
@@ -75,6 +182,24 @@ function getNodes() {
  */
 function getEdges() {
     return graph.getEdges();
+}
+
+/**
+ * Gets the ids of all incoming edges from source.
+ * @param {String} nodeId Source node
+ * @returns Array of incoming edges
+ */
+function incoming(nodeId) {
+    return graph.getIncomingEdges(nodeId);
+}
+
+/**
+ * Returns a list of all the outgoing edges of a specified node
+ * @param {String} id the id of the node to return the outgoing nodes of
+ * @return {String[]} An array representing all the outgoing edges of the graph
+ */
+function outgoing(node) {
+    return graph.getOutgoingEdges(node);
 }
 
 /**
@@ -123,30 +248,48 @@ function setAttribute(id, name, value) {
         // Handle edge attribute
         let split = id.split(",");
         let source = split[0], target = split[1];
+        graph.algorithmChangeManager.setEdgeAttribute(source, target, name, value);
         postMessage({ action: "setEdgeAttribute", source: source, target: target, name: name, value: value });
     
     } else {
         // Handle node attribute
+        graph.algorithmChangeManager.setNodeAttribute(id, name, value);
         postMessage({ action: "setNodeAttribute", nodeId: id, name: name, value: value });
     }
-    step();
+}
+
+/**
+ * Sets a new attribute for the given class of graph element.
+ * @param {String} type Either nodes or edges
+ * @param {String} name Attribute name
+ * @param {Object} value Attribute value
+ */
+function setAttributeAll(type, name, value) {
+    if (type === "nodes") {
+        graph.algorithmChangeManager.setNodeAttributeAll(name, value);
+        postMessage({ action: "setNodeAttributeAll", name: name, value: value });
+
+    } else {
+        graph.algorithmChangeManager.setEdgeAttributeAll(name, value);
+        postMessage({ action: "setEdgeAttributeAll", name: name, value: value });
+    }
 }
 
 /**
  * Gets the value of an attribute for a given graph element.
  * @param {String} id Id of the graph element
- * @param {*} name Name of the attribute
+ * @param {String} name Name of the attribute
  */
 function getAttribute(id, name) {
     if (id.includes(",")) {
         // Handle edge attribute
         let split = id.split(",");
         let source = split[0], target = split[1];
-        graph.getEdgeAttribute(source, target, name);
+        return graph.getEdgeAttribute(source, target, name);
 
     } else {
         // Handle node attribute
-        graph.getNodeAttribute(id, name);
+        return graph.getNodeAttribute(id, name);
     }
 }
 
@@ -158,8 +301,56 @@ function uncolor(id) {
     setAttribute(id, "color", undefined);
 }
 
+function hasColor(id) {
+    return getAttribute(id, "color") !== undefined;
+}
+
+function clearEdgeColors() {
+    setAttributeAll("edges", "color", undefined);
+}
+
 function setEdgeWidth(id, width) {
     setAttribute(id, "edgeWidth", width);
+}
+
+function highlight(id) {
+    setAttribute(id, "highlighted", true);
+}
+
+function highlighted(id) {
+    return getAttribute(id, "highlighted");
+}
+
+function clearEdgeHighlights() {
+    setAttributeAll("edges", "highlighted", false);
+}
+
+function clearNodeHighlights() {
+    setAttributeAll("nodes", "highlighted", false);
+}
+
+function label(id, label) {
+    setAttribute(id, "label", label);
+}
+
+function clearNodeLabels() {
+    setAttributeAll("nodes", "label", "");
+}
+
+function mark(nodeId) {
+    setAttribute(nodeId, "marked", true);
+}
+
+function unmark(nodeId) {
+    setAttribute(nodeId, "marked", false);
+}
+
+function marked(nodeId) {
+    return getAttribute(nodeId, "marked");
+}
+
+function clearNodeMarks() {
+    setAttributeAll("nodes", "marked", false);
 }
 
 function setShape(id, shape) {
@@ -167,7 +358,7 @@ function setShape(id, shape) {
 }
 
 function weight(id) {
-    getAttribute(id, "weight");
+    return getAttribute(id, "weight");
 }
 
 function setWeight(id, weight) {
@@ -184,37 +375,14 @@ function setWeight(id, weight) {
 function addNode(x, y) {
     let id = graph.algorithmChangeManager.addNode(x, y);
     postMessage({ action: "addNode", x: x, y: y });
-    step();
     return id;
-}
-
-/**
- * Removes the "marked" attribute from every node
- */
-function clearNodeMarks() {
-    
-    // FIXME: This function for some reason sets every node to be orange. No idea why.
-    // graph.algorithmChangeManager.setEveryNodeAttribute("marked", "false");
-    // postMessage({ action: "setEveryNodeAttribute", name: "marked", value: "false"});
-    step();
 }
 
 /**
  * Sets the weight of every node to undefined
  */
 function clearNodeWeights() {
-    graph.algorithmChangeManager.setEveryNodeAttribute("weight", undefined);
-    postMessage({ action: "setEveryNodeAttribute", name: "weight", value: undefined});
-    step();
-}
-
-/**
- * Set the "color" attribute of each node to undefined
- */
-function clearEdgeColors() {
-    graph.algorithmChangeManager.setEveryNodeAttribute("color", undefined);
-    postMessage({ action: "setEveryNodeAttribute", name: "color", value: undefined});
-    step();
+    setAttributeAll("node", "weight", "0");
 }
 
 /**
@@ -230,29 +398,6 @@ function hasWeight(edge) {
     let arr = edge.split(",");
     return graph.getEdgeAttribute(arr[0], arr[1], "weight") == undefined;
 }
-
-/**
- * This function should prompt the user to enter the id of a node, and should
- * return whatever the user enters. Currently, it just returns the first node in
- * the getNodeArray() array for testing.
- */
-function promptNode(message, errMessage) {
-    return graph.getNodeArray()[0];
-}
-
-/**
- * Returns a list of all the outgoing edges of a specified node
- * @param {String} id the id of the node to return the outgoing nodes of
- * @return {String[]} An array representing all the outgoing edges of the graph
- */
-function outgoing(node) {
-    return graph.edgeArrToStringArr(graph.getOutgoingEdges(node)); 
-}
-
-
-
-
-
 
 /**
  * Receives the shared array reference, graph string to parse, and a copy of the 
