@@ -204,11 +204,20 @@ function incoming(nodeId) {
 
 /**
  * Returns a list of all the outgoing edges of a specified node
- * @param {String} id the id of the node to return the outgoing nodes of
+ * @param {String} nodeId the id of the node to return the outgoing nodes of
  * @return {String[]} An array representing all the outgoing edges of the graph
  */
-function outgoing(node) {
-    return graph.getOutgoingEdges(node);
+function outgoing(nodeId) {
+    return graph.getOutgoingEdges(nodeId);
+}
+
+/**
+ * Gets the ids of all incident edges to the given node.
+ * @param {String} nodeId Node id
+ * @returns Array of incident edges
+ */
+function incident(nodeId) {
+    return graph.getAllEdges(nodeId);
 }
 
 /**
@@ -396,7 +405,7 @@ function setWeight(id, weight) {
 }
 
 function clearNodeWeights() {
-    setAttributeAll("node", "weight", undefined);
+    setAttributeAll("node", "weight", 0);
 }
 
 function hasWeight(edge) {
