@@ -222,6 +222,18 @@ function other(nodeId, edgeId) {
 }
 
 /**
+ * Adds a node at the given x, y position.
+ * @param {Integer} x the x position to add the new node at
+ * @param {Integer} y the y position to add the new node at
+ * @return {String} the ID of the new node
+ */
+function addNode(x, y) {
+    let id = graph.algorithmChangeManager.addNode(x, y);
+    postMessage({ action: "addNode", x: x, y: y });
+    return id;
+}
+
+/**
  * Deletes the given nodes.
  * @param {String} nodeId Node to delete
  */
@@ -342,8 +354,17 @@ function label(id, label) {
     setAttribute(id, "label", label);
 }
 
+function hasLabel(id) {
+    let label = getAttribute(id, "label");
+    return label !== undefined && label !== "";
+}
+
 function clearNodeLabels() {
     setAttributeAll("nodes", "label", "");
+}
+
+function clearEdgeLabels() {
+    setAttributeAll("edges", "label", "");
 }
 
 function mark(nodeId) {
@@ -374,38 +395,17 @@ function setWeight(id, weight) {
     setAttribute(id, "weight", weight);
 }
 
-/**
- * Adds a node at the given x, y position.
- *
- * @param {Integer} x the x position to add the new node at
- * @param {Integer} y the y position to add the new node at
- * @return {String} the ID of the new node
- */
-function addNode(x, y) {
-    let id = graph.algorithmChangeManager.addNode(x, y);
-    postMessage({ action: "addNode", x: x, y: y });
-    return id;
-}
-
-/**
- * Sets the weight of every node to undefined
- */
 function clearNodeWeights() {
-    setAttributeAll("node", "weight", "0");
+    setAttributeAll("node", "weight", undefined);
 }
 
-/**
- * Returns true if the given edge has a defined weight
- *
- * @param {String} edge a string representation of the edge. The string must be in
- *                      form "src,dest", where src is the id of the source ndoe and
- *                      dest is the id of the destination node.
- * @return {Boolean} true if the edge has a defined weight (including 0), or false if
- *                   the weight is undefined
- */
 function hasWeight(edge) {
     let arr = edge.split(",");
-    return graph.getEdgeAttribute(arr[0], arr[1], "weight") == undefined;
+    return graph.getEdgeAttribute(arr[0], arr[1], "weight") === undefined;
+}
+
+function hideAllEdgeWeights() {
+    // TODO
 }
 
 /**
