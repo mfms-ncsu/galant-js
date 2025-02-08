@@ -1,5 +1,5 @@
 import { ArrowLeftIcon, ArrowPathIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAlgorithmContext } from 'pages/GraphView/utils/AlgorithmContext';
 import { useGraphContext } from "pages/GraphView/utils/GraphContext";
 import { StringifyGraphSnapshot } from "pages/GraphView/utils/PredicateToFile";
@@ -18,19 +18,22 @@ export default function AlgorithmControls() {
     const cytoscapeInstance = graphContext.cytoscape.instance;
     const { algorithm, setAlgorithm } = useAlgorithmContext();
     const PromptService = usePromptService(); 
+    const [ stepText, setStepText ] = useState("");
 
     // Function to handle pressing the front button
     function frontButtonPress() {
         if (!algorithm || !algorithm.canStepForward) return;
-        console.log("stepForward pressed");
-        console.log(algorithm);
         algorithm.stepForward();
+        // updateStepText();
+        setTimeout( () => {updateStepText()}, 10);
     } 
 
     // Function to handle pressing the back button
     function backButtonPress() {
         if (!algorithm || !algorithm.canStepBack) return;
         algorithm.stepBack();
+        // updateStepText();
+        setTimeout( () => {updateStepText()}, 10);
     }
 
     function exportGraph() {
@@ -104,9 +107,11 @@ export default function AlgorithmControls() {
     if (!algorithm) return null;
 
     // Make the step text
-    const stepText = `Step ${algorithm.currentIndex}` + (algorithm.completed ? ` / ${algorithm.steps.length - 1}` : '');
+    // const stepText = `Step ${algorithm.currentIndex}` + (algorithm.completed ? ` / ${algorithm.steps.length - 1}` : '');
+    const updateStepText = () => {
+        setStepText(algorithm.getStepText());
+    };
 
-    
     return (
         <div>
             <div id="algorithm-controls" className="absolute bottom-1 left-1 mt-auto mb-2">

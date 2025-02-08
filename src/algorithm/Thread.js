@@ -30,10 +30,18 @@ function wait() {
  * Tells the thread to wait after running a step.
  */
 function step(code=null) {
-    postMessage({type: "stepStart"});
+    
+    // Execute the code in this step
     (code !== null) && code();
-    postMessage({type: "stepEnd"});
+    
+    // End this recording after the step is finished
+    postMessage({action: "endRecording"});
+
+    // Wait until we should start the next step
     wait();
+
+    // Start recording the next step
+    postMessage({action: "startRecording"});
 }
 
 function getNodeAttribute(nodeId, name) {
@@ -419,7 +427,12 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
 
         // Evaluate the algorithm
         try {
+            
+            // Start recording the first step
+            postMessage({action: "startRecording"});
             eval(message[2]); /* eslint-disable-line no-eval */
+            // End recording of the last step
+            postMessage({action: "endRecording"});
             console.log("Algorithm completed");
             postMessage({type: "complete"});
 

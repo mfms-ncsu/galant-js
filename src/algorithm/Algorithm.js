@@ -21,21 +21,8 @@ export default class Algorithm {
         const [status, setStatus] = stateVar;
         this.status = status;
         this.setStatus = setStatus;
-        this.currentIndex = 0;
         this.fetchingSteps = false;
         
-        /**
-         * The size of each step. For example, if stepSizes[1] = 2, then step 1 in
-         * the algorithm did two things (ie, it highlighted two edges)
-         */
-        this.stepSizes = [];
-
-        /**
-         * Used to record the size of a step. Starts at 0, and increments with
-         * each action of that step until the step ends.
-         */
-        this.tempStepSize = 0;
-
         // Initialize the thread worker
         this.worker = new Worker(new URL("./Thread.js", import.meta.url));
         let handleMessage = (message) => { this.#onMessage(message.data) }
@@ -46,6 +33,25 @@ export default class Algorithm {
     }
 
     /**
+     * Returns a string that will be displayed in the AlgorithmControlsComponent that
+     * represents the current index of the algorithm. For example, if we are on step
+     * 4 of 6, then this algorithm will return "Step 4 / 6"
+     */
+    getStepText() {
+        return "Step " + Graph.algorithmChangeManager.getIndex() + " / " + Graph.algorithmChangeManager.getLength();
+    }
+
+    /**
+     * Not sure what this object is supposed to do. It's called by the AlgorithmControlsComponent, and it fails to
+     * run if this function isn't there.
+     *
+     * TODO:
+     * FIXME: Either figure out what this configuration object is supposed to do/be or modify the AlgorithmConrtolsComponent
+     *        file to no longer require it
+     */
+    configuration = {controlNodePosition: 0};
+
+    /**
      * This places a 1 at index 0 in the shared array using the Atomics.store method. Once
      * stored it then notifies any process that is waiting and looking at index 0 to check the index. 
      * Which should be the worker Thread that had been created.
@@ -53,7 +59,6 @@ export default class Algorithm {
     resumeThread() {
         Atomics.store(this.array, 0, 1);
         Atomics.notify(this.array, 0);
-        this.currentIndex++;
     }
 
     /**
@@ -66,7 +71,7 @@ export default class Algorithm {
     }
 
     canStepBack() {
-        return Graph.algorithmChangeManager.index > 0;
+        return Graph.algorithmChangeManager.getIndex() > 0;
     }
 
     canStepForward() {
@@ -74,14 +79,13 @@ export default class Algorithm {
     }
 
     stepBack() {
-        if (this.currentIndex == 0) return;
+        if (Graph.algorithmChangeManager.getIndex() == 0) return;
         Graph.algorithmChangeManager.undo();
-        this.currentIndex--;
     }
 
     stepForward() {
         if (!this.canStepForward()) return;
-        if (Graph.algorithmChangeManager.index === Graph.algorithmChangeManager.length) {
+        if (Graph.algorithmChangeManager.getIndex() === Graph.algorithmChangeManager.getLength()) {
             this.resumeThread();
         } else {
             Graph.algorithmChangeManager.redo();
@@ -107,7 +111,7 @@ export default class Algorithm {
         switch (message.action) {
             case "addNode":
                 Graph.algorithmChangeManager.addNode(message.x, message.y);
-                this.tempStepSize++;
+                break;
             case "prompt":
                 this.PromptService.addPrompt(
                     { type: 'input', label: message.content[0] },
@@ -115,42 +119,38 @@ export default class Algorithm {
                         this.enterPromptResult(value);
                     }
                 );
-                this.tempStepSize++;
                 break;
             case "message":
-                this.tempStepSize++;
                 break;
             case "deleteNode":
                 Graph.algorithmChangeManager.deleteNode(message.nodeId);
-                this.tempStepSize++;
                 break;
             case "deleteEdge":
                 Graph.algorithmChangeManager.deleteEdge(message.source, message.target);
-                this.tempStepSize++;
                 break;
             case "setNodeAttribute":
                 Graph.algorithmChangeManager.setNodeAttribute(message.nodeId, message.name, message.value);
-                this.tempStepSize++;
                 break;
             case "setNodeAttributeAll":
                 Graph.algorithmChangeManager.setNodeAttributeAll(message.name, message.value);
-                this.tempStepSize++;
                 break;
             case "setEdgeAttribute":
                 Graph.algorithmChangeManager.setEdgeAttribute(message.source, message.target, message.name, message.value);
-                this.tempStepSize++;
                 break;
             case "setEdgeAttributeAll":
                 Graph.algorithmChangeManager.setEdgeAttributeAll(message.name, message.value);
-                this.tempStepSize++;
                 break;
-            case "stepStart":
-                this.tempStepSize = 0;
+            case "startRecording":
+                Graph.algorithmChangeManager.startRecording();
                 break;
-            case "stepEnd":
-                this.stepSizes.push(this.tempStepSize);
-                this.tempStepSize = 0;
+            case "endRecording":
+                Graph.algorithmChangeManager.endRecording();
                 break;
+            default:
+                // If the message was not a type we define here, then we probably just made
+                // a mistake or typo when sending this message. Throw an error to let us
+                // know about it
+                throw new Error("Unexpected message type: " + message.action);
                 
         }
     }
