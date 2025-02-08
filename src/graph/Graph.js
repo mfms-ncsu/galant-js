@@ -150,7 +150,7 @@ export class Graph {
         // Iterate over all edges
         this.#nodes.get(target).edges.forEach((edge, key) => {
             // Only push if the given node is the target
-            if (edge.target === target || !this.#isDirected) {
+            if (edge.target === target) {
                 edges.push(key);
             }
         });
@@ -175,7 +175,7 @@ export class Graph {
         // Iterate over all edges
         this.#nodes.get(source).edges.forEach((edge, key) => {
             // Only push if the given node is the source
-            if (edge.source === source || !this.#isDirected) {
+            if (edge.source === source) {
                 edges.push(key);
             }
         });
