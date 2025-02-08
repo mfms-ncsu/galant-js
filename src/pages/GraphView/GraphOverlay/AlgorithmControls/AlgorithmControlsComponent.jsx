@@ -22,17 +22,25 @@ export default function AlgorithmControls() {
 
     // Function to handle pressing the front button
     function frontButtonPress() {
-        if (!algorithm || !algorithm.canStepForward) return;
+        if (!algorithm || !algorithm.canStepForward()) return;
         algorithm.stepForward();
         // updateStepText();
+
+        // FIXME: This is a hacky fix to get around a race condition. There
+        //        has to be a more elegant solution rather than just waiting
+        //        10 ms before updating the text.
         setTimeout( () => {updateStepText()}, 10);
     } 
 
     // Function to handle pressing the back button
     function backButtonPress() {
-        if (!algorithm || !algorithm.canStepBack) return;
+        if (!algorithm || !algorithm.canStepBack()) return;
         algorithm.stepBack();
         // updateStepText();
+
+        // FIXME: This is a hacky fix to get around a race condition. There
+        //        has to be a more elegant solution rather than just waiting
+        //        10 ms before updating the text.
         setTimeout( () => {updateStepText()}, 10);
     }
 
