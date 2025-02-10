@@ -5,6 +5,7 @@
  * state between changes.
  * 
  * @author Henry Morris
+ * @author Krisjian Smith
  */
 export default class ChangeManager {
     /** Graph object for which change */
@@ -13,6 +14,20 @@ export default class ChangeManager {
     #changes;
     /** Current index within changes */
     #index;
+
+    /**
+     * Flag representing whether or not the ChangeManager is currently
+     * recording changes
+     */
+    #isRecording
+
+    /**
+     * Temporary list of ChangeObjects used to record a list of several
+     * changes. This is used when multiple changes happen in a single
+     * algorithm step, so that they are all undone/redone at once
+     */
+    #currentChangeList
+
 
     /**
      * Constucts a new ChangeManager with the graph for which to change. Takes in
@@ -33,6 +48,55 @@ export default class ChangeManager {
         // Create an empty representation of changes
         this.#changes = [];
         this.#index = 0;
+
+        // Set up the temporary change list and isRecording flags
+        this.#isRecording = false;
+        this.#currentChangeList = [];
+    }
+
+    /** Methods for starting and ending a recording of several changes */
+
+    /**
+     * Makes the ChangeManager start recording. When recording, the ChangeManager
+     * will not save any new ChangeObjects until the recording is over. When the
+     * recording is over, it will save all the ChangeObjects at once, so that they
+     * will all be undone/redone at once
+     */
+    startRecording() {
+        
+        // If we are already recording, and startRecording() is called, then something
+        // went wrong. We should throw an error to let the user know that something
+        // happened
+        if (this.#isRecording) {
+            throw new Error("Cannot start recording because this ChangeManager is already recording");
+        }
+        
+        // Reset the change list and set the isRecording flag to true
+        this.#currentChangeList = [];
+        this.#isRecording = true;
+    }
+
+    /**
+     * Makes the ChangeManager stop recording. Any changes that happened while recording will be
+     * saved as a single entry in the changes list.
+     */
+    endRecording() {
+        
+        // If we are not recording, then we cannot stop recording.
+        if (!this.#isRecording) {
+            throw new Error("Cannot stop recording becausee this ChangeManager has not started recording");
+        }
+
+
+        // Set the isRecording flag back to false
+        this.#isRecording = false;
+    
+        // Record the list of changes, but only if changes were actually made. If
+        // the currentChangeList is empty, do nothing.
+        if (this.#currentChangeList.length != 0) {
+            this.#recordChange(this.#currentChangeList);
+        }
+
     }
 
     /** Methods for creating new ChangeObjects */
@@ -203,14 +267,14 @@ export default class ChangeManager {
     /**
      * Gets the length of changes
      */
-    get length() {
+    getLength() {
         return this.#changes.length;
     }
 
     /**
      * Gets the current index in changes
      */
-    get index() {
+    getIndex() {
         return this.#index;
     }
 
@@ -218,10 +282,28 @@ export default class ChangeManager {
      * Records a change and updates the index.
      * @param {ChangeObject} change Change object to record
      * @author Ziyu Wang
+     * @author Krisjian Smith
      */
     #recordChange(change) {
+        
         // Remove all changes after the current index
         this.#changes = this.#changes.slice(0, this.#index);
+
+        // If we are recording, save the change to the temporary list of changes and
+        // return.
+        // NOTE: When recording, the cytoscape window will not be updated. This is important, as
+        //       we do not want the window to be updated when a recording is happening. Recordings
+        //       should be started when an algorithm is doing multiple things in one step. In this
+        //       case, we want everything to appear to happen at one time, but if the window was updated
+        //       with every change, we would be able to see every individual change
+        if (this.#isRecording) {
+            
+            for (let changeObj of change) {
+                this.#currentChangeList.push(changeObj);
+            }
+
+            return;
+        }
 
         // Push the new change
         this.#changes.push(change);

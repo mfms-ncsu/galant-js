@@ -30,9 +30,18 @@ function wait() {
  * Tells the thread to wait after running a step.
  */
 function step(code=null) {
+    
+    // Execute the code in this step
     (code !== null) && code();
-    postMessage({type: "step"});
+    
+    // End this recording after the step is finished
+    postMessage({action: "endRecording"});
+
+    // Wait until we should start the next step
     wait();
+
+    // Start recording the next step
+    postMessage({action: "startRecording"});
 }
 
 function getNodeAttribute(nodeId, name) {
@@ -195,11 +204,20 @@ function incoming(nodeId) {
 
 /**
  * Returns a list of all the outgoing edges of a specified node
- * @param {String} id the id of the node to return the outgoing nodes of
+ * @param {String} nodeId the id of the node to return the outgoing nodes of
  * @return {String[]} An array representing all the outgoing edges of the graph
  */
-function outgoing(node) {
-    return graph.getOutgoingEdges(node);
+function outgoing(nodeId) {
+    return graph.getOutgoingEdges(nodeId);
+}
+
+/**
+ * Gets the ids of all incident edges to the given node.
+ * @param {String} nodeId Node id
+ * @returns Array of incident edges
+ */
+function incident(nodeId) {
+    return graph.getAllEdges(nodeId);
 }
 
 /**
@@ -210,6 +228,18 @@ function outgoing(node) {
  */
 function other(nodeId, edgeId) {
     return graph.getOppositeNode(nodeId, edgeId);
+}
+
+/**
+ * Adds a node at the given x, y position.
+ * @param {Integer} x the x position to add the new node at
+ * @param {Integer} y the y position to add the new node at
+ * @return {String} the ID of the new node
+ */
+function addNode(x, y) {
+    let id = graph.algorithmChangeManager.addNode(x, y);
+    postMessage({ action: "addNode", x: x, y: y });
+    return id;
 }
 
 /**
@@ -333,8 +363,17 @@ function label(id, label) {
     setAttribute(id, "label", label);
 }
 
+function hasLabel(id) {
+    let label = getAttribute(id, "label");
+    return label !== undefined && label !== "";
+}
+
 function clearNodeLabels() {
     setAttributeAll("nodes", "label", "");
+}
+
+function clearEdgeLabels() {
+    setAttributeAll("edges", "label", "");
 }
 
 function mark(nodeId) {
@@ -365,38 +404,17 @@ function setWeight(id, weight) {
     setAttribute(id, "weight", weight);
 }
 
-/**
- * Adds a node at the given x, y position.
- *
- * @param {Integer} x the x position to add the new node at
- * @param {Integer} y the y position to add the new node at
- * @return {String} the ID of the new node
- */
-function addNode(x, y) {
-    let id = graph.algorithmChangeManager.addNode(x, y);
-    postMessage({ action: "addNode", x: x, y: y });
-    return id;
-}
-
-/**
- * Sets the weight of every node to undefined
- */
 function clearNodeWeights() {
-    setAttributeAll("node", "weight", "0");
+    setAttributeAll("node", "weight", 0);
 }
 
-/**
- * Returns true if the given edge has a defined weight
- *
- * @param {String} edge a string representation of the edge. The string must be in
- *                      form "src,dest", where src is the id of the source ndoe and
- *                      dest is the id of the destination node.
- * @return {Boolean} true if the edge has a defined weight (including 0), or false if
- *                   the weight is undefined
- */
 function hasWeight(edge) {
     let arr = edge.split(",");
-    return graph.getEdgeAttribute(arr[0], arr[1], "weight") == undefined;
+    return graph.getEdgeAttribute(arr[0], arr[1], "weight") === undefined;
+}
+
+function hideAllEdgeWeights() {
+    // TODO
 }
 
 /**
@@ -418,7 +436,12 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
 
         // Evaluate the algorithm
         try {
+            
+            // Start recording the first step
+            postMessage({action: "startRecording"});
             eval(message[2]); /* eslint-disable-line no-eval */
+            // End recording of the last step
+            postMessage({action: "endRecording"});
             console.log("Algorithm completed");
             postMessage({type: "complete"});
 

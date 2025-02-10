@@ -21,9 +21,8 @@ export default class Algorithm {
         const [status, setStatus] = stateVar;
         this.status = status;
         this.setStatus = setStatus;
-        this.currentIndex = 0;
         this.fetchingSteps = false;
-
+        
         // Initialize the thread worker
         this.worker = new Worker(new URL("./Thread.js", import.meta.url));
         let handleMessage = (message) => { this.#onMessage(message.data) }
@@ -32,6 +31,25 @@ export default class Algorithm {
         this.worker.postMessage(["graph/algorithm", Graph.toGraphString(), this.code]);
         this.worker.postMessage(["algorithm", this.code]);
     }
+
+    /**
+     * Returns a string that will be displayed in the AlgorithmControlsComponent that
+     * represents the current index of the algorithm. For example, if we are on step
+     * 4 of 6, then this algorithm will return "Step 4 / 6"
+     */
+    getStepText() {
+        return "Step " + Graph.algorithmChangeManager.getIndex() + " / " + Graph.algorithmChangeManager.getLength();
+    }
+
+    /**
+     * Not sure what this object is supposed to do. It's called by the AlgorithmControlsComponent, and it fails to
+     * run if this function isn't there.
+     *
+     * TODO:
+     * FIXME: Either figure out what this configuration object is supposed to do/be or modify the AlgorithmConrtolsComponent
+     *        file to no longer require it
+     */
+    configuration = {controlNodePosition: 0};
 
     /**
      * This places a 1 at index 0 in the shared array using the Atomics.store method. Once
@@ -53,7 +71,7 @@ export default class Algorithm {
     }
 
     canStepBack() {
-        return Graph.algorithmChangeManager.index > 0;
+        return Graph.algorithmChangeManager.getIndex() > 0;
     }
 
     canStepForward() {
@@ -61,12 +79,13 @@ export default class Algorithm {
     }
 
     stepBack() {
+        if (Graph.algorithmChangeManager.getIndex() == 0) return;
         Graph.algorithmChangeManager.undo();
     }
 
     stepForward() {
         if (!this.canStepForward()) return;
-        if (Graph.algorithmChangeManager.index === Graph.algorithmChangeManager.length) {
+        if (Graph.algorithmChangeManager.getIndex() === Graph.algorithmChangeManager.getLength()) {
             this.resumeThread();
         } else {
             Graph.algorithmChangeManager.redo();
@@ -92,6 +111,7 @@ export default class Algorithm {
         switch (message.action) {
             case "addNode":
                 Graph.algorithmChangeManager.addNode(message.x, message.y);
+                break;
             case "prompt":
                 this.PromptService.addPrompt(
                     { type: 'input', label: message.content[0] },
@@ -120,6 +140,18 @@ export default class Algorithm {
             case "setEdgeAttributeAll":
                 Graph.algorithmChangeManager.setEdgeAttributeAll(message.name, message.value);
                 break;
+            case "startRecording":
+                Graph.algorithmChangeManager.startRecording();
+                break;
+            case "endRecording":
+                Graph.algorithmChangeManager.endRecording();
+                break;
+            default:
+                // If the message was not a type we define here, then we probably just made
+                // a mistake or typo when sending this message. Throw an error to let us
+                // know about it
+                throw new Error("Unexpected message type: " + message.action);
+                
         }
     }
 }

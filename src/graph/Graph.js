@@ -20,6 +20,8 @@ export class Graph {
     #nodes;
     /** Scale */
     #scalar;
+    /** Flag for whether the graph is directed or not */
+    #isDirected;
 
     /**
      * Creates a new graph with nodes, file parser, and change managers.
@@ -30,6 +32,9 @@ export class Graph {
 
         // Use this scalar in toCytoscape
         this.#scalar = 1;
+
+        // Set to false
+        this.#isDirected = false;
 
         // Create a file parser to load files into this graph
         this.fileParser = new FileParser(this, this.#privateMethods);
