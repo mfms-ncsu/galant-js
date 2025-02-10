@@ -78,8 +78,8 @@ export default function GraphEditOverlay({ setMode }) {
     const [index, setIndex] = useState(0);
     const [length, setLength] = useState(0);
     window.updateStep = () => {
-        let newIndex = Graph.userChangeManager.index;
-        let newLength = Graph.userChangeManager.length;
+        let newIndex = Graph.userChangeManager.getIndex();
+        let newLength = Graph.userChangeManager.getLength();
         setIndex(newIndex);
         setLength(newLength);
     };

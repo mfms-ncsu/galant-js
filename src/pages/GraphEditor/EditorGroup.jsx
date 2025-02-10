@@ -124,9 +124,12 @@ export default function EditorGroup() {
             const storageItem = localStorage.getItem(`GraphFiles`);
             if (storageItem) {
                 const dataList = JSON.parse(storageItem);
-                setTabs(dataList.map(data => {
-                    const newTab = {name: data.name, content: data.content};
-                    return newTab;
+                setTabs(dataList.map((data, i) => {
+                    return {
+                        name: data.name,
+                        content: data.content,
+                        selected: (i === 0) ? true : false,
+                    }
                 }));
             }
         }
