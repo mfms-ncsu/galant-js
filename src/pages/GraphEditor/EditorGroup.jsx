@@ -120,6 +120,22 @@ export default function EditorGroup() {
     }, []);
 
     useEffect(() => {
+        function onStorage() {
+            const storageItem = localStorage.getItem(`GraphFiles`);
+            if (storageItem) {
+                const dataList = JSON.parse(storageItem);
+                setTabs(dataList.map(data => {
+                    const newTab = {name: data.name, content: data.content};
+                    return newTab;
+                }));
+            }
+        }
+
+        window.addEventListener("storage", onStorage);
+        return () => { window.removeEventListener("storage", onStorage) };
+    }, []);
+
+    useEffect(() => {
         function saveToStorage() {
             const dataList = tabs.map(tab => ({name: tab.name, content: tab.content}));
             localStorage.setItem(`GraphFiles`, JSON.stringify(dataList));

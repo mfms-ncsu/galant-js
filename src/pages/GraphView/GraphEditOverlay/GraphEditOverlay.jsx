@@ -14,13 +14,30 @@ export default function GraphEditOverlay({ setMode }) {
 
     // Function to save the graph state
     function save() {
+        // Get the graph as a JSON object
         const graphData = {
             name: "Saved Graph",
             content: Graph.toGraphString(),
         };
-    
-        console.log("Graph Saved:", JSON.stringify(graphData, null, 2));
+
+        const storageItem = localStorage.getItem(`GraphFiles`); // Get the existing local storage
+        const dataList = (storageItem) ? JSON.parse(storageItem) : []; // Parse it
         
+        // Attempt to overwrite the existing graph
+        let added = false;
+        dataList.forEach((graph, i) => {
+            if (graph.name === graphData.name) {
+                dataList[i] = graphData;
+                added = true;
+            }
+        });
+
+        // If there isn't one, save it
+        !added && dataList.push(graphData);
+
+        localStorage.setItem(`GraphFiles`, JSON.stringify(dataList)); // Set the local storage
+
+
     }
 
     // Function to revert graph edits (node movements, etc.)
