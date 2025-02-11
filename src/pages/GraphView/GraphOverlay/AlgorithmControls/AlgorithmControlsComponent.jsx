@@ -18,7 +18,7 @@ export default function AlgorithmControls() {
     const cytoscapeInstance = graphContext.cytoscape.instance;
     const { algorithm, setAlgorithm } = useAlgorithmContext();
     const PromptService = usePromptService(); 
-    const [ stepText, setStepText ] = useState("");
+    const [ stepText, setStepText ] = useState("Step 0 / 0");
 
     // Function to handle pressing the front button
     function frontButtonPress() {

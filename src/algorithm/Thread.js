@@ -26,22 +26,52 @@ function wait() {
     Atomics.wait(sharedArray, 0, 0);
 }
 
+/** 
+ * Flag that is set to true when the algorithm is in a step. When
+ * false, the algorithm should wait after every change to the graph. When
+ * true, the algorithm should only wait when the step is finished.
+ */
+let isInStep;
+
+/**
+ * Waits, but only if the algorithm is not in a step
+ */
+function waitIfNeeded() {
+    if (!isInStep) {
+        wait();
+    }
+}
+
 /**
  * Tells the thread to wait after running a step.
  */
 function step(code=null) {
     
-    // Execute the code in this step
-    (code !== null) && code();
+    // If we are already in a step, something probably went wrong,
+    // since it doesn't make sense to have a step within a step.
+    if (isInStep) {
+        throw new Error("Step started when already in a step. Recursive steps are not allowed.");
+    }
+
+    // If there is no code in this step, an error must have happened
+    if (code == null || code == undefined) {
+        throw new Error("Invalid code in step. Code cannot be null or undefined.");
+    }
     
-    // End this recording after the step is finished
+    // Tell the ChangeManager to start recording our changes
+    postMessage({action: "startRecording"});
+    isInStep = true;
+
+    // Execute the code in this step
+    code();
+    
+    // End the recording of the steps
     postMessage({action: "endRecording"});
+    isInStep = false;
 
     // Wait until we should start the next step
     wait();
 
-    // Start recording the next step
-    postMessage({action: "startRecording"});
 }
 
 function getNodeAttribute(nodeId, name) {
@@ -62,6 +92,7 @@ function display(message) {
     // This console.log is for debugging purposes. Feel free to remove.
     console.log("Displayed a message: " + message);
     postMessage({ action: "message", message: message });
+    waitIfNeeded();
 }
 
 /**
@@ -239,6 +270,7 @@ function other(nodeId, edgeId) {
 function addNode(x, y) {
     let id = graph.algorithmChangeManager.addNode(x, y);
     postMessage({ action: "addNode", x: x, y: y });
+    waitIfNeeded();
     return id;
 }
 
@@ -249,7 +281,7 @@ function addNode(x, y) {
 function deleteNode(nodeId) {
     graph.algorithmChangeManager.deleteNode(nodeId);
     postMessage({ action: "deleteNode", nodeId: nodeId });
-    step();
+    waitIfNeeded();
 }
 
 /**
@@ -261,7 +293,7 @@ function deleteEdge(edgeId) {
     let source = split[0], target = split[1];
     graph.algorithmChangeManager.deleteEdge(source, target);
     postMessage({ action: "deleteEdge", source: source, target: target });
-    step();
+    waitIfNeeded();
 }
 
 /**
@@ -286,6 +318,7 @@ function setAttribute(id, name, value) {
         graph.algorithmChangeManager.setNodeAttribute(id, name, value);
         postMessage({ action: "setNodeAttribute", nodeId: id, name: name, value: value });
     }
+    waitIfNeeded();
 }
 
 /**
@@ -303,6 +336,7 @@ function setAttributeAll(type, name, value) {
         graph.algorithmChangeManager.setEdgeAttributeAll(name, value);
         postMessage({ action: "setEdgeAttributeAll", name: name, value: value });
     }
+    waitIfNeeded();
 }
 
 /**
@@ -431,17 +465,17 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         // Load the graph
         graph.fileParser.loadGraph(message[1]);
 
+        // Make sure that the isInStep variable is initialized
+        isInStep = false;
+
         // Wait for the user to resume the algorithm
         wait();
 
         // Evaluate the algorithm
         try {
             
-            // Start recording the first step
-            postMessage({action: "startRecording"});
             eval(message[2]); /* eslint-disable-line no-eval */
             // End recording of the last step
-            postMessage({action: "endRecording"});
             console.log("Algorithm completed");
             postMessage({type: "complete"});
 
