@@ -192,3 +192,19 @@ the "new" tab. This feels inconsistent, and I think the graph editor
 should open the last graph you loaded by default. This is just a minor
 annoyance, however.
 
+### Messages are not displayed
+
+**Date:** 2/11/25
+
+**Author:** Krisjian Smith
+
+**Classification:** Unimplemented feature
+
+**Severity:** Medium
+
+**Description:** One of the methods an algorithm can call is
+`display()`. This method should show a message on the screen. Currently,
+the functionality for this is not implemented. The method only prints a
+message into the console, but does not print anything onto the screen
+for the user to see
+
