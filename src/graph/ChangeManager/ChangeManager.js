@@ -98,6 +98,13 @@ export default class ChangeManager {
         }
 
     }
+    
+    /**
+     * Returns true if this ChangeManager is currently recording
+     */
+    isRecording() {
+        return this.#isRecording;
+    }
 
     /** Methods for creating new ChangeObjects */
     
