@@ -22,6 +22,7 @@ export default class Algorithm {
         this.status = status;
         this.setStatus = setStatus;
         this.fetchingSteps = false;
+        this.completed = false;
         
         // Initialize the thread worker
         this.worker = new Worker(new URL("./Thread.js", import.meta.url));
@@ -75,21 +76,60 @@ export default class Algorithm {
     }
 
     canStepForward() {
+        if (this.fetchingSteps) return false;
+        if (this.completed && Graph.algorithmChangeManager.getIndex() >= Graph.algorithmChangeManager.getLength() - 1) return false;
         return true;
     }
 
     stepBack() {
-        if (Graph.algorithmChangeManager.getIndex() == 0) return;
+        if (!this.canStepBack()) return;
         Graph.algorithmChangeManager.undo();
+        this.#updateStatus();
     }
 
     stepForward() {
         if (!this.canStepForward()) return;
         if (Graph.algorithmChangeManager.getIndex() === Graph.algorithmChangeManager.getLength()) {
+            this.fetchingSteps = true;
             this.resumeThread();
+
+            this.onStepAdded = () => {
+                this.fetchingSteps = false;
+                this.#updateStatus();
+            }
         } else {
             Graph.algorithmChangeManager.redo();
         }
+    }
+
+    skipToEndStep(callback) {
+        if (!this.canStepForward()) return;
+        if (Graph.algorithmChangeManager.getIndex() === Graph.algorithmChangeManager.getLength()) {
+            this.fetchingSteps = true;
+            this.resumeThread();
+
+            this.onStepAdded = () => {
+                this.fetchingSteps = false;
+                this.#updateStatus();
+                if (callback) callback();
+            }
+        } else {
+            Graph.algorithmChangeManager.redo();
+            this.#updateStatus();
+            if (callback) callback();
+        }
+    }
+
+    skipToEnd() {
+        let count = 0;
+        const algorithm = this;
+        function recursiveNext() {
+            if (count >= 250) return;
+            count++;
+            algorithm.skipToEndStep(recursiveNext);
+        }
+
+        recursiveNext();
     }
 
     /**
@@ -105,6 +145,15 @@ export default class Algorithm {
             Atomics.store(this.array, i + 2, promptResult.charCodeAt(i));
         }
         this.resumeThread();
+
+        if (this.onStepAdded) this.onStepAdded();
+    }
+
+    /**
+     * Triggers re-render and updates index
+     */
+    #updateStatus() {
+        this.setStatus({});
     }
 
     #onMessage(message) {
@@ -121,6 +170,11 @@ export default class Algorithm {
                 );
                 break;
             case "message":
+                if (this.onStepAdded) this.onStepAdded();
+                break;
+            case "print":
+                if (this.onStepAdded) this.onStepAdded();
+                console.log(message.message);
                 break;
             case "deleteNode":
                 Graph.algorithmChangeManager.deleteNode(message.nodeId);
@@ -145,13 +199,16 @@ export default class Algorithm {
                 break;
             case "endRecording":
                 Graph.algorithmChangeManager.endRecording();
+                if (this.onStepAdded) this.onStepAdded();
+                break;
+            case "complete":
+                this.completed = true;
                 break;
             default:
                 // If the message was not a type we define here, then we probably just made
                 // a mistake or typo when sending this message. Throw an error to let us
                 // know about it
                 throw new Error("Unexpected message type: " + message.action);
-                
         }
     }
 }

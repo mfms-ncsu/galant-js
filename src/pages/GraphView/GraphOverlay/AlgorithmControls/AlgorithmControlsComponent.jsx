@@ -111,14 +111,13 @@ export default function AlgorithmControls() {
         return () => document.removeEventListener('keydown', handleKeyPress, true);
     }, [algorithm]);
 
+    // Update step text
+    function updateStepText() {
+        setStepText(algorithm.getStepText());
+    }
+
     // Return if no algorithm is available
     if (!algorithm) return null;
-
-    // Make the step text
-    // const stepText = `Step ${algorithm.currentIndex}` + (algorithm.completed ? ` / ${algorithm.steps.length - 1}` : '');
-    const updateStepText = () => {
-        setStepText(algorithm.getStepText());
-    };
 
     return (
         <div>

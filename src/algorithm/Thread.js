@@ -102,7 +102,7 @@ function display(message) {
  * @param {String} message Message to print
  */
 function print(message) {
-    console.log(message);
+    postMessage({ action: "print", message: message });
 }
 
 /**
@@ -479,11 +479,11 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
             eval(message[2]); /* eslint-disable-line no-eval */
             // End recording of the last step
             console.log("Algorithm completed");
-            postMessage({type: "complete"});
+            postMessage({action: "complete"});
 
         } catch (error) {
             // if there's an error, send a message with the error
-            postMessage({type: "error", content: error});
+            postMessage({action: "error", content: error});
             throw error
         }
     }
