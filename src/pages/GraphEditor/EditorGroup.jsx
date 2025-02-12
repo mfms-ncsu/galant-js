@@ -119,19 +119,33 @@ export default function EditorGroup() {
         }
     }, []);
 
+    // Listen for storage events for when a graph is saved
     useEffect(() => {
-        function onStorage() {
-            const storageItem = localStorage.getItem(`GraphFiles`);
-            if (storageItem) {
-                const dataList = JSON.parse(storageItem);
-                setTabs(dataList.map((data, i) => {
-                    return {
-                        name: data.name,
-                        content: data.content,
-                        selected: (i === 0) ? true : false,
+        function onStorage(event) {
+            // Get the old and new list of tabs
+            const oldList = JSON.parse(event.oldValue);
+            const newList = JSON.parse(event.newValue);
+
+            // Figure out which graph to mark as selected
+            let newSelected = 0;
+            newList.forEach((graph, i) => {
+                if (oldList[i]) {
+                    if (oldList[i].content !== graph.content) {
+                        newSelected = i;
                     }
-                }));
-            }
+                } else {
+                    newSelected = i;
+                }
+            });
+
+            // Set tabs
+            setTabs(newList.map((data, i) => {
+                return {
+                    name: data.name,
+                    content: data.content,
+                    selected: (i === newSelected) ? true : false,
+                }
+            }));
         }
 
         window.addEventListener("storage", onStorage);
