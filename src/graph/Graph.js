@@ -95,6 +95,19 @@ export class Graph {
     }
 
     /**
+     * Gets the edge between two nodes.
+     * @param {String} source Source node
+     * @param {String} target Target node
+     * @returns Edge between the given nodes, undefined if it doesn't exist
+     */
+    getEdge(source, target) {
+        const node = this.#nodes.get(source);
+        if (!node) return undefined;
+
+        return node.edges.get(`${source},${target}`);
+    }
+
+    /**
      * Gets an array of all edges in the graph.
      * @returns All edges in the graph
      */
