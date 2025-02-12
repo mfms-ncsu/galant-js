@@ -1,9 +1,11 @@
 import { Graph } from "graph/Graph";
 
 /**
- * 
+ * Execution environment for algorithms. This file provides all necessary functions
+ * and controls the flow of the algorithm to stop itself after each step.
  * 
  * @author Henry Morris
+ * @author Krisjian Smith
  */
 
 /**
