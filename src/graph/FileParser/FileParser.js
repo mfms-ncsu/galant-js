@@ -54,7 +54,7 @@ export default class FileParser {
         const values = line.split(" ");
 
         // Regexes to match simple node and edge lines
-        const nodeRegex = /^n \S+ -?\d+ -?\d+( -?\d+)?( [^ \n\t:]+:[^ \n\t:]+)*$/;
+        const nodeRegex = /^n \S+ -?\d+.?\d* -?\d+.?\d*( -?\d+)?( [^ \n\t:]+:[^ \n\t:]+)*$/;
         /*
             nodeRegex documentation:
             
