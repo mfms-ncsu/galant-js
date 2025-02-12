@@ -94,6 +94,7 @@ export default class Algorithm {
             }
         } else {
             Graph.algorithmChangeManager.redo();
+            this.#updateStatus();
         }
     }
 
