@@ -1,7 +1,8 @@
 import Graph from "graph/Graph";
 
 /**
- * 
+ * Representation of the algorithm loaded into the program. Contains a name and code. Controls a
+ * web worker called Thread, which is the execution environment for the code.
  * 
  * @author Henry Morris
  */
@@ -150,7 +151,7 @@ export default class Algorithm {
     }
 
     /**
-     * Triggers re-render and updates index
+     * Triggers re-render
      */
     #updateStatus() {
         this.setStatus({});
