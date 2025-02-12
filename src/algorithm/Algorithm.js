@@ -169,10 +169,8 @@ export default class Algorithm {
                 );
                 break;
             case "message":
-                if (this.onStepAdded) this.onStepAdded();
                 break;
             case "print":
-                if (this.onStepAdded) this.onStepAdded();
                 console.log(message.message);
                 break;
             case "deleteNode":
@@ -198,6 +196,9 @@ export default class Algorithm {
                 break;
             case "endRecording":
                 Graph.algorithmChangeManager.endRecording();
+                if (this.onStepAdded) this.onStepAdded();
+                break;
+            case "step":
                 if (this.onStepAdded) this.onStepAdded();
                 break;
             case "complete":

@@ -91,6 +91,7 @@ function getNodeAttribute(nodeId, name) {
  * @param {String} message Message to display
  */
 function display(message) {
+    if (!isInStep) { postMessage({ action: "step" }) }
     // This console.log is for debugging purposes. Feel free to remove.
     console.log("Displayed a message: " + message);
     postMessage({ action: "message", message: message });
@@ -102,6 +103,7 @@ function display(message) {
  * @param {String} message Message to print
  */
 function print(message) {
+    if (!isInStep) { postMessage({ action: "step" }) }
     postMessage({ action: "print", message: message });
 }
 
@@ -270,6 +272,8 @@ function other(nodeId, edgeId) {
  * @return {String} the ID of the new node
  */
 function addNode(x, y) {
+    if (!isInStep) { postMessage({ action: "step" }) }
+
     let id = graph.algorithmChangeManager.addNode(x, y);
     postMessage({ action: "addNode", x: x, y: y });
     waitIfNeeded();
@@ -281,6 +285,8 @@ function addNode(x, y) {
  * @param {String} nodeId Node to delete
  */
 function deleteNode(nodeId) {
+    if (!isInStep) { postMessage({ action: "step" }) }
+
     graph.algorithmChangeManager.deleteNode(nodeId);
     postMessage({ action: "deleteNode", nodeId: nodeId });
     waitIfNeeded();
@@ -291,6 +297,8 @@ function deleteNode(nodeId) {
  * @param {String} edgeId Edge to delete (Source,Target format)
  */
 function deleteEdge(edgeId) {
+    if (!isInStep) { postMessage({ action: "step" }) }
+
     let split = edgeId.split(",");
     let source = split[0], target = split[1];
     graph.algorithmChangeManager.deleteEdge(source, target);
@@ -305,6 +313,8 @@ function deleteEdge(edgeId) {
  * @param {Object} value Value of the attribute
  */
 function setAttribute(id, name, value) {
+    if (!isInStep) { postMessage({ action: "step" }) }
+
     if (id == null) {
         console.error("id is null! name: " + name + ", value: " + value);
     }
@@ -330,6 +340,8 @@ function setAttribute(id, name, value) {
  * @param {Object} value Attribute value
  */
 function setAttributeAll(type, name, value) {
+    if (!isInStep) { postMessage({ action: "step" }) }
+
     if (type === "nodes") {
         graph.algorithmChangeManager.setNodeAttributeAll(name, value);
         postMessage({ action: "setNodeAttributeAll", name: name, value: value });
