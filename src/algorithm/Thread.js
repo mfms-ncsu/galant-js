@@ -221,7 +221,7 @@ function getNodes() {
  * @returns Ids of all edges (Source,Target format)
  */
 function getEdges() {
-    return graph.getEdges();
+    return graph.getEdgeIds();
 }
 
 /**
@@ -248,7 +248,7 @@ function outgoing(nodeId) {
  * @returns Array of incident edges
  */
 function incident(nodeId) {
-    return graph.getAllEdges(nodeId);
+    return graph.getIncidentEdges(nodeId);
 }
 
 /**

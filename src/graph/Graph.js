@@ -108,15 +108,11 @@ export class Graph {
     }
 
     /**
-     * Gets an array of all edges in the graph.
-     * @returns All edges in the graph
+     * Gets an array of all edges ids in the graph. Used in thread because edges
+     * need to be referenced by a single id instead of source, target pair.
+     * @returns The ids of all edges in the graph
      */
-    getEdges() {
-        
-        // NOTE: This function returns the key of each edge (for edge a->b,
-        //       returns the string "a,b". However, for all of our other
-        //       edge functions (getAllEdges, getIncomingEdges, etc.) we
-        //       return the edge object itself. Why is this one different?
+    getEdgeIds() {
         const edges = [];
 
         this.#nodes.forEach(node => {
@@ -135,7 +131,7 @@ export class Graph {
      * @param {String} nodeId Node id
      * @returns Array of all edges incident to nodeId, undefined if nodeId doesn't exist
      */
-    getAllEdges(nodeId) {
+    getIncidentEdges(nodeId) {
         // Check if the node exists
         if (this.#nodes.has(nodeId)) {
             // If it does, return an array of all of its edges
