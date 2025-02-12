@@ -24,6 +24,9 @@ export default class Algorithm {
         this.setStatus = setStatus;
         this.fetchingSteps = false;
         this.completed = false;
+
+        this.index = 0;
+        this.length = 0;
         
         // Initialize the thread worker
         this.worker = new Worker(new URL("./Thread.js", import.meta.url));
@@ -32,15 +35,6 @@ export default class Algorithm {
         this.worker.postMessage(["shared", this.array]);
         this.worker.postMessage(["graph/algorithm", Graph.toGraphString(), this.code]);
         this.worker.postMessage(["algorithm", this.code]);
-    }
-
-    /**
-     * Returns a string that will be displayed in the AlgorithmControlsComponent that
-     * represents the current index of the algorithm. For example, if we are on step
-     * 4 of 6, then this algorithm will return "Step 4 / 6"
-     */
-    getStepText() {
-        return "Step " + Graph.algorithmChangeManager.getIndex() + " / " + Graph.algorithmChangeManager.getLength();
     }
 
     /**
@@ -151,10 +145,13 @@ export default class Algorithm {
     }
 
     /**
-     * Triggers re-render
+     * Triggers re-render and updates index/length
      */
     #updateStatus() {
         this.setStatus({});
+
+        this.index = Graph.algorithmChangeManager.getIndex();
+        this.length = Graph.algorithmChangeManager.getLength();
     }
 
     #onMessage(message) {
