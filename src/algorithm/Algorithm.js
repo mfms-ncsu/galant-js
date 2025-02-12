@@ -72,7 +72,7 @@ export default class Algorithm {
 
     canStepForward() {
         if (this.fetchingSteps) return false;
-        if (this.completed && Graph.algorithmChangeManager.getIndex() >= Graph.algorithmChangeManager.getLength() - 1) return false;
+        if (this.completed && Graph.algorithmChangeManager.getIndex() >= Graph.algorithmChangeManager.getLength()) return false;
         return true;
     }
 
