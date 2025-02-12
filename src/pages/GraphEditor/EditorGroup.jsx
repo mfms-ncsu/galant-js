@@ -122,6 +122,8 @@ export default function EditorGroup() {
     // Listen for storage events for when a graph is saved
     useEffect(() => {
         function onStorage(event) {
+            if (event.key !== "GraphFiles") return;
+            
             // Get the old and new list of tabs
             const oldList = JSON.parse(event.oldValue);
             const newList = JSON.parse(event.newValue);
