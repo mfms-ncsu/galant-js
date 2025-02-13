@@ -88,7 +88,7 @@ export default function AlgorithmControls() {
             </div>
 
             <div className="absolute bottom-1 right-1">
-                <button id="export-graph" className={`${(algorithm.currentIndex <= 0 || !algorithm.configuration.controlNodePosition) && 'hidden'} absolute bottom-0 right-0 py-2 px-4 bg-gradient-to-r from-indigo-500 to-blue-500 shadow rounded-full font-semibold text-white pointer-events-auto`} onClick={exportGraph}>Export Graph</button>
+                <button id="export-graph" className={`${algorithm.currentIndex <= 0 && 'hidden'} absolute bottom-20 right-0 py-2 px-4 bg-gradient-to-r from-indigo-500 to-blue-500 shadow rounded-full font-semibold text-white pointer-events-auto`} onClick={exportGraph}>Export Graph</button>
 
                 <button id="terminate-algorithm" className="flex items-center h-6 w-15 space-x-4 px-2 py-1 bg-red-100 text-black rounded shadow-lg hover:bg-gray-300 cursor-alias">
                     <label><span>Exit (x)</span></label>
