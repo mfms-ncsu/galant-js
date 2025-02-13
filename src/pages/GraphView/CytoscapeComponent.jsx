@@ -19,6 +19,9 @@ export default function CytoscapeComponent() {
     // Get a reference to the element into which cytoscape is loaded
     const cytoscapeElement = useRef();
 
+    // State for the message to display
+    const [message, setMessage] = useState(null);
+
     /**
      * Initialize cytoscape on mount (When cytoscapeElement ref is set to the div element)
      */
@@ -77,10 +80,18 @@ export default function CytoscapeComponent() {
         window.cytoscape.style(Graph.cytoscapeManager.getStyle()).update(); // Update style
     };
 
+    /**
+     * Function to call whenever the messages need to be updated
+     */
+    window.updateMessage = () => {
+        const newMessage = Graph.algorithmChangeManager.getMessage();
+        setMessage(newMessage);
+    }
+
     return (
         <div className="w-full h-full">
             <div className="flex justify-center">
-                <p className="absolute z-10 font-semibold">{}</p>
+                <p className="absolute z-10 font-semibold">{message}</p>
             </div>
             <div id="cytoscape-instance" ref={cytoscapeElement} className="w-full h-full bg-white ring-2 ring-slate-300 rounded-md" />
         </div>

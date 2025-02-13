@@ -92,8 +92,6 @@ function getNodeAttribute(nodeId, name) {
  */
 function display(message) {
     if (!isInStep) { postMessage({ action: "step" }) }
-    // This console.log is for debugging purposes. Feel free to remove.
-    console.log("Displayed a message: " + message);
     postMessage({ action: "message", message: message });
     waitIfNeeded();
 }

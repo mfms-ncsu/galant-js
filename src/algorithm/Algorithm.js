@@ -169,6 +169,7 @@ export default class Algorithm {
                 );
                 break;
             case "message":
+                Graph.algorithmChangeManager.addMessage(message.message);
                 break;
             case "print":
                 console.log(message.message);

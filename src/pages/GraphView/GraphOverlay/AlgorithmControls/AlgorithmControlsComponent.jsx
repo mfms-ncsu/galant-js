@@ -41,9 +41,7 @@ export default function AlgorithmControls() {
         setAlgorithm(null);
 
         // Undo all changes made by the algorithm
-        while(Graph.algorithmChangeManager.getIndex() > 0) {
-            Graph.algorithmChangeManager.undo();
-        }
+        Graph.algorithmChangeManager.revert();
     }
 
     // Effect hook to handle keyboard shortcuts for stepping through algorithm

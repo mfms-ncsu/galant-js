@@ -237,6 +237,7 @@ export default class ChangeManager {
             if (typeof window !== "undefined" && window.self === window.top) {
                 window.updateCytoscape();
                 window.updateStep();
+                window.updateMessage();
             }
         }
     }
@@ -258,6 +259,7 @@ export default class ChangeManager {
             if (typeof window !== "undefined" && window.self === window.top) {
                 window.updateCytoscape();
                 window.updateStep();
+                window.updateMessage();
             }
         }
     }
@@ -283,6 +285,23 @@ export default class ChangeManager {
      */
     getIndex() {
         return this.#index;
+    }
+
+    /**
+     * Gets the most recent message to display for the user.
+     * @returns Most recent message added to changes
+     */
+    getMessage() {
+        for (let i = this.#index; i >= 0; i--) {
+            if (this.#changes[i]) {
+                for (const change of this.#changes[i]) {
+                    if (change.action === "message") {
+                        return change.current.message;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -322,6 +341,7 @@ export default class ChangeManager {
         if (typeof window !== "undefined" && window.self === window.top) {
             window.updateCytoscape();
             window.updateStep();
+            window.updateMessage();
         }
     }
 
