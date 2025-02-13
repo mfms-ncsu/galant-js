@@ -93,7 +93,7 @@ export default class ChangeManager {
     
         // Record the list of changes, but only if changes were actually made. If
         // the currentChangeList is empty, do nothing.
-        if (this.#currentChangeList.length != 0) {
+        if (this.#currentChangeList.length !== 0) {
             this.#recordChange(this.#currentChangeList);
         }
 
