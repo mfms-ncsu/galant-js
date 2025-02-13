@@ -417,22 +417,6 @@ function getAttribute(id, name) {
     }
 }
 
-function color(id, color) {
-    setAttribute(id, "color", color);
-}
-
-function uncolor(id) {
-    setAttribute(id, "color", undefined);
-}
-
-function hasColor(id) {
-    return getAttribute(id, "color") !== undefined;
-}
-
-function clearEdgeColors() {
-    setAttributeAll("edges", "color", undefined);
-}
-
 function setEdgeWidth(id, width) {
     setAttribute(id, "edgeWidth", width);
 }
@@ -453,8 +437,40 @@ function clearNodeHighlights() {
     setAttributeAll("nodes", "highlighted", false);
 }
 
+function color(id, color) {
+    setAttribute(id, "color", color);
+}
+
+function uncolor(id) {
+    setAttribute(id, "color", undefined);
+}
+
+function getColor(id) {
+    return getAttribute(id, "color");
+}
+
+function hasColor(id) {
+    return getAttribute(id, "color") !== undefined;
+}
+
+function clearNodeColors() {
+    setAttributeAll("node", "color", undefined);
+}
+
+function clearEdgeColors() {
+    setAttributeAll("edges", "color", undefined);
+}
+
 function label(id, label) {
     setAttribute(id, "label", label);
+}
+
+function unlabel(id) {
+    setAttribute(id, "label", "");
+}
+
+function getLabel(id) {
+    return getAttribute(id, "label");
 }
 
 function hasLabel(id) {
