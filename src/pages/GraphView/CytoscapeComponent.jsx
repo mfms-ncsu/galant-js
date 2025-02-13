@@ -47,14 +47,11 @@ export default function CytoscapeComponent() {
                 valign: "top",
                 valignBox: "top",
                 tpl: (data) => {
-                    const hideWeight = false; // NOTE: these need to be pulled from somewhere
-                    const hideLabel = false;
-
-                    if ((!hideWeight && data.weight) || (!hideLabel && data.label)) {
+                    if (data.weight || data.label) {
                         return renderToString(
                             <div className={`flex flex-col items-center justify-center border bg-white border-black  ${data.invisible && "hidden"}`}>
-                                <p className="leading-none">{!data.invisibleWeight && !hideWeight ? data.weight : ""}</p>
-                                <p className="leading-none">{!data.invisibleLabel && !hideLabel ? data.label : ""}</p>
+                                <p className="leading-none">{!data.invisibleWeight ? data.weight : ""}</p>
+                                <p className="leading-none">{!data.invisibleLabel ? data.label : ""}</p>
                             </div>
                         );
                     }

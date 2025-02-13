@@ -461,6 +461,7 @@ function hasWeight(edge) {
 
 function hideAllEdgeWeights() {
     // TODO
+    // Is this necessary? Instead, could use clearNodeWeights
 }
 
 /**
