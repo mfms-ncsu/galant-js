@@ -219,11 +219,27 @@ function getNodes() {
 }
 
 /**
+ * Returns the number of nodes in the graph
+ * @return the number of node in the graph
+ */
+function getNumberOfNodes() {
+    return graph.getNodeArray().length;
+}
+
+/**
  * Gets the ids of all edges in an array
  * @returns Ids of all edges (Source,Target format)
  */
 function getEdges() {
     return graph.getEdgeIds();
+}
+
+/**
+ * Returns the number of edges in the graph
+ * @return the number of edges in the graph
+ */
+function getNumberOfEdges() {
+    return graph.getEdgeIds().length;
 }
 
 /**
