@@ -2,6 +2,15 @@ import  { Graph } from "graph/Graph";
 import Edge from "graph/GraphElement/Edge";
 
 /**
+ * Mock window functions for testing environment
+ * @author Ziyu Wang
+ */
+global.window = {};
+window.updateCytoscape = jest.fn();
+window.updateStep = jest.fn();
+window.updateMessage = jest.fn();
+
+/**
  * Test methods for the FileParser, which is responsible
  * for loading a graph from a text file.
  *
