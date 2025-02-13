@@ -3,6 +3,17 @@ import Edge from "graph/GraphElement/Edge";
 import ChangeManager from "graph/ChangeManager/ChangeManager";
 
 /**
+ * Mock window functions for testing environment
+ * Note: These four lines of code are necessary for the windows environment
+ *       It might cause some problems if you are running the tests in a different environment
+ * @author Ziyu Wang
+ */
+global.window = {};
+window.updateCytoscape = jest.fn();
+window.updateStep = jest.fn();
+window.updateMessage = jest.fn();
+
+/**
  * Test file for the ChangeManager class.
  *
  * @author Krisjian Smith
@@ -276,4 +287,57 @@ describe("ChangeManager tests", () => {
         graph.userChangeManager.redo();
 
     });
+
+    /** 
+     * Test the startRecording and endRecording methods
+     * @author Ziyu Wang
+     */
+    test("Testing ChangeManager.startRecording and ChangeManager.endRecording", () => {
+        graph.userChangeManager.startRecording();
+        expect(graph.userChangeManager.isRecording()).toBe(true);
+
+        let node1 = graph.userChangeManager.addNode(0, 0);
+        let node2 = graph.userChangeManager.addNode(1, 1);
+        graph.userChangeManager.addEdge(node1, node2);
+
+        graph.userChangeManager.endRecording();
+        expect(graph.userChangeManager.isRecording()).toBe(false);
+
+        // Undo should remove both nodes and the edge at once
+        graph.userChangeManager.undo();
+        expect(graph.getEdge(node1, node2)).toBeUndefined();
+        expect(graph.getNodePosition(node1)).toBeUndefined();
+        expect(graph.getNodeAttribute(node1, "color")).toBeUndefined();
+    });
+
+    /** 
+     * Test the revert method
+     * @author Ziyu Wang
+     */
+    test("Testing ChangeManager.revert", () => {
+        let node1 = graph.userChangeManager.addNode(0, 0);
+        let node2 = graph.userChangeManager.addNode(1, 1);
+        graph.userChangeManager.addEdge(node1, node2);
+
+        graph.userChangeManager.revert();
+        expect(graph.getEdge(node1, node2)).toBeUndefined();
+        expect(graph.getNodeAttribute(node1, "color")).toBeUndefined();
+    });
+
+    /** 
+     * Test the getLength and getIndex methods
+     * @author Ziyu Wang
+     */
+    test("Testing ChangeManager.getLength and ChangeManager.getIndex", () => {
+        let node1 = graph.userChangeManager.addNode(0, 0);
+        let node2 = graph.userChangeManager.addNode(1, 1);
+        graph.userChangeManager.addEdge(node1, node2);
+
+        expect(graph.userChangeManager.getLength()).toBe(3);
+        expect(graph.userChangeManager.getIndex()).toBe(3);
+
+        graph.userChangeManager.undo();
+        expect(graph.userChangeManager.getIndex()).toBe(2);
+    });
+    
 });
