@@ -66,22 +66,36 @@ export default class Algorithm {
         }
     }
 
+    /**
+     * Checks whether the algorithm can step back.
+     * @returns True if it can, false otherwise
+     */
     canStepBack() {
         return Graph.algorithmChangeManager.getIndex() > 0;
     }
 
+    /**
+     * Checks whether the algorithm can step forward.
+     * @returns True if it can, false otherwise
+     */
     canStepForward() {
         if (this.fetchingSteps) return false;
         if (this.completed && Graph.algorithmChangeManager.getIndex() >= Graph.algorithmChangeManager.getLength()) return false;
         return true;
     }
 
+    /**
+     * Moves back a step.
+     */
     stepBack() {
         if (!this.canStepBack()) return;
         Graph.algorithmChangeManager.undo();
         this.#updateStatus();
     }
 
+    /**
+     * Moves forward a step.
+     */
     stepForward() {
         if (!this.canStepForward()) return;
         if (Graph.algorithmChangeManager.getIndex() === Graph.algorithmChangeManager.getLength()) {
@@ -98,6 +112,10 @@ export default class Algorithm {
         }
     }
 
+    /**
+     * Recursive call for skipToEnd.
+     * @param {Function} callback Function to call upon completion
+     */
     skipToEndStep(callback) {
         if (!this.canStepForward()) return;
         if (Graph.algorithmChangeManager.getIndex() === Graph.algorithmChangeManager.getLength()) {
@@ -116,6 +134,9 @@ export default class Algorithm {
         }
     }
 
+    /**
+     * Skips to the end of the algorithm execution.
+     */
     skipToEnd() {
         let count = 0;
         const algorithm = this;
@@ -155,6 +176,10 @@ export default class Algorithm {
         this.length = Graph.algorithmChangeManager.getLength();
     }
 
+    /**
+     * Handles messages from thread.
+     * @param {Object} message Message from thread
+     */
     #onMessage(message) {
         switch (message.action) {
             case "addNode":
