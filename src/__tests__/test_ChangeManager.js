@@ -4,8 +4,6 @@ import ChangeManager from "graph/ChangeManager/ChangeManager";
 
 /**
  * Mock window functions for testing environment
- * Note: These four lines of code are necessary for the windows environment
- *       It might cause some problems if you are running the tests in a different environment
  * @author Ziyu Wang
  */
 global.window = {};

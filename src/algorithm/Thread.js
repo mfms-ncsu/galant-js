@@ -295,6 +295,57 @@ function promptEdge(message) {
 }
 
 /**
+ * Gets the ids of all nodes in an array
+ * @returns Ids of all nodes
+ */
+function getNodes() {
+    return graph.getNodeArray();
+}
+
+/**
+ * Returns the number of nodes in the graph
+ * @return the number of node in the graph
+ */
+function getNumberOfNodes() {
+    return graph.getNodeArray().length;
+}
+
+/**
+ * Gets the ids of all edges in an array
+ * @returns Ids of all edges (Source,Target format)
+ */
+function getEdges() {
+    return graph.getEdgeIds();
+}
+
+/**
+ * Returns the number of edges in the graph
+ * @return the number of edges in the graph
+ */
+function getNumberOfEdges() {
+    return graph.getEdgeIds().length;
+}
+
+/**
+ * Gets the opposite node on the given edge.
+ * @param {String} nodeId Node id
+ * @param {String} edgeId Edge id (Source,Target format)
+ * @returns Opposite node
+ */
+function other(nodeId, edgeId) {
+    return graph.getOppositeNode(nodeId, edgeId);
+}
+
+/**
+ * Gets the ids of all incident edges to the given node.
+ * @param {String} nodeId Node id
+ * @returns Array of incident edges
+ */
+function incident(nodeId) {
+    return graph.getIncidentEdges(nodeId);
+}
+
+/**
  * Gets the ids of all incoming edges from source.
  * @param {String} nodeId Source node
  * @returns Array of incoming edges
@@ -312,13 +363,28 @@ function outgoing(nodeId) {
     return graph.getOutgoingEdges(nodeId);
 }
 
-/**
- * Gets the ids of all incident edges to the given node.
- * @param {String} nodeId Node id
- * @returns Array of incident edges
- */
-function incident(nodeId) {
-    return graph.getIncidentEdges(nodeId);
+function adjacentNodes(nodeId) {
+    return graph.getAdjacentNodes(nodeId);
+}
+
+function incomingNodes(nodeId) {
+    return graph.getIncomingNodes(nodeId);
+}
+
+function outgoingNodes(nodeId) {
+    return graph.getOutgoingNodes(nodeId);
+}
+
+function degree(nodeId) {
+    return graph.getAdjacentEdges(nodeId).length;
+}
+
+function inDegree(nodeId) {
+    return graph.getIncomingEdges(nodeId).length;
+}
+
+function outDegree(nodeId) {
+    return graph.getOutgoingEdges(nodeId).length;
 }
 
 /**
@@ -435,22 +501,6 @@ function getAttribute(id, name) {
     }
 }
 
-function color(id, color) {
-    setAttribute(id, "color", color);
-}
-
-function uncolor(id) {
-    setAttribute(id, "color", undefined);
-}
-
-function hasColor(id) {
-    return getAttribute(id, "color") !== undefined;
-}
-
-function clearEdgeColors() {
-    setAttributeAll("edges", "color", undefined);
-}
-
 function setEdgeWidth(id, width) {
     setAttribute(id, "edgeWidth", width);
 }
@@ -471,8 +521,40 @@ function clearNodeHighlights() {
     setAttributeAll("nodes", "highlighted", false);
 }
 
+function color(id, color) {
+    setAttribute(id, "color", color);
+}
+
+function uncolor(id) {
+    setAttribute(id, "color", undefined);
+}
+
+function getColor(id) {
+    return getAttribute(id, "color");
+}
+
+function hasColor(id) {
+    return getAttribute(id, "color") !== undefined;
+}
+
+function clearNodeColors() {
+    setAttributeAll("node", "color", undefined);
+}
+
+function clearEdgeColors() {
+    setAttributeAll("edges", "color", undefined);
+}
+
 function label(id, label) {
     setAttribute(id, "label", label);
+}
+
+function unlabel(id) {
+    setAttribute(id, "label", "");
+}
+
+function getLabel(id) {
+    return getAttribute(id, "label");
 }
 
 function hasLabel(id) {
