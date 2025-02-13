@@ -243,6 +243,25 @@ function getNumberOfEdges() {
 }
 
 /**
+ * Gets the opposite node on the given edge.
+ * @param {String} nodeId Node id
+ * @param {String} edgeId Edge id (Source,Target format)
+ * @returns Opposite node
+ */
+function other(nodeId, edgeId) {
+    return graph.getOppositeNode(nodeId, edgeId);
+}
+
+/**
+ * Gets the ids of all incident edges to the given node.
+ * @param {String} nodeId Node id
+ * @returns Array of incident edges
+ */
+function incident(nodeId) {
+    return graph.getIncidentEdges(nodeId);
+}
+
+/**
  * Gets the ids of all incoming edges from source.
  * @param {String} nodeId Source node
  * @returns Array of incoming edges
@@ -260,23 +279,28 @@ function outgoing(nodeId) {
     return graph.getOutgoingEdges(nodeId);
 }
 
-/**
- * Gets the ids of all incident edges to the given node.
- * @param {String} nodeId Node id
- * @returns Array of incident edges
- */
-function incident(nodeId) {
-    return graph.getIncidentEdges(nodeId);
+function adjacentNodes(nodeId) {
+    return graph.getAdjacentNodes(nodeId);
 }
 
-/**
- * Gets the opposite node on the given edge.
- * @param {String} nodeId Node id
- * @param {String} edgeId Edge id (Source,Target format)
- * @returns Opposite node
- */
-function other(nodeId, edgeId) {
-    return graph.getOppositeNode(nodeId, edgeId);
+function incomingNodes(nodeId) {
+    return graph.getIncomingNodes(nodeId);
+}
+
+function outgoingNodes(nodeId) {
+    return graph.getOutgoingNodes(nodeId);
+}
+
+function degree(nodeId) {
+    return graph.getAdjacentEdges(nodeId).length;
+}
+
+function inDegree(nodeId) {
+    return graph.getIncomingEdges(nodeId).length;
+}
+
+function outDegree(nodeId) {
+    return graph.getOutgoingEdges(nodeId).length;
 }
 
 /**

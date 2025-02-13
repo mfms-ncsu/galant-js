@@ -193,6 +193,77 @@ export class Graph {
     }
 
     /**
+     * Gets all nodes adjacent to the given node.
+     * @param {String} nodeId Node to check
+     * @returns Array of adjacent nodes
+     */
+    getAdjacentNodes(nodeId) {
+        let nodes = [];
+
+        // Check if the node exists
+        if (this.#nodes.has(nodeId)) {
+            this.#nodes.get(nodeId).edges.forEach(edge => {
+                if (edge.source === nodeId) {
+                    nodes.push(edge.target);
+                } else {
+                    nodes.push(edge.source);
+                }
+            });
+
+            return nodes;
+        } else {
+            // If the node doesn't exist, return undefined
+            return undefined;
+        }
+    }
+
+    /**
+     * Gets all nodes incoming to the given node.
+     * @param {String} target Node to check
+     * @returns Array of incoming nodes
+     */
+    getIncomingNodes(target) {
+        let nodes = [];
+
+        // Check if the node exists
+        if (this.#nodes.has(target)) {
+            this.#nodes.get(target).edges.forEach(edge => {
+                if (edge.target === target) {
+                    nodes.push(edge.source);
+                }
+            });
+
+            return nodes;
+        } else {
+            // If the node doesn't exist, return undefined
+            return undefined;
+        }
+    }
+
+    /**
+     * Gets all nodes outgoing from the given node.
+     * @param {String} source Node to check
+     * @returns Array of outgoing nodes
+     */
+    getOutgoingNodes(source) {
+        let nodes = [];
+
+        // Check if the node exists
+        if (this.#nodes.has(source)) {
+            this.#nodes.get(source).edges.forEach(edge => {
+                if (edge.source === source) {
+                    nodes.push(edge.target);
+                }
+            });
+
+            return nodes;
+        } else {
+            // If the node doesn't exist, return undefined
+            return undefined;
+        }
+    }
+
+    /**
      * Gets the node opposite the given on the given edge.
      * @param {String} nodeId Id of the node to check for
      * @param {String} edgeId Id of the edge to check (Source,Target format)
