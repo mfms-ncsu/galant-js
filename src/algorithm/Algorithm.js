@@ -90,7 +90,10 @@ export default class Algorithm {
     stepBack() {
         if (!this.canStepBack()) return;
         Graph.algorithmChangeManager.undo();
-        this.#updateStatus();
+        
+        setTimeout(() => {
+            this.#updateStatus();
+        }, 10);
     }
 
     /**
@@ -104,7 +107,10 @@ export default class Algorithm {
 
             this.onStepAdded = () => {
                 this.fetchingSteps = false;
-                this.#updateStatus();
+
+                setTimeout(() => {
+                    this.#updateStatus();
+                }, 10);
             }
         } else {
             Graph.algorithmChangeManager.redo();
@@ -124,7 +130,11 @@ export default class Algorithm {
 
             this.onStepAdded = () => {
                 this.fetchingSteps = false;
-                this.#updateStatus();
+                
+                setTimeout(() => {
+                    this.#updateStatus();
+                }, 10);
+
                 if (callback) callback();
             }
         } else {
