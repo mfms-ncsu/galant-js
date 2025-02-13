@@ -120,11 +120,7 @@ export default class Algorithm {
 
             this.onStepAdded = () => {
                 this.fetchingSteps = false;
-                
-                setTimeout(() => {
-                    this.#updateStatus();
-                }, 10);
-
+                this.#updateStatus();
                 if (callback) callback();
             }
         } else {
