@@ -114,61 +114,9 @@ export class Graph {
 
         return node.edges.get(`${source},${target}`);
     }
-    
-    /**
-     * Returns the total number of nodes in the graph
-     * @return the total number of nodes in the graph
-     */
-    getNumberOfEdges() {
-        return this.#nodes.length;
-    }
-    
-    /**
-     * Returns the total number of edges in the graph
-     * @return the total number of edges in the graph
-     */
+
     getNumberOfEdges() {
         return getEdgeIds().length;
-    }
-
-    /**
-     * Returns the id of the target of the given edge
-     * @return the id of the target of the given edge
-     * @throws if the edge does not exist
-     */
-    getTarget(edge) {
-        nodes = edge.split(",");
-        if (nodes.length != 2 || !this.#nodes.has(nodes[1])) { 
-            throw new Error("Given edge is not valid: " + edge);
-        }
-        return nodes[1];
-    }
-
-    /**
-     * Returns the id of the source of the given edge
-     * @return the id of the source of the given edge
-     * @throws if the edge does not exist
-     */
-    getSource(edge) {
-        nodes = edge.split(",");
-        if (nodes.length != 2 || !this.#nodes.has(nodes[0])) { 
-            throw new Error("Given edge is not valid: " + edge);
-        }
-        return nodes[0];
-    }
-
-    /**
-     * Returns an edge between the two nodes, if one exists. Returns
-     * undefined if none exists. If the graph is directed, then only
-     * edges in the given direction will be returned
-     * @return the edge between source and target, as described above
-     */
-    getEdgeBetween(source, target) {
-        let edge = getEdge(source, target);
-        if (edge == undefined && this.#isDirected) {
-            edge = getEdge(target, source);
-        }
-        return edge
     }
 
     /**

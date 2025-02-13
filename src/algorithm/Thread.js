@@ -76,6 +76,90 @@ function step(code=null) {
 
 }
 
+/**************************************************************/
+/************* Start of algorithm methods *********************/
+/**************************************************************/
+
+/**
+ * Gets the ids of all nodes in an array
+ * @returns Ids of all nodes
+ */
+function getNodes() {
+    return graph.getNodeArray();
+}
+
+/**
+ * Returns the number of nodes in the graph
+ * @return the number of node in the graph
+ */
+function getNumberOfNodes() {
+    return graph.getNumberOfNodes();
+}
+
+/**
+ * Gets the ids of all edges in an array
+ * @returns Ids of all edges (Source,Target format)
+ */
+function getEdges() {
+    return graph.getEdgeIds();
+}
+
+/**
+ * Returns the number of edges in the graph
+ * @return the number of edges in the graph
+ */
+function getNumberOfEdges() {
+    return graph.getNumberOfEdges();
+}
+
+/**
+ * Returns the id of the source of the given edge
+ * @return the id of the source of the given edge
+ */
+function source(edge) {
+    return graph.getSource(edge);
+}
+
+/**
+ * Returns the id of the target of the given edge
+ * @return the id of the target of the given edge
+ */
+function target(edge) {
+    return graph.getTarget(edge);
+}
+
+/**
+ * Returns an edge between the two nodes, if one exists. Returns
+ * undefined if none exists. If the graph is directed, then only
+ * edges in the given direction will be returned
+ * @return the edge between source and target, as described above
+ */
+function getEdgeBetween(source, target) {
+    return graph.getEdgeBetween(source, target);
+}
+
+/**
+ * Returns a list of edge between the two nodes, if one exists. Returns
+ * an empty if none exists. If the graph is directed, then only
+ * edges in the given direction will be returned
+ * @return the edge between source and target, as described above
+ */
+function getEdgeBetween(source, target) {
+    return graph.getEdgeBetween(source, target);
+}
+
+
+/**
+ * Gets the opposite node on the given edge.
+ * @param {String} nodeId Node id
+ * @param {String} edgeId Edge id (Source,Target format)
+ * @returns Opposite node
+ */
+function other(nodeId, edgeId) {
+    return graph.getOppositeNode(nodeId, edgeId);
+}
+
+
 function getNodeAttribute(nodeId, name) {
     let attr = postMessage({
         action: "getNodeAttribute",
@@ -211,38 +295,6 @@ function promptEdge(message) {
 }
 
 /**
- * Gets the ids of all nodes in an array
- * @returns Ids of all nodes
- */
-function getNodes() {
-    return graph.getNodeArray();
-}
-
-/**
- * Returns the number of nodes in the graph
- * @return the number of node in the graph
- */
-function getNumberOfNodes() {
-    return graph.getNodeArray().length;
-}
-
-/**
- * Gets the ids of all edges in an array
- * @returns Ids of all edges (Source,Target format)
- */
-function getEdges() {
-    return graph.getEdgeIds();
-}
-
-/**
- * Returns the number of edges in the graph
- * @return the number of edges in the graph
- */
-function getNumberOfEdges() {
-    return graph.getEdgeIds().length;
-}
-
-/**
  * Gets the ids of all incoming edges from source.
  * @param {String} nodeId Source node
  * @returns Array of incoming edges
@@ -267,16 +319,6 @@ function outgoing(nodeId) {
  */
 function incident(nodeId) {
     return graph.getIncidentEdges(nodeId);
-}
-
-/**
- * Gets the opposite node on the given edge.
- * @param {String} nodeId Node id
- * @param {String} edgeId Edge id (Source,Target format)
- * @returns Opposite node
- */
-function other(nodeId, edgeId) {
-    return graph.getOppositeNode(nodeId, edgeId);
 }
 
 /**
