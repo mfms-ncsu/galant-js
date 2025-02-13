@@ -290,6 +290,14 @@ function deleteNode(nodeId) {
     waitIfNeeded();
 }
 
+function setPosition(nodeId, x, y) {
+    if (!isInStep) { postMessage({ action: "step" }) }
+
+    graph.algorithmChangeManager.setNodePosition(nodeId, x, y);
+    postMessage({ action: "setNodePosition", nodeId: nodeId, x: x, y: y });
+    waitIfNeeded();
+}
+
 /**
  * Deletes the given edge.
  * @param {String} edgeId Edge to delete (Source,Target format)

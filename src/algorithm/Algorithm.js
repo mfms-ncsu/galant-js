@@ -38,16 +38,6 @@ export default class Algorithm {
     }
 
     /**
-     * Not sure what this object is supposed to do. It's called by the AlgorithmControlsComponent, and it fails to
-     * run if this function isn't there.
-     *
-     * TODO:
-     * FIXME: Either figure out what this configuration object is supposed to do/be or modify the AlgorithmConrtolsComponent
-     *        file to no longer require it
-     */
-    configuration = {controlNodePosition: 0};
-
-    /**
      * This places a 1 at index 0 in the shared array using the Atomics.store method. Once
      * stored it then notifies any process that is waiting and looking at index 0 to check the index. 
      * Which should be the worker Thread that had been created.
@@ -211,6 +201,9 @@ export default class Algorithm {
                 break;
             case "deleteNode":
                 Graph.algorithmChangeManager.deleteNode(message.nodeId);
+                break;
+            case "setNodePosition":
+                Graph.algorithmChangeManager.setNodePosition(message.nodeId, message.x, message.y);
                 break;
             case "deleteEdge":
                 Graph.algorithmChangeManager.deleteEdge(message.source, message.target);
