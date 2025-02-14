@@ -20,8 +20,6 @@ export class Graph {
     #nodes;
     /** Scale */
     #scalar;
-    /** Flag for whether the graph is directed or not */
-    #isDirected;
 
     /**
      * Creates a new graph with nodes, file parser, and change managers.
@@ -33,14 +31,8 @@ export class Graph {
         // Use this scalar in toCytoscape
         this.#scalar = 1;
 
-        /** Flag for whether the graph is directed or not */
-        this.#isDirected = false;
-
-        /** Flags for showing labels and weights */
-        this.nodeLabels = true;
-        this.nodeWeights = true;
-        this.edgeLabels = true;
-        this.edgeWeights = true;
+        // Flag for whether the graph is directed or not
+        this.isDirected = false;
 
         // Create a file parser to load files into this graph
         this.fileParser = new FileParser(this, this.#privateMethods);
@@ -51,23 +43,6 @@ export class Graph {
 
         // Create a cytoscape manager to generate element and style arrays of the graph
         this.cytoscapeManager = new CytoscapeManager(this, this.#privateMethods);
-    }
-    
-    /**
-     * Returns true if the graph is directed.
-     * @return true if the graph is directed
-     */
-    isDirected() {
-        return this.#isDirected;
-    }
-
-    /**
-     * Sets a new boolean value for the isDirected flag.
-     * @param {Boolean} isDirected New value for isDirected
-     */
-    setIsDirected(isDirected) {
-        this.#isDirected = isDirected;
-        window.updateCytoscape(); // Update cytoscape to show/hide the arrows
     }
 
     /**
@@ -180,7 +155,7 @@ export class Graph {
      */
     getEdgeBetween(source, target) {
         let edge = this.getEdge(source, target);
-        if (edge === undefined && this.#isDirected) {
+        if (edge === undefined && this.isDirected) {
             edge = this.getEdge(target, source);
         }
         return edge;
@@ -233,7 +208,7 @@ export class Graph {
         }
 
         // Get all edges if undirected
-        if (!this.#isDirected) {
+        if (!this.isDirected) {
             return this.getIncidentEdges(target);
         }
 
@@ -263,7 +238,7 @@ export class Graph {
         }
 
         // Get all edges if undirected
-        if (!this.#isDirected) {
+        if (!this.isDirected) {
             return this.getIncidentEdges(source);
         }
 
@@ -313,7 +288,7 @@ export class Graph {
      */
     getIncomingNodes(target) {
         // Get all nodes if undirected
-        if (!this.#isDirected) {
+        if (!this.isDirected) {
             return this.getAdjacentNodes(target);
         }
 
@@ -341,7 +316,7 @@ export class Graph {
      */
     getOutgoingNodes(source) {
         // Get all nodes if undirected
-        if (!this.#isDirected) {
+        if (!this.isDirected) {
             return this.getAdjacentNodes(source);
         }
 

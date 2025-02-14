@@ -1,8 +1,8 @@
 import { Popover, Switch } from '@headlessui/react'
 import { useEffect, useState, useRef } from 'react'
-import { useGraphContext } from 'pages/GraphView/utils/GraphContext';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
+import Graph from 'graph/Graph';
 
 /**
  * BinarySwitchComponent renders a binary switch component.
@@ -35,13 +35,9 @@ function BinarySwitchComponent({enabled, setEnabled}) {
  * @returns {JSX.Element} - Returns the JSX for NodeSettingsPopover component.
  */
 export default function NodeSettingsPopover() {
-    const hasMounted = useRef(false);
     const [displayLabels, setDisplayLabels] =  useState(true);
     const [displayWeights, setDisplayWeights] =  useState(true);
     const [nodeRadius, setNodeRadius] = useState(25);
-
-    const graphContext = useGraphContext();
-    const preferences = graphContext.preferences.style;
 
     // Ref for popover button
     const button = useRef(null);
@@ -49,53 +45,36 @@ export default function NodeSettingsPopover() {
     // Effect hook to handle keyboard shortcut for opening popover
     useEffect(() => {
         if (!button.current) return;
-
         function onKeyPress(event) {
             // If user is typing into an input field, ignore.
             if (event.target.tagName.toLowerCase() === 'input') return;
-
             // Only if user enters designated keyboard shortcut - n - the button is clicked
             if (event.key !== 'n') return;
             button.current.click();
         }
-
         document.addEventListener('keypress', onKeyPress);
         return () => document.removeEventListener('keypress', onKeyPress);
     }, []);
 
     // Effect to update display labels preference
     useEffect(() => {
-        if (!hasMounted.current) return; // Don't update preferences on mount cycle
-        //preferences.node.textOpacity = displayLabels ? 1 : 0;
-        preferences.node.hideLabel = !displayLabels;
-        graphContext.preferences.setStylePreferences({...preferences})
+        Graph.cytoscapeManager.nodeLabels = displayLabels;
+        window.updateCytoscape();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [displayLabels]);
 
     // Effect to update display weights preference
     useEffect(() => {
-        if (!hasMounted.current) return; // Don't update preferences on mount cycle
-        preferences.node.hideWeight = !displayWeights;
-        graphContext.preferences.setStylePreferences({...preferences})
+        Graph.cytoscapeManager.nodeWeights = displayWeights;
+        window.updateCytoscape();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [displayWeights]);
 
     // Effect to update node radius preference
     useEffect(() => {
-        const timeOut = setTimeout(() => {
-            preferences.node.size.x = nodeRadius;
-            preferences.node.size.y = nodeRadius;
-            graphContext.preferences.setStylePreferences({...preferences});
-        }, 5);
-
-        return () => clearTimeout(timeOut);
+        Graph.cytoscapeManager.nodeSize = nodeRadius;
+        window.updateCytoscape();
     }, [nodeRadius]);
-
-    // Effect to set hasMounted to true after mount
-    useEffect(() => {
-        hasMounted.current = true;
-    }, []);
-
     
     return (
         <Popover className="relative">

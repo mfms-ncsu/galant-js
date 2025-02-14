@@ -47,11 +47,14 @@ export default function CytoscapeComponent() {
                 valign: "top",
                 valignBox: "top",
                 tpl: (data) => {
-                    if (data.weight || data.label) {
+                    const showWeights = Graph.cytoscapeManager.nodeWeights;
+					const showLabels = Graph.cytoscapeManager.nodeLabels;
+
+                    if ((showWeights && data.weight) || (showLabels && data.label)) {
                         return renderToString(
                             <div className={`flex flex-col items-center justify-center border bg-white border-black  ${data.invisible && "hidden"}`}>
-                                <p className="leading-none">{!data.invisibleWeight ? data.weight : ""}</p>
-                                <p className="leading-none">{!data.invisibleLabel ? data.label : ""}</p>
+                                <p className="leading-none">{(!data.invisibleWeight && showWeights) ? data.weight : ""}</p>
+                                <p className="leading-none">{(!data.invisibleLabel && showLabels) ? data.label : ""}</p>
                             </div>
                         );
                     }

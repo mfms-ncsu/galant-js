@@ -22,6 +22,15 @@ export default class CytoscapeManager {
         for (let method in privateMethods) {
             this.#graph[method] = privateMethods[method];
         }
+
+        // Use a variable for node size scaling
+        this.nodeSize = 25;
+
+        // Flags for showing labels and weights
+        this.nodeLabels = true;
+        this.nodeWeights = true;
+        this.edgeLabels = true;
+        this.edgeWeights = true;
     }
 
     /**
@@ -98,42 +107,36 @@ export default class CytoscapeManager {
      * @returns Cytoscape stylesheet
      */
     getStyle() {
-        // Use a variable for node size scaling
-        let nodeSize = 25;
-
-        // Get the scalar for the sizing of elements
-        let scalar = 1;
-        
         return [
             {
                 "selector": "node",
                 "style": {
-                    "width": `${nodeSize / scalar}px`,
-                    "height": `${nodeSize / scalar}px`,
+                    "width": `${this.nodeSize}px`,
+                    "height": `${this.nodeSize}px`,
                     "backgroundColor": "#FFFFFF",
                     "color": "#000000",
-                    "borderWidth": `${nodeSize / (10 * scalar)}px`,
+                    "borderWidth": `${this.nodeSize / 10}px`,
                     "borderStyle": "solid",
                     "borderColor": "#AAAAAA",
                     "backgroundOpacity": 1,
                     "shape": "circle",
                     "textValign": "center",
                     "visibility": "visible",
-                    "fontSize": `${nodeSize / (2 * scalar)}px`,
-                    "overlay-padding": `${nodeSize / (5 * scalar)}px`
+                    "fontSize": `${this.nodeSize / 2}px`,
+                    "overlay-padding": `${this.nodeSize / 5}px`
                 }
             },
             {
                 "selector": "edge",
                 "style": {
                     "label": "data(id)",
-                    "width": nodeSize / (10 * scalar),
+                    "width": this.nodeSize / 10,
                     "lineColor": "#444444",
                     "color": "#AA0000",
                     "targetArrowColor": "#444444",
-                    "targetArrowShape": (this.#graph.isDirected()) ? "triangle" : "none",
+                    "targetArrowShape": (this.#graph.isDirected) ? "triangle" : "none",
                     "curveStyle": "bezier",
-                    "overlay-padding": `${nodeSize / (5 * scalar)}px`
+                    "overlay-padding": `${this.nodeSize / 5}px`
                 }
             },
             {
@@ -145,7 +148,7 @@ export default class CytoscapeManager {
             {
                 "selector": "node[?highlighted]",
                 "style": {
-                    "borderWidth": `${nodeSize / (5 * scalar)}px`
+                    "borderWidth": `${this.nodeSize / 5}px`
                 }
             },
             {
@@ -163,21 +166,21 @@ export default class CytoscapeManager {
             {
                 "selector": "edge[?highlighted]",
                 "style": {
-                    "width": `${nodeSize / (2.5 * scalar)}px`
+                    "width": `${this.nodeSize / 2.5}px`
                 }
             },
             {
                 "selector": "edge[label]",
                 "style": {
                     "label": "data(label)",
-                    "fontSize": `${nodeSize / (2.5 * scalar)}px`,
+                    "fontSize": `${this.nodeSize / 2.5}px`,
                     "textWrap": "wrap",
                     "textBackgroundColor": "white",
                     "textBackgroundOpacity": "1.0",
-                    "textBackgroundPadding": `${nodeSize / (12.5 * scalar)}px`,
+                    "textBackgroundPadding": `${this.nodeSize / 12.5}px`,
                     "textBorderOpacity": "1.0",
                     "textBorderStyle": "solid",
-                    "textBorderWidth": `${nodeSize / (25 * scalar)}px`,
+                    "textBorderWidth": `${this.nodeSize / 25}px`,
                     "textBorderColor": "black"
                 }
             },

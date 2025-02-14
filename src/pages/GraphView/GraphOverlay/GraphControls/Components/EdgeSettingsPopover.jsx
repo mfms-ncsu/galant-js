@@ -52,8 +52,10 @@ export default function EdgeSettingsPopover() {
         return () => document.removeEventListener('keypress', onKeyPress);
     }, []);
 
+    // Set isDirected in Graph
     useEffect(() => {
-        Graph.setIsDirected(isDirected);
+        Graph.isDirected = isDirected;
+        window.updateCytoscape();
     }, [isDirected]);
 
    
