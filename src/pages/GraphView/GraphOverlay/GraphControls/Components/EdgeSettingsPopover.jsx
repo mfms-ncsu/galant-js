@@ -52,7 +52,19 @@ export default function EdgeSettingsPopover() {
         return () => document.removeEventListener('keypress', onKeyPress);
     }, []);
 
-    // Set isDirected in Graph
+    // Set edgeLabels in graph
+    useEffect(() => {
+        Graph.cytoscapeManager.edgeLabels = setDisplayLabels;
+        window.updateCytoscape();
+    }, [displayLabels]);
+
+    // Set edgeWeights in graph
+    useEffect(() => {
+        Graph.cytoscapeManager.edgeWeights = setDisplayWeights;
+        window.updateCytoscape();
+    }, [displayWeights]);
+
+    // Set isDirected in graph
     useEffect(() => {
         Graph.isDirected = isDirected;
         window.updateCytoscape();
