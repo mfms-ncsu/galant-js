@@ -445,7 +445,8 @@ function weight(id) {
 }
 
 function hasWeight(id) {
-    return getAttribute(id, "weight") !== 0;
+    let weight = getAttribute(id, "weight")
+    return weight !== 0 && weight !== undefined;
 }
 
 function clearNodeWeights() {
