@@ -119,7 +119,7 @@ export class Graph {
      * Returns the total number of nodes in the graph
      * @return the total number of nodes in the graph
      */
-    getNumberOfEdges() {
+    getNumberOfNodes() {
         return this.#nodes.length;
     }
     
@@ -137,7 +137,7 @@ export class Graph {
      * @throws if the edge does not exist
      */
     getTarget(edge) {
-        nodes = edge.split(",");
+        const nodes = edge.split(",");
         if (nodes.length != 2 || !this.#nodes.has(nodes[1])) { 
             throw new Error("Given edge is not valid: " + edge);
         }
@@ -150,7 +150,7 @@ export class Graph {
      * @throws if the edge does not exist
      */
     getSource(edge) {
-        nodes = edge.split(",");
+        const nodes = edge.split(",");
         if (nodes.length != 2 || !this.#nodes.has(nodes[0])) { 
             throw new Error("Given edge is not valid: " + edge);
         }
