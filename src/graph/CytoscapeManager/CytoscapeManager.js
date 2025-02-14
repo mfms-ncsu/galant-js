@@ -119,7 +119,7 @@ export default class CytoscapeManager {
                     "borderStyle": "solid",
                     "borderColor": "#AAAAAA",
                     "backgroundOpacity": 1,
-                    "shape": "circle",
+                    "shape": "ellipse",
                     "textValign": "center",
                     "visibility": "visible",
                     "fontSize": `${this.nodeSize / 2}px`,
