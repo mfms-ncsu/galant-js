@@ -33,7 +33,7 @@ export default function CytoscapeComponent() {
             container: cytoscapeElement.current,
             elements: Graph.cytoscapeManager.getElements(),
             style: Graph.cytoscapeManager.getStyle(),
-            layout: { name: "preset" },
+            layout: Graph.cytoscapeManager.layout,
             autounselectify: true,
             wheelSensitivity: 0.35,
         });

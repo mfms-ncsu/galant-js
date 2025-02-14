@@ -23,6 +23,9 @@ export default class CytoscapeManager {
             this.#graph[method] = privateMethods[method];
         }
 
+        // Cytoscape layout. Preset is default.
+        this.layout = { name: "preset" };
+
         // Use a variable for node size scaling
         this.nodeSize = 25;
 
