@@ -20,8 +20,6 @@ export class Graph {
     #nodes;
     /** Scale */
     #scalar;
-    /** Flag for whether the graph is directed or not */
-    #isDirected;
 
     /**
      * Creates a new graph with nodes, file parser, and change managers.
@@ -33,8 +31,14 @@ export class Graph {
         // Use this scalar in toCytoscape
         this.#scalar = 1;
 
-        // Set to false
-        this.#isDirected = false;
+        /** Flag for whether the graph is directed or not */
+        this.isDirected = false;
+
+        /** Flags for showing labels and weights */
+        this.nodeLabels = true;
+        this.nodeWeights = true;
+        this.edgeLabels = true;
+        this.edgeWeights = true;
 
         // Create a file parser to load files into this graph
         this.fileParser = new FileParser(this, this.#privateMethods);
@@ -52,7 +56,7 @@ export class Graph {
      * @return true if the graph is directed
      */
     isDirected() {
-        return this.#isDirected;
+        return this.isDirected;
     }
 
     /**
@@ -128,7 +132,7 @@ export class Graph {
      * @return the total number of edges in the graph
      */
     getNumberOfEdges() {
-        return getEdgeIds().length;
+        return this.getEdgeIds().length;
     }
 
     /**
@@ -164,9 +168,9 @@ export class Graph {
      * @return the edge between source and target, as described above
      */
     getEdgeBetween(source, target) {
-        let edge = getEdge(source, target);
-        if (edge == undefined && this.#isDirected) {
-            edge = getEdge(target, source);
+        let edge = this.getEdge(source, target);
+        if (edge == undefined && this.isDirected) {
+            edge = this.getEdge(target, source);
         }
         return edge
     }

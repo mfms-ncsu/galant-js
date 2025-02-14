@@ -307,10 +307,6 @@ function getEdgeBetween(source, target) {
     return graph.getEdgeBetween(source, target);
 }
 
-function getEdgeBetween(source, target) {
-    return graph.getEdgeBetween(source, target);
-}
-
 function other(nodeId, edgeId) {
     return graph.getOppositeNode(nodeId, edgeId);
 }
@@ -532,7 +528,7 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
 
         } catch (error) {
             // if there's an error, send a message with the error
-            postMessage({action: "error", content: error});
+            postMessage({action: "error", error: error});
             throw error
         }
     }

@@ -38,9 +38,7 @@ export default class Algorithm {
     }
 
     /**
-     * This places a 1 at index 0 in the shared array using the Atomics.store method. Once
-     * stored it then notifies any process that is waiting and looking at index 0 to check the index. 
-     * Which should be the worker Thread that had been created.
+     * Stores a 1 in the shared array and notifies the Thread that it can resume.
      */
     resumeThread() {
         Atomics.store(this.array, 0, 1);
@@ -229,6 +227,8 @@ export default class Algorithm {
             case "complete":
                 this.completed = true;
                 break;
+            case "error":
+                window.alert(message.error);
             default:
                 // If the message was not a type we define here, then we probably just made
                 // a mistake or typo when sending this message. Throw an error to let us
