@@ -225,6 +225,7 @@ export default class Algorithm {
                 if (this.onStepAdded) this.onStepAdded();
                 break;
             case "complete":
+                if (this.onStepAdded) this.onStepAdded();
                 this.completed = true;
                 break;
             case "error":
