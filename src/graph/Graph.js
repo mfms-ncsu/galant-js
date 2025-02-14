@@ -20,6 +20,8 @@ export class Graph {
     #nodes;
     /** Scale */
     #scalar;
+    /** Flag for whether the graph is directed or not */
+    #isDirected;
 
     /**
      * Creates a new graph with nodes, file parser, and change managers.
@@ -32,7 +34,7 @@ export class Graph {
         this.#scalar = 1;
 
         /** Flag for whether the graph is directed or not */
-        this.isDirected = false;
+        this.#isDirected = false;
 
         /** Flags for showing labels and weights */
         this.nodeLabels = true;
@@ -52,11 +54,20 @@ export class Graph {
     }
     
     /**
-     * Returns true if the graph is directed
+     * Returns true if the graph is directed.
      * @return true if the graph is directed
      */
     isDirected() {
-        return this.isDirected;
+        return this.#isDirected;
+    }
+
+    /**
+     * Sets a new boolean value for the isDirected flag.
+     * @param {Boolean} isDirected New value for isDirected
+     */
+    setIsDirected(isDirected) {
+        this.#isDirected = isDirected;
+        window.updateCytoscape(); // Update cytoscape to show/hide the arrows
     }
 
     /**
@@ -169,10 +180,10 @@ export class Graph {
      */
     getEdgeBetween(source, target) {
         let edge = this.getEdge(source, target);
-        if (edge == undefined && this.isDirected) {
+        if (edge === undefined && this.#isDirected) {
             edge = this.getEdge(target, source);
         }
-        return edge
+        return edge;
     }
 
     /**
@@ -221,6 +232,11 @@ export class Graph {
             return undefined;
         }
 
+        // Get all edges if undirected
+        if (!this.#isDirected) {
+            return this.getIncidentEdges(target);
+        }
+
         // Keep an array of edges
         const edges = [];
 
@@ -244,6 +260,11 @@ export class Graph {
         // Return undefined if the node doesn't exist
         if (!this.#nodes.has(source)) {
             return undefined;
+        }
+
+        // Get all edges if undirected
+        if (!this.#isDirected) {
+            return this.getIncidentEdges(source);
         }
 
         // Keep an array of edges
@@ -291,6 +312,11 @@ export class Graph {
      * @returns Array of incoming nodes
      */
     getIncomingNodes(target) {
+        // Get all nodes if undirected
+        if (!this.#isDirected) {
+            return this.getAdjacentNodes(target);
+        }
+
         let nodes = [];
 
         // Check if the node exists
@@ -314,6 +340,11 @@ export class Graph {
      * @returns Array of outgoing nodes
      */
     getOutgoingNodes(source) {
+        // Get all nodes if undirected
+        if (!this.#isDirected) {
+            return this.getAdjacentNodes(source);
+        }
+
         let nodes = [];
 
         // Check if the node exists
@@ -339,7 +370,6 @@ export class Graph {
      * @returns Id of the node opposite the given
      */
     getOppositeNode(nodeId, edgeId) {
-        
         // Error checking
         // Note that for getters, we usually just return undefined if the node or edge doesn't exist. I am adding
         // detailed error messages in an attempt to debug some Algorithm functions. Feel free to change these to just

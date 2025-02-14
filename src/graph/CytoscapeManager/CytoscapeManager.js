@@ -131,7 +131,7 @@ export default class CytoscapeManager {
                     "lineColor": "#444444",
                     "color": "#AA0000",
                     "targetArrowColor": "#444444",
-                    "targetArrowShape": "none",
+                    "targetArrowShape": (this.#graph.isDirected()) ? "triangle" : "none",
                     "curveStyle": "bezier",
                     "overlay-padding": `${nodeSize / (5 * scalar)}px`
                 }

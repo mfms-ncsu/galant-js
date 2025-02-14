@@ -485,11 +485,6 @@ function setEdgeWidth(id, width) {
     setAttribute(id, "edgeWidth", width);
 }
 
-function hideAllEdgeWeights() {
-    // TODO
-    // Is this necessary? Instead, could use clearNodeWeights
-}
-
 /**************************************************************/
 /*************** End of algorithm methods *********************/
 /**************************************************************/
