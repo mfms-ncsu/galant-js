@@ -25,12 +25,15 @@ export default function AlgorithmControls() {
     }
 
     function exportGraph() {
+        const fileName = prompt("Please enter a file name for the exported graph:", "graph.txt");
+        if (!fileName) return;
+
         const content = Graph.toGraphString();
         const blob = new Blob([content], { type: 'text/plain' });
 
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = "download.txt";
+        link.download = fileName;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
