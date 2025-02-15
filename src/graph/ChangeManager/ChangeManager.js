@@ -109,6 +109,20 @@ export default class ChangeManager {
     /** Methods for creating new ChangeObjects */
     
     /**
+     * Clears the list of ChangeObjects. This method is used when
+     * a new algorithm is loaded. If the list of ChangeObjects is not
+     * cleared when a new algorithm or graph is loaded, then the undo/
+     * redo feature will try to undo/redo changes from the previous
+     * graph or algorithm.
+     */
+    clear() {
+        this.#changes = [];
+        this.#index = 0;
+        this.#isRecording = false;
+        this.#currentChangeList = [];
+    }
+    
+    /**
      * Adds a new node to the graph and records the change.
      * @param {Number} x X-position of the node
      * @param {Number} y Y-position of the node

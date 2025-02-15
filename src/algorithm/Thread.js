@@ -228,12 +228,12 @@ function promptNumber(message) {
     return promptResult;
 }
 
-function promptNode(message) {
+function promptNode(message, error) {
     let nodes = getNodes();
     if (nodes.length === 0) {
         throw new Error("Cannot prompt for a node when no valid nodes exist.");
     }
-    return promptFrom(message, nodes, "Must enter a valid Node ID. The valid nodes are " + nodes);
+    return promptFrom(message, nodes, error);
 }
 
 function promptEdge(message) {
@@ -301,10 +301,6 @@ function source(edge) {
 
 function target(edge) {
     return graph.getTarget(edge);
-}
-
-function getEdgeBetween(source, target) {
-    return graph.getEdgeBetween(source, target);
 }
 
 function other(nodeId, edgeId) {
@@ -517,6 +513,7 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         // Evaluate the algorithm
         try {
             
+            // Start running the algorithm
             eval(message[2]); /* eslint-disable-line no-eval */
             // End recording of the last step
             console.log("Algorithm completed");
