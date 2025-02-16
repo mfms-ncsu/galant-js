@@ -473,10 +473,85 @@ function clearNodeShapes() {
     setAttributeAll("nodes", "shape", undefined);
 }
 
+function borderWidth(id){
+    return getAttribute(id, "borderWidth");
+}
 
+function setBorderWidth(id, borderWidth) {
+    setAttribute(id, "borderWidth", borderWidth);
+}
 
+function clearBorderWidth(id) {
+    setAttribute(id, "borderWidth", 0);
+}
 
+function hasBorderWidth(id) {
+    return getAttribute(id, "borderWidth") !== undefined;
+}
 
+function clearNodeBorderWidths() {
+    setAttributeAll("nodes", "borderWidth", undefined);
+}
+
+function backgroundOpacity(id) {
+    return getAttribute(id, "backgroundOpacity");
+}
+
+function setBackgroundOpacity(id, backgroundOpacity) {
+    setAttribute(id, "backgroundOpacity", backgroundOpacity);
+}
+
+function clearBackgroundOpacity(id) {
+    setAttribute(id, "backgroundOpacity", 0);
+}
+
+function hasBackgroundOpacity(id) {
+    return getAttribute(id, "backgroundOpacity") !== undefined;
+}
+
+function clearNodeBackgroundOpacity() {
+    setAttributeAll("nodes", "backgroundOpacity", undefined);
+}
+
+function size(id) {
+    return getAttribute(id, "size");
+}
+
+function setSize(id, size) {
+    setAttribute(id, "size", size)
+}
+
+function clearSize(id) {
+    setAttribute(id, "size", 0)
+}
+
+function hasSize(id) {
+    return getAttribute(id, "size") !== undefined;
+}
+
+function clearNodeSizes() {
+    setAttributeAll("nodes", "size", undefined)
+}
+
+function edgeWidth(id) {
+    return getAttribute(id, "edgeWidth")
+}
+
+function setEdgeWidth(id, width) {
+    setAttribute(id, "edgeWidth", width)
+}
+
+function clearEdgeWidth(id) {
+    setAttribute(id, "edgeWidth", 0)
+}
+
+function hasEdgeWidth(id) {
+    return getAttribute(id, "edgeWidth") !== undefined
+}
+
+function clearNodeEdgeWidth() {
+    setAttribute("edges", "edgeWidth", undefined)
+}
 
 function setEdgeWidth(id, width) {
     setAttribute(id, "edgeWidth", width);
