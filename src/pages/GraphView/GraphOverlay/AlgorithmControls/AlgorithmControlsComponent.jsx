@@ -53,7 +53,13 @@ export default function AlgorithmControls() {
      */
     async function exportGraphFallback() {
         // Prompt user for the desired file name, defaulting to "graph.gph"
-        const fileName = window.prompt("Enter the filename to save:", "graph.gph") || "graph.gph";
+        const fileName = window.prompt("Enter the filename to save:", "graph.gph");
+
+        // Check if the user cancelled the prompt
+        if (!fileName) {
+            return; // Exit the function if the user cancelled
+        }
+
         const content = Graph.toGraphString();
         const blob = new Blob([content], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
