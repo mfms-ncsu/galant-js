@@ -84,7 +84,18 @@ export default class CytoscapeManager {
 
         return element;
     }
-
+    
+    /**
+     * Returns true if the given attribute in the ege
+     * is not undefined, not an empty string, and is not hidden.
+     */
+    #edgeHasAttribute(edge, attribute) {
+        
+        return edge.attributes.has(attribute) &&
+               edge.attributes.get(attribute) !== "" &&
+               edge.attributes.get(attribute) !== undefined &&
+               !edge.attributes.get(attribute + "Hidden");
+    }
     /**
      * Converts an Edge into a cytoscape element.
      * @param {Edge} edge Edge to parse
@@ -101,6 +112,40 @@ export default class CytoscapeManager {
         edge.attributes.forEach((value, name) => {
             element.data[name] = value;
         });
+
+        // Add the edge label to display. Since we put both the
+        // label and weight in the same textbox, we need to
+        // put them together
+        
+        let text = "";
+        let addedWeight = false;
+
+        if (this.#edgeHasAttribute(edge, "weight")) {
+            
+            addedWeight = true;
+            text += edge.attributes.get("weight");
+        }
+        
+        if (this.#edgeHasAttribute(edge, "label")) {
+
+            // If we added a weight, separate the label and
+            // weight with a newline
+            if (addedWeight) {
+                text += "\n";
+            }
+
+            text += edge.attributes.get("label");
+        }
+
+        element.data["textToDisplay"] = text;
+
+        // If either the source or target nodes are hidden, then this
+        // edge should also be hidden
+        if (this.#graph.getNodeAttribute(edge.source, "hidden") ||
+            this.#graph.getNodeAttribute(edge.target, "hidden")) {
+            
+            element.data["hidden"] = true;
+        }
 
         return element;
     }
@@ -155,13 +200,13 @@ export default class CytoscapeManager {
                 }
             },
             {
-                "selector": "node[?invisible]",
+                "selector": "node[?hidden]",
                 "style": {
                     "visibility": "hidden"
                 }
             },
             {
-                "selector": "edge[?invisible]",
+                "selector": "edge[?hidden]",
                 "style": {
                     "visibility": "hidden"
                 }
@@ -175,7 +220,7 @@ export default class CytoscapeManager {
             {
                 "selector": "edge[label]",
                 "style": {
-                    "label": "data(label)",
+                    "label": "data(textToDisplay)",
                     "fontSize": `${this.nodeSize / 2.5}px`,
                     "textWrap": "wrap",
                     "textBackgroundColor": "white",
