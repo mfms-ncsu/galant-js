@@ -477,11 +477,19 @@ function clearNodeShapes() {
 //       to be implemented properly so that Cytoscape will not draw
 //       the edges/weight labels if the corresponding flags are false
 function hideAllEdgeWeights() {
-    graph.showEdgeWeights = false;
+    graph.cytoscapeManager.edgeWeights = false;
+}
+
+function hideAllNodeWeights() {
+    graph.cytoscapeManager.nodeWeights = false;
+}
+
+function showAllEdgeWeights() {
+    graph.cytoscapeManager.edgeWeights = true;
 }
 
 function showAllNodeWeights() {
-    graph.showNodeWeights = true;
+    graph.cytoscapeManager.nodeWeights = true;
 }
 
 function hideNode(node) {
@@ -506,6 +514,22 @@ function showNodeWeight(node) {
 
 function showEdgeWeight(edge) {
     setAttribute(edge, "weightHidden", "false");
+}
+
+function hideNodeLabel(node) {
+    setAttribute(node, "labelHidden", "true");
+}
+
+function hideEdgeLabel(edge) {
+    setAttribute(edge, "labelHidden", "true");
+}
+
+function showNodeLabel(node) {
+    setAttribute(node, "labelHidden", "false");
+}
+
+function showEdgeLabel(edge) {
+    setAttribute(edge, "labelHidden", "false");
 }
 
 
