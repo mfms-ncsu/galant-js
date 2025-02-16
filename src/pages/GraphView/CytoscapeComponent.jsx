@@ -33,7 +33,7 @@ export default function CytoscapeComponent() {
             container: cytoscapeElement.current,
             elements: Graph.cytoscapeManager.getElements(),
             style: Graph.cytoscapeManager.getStyle(),
-            layout: Graph.cytoscapeManager.layout,
+            layout: { name: "cose-bilkent" },
             autounselectify: true,
             wheelSensitivity: 0.35,
         });
