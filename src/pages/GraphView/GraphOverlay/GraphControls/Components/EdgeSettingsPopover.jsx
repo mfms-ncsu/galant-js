@@ -54,13 +54,13 @@ export default function EdgeSettingsPopover() {
 
     // Set edgeLabels in graph
     useEffect(() => {
-        Graph.cytoscapeManager.edgeLabels = setDisplayLabels;
+        Graph.cytoscapeManager.edgeLabels = displayLabels;
         window.updateCytoscape();
     }, [displayLabels]);
 
     // Set edgeWeights in graph
     useEffect(() => {
-        Graph.cytoscapeManager.edgeWeights = setDisplayWeights;
+        Graph.cytoscapeManager.edgeWeights = displayWeights;
         window.updateCytoscape();
     }, [displayWeights]);
 
