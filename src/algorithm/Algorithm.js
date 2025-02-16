@@ -224,14 +224,6 @@ export default class Algorithm {
             case "step":
                 if (this.onStepAdded) this.onStepAdded();
                 break;
-
-            // Clear the algorithmChangeManager to prevent the algorithm
-            // from just redoing the previous algorithm
-            case "start":
-                console.log("Clearing ChangeManager");
-                Graph.algorithmChangeManager.clear();
-                break;
-
             case "complete":
                 if (this.onStepAdded) this.onStepAdded();
                 this.completed = true;
