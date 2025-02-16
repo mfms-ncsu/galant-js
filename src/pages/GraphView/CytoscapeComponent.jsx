@@ -33,7 +33,6 @@ export default function CytoscapeComponent() {
             container: cytoscapeElement.current,
             elements: Graph.cytoscapeManager.getElements(),
             style: Graph.cytoscapeManager.getStyle(),
-            layout: Graph.cytoscapeManager.layout,
             autounselectify: true,
             wheelSensitivity: 0.35,
         });
@@ -47,14 +46,44 @@ export default function CytoscapeComponent() {
                 valign: "top",
                 valignBox: "top",
                 tpl: (data) => {
-                    const showWeights = Graph.cytoscapeManager.nodeWeights;
-					const showLabels = Graph.cytoscapeManager.nodeLabels;
 
-                    if ((showWeights && data.weight) || (showLabels && data.label)) {
+                    const showWeights =
+                        Graph.cytoscapeManager.nodeWeights;
+					const showLabels =
+                        Graph.cytoscapeManager.nodeLabels;
+
+                    if ( (showWeights && !data.weightHidden) ||
+                         (showLabels && !data.labelHidden)   ){
+                        
+                        // This flag determines whether or not there
+                        // is anything to render. If both the weight
+                        // and label of the node are empty, then
+                        // we should not draw the label
+
+                        let hasWeight = 
+                            data.weight !== undefined &&
+                            data.weight !== "" &&
+                            showWeights &&
+                            !data.weightHidden;
+
+                        let hasLabel =
+                            data.label !== undefined &&
+                            data.label !== "" &&
+                            showLabels &&
+                            !data.labelHidden;
+
+                        let hasWeightOrLabel = hasWeight || hasLabel;
+
                         return renderToString(
-                            <div className={`flex flex-col items-center justify-center border bg-white border-black  ${data.invisible && "hidden"}`}>
-                                <p className="leading-none">{(!data.invisibleWeight && showWeights) ? data.weight : ""}</p>
-                                <p className="leading-none">{(!data.invisibleLabel && showLabels) ? data.label : ""}</p>
+                            <div className=
+                                {`flex flex-col items-center justify-center border bg-white border-black  ${(data.hidden || !hasWeightOrLabel) && "hidden"}`
+                                }>
+                                <p className="leading-none">
+                                    {(!data.weightHidden && showWeights) ? data.weight : ""}
+                                </p>
+                                <p className="leading-none">
+                                    {(!data.labelHidden && showLabels) ? data.label : ""}
+                                </p>
                             </div>
                         );
                     }

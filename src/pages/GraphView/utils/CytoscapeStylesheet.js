@@ -219,7 +219,6 @@ export function createCytoscapeStyleSheet(preferences=defaultStylePreferences) {
 		},
     ];
 
-
     for (const mapping of dataMappings) {
         styleSheet.push(createCSSRuleFromDataMapping(mapping))
     }

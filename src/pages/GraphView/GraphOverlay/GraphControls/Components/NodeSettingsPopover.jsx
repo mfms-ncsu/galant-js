@@ -38,7 +38,7 @@ export default function NodeSettingsPopover() {
     const [displayLabels, setDisplayLabels] =  useState(true);
     const [displayWeights, setDisplayWeights] =  useState(true);
     const [nodeRadius, setNodeRadius] = useState(25);
-
+    
     // Ref for popover button
     const button = useRef(null);
 

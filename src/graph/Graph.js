@@ -22,6 +22,15 @@ export class Graph {
     #scalar;
 
     /**
+     * Flags that determine if the labels or weights for nodes and
+     * edges should be drawn 
+     */
+    showEdgeWeights;
+    showNodeWeights;
+    showEdgeLabels;
+    showNodeLabels;
+
+    /**
      * Creates a new graph with nodes, file parser, and change managers.
      */
     constructor() {

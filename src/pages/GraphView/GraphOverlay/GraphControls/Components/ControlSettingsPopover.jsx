@@ -29,12 +29,12 @@ export default function ControlSettingsPopover() {
 
     // Function to handle auto camera action
     function autoCamera() {
-        
+        window.cytoscape.fit();
     }
 
     // Function to handle auto layout action
     function autoLayout() {
-        Graph.cytoscapeManager.layout = { name: "cose-bilkent" };
+        window.cytoscape.layout({ name: "cose-bilkent" });
         window.updateCytoscape();
     }
 

@@ -33,7 +33,7 @@ export default class Algorithm {
         let handleMessage = (message) => { this.#onMessage(message.data) }
         this.worker.onmessage = handleMessage;
         this.worker.postMessage(["shared", this.array]);
-        this.worker.postMessage(["graph/algorithm", Graph.toGraphString(), this.code]);
+        this.worker.postMessage(["graph/algorithm", Graph.toGraphString(), Graph.isDirected, this.code]);
         this.worker.postMessage(["algorithm", this.code]);
     }
 
@@ -214,6 +214,7 @@ export default class Algorithm {
             case "setEdgeAttributeAll":
                 Graph.algorithmChangeManager.setEdgeAttributeAll(message.name, message.value);
                 break;
+ 
             case "startRecording":
                 Graph.algorithmChangeManager.startRecording();
                 break;
@@ -224,14 +225,6 @@ export default class Algorithm {
             case "step":
                 if (this.onStepAdded) this.onStepAdded();
                 break;
-
-            // Clear the algorithmChangeManager to prevent the algorithm
-            // from just redoing the previous algorithm
-            case "start":
-                console.log("Clearing ChangeManager");
-                Graph.algorithmChangeManager.clear();
-                break;
-
             case "complete":
                 if (this.onStepAdded) this.onStepAdded();
                 this.completed = true;
