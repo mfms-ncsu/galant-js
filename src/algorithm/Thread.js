@@ -580,6 +580,9 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         // Load the graph
         graph.fileParser.loadGraph(message[1]);
 
+        // Get the isDirected value from the message
+        graph.isDirected = message[2];
+
         // Make sure that the isInStep variable is initialized
         isInStep = false;
 
@@ -590,7 +593,7 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         try {
             
             // Start running the algorithm
-            eval(message[2]); /* eslint-disable-line no-eval */
+            eval(message[3]); /* eslint-disable-line no-eval */
             // End recording of the last step
             console.log("Algorithm completed");
             postMessage({action: "complete"});
