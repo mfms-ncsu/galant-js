@@ -53,12 +53,31 @@ export default function CytoscapeComponent() {
 					const showLabels =
                         Graph.cytoscapeManager.nodeLabels;
 
-                    if ( (showWeights && data.showWeight) ||
-                         (showLabels && data.showLabel)   ){
+                    if ( (showWeights && !data.weightHidden) ||
+                         (showLabels && !data.labelHidden)   ){
+                        
+                        // This flag determines whether or not there
+                        // is anything to render. If both the weight
+                        // and label of the node are empty, then
+                        // we should not draw the label
+
+                        let hasWeight = 
+                            data.weight !== undefined &&
+                            data.weight !== "" &&
+                            showWeights &&
+                            !data.weightHidden;
+
+                        let hasLabel =
+                            data.label !== undefined &&
+                            data.label !== "" &&
+                            showLabels &&
+                            !data.labelHidden;
+
+                        let hasWeightOrLabel = hasWeight || hasLabel;
 
                         return renderToString(
                             <div className=
-                                {`flex flex-col items-center justify-center border bg-white border-black  ${data.invisible && "hidden"}`
+                                {`flex flex-col items-center justify-center border bg-white border-black  ${(data.hidden || !hasWeightOrLabel) && "hidden"}`
                                 }>
                                 <p className="leading-none">
                                     {(!data.weightHidden && showWeights) ? data.weight : ""}

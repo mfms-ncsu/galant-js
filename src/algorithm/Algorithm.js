@@ -214,6 +214,7 @@ export default class Algorithm {
             case "setEdgeAttributeAll":
                 Graph.algorithmChangeManager.setEdgeAttributeAll(message.name, message.value);
                 break;
+ 
             case "startRecording":
                 Graph.algorithmChangeManager.startRecording();
                 break;
