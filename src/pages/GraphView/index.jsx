@@ -66,6 +66,9 @@ export default function GraphView() {
             const { name: graphName, graph: graphText } = data;
             if (!graphText) return;
 
+            // Remove any running algorithm
+            setCurrentAlgorithm(null);
+
             // Load the graph
             NewGraph.fileParser.loadGraph(graphText);
 
