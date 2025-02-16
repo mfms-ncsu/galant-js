@@ -12,31 +12,35 @@ export default function AlgorithmControls() {
     // Retrieve algorithm context
     const { algorithm, setAlgorithm } = useAlgorithmContext();
 
-    // Function to handle pressing the front button
+    // Function to handle pressing the forward button
     function frontButtonPress() {
         if (!algorithm || !algorithm.canStepForward()) return;
         algorithm.stepForward();
     } 
 
-    // Function to handle pressing the back button
+    // Function to handle pressing the backward button
     function backButtonPress() {
         if (!algorithm || !algorithm.canStepBack()) return;
         algorithm.stepBack();
     }
 
-    function exportGraph() {
-        const fileName = prompt("Please enter a file name for the exported graph:", "graph.gph");
-        if (!fileName) return;
+    async function exportGraph() {
+        const fileHandle = await window.showSaveFilePicker({
+            suggestedName: 'graph.gph',
+            types: [
+                {
+                    description: 'Graph Files',
+                    accept: {
+                        'text/plain': ['.gph'],
+                    },
+                },
+            ],
+        });
 
+        const writableStream = await fileHandle.createWritable();
         const content = Graph.toGraphString();
-        const blob = new Blob([content], { type: 'text/plain' });
-
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        await writableStream.write(content);
+        await writableStream.close();
     }
 
     function terminateAlgorithm() {
@@ -48,7 +52,7 @@ export default function AlgorithmControls() {
         Graph.algorithmChangeManager.clear();
     }
 
-    // Effect hook to handle keyboard shortcuts for stepping through algorithm
+    // Effect hook to handle keyboard shortcuts for stepping through the algorithm
     useEffect(() => {
         function handleKeyPress(event) {
             if (event.target.tagName.toLowerCase() === 'input') return;
@@ -66,7 +70,7 @@ export default function AlgorithmControls() {
     // Return if no algorithm is available
     if (!algorithm) return null;
 
-    // Make the step text
+    // Create the step text
     const stepText = `Step ${algorithm.index}` + (algorithm.completed ? ` / ${algorithm.length}` : '');
 
     return (
@@ -77,16 +81,16 @@ export default function AlgorithmControls() {
                 </div>
                 <div className="flex justify-center items-center space-x-4 mt-auto">
                     <button id="step-back" className="h-8 w-8 p-3 rounded bg-blue-300 pointer-events-auto disabled:opacity-75" disabled={!algorithm.canStepBack()} onClick={() => backButtonPress()}>
-                    <ArrowLeftIcon className="fill-black stroke-1 stroke-black" />
+                        <ArrowLeftIcon className="fill-black stroke-1 stroke-black" />
                     </button>
                 
                     <p className="p-2 px-3 bg-gray-200 pointer-events-auto">{stepText}</p>
                     <button id="step-forward" className={`relative h-8 w-8 p-3 rounded bg-blue-300 pointer-events-auto disabled:opacity-75 ${algorithm.fetchingSteps && 'cursor-progress'}`} disabled={!algorithm.canStepForward()} onClick={() => frontButtonPress()}>
                         {!algorithm.fetchingSteps ?
-                        <ArrowRightIcon className="fill-black stroke-1 stroke-black"/>
-                    :
-                        <ArrowPathIcon className="fill-gray-500 animate-spin"/>
-                    }
+                            <ArrowRightIcon className="fill-black stroke-1 stroke-black"/>
+                        :
+                            <ArrowPathIcon className="fill-gray-500 animate-spin"/>
+                        }
                     </button>
                 </div>
             </div>
