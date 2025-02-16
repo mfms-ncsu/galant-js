@@ -24,23 +24,46 @@ export default function AlgorithmControls() {
         algorithm.stepBack();
     }
 
+    /**
+     * Function to export the graph to a file using the File System Access API on Chrome based browser.
+     */
     async function exportGraph() {
-        const fileHandle = await window.showSaveFilePicker({
-            suggestedName: 'graph.gph',
-            types: [
-                {
-                    description: 'Graph Files',
-                    accept: {
-                        'text/plain': ['.gph'],
+        if (window.showSaveFilePicker) {
+            const fileHandle = await window.showSaveFilePicker({
+                suggestedName: 'graph.gph',
+                types: [
+                    {
+                        description: 'Graph Files',
+                        accept: {'text/plain': ['.gph']},
                     },
-                },
-            ],
-        });
+                ],
+            });
+            const writableStream = await fileHandle.createWritable();
+            const content = Graph.toGraphString();
+            await writableStream.write(content);
+            await writableStream.close();
+        } else {
+            await exportGraphFallback();
+        }
+    }
 
-        const writableStream = await fileHandle.createWritable();
+    /**
+     * Fallback function to export the graph if the browser does not support the 
+     * File System Access API(This API only supported by chrome and edge).
+     */
+    async function exportGraphFallback() {
+        // Prompt user for the desired file name, defaulting to "graph.gph"
+        const fileName = window.prompt("Enter the filename to save:", "graph.gph") || "graph.gph";
         const content = Graph.toGraphString();
-        await writableStream.write(content);
-        await writableStream.close();
+        const blob = new Blob([content], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 
     function terminateAlgorithm() {
