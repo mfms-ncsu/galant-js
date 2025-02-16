@@ -25,7 +25,7 @@ export default function AlgorithmControls() {
     }
 
     function exportGraph() {
-        const fileName = prompt("Please enter a file name for the exported graph:", "graph.txt");
+        const fileName = prompt("Please enter a file name for the exported graph:", "graph.gph");
         if (!fileName) return;
 
         const content = Graph.toGraphString();
