@@ -120,13 +120,15 @@ export default class CytoscapeManager {
         let text = "";
         let addedWeight = false;
 
-        if (this.#edgeHasAttribute(edge, "weight")) {
+        if (this.#edgeHasAttribute(edge, "weight") &&
+            this.edgeWeights) {
             
             addedWeight = true;
             text += edge.attributes.get("weight");
         }
         
-        if (this.#edgeHasAttribute(edge, "label")) {
+        if (this.#edgeHasAttribute(edge, "label") &&
+            this.edgeLabels) {
 
             // If we added a weight, separate the label and
             // weight with a newline
