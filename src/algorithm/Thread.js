@@ -553,10 +553,6 @@ function clearNodeEdgeWidth() {
     setAttribute("edges", "edgeWidth", undefined)
 }
 
-function setEdgeWidth(id, width) {
-    setAttribute(id, "edgeWidth", width);
-}
-
 /**************************************************************/
 /*************** End of algorithm methods *********************/
 /**************************************************************/
@@ -576,8 +572,9 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         sharedArray = message[1];
 
     } else if (message[0] === "graph/algorithm") {
-        // Load the graph
+        // Load the graph with isDirected flag
         graph.fileParser.loadGraph(message[1]);
+        graph.isDirected = message[2];
 
         // Make sure that the isInStep variable is initialized
         isInStep = false;
@@ -589,7 +586,7 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         try {
             
             // Start running the algorithm
-            eval(message[2]); /* eslint-disable-line no-eval */
+            eval(message[3]); /* eslint-disable-line no-eval */
             // End recording of the last step
             console.log("Algorithm completed");
             postMessage({action: "complete"});
