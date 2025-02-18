@@ -62,22 +62,36 @@ export class Graph {
     toGraphString() {
         let content = "";
 
+        // Loop over each node
         this.#nodes.forEach(node => {
-            let attributesString = "";
-            if (node.attributes.size > 0) {
-                attributesString = " " + [...node.attributes.entries()]
-                    .filter(([_,value]) => value !== undefined && value !== false && value !== "")
-                    .map(([key, value]) => `${key}:${value}`)
-                    .join(" ");
-            }
-            // eslint-disable-next-line no-undef
-            content += `n ${node.id} ${node.position.x} ${node.position.y}${attributesString}\n`;
+            // Get the attributes string
+            let attributesString = " " + [...node.attributes.entries()]
+                .filter(([key ,value]) => key !== "weight" && value !== undefined && value !== false && value !== "")
+                .map(([key, value]) => `${key}:${value}`)
+                .join(" ");
+
+            // Get the weight string
+            let weightString = (node.attributes.get("weight") !== undefined) ? ` ${node.attributes.get("weight")}` : "";
+
+            // Add the node line
+            content += `n ${node.id} ${node.position.x.toFixed(4).replace(/[.,]0000$/, "")} ${node.position.y.toFixed(4).replace(/[.,]0000$/, "")}${weightString}${attributesString}\n`;
         });
 
+        // Loop over each edge
         this.#nodes.forEach(node => {
             node.edges.forEach(edge => {
                 if (edge.source === node.id) {
-                    content += `e ${edge.source} ${edge.target}\n`;
+                    // Get the attributes string
+                    let attributesString = " " + [...edge.attributes.entries()]
+                        .filter(([key, value]) => key !== "weight" && value !== undefined && value !== false && value !== "")
+                        .map(([key, value]) => `${key}:${value}`)
+                        .join(" ");
+
+                    // Get the weight string
+                    let weightString = (node.attributes.get("weight") !== undefined) ? ` ${node.attributes.get("weight")}` : "";
+
+                    // Add the edge line
+                    content += `e ${edge.source} ${edge.target}${weightString}${attributesString}\n`;
                 }
             });
         });
