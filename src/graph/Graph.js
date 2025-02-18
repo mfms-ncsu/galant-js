@@ -29,6 +29,9 @@ export class Graph {
     showNodeWeights;
     showEdgeLabels;
     showNodeLabels;
+    
+    /** Comments at the start of this graph's file */
+    #headerComments;
 
     /**
      * Creates a new graph with nodes, file parser, and change managers.
@@ -52,6 +55,15 @@ export class Graph {
 
         // Create a cytoscape manager to generate element and style arrays of the graph
         this.cytoscapeManager = new CytoscapeManager(this, this.#privateMethods);
+
+        this.#headerComments = "";
+    }
+    
+    /**
+     * Add the string of text as a line in the header section of this document 
+     */
+    #addComment(line) { 
+        this.#headerComments = this.#headerComments + line + "\n";
     }
 
     /**
@@ -60,7 +72,9 @@ export class Graph {
      * @author Ziyu Wang
      */
     toGraphString() {
-        let content = "";
+        
+        // Start this file with the header comments
+        let content = this.#headerComments;
 
         // Loop over each node
         this.#nodes.forEach(node => {
@@ -450,6 +464,7 @@ export class Graph {
      */
     #clear() {
         this.#nodes = new Map();
+        this.#headerComments = ""; // Reset the header comment
     }
 
     /**
@@ -950,7 +965,8 @@ export class Graph {
         setEdgeAttribute: this.#setEdgeAttribute,
         setEdgeAttributeAll: this.#setEdgeAttributeAll,
         undoStep: this.#undoStep,
-        redoStep: this.#redoStep
+        redoStep: this.#redoStep,
+        addComment: this.#addComment
     }
 }
 

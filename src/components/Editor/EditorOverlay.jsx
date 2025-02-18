@@ -65,8 +65,10 @@ function downloadFile(tab) {
  * @returns {React.ReactElement}
  */
 function DownloadComponent({ tab }) {
-    // Keyboard shortcut for exporting file
+
+    // Keyboard shortcut for downloading file
     useEffect(() => {
+        
         function onKeyPress(event) {
             if (event.target.tagName.toLowerCase() === 'textarea') return;
             // Check for Command + S or Control + S
