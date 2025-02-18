@@ -72,7 +72,8 @@ function DownloadComponent({ tab }) {
         function onKeyPress(event) {
             if (event.target.tagName.toLowerCase() === 'textarea') return;
             // Check for Command + S or Control + S
-            if ((event.metaKey || event.ctrlKey) && event.key === 's') {
+            // Currently this will be control + d
+            if ((event.metaKey || event.ctrlKey) && event.key === 'd') {
                 event.preventDefault(); // Prevent the default browser behavior
                 downloadFile(tab);
             }
