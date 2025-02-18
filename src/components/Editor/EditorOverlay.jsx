@@ -30,9 +30,12 @@ function downloadFile(name, content) {
  * @returns {React.ReactElement}
  */
 function DownloadComponent({ tab }) {
+    
+    console.log(tab);
+
     // Keyboard shortcut for downloading file
     useEffect(() => {
-
+        
         function onKeyPress(event) {
             if (event.target.tagName.toLowerCase() === 'textarea') return;
 
