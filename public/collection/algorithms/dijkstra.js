@@ -65,7 +65,6 @@ step(() => {
     }
 
     for ( let node of getNodes() ) {
-        nodePQ[node] = Infinity
         setWeight(node, Infinity)
     }
 })
@@ -95,7 +94,7 @@ while ( PQsize() > 0 ) {
     let current_dist = weight(current_node)
     for (let edge of outgoing(current_node)) {
         let next_node = other(current_node, edge)
-        if ( inTree[next_node ]) continue
+        if ( inTree[next_node ] ) continue
         let next_dist = current_dist + weight(edge)
         print(next_node + " " + next_dist)
         color(edge, "violet")
