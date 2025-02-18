@@ -255,10 +255,14 @@ function addNode(x, y) {
 
 function setPosition(nodeId, x, y) {
     if (!isInStep) { postMessage({ action: "step" }) }
-
     graph.algorithmChangeManager.setNodePosition(nodeId, x, y);
     postMessage({ action: "setNodePosition", nodeId: nodeId, x: x, y: y });
     waitIfNeeded();
+}
+
+function incrementPosition(nodeId, x, y) {
+    let currPos = graph.getNodePosition(nodeId);
+    currPos && setPosition(nodeId, currPos.x + x, currPos.y + y);
 }
 
 function deleteNode(nodeId) {
