@@ -7,6 +7,12 @@ import Graph from "graph/Graph";
  * @author Henry Morris
  */
 export default class Algorithm {
+
+    /** The ID of the timeout instance so that it can be canceled if we get a good message */
+    #timeoutId;
+    /** The number of miliseconds before a timeout happens. DONT CHANGE THIS */
+    #timeoutPeriod = 5000;
+
     /**
      * Constructs a new Algorithm with name, code, a shared array, and a thread worker.
      * @param {String} name Algorithm name
@@ -35,6 +41,27 @@ export default class Algorithm {
         this.worker.postMessage(["shared", this.array]);
         this.worker.postMessage(["graph/algorithm", Graph.toGraphString(), Graph.isDirected, this.code]);
         this.worker.postMessage(["algorithm", this.code]);
+    }
+
+    /**
+     * Sets up a timeout for the thread to run a step
+     */
+    #setupTimeout() {
+        this.#timeoutId = setTimeout(() => {
+            // Kill the thread
+            this.killThread();
+            
+            // Create an error
+            var err = new Error("Timeout has occurred.");
+            err.lineNumber = -1;
+
+            // Prompt the user with the error
+            this.PromptService.addPrompt({
+                type: 'algorithmError',
+                errorObject: err,
+                algorithmCode: this.code
+            }, () => { });
+        }, this.#timeoutPeriod);
     }
 
     /**
@@ -78,10 +105,7 @@ export default class Algorithm {
     stepBack() {
         if (!this.canStepBack()) return;
         Graph.algorithmChangeManager.undo();
-        
-        setTimeout(() => {
-            this.#updateStatus();
-        }, 10);
+        setTimeout(this.#updateStatus(), 10);
     }
 
     /**
@@ -91,16 +115,17 @@ export default class Algorithm {
         if (!this.canStepForward()) return;
         if (Graph.algorithmChangeManager.getIndex() === Graph.algorithmChangeManager.getLength()) {
             this.fetchingSteps = true;
-            this.resumeThread();
+            this.resumeThread(); // Resume the thread
+            this.#setupTimeout(); // Start the timeout timer
 
+            // Once the step is complete:
             this.onStepAdded = () => {
+                clearTimeout(this.#timeoutId); // Clear the timer once a step is finished
                 this.fetchingSteps = false;
-
-                setTimeout(() => {
-                    this.#updateStatus();
-                }, 10);
+                setTimeout(this.#updateStatus(), 10);
             }
         } else {
+            // Use redo if there are pre-loaded steps ahead of the index
             Graph.algorithmChangeManager.redo();
             this.#updateStatus();
         }
@@ -114,14 +139,18 @@ export default class Algorithm {
         if (!this.canStepForward()) return;
         if (Graph.algorithmChangeManager.getIndex() === Graph.algorithmChangeManager.getLength()) {
             this.fetchingSteps = true;
-            this.resumeThread();
+            this.resumeThread(); // Resume the thread
+            this.#setupTimeout(); // Start the timeout timer
 
+            // Once the step is complete:
             this.onStepAdded = () => {
+                clearTimeout(this.#timeoutId); // Clear the timer once a step is finished
                 this.fetchingSteps = false;
                 this.#updateStatus();
                 if (callback) callback();
             }
         } else {
+            // Use redo if there are pre-loaded steps ahead of the index
             Graph.algorithmChangeManager.redo();
             this.#updateStatus();
             if (callback) callback();
@@ -230,7 +259,11 @@ export default class Algorithm {
                 this.completed = true;
                 break;
             case "error":
-                window.alert(message.error);
+                this.services.PromptService.addPrompt({
+                    type: "algorithmError",
+                    errorObject: message.error,
+                    algorithmCode: this.code
+                }, () => { });
             default:
                 // If the message was not a type we define here, then we probably just made
                 // a mistake or typo when sending this message. Throw an error to let us
