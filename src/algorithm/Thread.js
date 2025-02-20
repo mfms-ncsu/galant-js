@@ -9,7 +9,8 @@ import { Graph } from "graph/Graph";
  */
 
 /**
- * The array has one purpose: telling the thread to run or wait with Atomics.wait().
+ * Used to inform the thread when to run and storing prompt results to be accessed in
+ * the thread.
  * If sharedArray[0] is 0, that means the Thread should wait. Once it is changed, the 
  * Thread wakes up from Atoimics.notify() from the Handler.
  */
@@ -90,8 +91,12 @@ function prompt(message, error="") {
     if (message === null || message === "") {
         message = "Prompt";
     }
-    postMessage({action: "prompt", content: [message, error]})
+
+    // Post the message and wait for the thread to resume
+    postMessage({action: "prompt", content: [message, error]});
     wait();
+
+    // Get the result from the shared array
     let len = Atomics.load(sharedArray, 1);
     let promptResult = "";
     for (let i = 0; i < len; i++) {
@@ -108,15 +113,11 @@ function prompt(message, error="") {
  * @returns {string} promptResult 
  */
 function promptFrom(message, list, error) {
-    if (list.length === 0) {
-        throw new Error("Cannot prompt when no valid options exist.");
-    }
-    if (error === null) {
-        error = "Must enter a value from " + list;
-    }
+    if (list.length === 0) throw new Error("Cannot prompt when no valid options exist.");
+    if (error === null) error = "Error: Must enter a value from " + list;
+
     let promptResult = prompt(message);
     while(!list.includes(promptResult)) {
-        console.log("NOT FOUND - REPROMPTING");
         promptResult = prompt(message, error);
     }
     return promptResult;
@@ -209,13 +210,13 @@ function print(message) {
 }
 
 function promptBoolean(message) {
-    return promptFrom(message, ["true", "false"], "Must enter a boolean value (true/false)") === "true";
+    return promptFrom(message, ["true", "false"], "Error: Must enter a boolean value (true/false)") === "true";
 }
 
 function promptInteger(message) {
     let promptResult = parseInt(prompt(message));
     while (isNaN(promptResult)) {
-        promptResult = parseInt(prompt(message, "Must enter an integer"));
+        promptResult = parseInt(prompt(message, "Error: Must enter an integer"));
     }
     return promptResult;
 }
@@ -223,7 +224,7 @@ function promptInteger(message) {
 function promptNumber(message) {
     let promptResult = parseFloat(prompt(message));
     while (isNaN(promptResult)) {
-        promptResult = parseFloat(prompt(message, "Must enter a number"));
+        promptResult = parseFloat(prompt(message, "Error: Must enter a number"));
     }
     return promptResult;
 }
@@ -241,7 +242,7 @@ function promptEdge(message) {
     if (edges.length === 0) {
         throw new Error("Cannot prompt for an edge when no valid edges exist.");
     }
-    return promptFrom(message, edges, "Must enter a valid Edge ID. The valid edges are " + edges);
+    return promptFrom(message, edges, "Error: Must enter a valid Edge ID in source,target format. The valid edges are: " + edges.join(" "));
 }
 
 function addNode(x, y) {
@@ -273,7 +274,6 @@ function incrementPosition(nodeId, x, y) {
 
 function deleteNode(nodeId) {
     if (!isInStep) { postMessage({ action: "step" }) }
-
     graph.algorithmChangeManager.deleteNode(nodeId);
     postMessage({ action: "deleteNode", nodeId: nodeId });
     waitIfNeeded();
@@ -281,7 +281,6 @@ function deleteNode(nodeId) {
 
 function deleteEdge(edgeId) {
     if (!isInStep) { postMessage({ action: "step" }) }
-
     let split = edgeId.split(",");
     let source = split[0], target = split[1];
     graph.algorithmChangeManager.deleteEdge(source, target);
@@ -666,7 +665,6 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
 
         // Evaluate the algorithm
         try {
-            
             // Start running the algorithm
             eval(message[3]); /* eslint-disable-line no-eval */
             // End recording of the last step

@@ -210,7 +210,7 @@ export default class Algorithm {
             case "prompt":
                 clearTimeout(this.#timeoutId); // Cancel the timer while the prompt is up
                 this.PromptService.addPrompt(
-                    { type: 'input', label: message.content[0] },
+                    { type: 'input', label: message.content[1] || message.content[0], },
                     (value) => {
                         this.#setupTimeout(); // Start the timeout timer back up
                         this.enterPromptResult(value);
