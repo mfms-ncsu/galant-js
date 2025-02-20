@@ -214,19 +214,19 @@ function promptBoolean(message) {
 }
 
 function promptInteger(message) {
-    let promptResult = parseInt(prompt(message));
-    while (isNaN(promptResult)) {
-        promptResult = parseInt(prompt(message, "Error: Must enter an integer"));
+    let promptResult = prompt(message);
+    while (isNaN(parseInt(promptResult)) || !/^-?[0-9]+$/.test(promptResult)) {
+        promptResult = prompt(message, "Error: Must enter an integer");
     }
-    return promptResult;
+    return parseInt(promptResult);
 }
 
 function promptNumber(message) {
-    let promptResult = parseFloat(prompt(message));
-    while (isNaN(promptResult)) {
-        promptResult = parseFloat(prompt(message, "Error: Must enter a number"));
+    let promptResult = prompt(message);
+    while (isNaN(parseFloat(promptResult)) || !/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(promptResult)) {
+        promptResult = prompt(message, "Error: Must enter a number");
     }
-    return promptResult;
+    return parseFloat(promptResult);
 }
 
 function promptNode(message, error) {
