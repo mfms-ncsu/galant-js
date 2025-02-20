@@ -86,24 +86,23 @@ export default function GraphEditOverlay({ setMode }) {
 
 
     return length > 0 && (
-        <div id="edit-overlay" className="absolute inset-0 flex flex-col p-4 pointer-events-none">
-            <div className="w-fit mx-auto">
-                <p className="p-2 rounded shadow backdrop-blur bg-gradient-to-r from-indigo-500/90 to-blue-500/75 text-white">You're in edit mode</p>
-                <button className="block mx-auto pointer-events-auto backdrop-blur-sm hover:font-semibold hover:underline" onClick={revert}>Revert</button>
-            </div>
+        <div id="edit-overlay" className="absolute inset-0 flex flex-col items-center p-4 pointer-events-none">
             <div className="mt-auto mb-4">
                 <div className="flex space-x-12 w-fit mx-auto">
-                    <button className="relative p-1 pointer-events-auto stroke-0 stroke-black hover:stroke-1" onClick={undo}>
+                    <button className="relative pointer-events-auto stroke-0 stroke-black hover:stroke-1 transition-all" onClick={undo}>
                         <ArrowUturnLeftIcon className="w-6 h-6" />
                         <label className="absolute -bottom-2 left-0 text-sm">z</label>
                     </button>
                     <span>{index} / {length}</span>
-                    <button className="relative p-1 pointer-events-auto stroke-0 stroke-black hover:stroke-1" onClick={redo}>
+                    <button className="relative pointer-events-auto stroke-0 stroke-black hover:stroke-1 transition-all" onClick={redo}>
                         <ArrowUturnRightIcon className="w-6 h-6" />
                         <label className="absolute -bottom-2 right-0 text-sm">y</label>
                     </button>
                 </div>
-                <button className="block mt-4 mx-auto p-2 rounded-full font-semibold bg-gradient-to-r from-indigo-500 to-blue-500 text-white ring-indigo-500 pointer-events-auto shadow-sm hover:shadow-lg" onClick={save}>Save Changes</button>
+                <div className="flex w-fit">
+                    <button className=" mt-4 mx-auto me-2 px-4 py-2 rounded-full font-semibold bg-blue-500 hover:bg-blue-600 text-white pointer-events-auto transition-all" onClick={revert}>Revert</button>
+                    <button className=" mt-4 mx-auto ms-2 px-4 py-2 rounded-full font-semibold bg-blue-500 hover:bg-blue-600 text-white pointer-events-auto transition-all" onClick={save}>Save Changes</button>
+                </div>
             </div>
         </div>
     );
