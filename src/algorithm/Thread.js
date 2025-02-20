@@ -543,24 +543,96 @@ function clearNodeSizes() {
     setAttributeAll("nodes", "size", undefined)
 }
 
-function width(id) {
+function edgeWidth(id) {
     return getAttribute(id, "width")
 }
 
-function setWidth(id, width) {
+function setEdgeWidth(id, width) {
     setAttribute(id, "width", width)
 }
 
-function clearWidth(id) {
+function clearEdgeWidth(id) {
     setAttribute(id, "width", undefined)
 }
 
-function hasWidth(id) {
+function hasEdgeWidth(id) {
     return getAttribute(id, "width") !== undefined
 }
 
 function clearEdgeWidths() {
     setAttributeAll("edges", "width", undefined)
+}
+
+function hideAllEdgeWeights() {
+    setAttributeAll("edges", "weightHidden", true);
+}
+
+function hideAllNodeWeights() {
+    setAttributeAll("nodes", "weightHidden", true);
+}
+
+function showAllEdgeWeights() {
+    setAttributeAll("edges", "weightHidden", false);
+}
+
+function showAllNodeWeights() {
+    setAttributeAll("nodes", "weightHidden", false);
+}
+
+function hideAllEdgeLabels() {
+    setAttributeAll("edges", "labelHidden", true);
+}
+
+function hideAllNodeLabels() {
+    setAttributeAll("nodes", "labelHidden", true);
+}
+
+function showAllEdgeLabels() {
+    setAttributeAll("edges", "labelHidden", false);
+}
+
+function showAllNodeLabels() {
+    setAttributeAll("nodes", "labelHidden", false);
+}
+
+function hideNode(node) {
+    setAttribute(node, "hidden", "true"); 
+}
+
+function showNode(node) {
+    setAttribute(node, "hidden", "false");
+}
+
+function hideNodeWeight(node) {
+    setAttribute(node, "weightHidden", "true");
+}
+
+function hideEdgeWeight(edge) {
+    setAttribute(edge, "weightHidden", "true");
+}
+
+function showNodeWeight(node) {
+    setAttribute(node, "weightHidden", "false");
+}
+
+function showEdgeWeight(edge) {
+    setAttribute(edge, "weightHidden", "false");
+}
+
+function hideNodeLabel(node) {
+    setAttribute(node, "labelHidden", "true");
+}
+
+function hideEdgeLabel(edge) {
+    setAttribute(edge, "labelHidden", "true");
+}
+
+function showNodeLabel(node) {
+    setAttribute(node, "labelHidden", "false");
+}
+
+function showEdgeLabel(edge) {
+    setAttribute(edge, "labelHidden", "false");
 }
 
 /**************************************************************/
