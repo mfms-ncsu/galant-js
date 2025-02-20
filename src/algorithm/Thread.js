@@ -596,43 +596,43 @@ function showAllNodeLabels() {
 }
 
 function hideNode(node) {
-    setAttribute(node, "hidden", "true"); 
+    setAttribute(node, "hidden", true); 
 }
 
 function showNode(node) {
-    setAttribute(node, "hidden", "false");
+    setAttribute(node, "hidden", false);
 }
 
 function hideNodeWeight(node) {
-    setAttribute(node, "weightHidden", "true");
+    setAttribute(node, "weightHidden", true);
 }
 
 function hideEdgeWeight(edge) {
-    setAttribute(edge, "weightHidden", "true");
+    setAttribute(edge, "weightHidden", true);
 }
 
 function showNodeWeight(node) {
-    setAttribute(node, "weightHidden", "false");
+    setAttribute(node, "weightHidden", false);
 }
 
 function showEdgeWeight(edge) {
-    setAttribute(edge, "weightHidden", "false");
+    setAttribute(edge, "weightHidden", false);
 }
 
 function hideNodeLabel(node) {
-    setAttribute(node, "labelHidden", "true");
+    setAttribute(node, "labelHidden", true);
 }
 
 function hideEdgeLabel(edge) {
-    setAttribute(edge, "labelHidden", "true");
+    setAttribute(edge, "labelHidden", true);
 }
 
 function showNodeLabel(node) {
-    setAttribute(node, "labelHidden", "false");
+    setAttribute(node, "labelHidden", false);
 }
 
 function showEdgeLabel(edge) {
-    setAttribute(edge, "labelHidden", "false");
+    setAttribute(edge, "labelHidden", false);
 }
 
 /**************************************************************/
