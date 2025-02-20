@@ -17,7 +17,7 @@ export default class Edge extends GraphElement {
         // Call the super constructor with the map of attributes
         super(new Map([
             ["color", undefined],
-            ["edgeWidth", undefined],
+            ["width", undefined],
             ["highlighted", false],
             ["label", ""],
             ["weight", undefined]

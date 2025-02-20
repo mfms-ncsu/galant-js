@@ -246,11 +246,17 @@ function promptEdge(message) {
 
 function addNode(x, y) {
     if (!isInStep) { postMessage({ action: "step" }) }
-
     let id = graph.algorithmChangeManager.addNode(x, y);
     postMessage({ action: "addNode", x: x, y: y });
     waitIfNeeded();
     return id;
+}
+
+function addEdge(source, target) {
+    if (!isInStep) { postMessage({ action: "step" }) }
+    graph.algorithmChangeManager.addEdge(source, target);
+    postMessage({ action: "addEdge", source: source, target: target });
+    waitIfNeeded();
 }
 
 function setPosition(nodeId, x, y) {
@@ -400,7 +406,7 @@ function hasColor(id) {
 }
 
 function clearNodeColors() {
-    setAttributeAll("node", "color", undefined);
+    setAttributeAll("nodes", "color", undefined);
 }
 
 function clearEdgeColors() {
@@ -437,7 +443,7 @@ function setWeight(id, weight) {
 }
 
 function clearWeight(id) {
-    setAttribute(id, "weight", 0);
+    setAttribute(id, "weight", undefined);
 }
 
 function weight(id) {
@@ -450,11 +456,11 @@ function hasWeight(id) {
 }
 
 function clearNodeWeights() {
-    setAttributeAll("nodes", "weight", 0);
+    setAttributeAll("nodes", "weight", undefined);
 }
 
 function clearEdgeWeights() {
-    setAttributeAll("edges", "weight", 0);
+    setAttributeAll("edges", "weight", undefined);
 }
 
 function shape(id) {
@@ -486,7 +492,7 @@ function setBorderWidth(id, borderWidth) {
 }
 
 function clearBorderWidth(id) {
-    setAttribute(id, "borderWidth", 0);
+    setAttribute(id, "borderWidth", undefined);
 }
 
 function hasBorderWidth(id) {
@@ -506,14 +512,14 @@ function setBackgroundOpacity(id, backgroundOpacity) {
 }
 
 function clearBackgroundOpacity(id) {
-    setAttribute(id, "backgroundOpacity", 0);
+    setAttribute(id, "backgroundOpacity", undefined);
 }
 
 function hasBackgroundOpacity(id) {
     return getAttribute(id, "backgroundOpacity") !== undefined;
 }
 
-function clearNodeBackgroundOpacity() {
+function clearNodeBackgroundOpacities() {
     setAttributeAll("nodes", "backgroundOpacity", undefined);
 }
 
@@ -526,7 +532,7 @@ function setSize(id, size) {
 }
 
 function clearSize(id) {
-    setAttribute(id, "size", 0)
+    setAttribute(id, "size", undefined)
 }
 
 function hasSize(id) {
@@ -537,24 +543,24 @@ function clearNodeSizes() {
     setAttributeAll("nodes", "size", undefined)
 }
 
-function edgeWidth(id) {
-    return getAttribute(id, "edgeWidth")
+function width(id) {
+    return getAttribute(id, "width")
 }
 
-function setEdgeWidth(id, width) {
-    setAttribute(id, "edgeWidth", width)
+function setWidth(id, width) {
+    setAttribute(id, "width", width)
 }
 
-function clearEdgeWidth(id) {
-    setAttribute(id, "edgeWidth", 0)
+function clearWidth(id) {
+    setAttribute(id, "width", undefined)
 }
 
-function hasEdgeWidth(id) {
-    return getAttribute(id, "edgeWidth") !== undefined
+function hasWidth(id) {
+    return getAttribute(id, "width") !== undefined
 }
 
-function clearNodeEdgeWidth() {
-    setAttribute("edges", "edgeWidth", undefined)
+function clearEdgeWidths() {
+    setAttributeAll("edges", "width", undefined)
 }
 
 /**************************************************************/

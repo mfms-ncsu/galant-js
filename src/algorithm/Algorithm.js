@@ -204,6 +204,9 @@ export default class Algorithm {
             case "addNode":
                 Graph.algorithmChangeManager.addNode(message.x, message.y);
                 break;
+            case "addEdge":
+                Graph.algorithmChangeManager.addEdge(message.source, message.target);
+                break;
             case "prompt":
                 this.PromptService.addPrompt(
                     { type: 'input', label: message.content[0] },
@@ -257,7 +260,7 @@ export default class Algorithm {
                 this.completed = true;
                 break;
             case "error":
-                this.services.PromptService.addPrompt({
+                this.PromptService.addPrompt({
                     type: "algorithmError",
                     errorObject: message.error,
                     algorithmCode: this.code

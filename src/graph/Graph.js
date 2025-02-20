@@ -72,7 +72,6 @@ export class Graph {
      * @author Ziyu Wang
      */
     toGraphString() {
-        
         // Start this file with the header comments
         let content = this.#headerComments;
 
@@ -147,7 +146,7 @@ export class Graph {
      * @return the total number of nodes in the graph
      */
     getNumberOfNodes() {
-        return this.#nodes.length;
+        return this.#nodes.size;
     }
     
     /**
@@ -165,7 +164,7 @@ export class Graph {
      */
     getTarget(edge) {
         const nodes = edge.split(",");
-        if (nodes.length != 2 || !this.#nodes.has(nodes[1])) { 
+        if (nodes.length !== 2 || !this.#nodes.has(nodes[1])) { 
             throw new Error("Given edge is not valid: " + edge);
         }
         return nodes[1];
@@ -178,7 +177,7 @@ export class Graph {
      */
     getSource(edge) {
         const nodes = edge.split(",");
-        if (nodes.length != 2 || !this.#nodes.has(nodes[0])) { 
+        if (nodes.length !== 2 || !this.#nodes.has(nodes[0])) { 
             throw new Error("Given edge is not valid: " + edge);
         }
         return nodes[0];
