@@ -1,16 +1,4 @@
 import {useContext, createContext} from 'react';
-import Algorithm from 'utils/Algorithm/Algorithm';
-
-
-/**
- * @typedef {import("utils/Algorithm/Algorithm").default} Algorithm
- */
-
-/**
- * @typedef AlgorithmContextObject Contains all the functions and helpers provided by AlgorithmContext
- * @property {Algorithm} algorithm Current algorithm
- * @property {Function} setAlgorithm Set the current algorithm
- */
 
 /**
  * Creates the AlgorithmContextObject

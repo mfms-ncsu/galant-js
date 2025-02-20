@@ -1,7 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import { ArrowDownTrayIcon, ArrowPathIcon, ArrowUpRightIcon, CheckIcon } from "@heroicons/react/24/solid";
-import { parseText } from 'utils/FileToPredicate.js';
-
 /**
  * Basic heuristic to detect if the content is JavaScript.
  * @param {string} content
