@@ -120,6 +120,8 @@ export default class ChangeManager {
         this.#index = 0;
         this.#isRecording = false;
         this.#currentChangeList = [];
+        window.updateStep();
+        window.updateMessage();
     }
     
     /**
