@@ -208,9 +208,11 @@ export default class Algorithm {
                 Graph.algorithmChangeManager.addEdge(message.source, message.target);
                 break;
             case "prompt":
+                clearTimeout(this.#timeoutId); // Cancel the timer while the prompt is up
                 this.PromptService.addPrompt(
                     { type: 'input', label: message.content[0] },
                     (value) => {
+                        this.#setupTimeout(); // Start the timeout timer back up
                         this.enterPromptResult(value);
                     }
                 );
