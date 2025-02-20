@@ -242,7 +242,24 @@ function promptEdge(message) {
     if (edges.length === 0) {
         throw new Error("Cannot prompt for an edge when no valid edges exist.");
     }
-    return promptFrom(message, edges, "Error: Must enter a valid Edge ID in source,target format. The valid edges are: " + edges.join(" "));
+
+    // If the graph is directed, put the reversed edges into edges
+    let reversedEdges = new Map();
+    if (!graph.isDirected) {
+        edges.forEach(edge => {
+            // Split the edge into source and target
+            let split = edge.split(",");
+
+            // If the reversed edge isn't edges, add it to reversedEdges as the key to the original edge value
+            if (!edges.includes(`${split[1]},${split[0]}`)) reversedEdges.set(`${split[1]},${split[0]}`, edge);
+        });
+
+        // Add the reversed edges
+        edges = edges.concat([...reversedEdges.keys()]);
+    }
+    
+    let promptResult = promptFrom(message, edges, "Error: Must enter a valid Edge ID in source,target format. The valid edges are: " + edges.join(" "));
+    return reversedEdges.get(promptResult) || promptResult; // Check if the edge is reversed or not
 }
 
 function addNode(x, y) {
