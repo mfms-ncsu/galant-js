@@ -44,12 +44,15 @@ export default function PromptComponent() {
             x: event.pageX - pos.x,
             y: event.pageY - pos.y
         });
+        event.stopPropagation();
+        event.preventDefault();
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
     }
 
-    function onMouseUp() {
-        console.log("here");
+    function onMouseUp(event) {
+        event.stopPropagation();
+        event.preventDefault();
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
     }
@@ -60,6 +63,8 @@ export default function PromptComponent() {
             x: event.pageX - promptPosition.x,
             y: event.pageY - promptPosition.y
         });
+        event.stopPropagation();
+        event.preventDefault();
     }
 
     if (!currentPrompt) return null;
