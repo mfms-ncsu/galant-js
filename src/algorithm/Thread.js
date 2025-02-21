@@ -237,6 +237,30 @@ function promptNode(message, error) {
     return promptFrom(message, nodes, error);
 }
 
+function promptNodeFrom(message, nodes) {
+    // If this is a set, make it an array
+    if (nodes instanceof Set) {
+        nodes = [...nodes.values()];
+    }
+
+    if (nodes.length === 0) {
+        throw new Error("Cannot prompt for a node when no valid nodes exist.");
+    }
+    return promptFrom(message, nodes, "Must add node from: " + nodes.join(" "));
+}
+
+function promptEdgeFrom(message, edges) {
+    // If this is a set, make it an array
+    if (edges instanceof Set) {
+        edges = [...edges.values()];
+    }
+
+    if (edges.length === 0) {
+        throw new Error("Cannot prompt for a edge when no valid edges exist.");
+    }
+    return promptFrom(message, edges, "Must add edge from: " + edges.join(" "));
+}
+
 function promptEdge(message) {
     let edges = getEdges();
     if (edges.length === 0) {
