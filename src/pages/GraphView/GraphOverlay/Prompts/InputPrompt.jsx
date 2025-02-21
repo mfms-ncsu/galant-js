@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 
 
 /**
@@ -9,7 +9,7 @@ import { useState } from "react"
  * @param {Function} props.callback The function that should be called on submit
  * @returns {React.ReactElement} Modal that prompts the user for input
  */
-export default function InputPrompt({prompt, callback}) {
+export default function InputPrompt({prompt, callback, promptRef}) {
     const [inputValue, setInputValue] = useState('');
 
     function onEnterPressed(event) {
@@ -18,12 +18,10 @@ export default function InputPrompt({prompt, callback}) {
     }
 
     return (
-        <div className="absolute flex items-center justify-center inset-0 z-50">
-            <div className="bg-gray-100 p-4 rounded shadow-lg ring-1 ring-gray-200">
-                <span className="block text-lg font-semibold">{prompt.label}</span>
-                <input className="block h-8 p-2 mt-4 rounded" value={inputValue} onChange={(event) => setInputValue(event.target.value)} onKeyDown={onEnterPressed} autoFocus />
-                <button className="w-full py-2 mt-4 rounded bg-gradient-to-r from-blue-500 to-indigo-500 font-semibold text-white" onClick={() => callback(inputValue)}>Submit</button>
-            </div>
+        <div className="bg-gray-100 p-4 rounded-xl" ref={promptRef}>
+            <span className="block text-lg font-semibold pointer-events-none select-none">{prompt.label}</span>
+            <input className="block h-8 w-full p-2 my-4 rounded" value={inputValue} onChange={(event) => setInputValue(event.target.value)} onKeyDown={onEnterPressed} autoFocus />
+            <button className="w-full py-2 rounded-full bg-blue-500 hover:bg-blue-600 transition-all font-semibold text-white" onClick={() => callback(inputValue)}>Submit</button>
         </div>
     )
 }

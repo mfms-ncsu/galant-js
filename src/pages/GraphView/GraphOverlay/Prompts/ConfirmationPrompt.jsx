@@ -1,5 +1,4 @@
-import { useState, useRef, useEffect } from "react"
-
+import { useRef, useEffect } from "react"
 
 /**
  * Creates a modal requesting the user for confirmation.
@@ -11,8 +10,7 @@ import { useState, useRef, useEffect } from "react"
  * @param {Function} props.callback The function that should be called on submit
  * @returns {React.ReactElement} Modal that prompts the user for confirmation
  */
-export default function ConfirmationPrompt({prompt, callback}) {
-    const [inputValue, setInputValue] = useState('');
+export default function ConfirmationPrompt({prompt, callback, promptRef}) {
     const button = useRef(null);
 
     const message = prompt.message;
@@ -30,12 +28,10 @@ export default function ConfirmationPrompt({prompt, callback}) {
     }, []);
 
     return (
-        <div className="absolute flex items-center justify-center inset-0 z-50">
-            <div id="confirmation-prompt" className="bg-gray-100 p-4 rounded shadow-lg ring-1 ring-gray-200">
-                <span className="block text-lg font-semibold">{message}</span>
-                <button id="confirmation-prompt-confirm" ref={button} className="w-full py-2 mt-4 rounded bg-gradient-to-r from-blue-500 to-indigo-500 font-semibold text-white" onClick={() => callback(true)}>{confirmationText}</button>
-                <button id="confirmation-prompt-cancel" className="w-full mt-1 text-black" onClick={() => callback(false)}>{cancelText}</button>
-            </div>
+        <div id="confirmation-prompt" className="bg-gray-100 p-4 rounded shadow-lg ring-1 ring-gray-200" ref={promptRef}>
+            <span className="block text-lg font-semibold">{message}</span>
+            <button id="confirmation-prompt-confirm" ref={button} className="w-full py-2 mt-4 rounded-full bg-blue-500 hover:bg-blue-600 transition-all font-semibold text-white" onClick={() => callback(true)}>{confirmationText}</button>
+            <button id="confirmation-prompt-cancel" className="w-full mt-1 text-black" onClick={() => callback(false)}>{cancelText}</button>
         </div>
     )
 }

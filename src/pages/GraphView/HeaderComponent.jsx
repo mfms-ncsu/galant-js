@@ -4,7 +4,6 @@
  * @author Vitesh Kambara
  */
 
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/16/solid";
 import { useEffect } from "react";
 
 /**

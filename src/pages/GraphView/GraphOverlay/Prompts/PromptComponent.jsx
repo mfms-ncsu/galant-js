@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react"
+import { useEffect, useState, useContext, useRef } from "react"
 import { PromptContext } from "pages/GraphView/utils/PromptService";
 import AlgorithmErrorPrompt from "./AlgorithmErrorPrompt";
 import InputPrompt from "./InputPrompt";
@@ -18,6 +18,8 @@ const typeMapping = {
 export default function PromptComponent() {
     const PromptService = useContext(PromptContext);
     const [currentPrompt, setCurrentPrompt] = useState(null);
+    const [dragPosition, setDragPosition] = useState({ x: 50, y: 50 });
+    const promptRef = useRef();
 
     useEffect(() => {
         if (currentPrompt) return; // Do nothing if there's already a current prompt
@@ -34,17 +36,46 @@ export default function PromptComponent() {
         setCurrentPrompt(null); 
     }
 
-    // If there's no current prompt, return null
+    let promptX, promptY; // Store the location within the prompt being clicked here
+    function onMouseDown(event) {
+        if (event.target !== promptRef.current) return;
+        let pos = event.target.getBoundingClientRect();
+        promptX = event.pageX - pos.x;
+        promptY = event.pageY - pos.y;
+        event.stopPropagation();
+        event.preventDefault();
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    }
+
+    function onMouseUp(event) {
+        event.stopPropagation();
+        event.preventDefault();
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+    }
+
+    function onMouseMove(event) {
+        if (event.target !== promptRef.current) return;
+        setDragPosition({
+            x: event.pageX - promptX,
+            y: event.pageY - promptY
+        });
+        event.stopPropagation();
+        event.preventDefault();
+    }
+
     if (!currentPrompt) return null;
-    
-   
     const TypeComponent = typeMapping[currentPrompt.data.type];
-    
-    // Throw an error if the TypeComponent is not found
     if (!TypeComponent) {
         throw new Error(`Received a Prompt with an invalid type attribute ${currentPrompt.data.type}`);
     }
 
-    
-    return <TypeComponent prompt={currentPrompt.data} callback={onCallback} />;
+    return (
+        <div className="relative z-50">
+            <div className="max-w-lg h-fit absolute active:cursor-move" style={{"top": dragPosition.y, "left": dragPosition.x}} onMouseDown={onMouseDown}>
+                <TypeComponent prompt={currentPrompt.data} callback={onCallback} promptRef={promptRef} />
+            </div>
+        </div>
+    );
 }

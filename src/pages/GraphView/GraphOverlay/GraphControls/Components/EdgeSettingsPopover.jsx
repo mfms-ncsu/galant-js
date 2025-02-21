@@ -1,7 +1,6 @@
 import { Popover, Switch } from '@headlessui/react'
 import { useState, useRef, useEffect } from 'react'
-import { useGraphContext } from 'pages/GraphView/utils/GraphContext';
-import Graph from 'utils/Graph';
+import Graph from "graph/Graph";
 
 /**
  * BinarySwitchComponent renders a binary switch component.
@@ -19,12 +18,12 @@ function BinarySwitchComponent({enabled, setEnabled}) {
                 enabled ? 'bg-gradient-to-r from-indigo-500 to-blue-500' : 'bg-gray-200'
             } relative inline-flex h-6 w-11 items-center rounded-full`}
         >
-        <span className="sr-only">Toggle</span>
-        <span
-            className={`${
-            enabled ? 'translate-x-6' : 'translate-x-1'
-            } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-        />
+            <span className="sr-only">Toggle</span>
+            <span
+                className={`${
+                enabled ? 'translate-x-6' : 'translate-x-1'
+                } inline-block h-4 w-4 transform rounded-full bg-white transition`}
+            />
         </Switch>
     )
 }
@@ -34,13 +33,9 @@ function BinarySwitchComponent({enabled, setEnabled}) {
  * @returns {JSX.Element} - Returns the JSX for EdgeSettingsPopover component.
  */
 export default function EdgeSettingsPopover() {
-    const hasMounted = useRef(false);
-    const [displayLabels, setDisplayLabels] =  useState(true);
-    const [displayWeights, setDisplayWeights] =  useState(true);
-    const [isDirected, setIsDirected] =  useState(false);
-
-    const graphContext = useGraphContext();
-    const preferences = graphContext.preferences.style;
+    const [displayLabels, setDisplayLabels] = useState(true);
+    const [displayWeights, setDisplayWeights] = useState(true);
+    const [isDirected, setIsDirected] = useState(false);
 
     // Ref for popover button
     const button = useRef(null);
@@ -48,49 +43,32 @@ export default function EdgeSettingsPopover() {
     // Effect hook to handle keyboard shortcut for opening popover
     useEffect(() => {
         if (!button.current) return;
-
         function onKeyPress(event) {
-            // If user is typing into an input field, ignore.
             if (event.target.tagName.toLowerCase() === 'input') return;
-
-            // Only if user enters designated keyboard shortcut - e - the button is clicked
             if (event.key !== 'e') return;
             button.current.click();
         }
-
         document.addEventListener('keypress', onKeyPress);
         return () => document.removeEventListener('keypress', onKeyPress);
     }, []);
 
-    // Effect to update display labels preference
+    // Set edgeLabels in graph
     useEffect(() => {
-        if (!hasMounted.current) return; // Don't update preferences on mount cycle
-        preferences.edge.hideLabel = !displayLabels;
-        //preferences.edge.textOpacity = displayLabels ? 1 : 0;
-        graphContext.preferences.setStylePreferences({...preferences});
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        Graph.cytoscapeManager.edgeLabels = displayLabels;
+        window.updateCytoscape();
     }, [displayLabels]);
 
+    // Set edgeWeights in graph
     useEffect(() => {
-        if (!hasMounted.current) return; // Don't update preferences on mount cycle
-        preferences.edge.hideWeight = !displayWeights;
-        graphContext.preferences.setStylePreferences({...preferences});
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        Graph.cytoscapeManager.edgeWeights = displayWeights;
+        window.updateCytoscape();
     }, [displayWeights]);
 
-    // Effect to update graph when directed option changes
+    // Set isDirected in graph
     useEffect(() => {
-        if (!hasMounted.current) return;
-
-        let newGraph = new Graph(graphContext.baseGraph.nodes, graphContext.baseGraph.edges, isDirected, graphContext.baseGraph.message);
-        graphContext.setBaseGraph(newGraph);
-        graphContext.setGraph(newGraph);
+        Graph.isDirected = isDirected;
+        window.updateCytoscape();
     }, [isDirected]);
-
-    // Effect to set hasMounted to true after mount
-    useEffect(() => {
-        hasMounted.current = true;
-    }, []);
 
    
     return (

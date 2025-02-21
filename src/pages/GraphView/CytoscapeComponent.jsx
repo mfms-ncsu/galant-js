@@ -1,4 +1,4 @@
-import { React, useEffect, useRef } from "react";
+import { React, useEffect, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
 import cytoscape from "cytoscape";
 import nodeHtmlLabel from "cytoscape-node-html-label";
@@ -19,6 +19,9 @@ export default function CytoscapeComponent() {
     // Get a reference to the element into which cytoscape is loaded
     const cytoscapeElement = useRef();
 
+    // State for the message to display
+    const [message, setMessage] = useState(null);
+
     /**
      * Initialize cytoscape on mount (When cytoscapeElement ref is set to the div element)
      */
@@ -30,7 +33,6 @@ export default function CytoscapeComponent() {
             container: cytoscapeElement.current,
             elements: Graph.cytoscapeManager.getElements(),
             style: Graph.cytoscapeManager.getStyle(),
-            layout: { name: "preset" },
             autounselectify: true,
             wheelSensitivity: 0.35,
         });
@@ -44,14 +46,44 @@ export default function CytoscapeComponent() {
                 valign: "top",
                 valignBox: "top",
                 tpl: (data) => {
-                    const hideWeight = false; // NOTE: these need to be pulled from somewhere
-                    const hideLabel = false;
 
-                    if ((!hideWeight && data.weight) || (!hideLabel && data.label)) {
+                    const showWeights =
+                        Graph.cytoscapeManager.nodeWeights;
+					const showLabels =
+                        Graph.cytoscapeManager.nodeLabels;
+
+                    if ( (showWeights && !data.weightHidden) ||
+                         (showLabels && !data.labelHidden)   ){
+                        
+                        // This flag determines whether or not there
+                        // is anything to render. If both the weight
+                        // and label of the node are empty, then
+                        // we should not draw the label
+
+                        let hasWeight = 
+                            data.weight !== undefined &&
+                            data.weight !== "" &&
+                            showWeights &&
+                            !data.weightHidden;
+
+                        let hasLabel =
+                            data.label !== undefined &&
+                            data.label !== "" &&
+                            showLabels &&
+                            !data.labelHidden;
+
+                        let hasWeightOrLabel = hasWeight || hasLabel;
+
                         return renderToString(
-                            <div className={`flex flex-col items-center justify-center border bg-white border-black  ${data.invisible && "hidden"}`}>
-                                <p className="leading-none">{!data.invisibleWeight && !hideWeight ? data.weight : ""}</p>
-                                <p className="leading-none">{!data.invisibleLabel && !hideLabel ? data.label : ""}</p>
+                            <div className=
+                                {`flex flex-col items-center justify-center border bg-white border-black  ${(data.hidden || !hasWeightOrLabel) && "hidden"}`
+                                }>
+                                <p className="leading-none">
+                                    {(!data.weightHidden && showWeights) ? data.weight : ""}
+                                </p>
+                                <p className="leading-none">
+                                    {(!data.labelHidden && showLabels) ? data.label : ""}
+                                </p>
                             </div>
                         );
                     }
@@ -64,24 +96,31 @@ export default function CytoscapeComponent() {
         window.cytoscape = cy;
 
         // react-hooks/exhaustive-deps
-    }, [cytoscapeElement])
-
+    }, [cytoscapeElement]);
 
     /**
-     * Update elements when the graph updates
+     * Create a function to call whenever cytoscape needs to be updated
      */
-    useEffect(() => {
+    window.updateCytoscape = () => {
         if (!window.cytoscape) return;
         window.cytoscape.elements().remove();// Remove elements
         window.cytoscape.add(Graph.cytoscapeManager.getElements()); // Get new elements
         window.cytoscape.style().resetToDefault(); // Reset style
         window.cytoscape.style(Graph.cytoscapeManager.getStyle()).update(); // Update style
-    }, [window.cytoscape, Graph.getNodesCopy()]);
+    };
+
+    /**
+     * Function to call whenever the messages need to be updated
+     */
+    window.updateMessage = () => {
+        const newMessage = Graph.algorithmChangeManager.getMessage();
+        setMessage(newMessage);
+    }
 
     return (
         <div className="w-full h-full">
             <div className="flex justify-center">
-                <p className="absolute z-10 font-semibold">{}</p>
+                <p className="absolute z-10 font-semibold">{message}</p>
             </div>
             <div id="cytoscape-instance" ref={cytoscapeElement} className="w-full h-full bg-white ring-2 ring-slate-300 rounded-md" />
         </div>

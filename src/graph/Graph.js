@@ -3,7 +3,6 @@ import ChangeObject from "./ChangeManager/ChangeObject.js";
 import CytoscapeManager from "./CytoscapeManager/CytoscapeManager.js";
 import Edge from "./GraphElement/Edge.js";
 import FileParser from "./FileParser/FileParser.js";
-import Message from "./GraphElement/Message.js";
 import Node from "./GraphElement/Node.js";
 
 /**
@@ -23,6 +22,18 @@ export class Graph {
     #scalar;
 
     /**
+     * Flags that determine if the labels or weights for nodes and
+     * edges should be drawn 
+     */
+    showEdgeWeights;
+    showNodeWeights;
+    showEdgeLabels;
+    showNodeLabels;
+    
+    /** Comments at the start of this graph's file */
+    #headerComments;
+
+    /**
      * Creates a new graph with nodes, file parser, and change managers.
      */
     constructor() {
@@ -31,6 +42,9 @@ export class Graph {
 
         // Use this scalar in toCytoscape
         this.#scalar = 1;
+
+        // Flag for whether the graph is directed or not
+        this.isDirected = false;
 
         // Create a file parser to load files into this graph
         this.fileParser = new FileParser(this, this.#privateMethods);
@@ -41,51 +55,207 @@ export class Graph {
 
         // Create a cytoscape manager to generate element and style arrays of the graph
         this.cytoscapeManager = new CytoscapeManager(this, this.#privateMethods);
+
+        this.#headerComments = "";
     }
-
-
-
+    
     /**
-     * Used on the frontend to trigger useEffect whenever the graph changes.
-     * @returns A deep copy of the graph's nodes
+     * Add the string of text as a line in the header section of this document 
      */
-    getNodesCopy() {
-        return JSON.parse(JSON.stringify(this.#nodes));
+    #addComment(line) { 
+        this.#headerComments = this.#headerComments + line + "\n";
     }
 
     /**
-     * Gets the edge between a given source and a given target node.
-     * @param {String} source Source node id
-     * @param {String} target Target node id
-     * @returns Edge between source and target
+     * Converts the graph to a string representation for exporting to a file.
+     * @returns String representation of the current graph
+     * @author Ziyu Wang
+     */
+    toGraphString() {
+        // Start this file with the header comments
+        let content = this.#headerComments;
+
+        // Loop over each node
+        this.#nodes.forEach(node => {
+            // Get the attributes string
+            let attributesString = " " + [...node.attributes.entries()]
+                .filter(([key ,value]) => key !== "weight" && value !== undefined && value !== false && value !== "")
+                .map(([key, value]) => `${key}:${value}`)
+                .join(" ");
+
+            // Get the weight string
+            let weightString = (node.attributes.get("weight") !== undefined) ? ` ${node.attributes.get("weight")}` : "";
+
+            // Add the node line
+            content += `n ${node.id} ${node.position.x.toFixed(4).replace(/[.,]0000$/, "")} ${node.position.y.toFixed(4).replace(/[.,]0000$/, "")}${weightString}${attributesString}\n`;
+        });
+
+        // Loop over each edge
+        this.#nodes.forEach(node => {
+            node.edges.forEach(edge => {
+                if (edge.source === node.id) {
+                    // Get the attributes string
+                    let attributesString = " " + [...edge.attributes.entries()]
+                        .filter(([key, value]) => key !== "weight" && value !== undefined && value !== false && value !== "")
+                        .map(([key, value]) => `${key}:${value}`)
+                        .join(" ");
+
+                    // Get the weight string
+                    let weightString = (node.attributes.get("weight") !== undefined) ? ` ${node.attributes.get("weight")}` : "";
+
+                    // Add the edge line
+                    content += `e ${edge.source} ${edge.target}${weightString}${attributesString}\n`;
+                }
+            });
+        });
+
+        return content;
+    }
+
+    /**
+     * Gets this graph's scalar.
+     * @returns This graph's scalar
+     */
+    getScalar() {
+        return this.#scalar;
+    }
+
+    /**
+     * Gets this graph's nodes in an array.
+     * @returns This graph's nodes in an array
+     */
+    getNodeArray() {
+        return [...this.#nodes.keys()];
+    }
+
+    /**
+     * Gets the edge between two nodes.
+     * @param {String} source Source node
+     * @param {String} target Target node
+     * @returns Edge between the given nodes, undefined if it doesn't exist
      */
     getEdge(source, target) {
-        return this.#nodes.get(source).edges.get(`${source},${target}`);
+        const node = this.#nodes.get(source);
+        if (!node) return undefined;
+
+        return node.edges.get(`${source},${target}`);
+    }
+    
+    /**
+     * Returns the total number of nodes in the graph
+     * @return the total number of nodes in the graph
+     */
+    getNumberOfNodes() {
+        return this.#nodes.size;
+    }
+    
+    /**
+     * Returns the total number of edges in the graph
+     * @return the total number of edges in the graph
+     */
+    getNumberOfEdges() {
+        return this.getEdgeIds().length;
+    }
+
+    /**
+     * Returns the id of the target of the given edge
+     * @return the id of the target of the given edge
+     * @throws if the edge does not exist
+     */
+    getTarget(edge) {
+        const nodes = edge.split(",");
+        if (nodes.length !== 2 || !this.#nodes.has(nodes[1])) { 
+            throw new Error("Given edge is not valid: " + edge);
+        }
+        return nodes[1];
+    }
+
+    /**
+     * Returns the id of the source of the given edge
+     * @return the id of the source of the given edge
+     * @throws if the edge does not exist
+     */
+    getSource(edge) {
+        const nodes = edge.split(",");
+        if (nodes.length !== 2 || !this.#nodes.has(nodes[0])) { 
+            throw new Error("Given edge is not valid: " + edge);
+        }
+        return nodes[0];
+    }
+
+    /**
+     * Returns an edge between the two nodes, if one exists. Returns
+     * undefined if none exists. If the graph is directed, then only
+     * edges in the given direction will be returned
+     * @return the edge between source and target, as described above
+     */
+    getEdgeBetween(source, target) {
+        let edge = this.getEdge(source, target);
+        if (edge === undefined && this.isDirected) {
+            edge = this.getEdge(target, source);
+        }
+        return edge;
+    }
+
+    /**
+     * Gets an array of all edges ids in the graph. Used in thread because edges
+     * need to be referenced by a single id instead of source, target pair.
+     * @returns The ids of all edges in the graph
+     */
+    getEdgeIds() {
+        const edges = [];
+
+        this.#nodes.forEach(node => {
+            node.edges.forEach((edge, key) => {
+                if (edge.source === node.id) {
+                    edges.push(key);
+                }
+            });
+        });
+
+        return edges;
     }
 
     /**
      * Gets all edges into and out of the given node.
      * @param {String} nodeId Node id
-     * @returns Array of all edges incident to nodeId
+     * @returns Array of all edges incident to nodeId, undefined if nodeId doesn't exist
      */
-    getAllEdges(nodeId) {
-        return [...this.#nodes.get(nodeId).edges.values()];
+    getIncidentEdges(nodeId) {
+        // Check if the node exists
+        if (this.#nodes.has(nodeId)) {
+            // If it does, return an array of all of its edges
+            return [...this.#nodes.get(nodeId).edges.keys()];
+        } else {
+            // If the node doesn't exist, return undefined
+            return undefined;
+        }
     }
 
     /**
      * Gets all edges incoming to the given node.
      * @param {String} target Target node id
-     * @returns Array of edges incoming to target
+     * @returns Array of edges incoming to target, undefined if the target doesn't exist
      */
     getIncomingEdges(target) {
+        // Return undefined if the node doesn't exist
+        if (!this.#nodes.has(target)) {
+            return undefined;
+        }
+
+        // Get all edges if undirected
+        if (!this.isDirected) {
+            return this.getIncidentEdges(target);
+        }
+
         // Keep an array of edges
         const edges = [];
 
         // Iterate over all edges
-        this.#nodes.get(target).edges.forEach(edge => {
+        this.#nodes.get(target).edges.forEach((edge, key) => {
             // Only push if the given node is the target
             if (edge.target === target) {
-                edges.push(edge);
+                edges.push(key);
             }
         });
 
@@ -95,21 +265,195 @@ export class Graph {
     /**
      * Gets all edges ougoing from the given node.
      * @param {String} source Source node id
-     * @returns Array of edges outgoing from source
+     * @returns Array of edges outgoing from source, undefined if source doesn't exist
      */
     getOutgoingEdges(source) {
+        // Return undefined if the node doesn't exist
+        if (!this.#nodes.has(source)) {
+            return undefined;
+        }
+
+        // Get all edges if undirected
+        if (!this.isDirected) {
+            return this.getIncidentEdges(source);
+        }
+
         // Keep an array of edges
         const edges = [];
 
         // Iterate over all edges
-        this.#nodes.get(source).edges.forEach(edge => {
+        this.#nodes.get(source).edges.forEach((edge, key) => {
             // Only push if the given node is the source
             if (edge.source === source) {
-                edges.push(edge);
+                edges.push(key);
             }
         });
 
         return edges;
+    }
+
+    /**
+     * Gets all nodes adjacent to the given node.
+     * @param {String} nodeId Node to check
+     * @returns Array of adjacent nodes
+     */
+    getAdjacentNodes(nodeId) {
+        let nodes = [];
+
+        // Check if the node exists
+        if (this.#nodes.has(nodeId)) {
+            this.#nodes.get(nodeId).edges.forEach(edge => {
+                if (edge.source === nodeId) {
+                    nodes.push(edge.target);
+                } else {
+                    nodes.push(edge.source);
+                }
+            });
+
+            return nodes;
+        } else {
+            // If the node doesn't exist, return undefined
+            return undefined;
+        }
+    }
+
+    /**
+     * Gets all nodes incoming to the given node.
+     * @param {String} target Node to check
+     * @returns Array of incoming nodes
+     */
+    getIncomingNodes(target) {
+        // Get all nodes if undirected
+        if (!this.isDirected) {
+            return this.getAdjacentNodes(target);
+        }
+
+        let nodes = [];
+
+        // Check if the node exists
+        if (this.#nodes.has(target)) {
+            this.#nodes.get(target).edges.forEach(edge => {
+                if (edge.target === target) {
+                    nodes.push(edge.source);
+                }
+            });
+
+            return nodes;
+        } else {
+            // If the node doesn't exist, return undefined
+            return undefined;
+        }
+    }
+
+    /**
+     * Gets all nodes outgoing from the given node.
+     * @param {String} source Node to check
+     * @returns Array of outgoing nodes
+     */
+    getOutgoingNodes(source) {
+        // Get all nodes if undirected
+        if (!this.isDirected) {
+            return this.getAdjacentNodes(source);
+        }
+
+        let nodes = [];
+
+        // Check if the node exists
+        if (this.#nodes.has(source)) {
+            this.#nodes.get(source).edges.forEach(edge => {
+                if (edge.source === source) {
+                    nodes.push(edge.target);
+                }
+            });
+
+            return nodes;
+        } else {
+            // If the node doesn't exist, return undefined
+            return undefined;
+        }
+    }
+
+    /**
+     * Gets the node opposite the given on the given edge.
+     * @param {String} nodeId Id of the node to check for
+     * @param {String} edgeId Id of the edge to check (Source,Target format)
+     * @throws if nodeId does not exist in the graph, or if the given edge does not exist
+     * @returns Id of the node opposite the given
+     */
+    getOppositeNode(nodeId, edgeId) {
+        // Error checking
+        // Note that for getters, we usually just return undefined if the node or edge doesn't exist. I am adding
+        // detailed error messages in an attempt to debug some Algorithm functions. Feel free to change these to just
+        // return undefined to make it consistent with the rest of the graph functions
+        if (!this.#nodes.has(nodeId)) {
+            throw new Error("Cannot get opposite node of node \"" + nodeId + "\" because it does not exist in the graph");
+        }
+        if (!this.#nodes.get(nodeId).edges.has(edgeId)) {
+            throw new Error("Cannot get the opposite of edge \"" + edgeId + "\" because it does not exist in the graph");
+        }
+
+        // Get the edge
+        let edge = this.#nodes.get(nodeId).edges.get(edgeId);
+        if (!edge) return undefined;
+
+        // Return the id of the opposite node
+        return (edge.source === nodeId) ? edge.target : edge.source;
+    }
+
+    /**
+     * Gets the position of a given node.
+     * @param {String} nodeId Node id
+     * @returns Node position
+     */
+    getNodePosition(nodeId) {
+        // Get the node
+        let node = this.#nodes.get(nodeId);
+
+        if (node) {
+            return node.position;
+        } else {
+            // If the node doesn't exist, return undefined
+            return undefined;
+        }
+    }
+
+    /**
+     * Gets an attribute value for a given node.
+     * @param {String} nodeId Node id
+     * @param {String} name Attribute name
+     * @returns Attribute value
+     */
+    getNodeAttribute(nodeId, name) {
+        // Get the node
+        let node = this.#nodes.get(nodeId);
+
+        if (node) {
+            return node.attributes.get(name);
+        } else {
+            // If the node doesn't exist, return undefined
+            return undefined;
+        }
+    }
+
+    /**
+     * Gets an attribute value for a given edge.
+     * @param {String} source Source node id
+     * @param {String} target Target node id
+     * @param {String} name Attribute name
+     * @returns Attribute value
+     */
+    getEdgeAttribute(source, target, name) {
+        // Verify the edge exists and get it
+        let sourceNode = this.#nodes.get(source);
+        let targetNode = this.#nodes.get(target);
+        let edge = sourceNode && targetNode && sourceNode.edges.get(`${source},${target}`);
+
+        if (edge) {
+            return edge.getAttribute(name);
+        } else {
+            // If the edge doesn't exist, return undefined
+            return undefined;
+        }
     }
 
 
@@ -119,6 +463,7 @@ export class Graph {
      */
     #clear() {
         this.#nodes = new Map();
+        this.#headerComments = ""; // Reset the header comment
     }
 
     /**
@@ -132,10 +477,10 @@ export class Graph {
         this.#scalar = 500 / max;
     }
 
-    #getScalar() {
-        return this.#scalar;
-    }
-
+    /**
+     * Gets this graph's nodes
+     * @returns This graph's nodes
+     */
     #getNodes() {
         return this.#nodes;
     }
@@ -147,8 +492,14 @@ export class Graph {
      * @param {String} nodeId Optional argument for setting a predetermined 
      * @param {Object} attributes Initial attributes of the node
      * @returns ChangeObject representing adding a node
+     * @throw new Errorhrows Error if nodeId already exists in nodes
      */
     #addNode(x, y, nodeId, attributes) {
+        // Throw an error if the id is a duplicate
+        if (nodeId && this.#nodes.has(nodeId)) {
+            throw new Error("Cannot add node with duplicate ID");
+        }
+
         // If the nodeId argument is passed, use that, otherwise generate an id
         nodeId = nodeId || generateId(this.#nodes);
 
@@ -158,7 +509,7 @@ export class Graph {
 
         // Set the attributes
         for (let name in attributes) {
-            node.attributes.has(name) && node.attributes.set(name, attributes[name]);
+            node.attributes.set(name, attributes[name]);
         }
 
         // Return a new change object
@@ -184,14 +535,18 @@ export class Graph {
      * @param {String} target Target node id
      * @param {Object} attributes Initial attributes of the edge
      * @returns ChangeObject representing adding an edge
+     * @throws Error if either source or target do not exist in nodes
      */
     #addEdge(source, target, attributes) {
+        // Error checking
+        this.#verifyNodes(source, target, "create edge");
+
         // Create the edge object
         let edge = new Edge(source, target);
 
         // Set the attributes
         for (let name in attributes) {
-            edge.attributes.has(name) && edge.attributes.set(name, attributes[name]);
+            edge.attributes.set(name, attributes[name]);
         }
 
         // Add the edge to both the source and target's adjacency lists
@@ -211,10 +566,6 @@ export class Graph {
      * @returns ChangeObject containing the message
      */
     #addMessage(message) {
-        // Create a new message object
-        // NOTE: currently doing nothing with this
-        const newMessage = new Message(message);
-
         // Return a new ChangeObject
         return new ChangeObject("message", null, {
             message: message
@@ -234,6 +585,11 @@ export class Graph {
         // Get a reference to the node
         const node = this.#nodes.get(nodeId);
 
+        // Error checking
+        if (!node) {
+            throw new Error("Cannot delete node " + nodeId + " because it does not exist in the graph");
+        }
+
         // Delete each edge and push the change objects into the array
         node.edges.forEach(edge => {
             changeObjects.push(this.#deleteEdge(edge.source, edge.target));
@@ -243,7 +599,7 @@ export class Graph {
         changeObjects.push(new ChangeObject("deleteNode", {
             id: node.id,
             position: node.position,
-            attributes: JSON.stringify(node.attributes)
+            attributes: node.attributes
         }, null));
 
         // Finally, delete the node from the nodes list
@@ -254,12 +610,43 @@ export class Graph {
     }
 
     /**
+     * Verifies that the nodes source and target exist. If they do not both exist,
+     * an exception with a detailed error message is thrown.
+     *
+     * @param {String} source the first node to check
+     * @param {String} target the second node to check
+     * @param {String} action the action to show in the error message. For example,
+     *                        if you are trying to add an edge, this string should
+     *                        be "add an edge", so that the exception message will
+     *                        be shown as "Cannot add an edge because ..."
+     * @throws exception if either the source or target nodes do not exist
+     */
+    #verifyNodes(source, target, action) {
+        // Error checking
+        if (!this.#nodes.has(source) && !this.#nodes.has(target)) {
+            throw new Error("Cannot " + action + " because neither the source (" + source + ") nor the" + 
+                  " target (" + target + ") node exist in the graph");
+        }
+        if (!this.#nodes.has(source)) {
+            throw new Error("Cannot " + action + " because the source node (" + source + ")" +
+                  " does not exist in the graph");
+        }
+        if (!this.#nodes.has(target)) {
+            throw new Error("Cannot " + action + " because the target node (" + target + ")" +
+                  " does not exist in the graph");
+        }
+    }
+
+    /**
      * Deletes the specified edge and creates the appropriate ChangeObject.
      * @param {String} source ID of the source node
      * @param {String} target ID of the target node
      * @returns ChangeObject representing the deleted edge
      */
     #deleteEdge(source, target) {
+        // Error checking
+        this.#verifyNodes(source, target, "delete edge");
+
         // Get a copy of the attributes
         const attributes = this.#nodes.get(source).edges.get(`${source},${target}`).attributes;
 
@@ -271,7 +658,7 @@ export class Graph {
         return new ChangeObject("deleteEdge", {
             source: source,
             target: target,
-            attributes: JSON.stringify(attributes)
+            attributes: attributes
         }, null);
     }
 
@@ -285,6 +672,11 @@ export class Graph {
     #setNodePosition(nodeId, x, y) {
         // Get a reference to the node
         const node = this.#nodes.get(nodeId);
+
+        // Error checking
+        if (!node) {
+            throw new Error("Cannot set position of node " + nodeId + " because it does not exist in the graph");
+        }
 
         // Store old and new values for the position
         let oldPosition = node.position;
@@ -315,6 +707,10 @@ export class Graph {
      * @returns A ChangeObject representing the attribute change
      */
     #setNodeAttribute(nodeId, name, value) {
+        if (!this.#nodes.has(nodeId)) {
+            throw new Error("Cannot set attribute of node " + nodeId + " because the node does not exist in the graph");
+        }
+
         // Get a reference to the node
         const node = this.#nodes.get(nodeId);
 
@@ -341,6 +737,43 @@ export class Graph {
     }
 
     /**
+     * Sets a new value for an attribute for all nodes and creates an array
+     * of corresponding ChangeObjects.
+     * @param {String} name Name of the attribute to set
+     * @param {*} value Value to set for the attribute
+     * @returns An array of ChangeObjects representing the changes
+     */
+    #setNodeAttributeAll(name, value) {
+        // Keep an array of ChangeObjects for the delete step
+        const changeObjects = [];
+
+        this.#nodes.forEach(node => {
+            // Store the old value
+            let oldValue = node.attributes.get(name);
+
+            // Update the node's attribute
+            node.attributes.set(name, value);
+
+            // Push a new change object
+            changeObjects.push(new ChangeObject("setNodeAttribute", {
+                id: node.id,
+                attribute: {
+                    name: name,
+                    value: oldValue
+                }
+            }, {
+                id: node.id,
+                attribute: {
+                    name: name,
+                    value: value
+                }
+            }));
+        });
+
+        return changeObjects;
+    }
+
+    /**
      * Sets a new value for an attribute within an edge and creates a corresponding
      * ChangeObject to record the change.
      * @param {String} source Source node of the edge for which to set an attribute value
@@ -350,6 +783,9 @@ export class Graph {
      * @returns A ChangeObject representing the attribute change
      */
     #setEdgeAttribute(source, target, name, value) {
+        // Error checking
+        this.#verifyNodes(source, target, "set attribute of edge");
+
         // Get a reference to the edge
         const edge = this.#nodes.get(source).edges.get(`${source},${target}`);
 
@@ -377,66 +813,136 @@ export class Graph {
         });
     }
 
-    /** Breifly implemented, debugging and polishing needed */
-    #undoChange(change) {
-        switch (change.type) {
-            case "addNode":
-                this.#nodes.delete(change.new.id);
-                break;
-            case "deleteNode":
-                this.#nodes.set(change.old.id, new Node(change.old.id, change.old.position.x, change.old.position.y));
-                break;
-            case "addEdge":
-                this.#nodes.get(change.new.source).edges.delete(`${change.new.source},${change.new.target}`);
-                this.#nodes.get(change.new.target).edges.delete(`${change.new.source},${change.new.target}`);
-                break;
-            case "deleteEdge":
-                this.#nodes.get(change.old.source).edges.set(`${change.old.source},${change.old.target}`, new Edge(change.old.source, change.old.target));
-                this.#nodes.get(change.old.target).edges.set(`${change.old.source},${change.old.target}`, new Edge(change.old.source, change.old.target));
-                break;
-            case "setNodePosition":
-                this.#nodes.get(change.old.id).position = change.old.position;
-                break;
-            case "setNodeAttribute":
-                this.#nodes.get(change.old.id).attributes.set(change.old.attribute.name, change.old.attribute.value);
-                break;
-            case "setEdgeAttribute":
-                this.#nodes.get(change.old.source).edges.get(`${change.old.source},${change.old.target}`).attributes.set(change.old.attribute.name, change.old.attribute.value);
-                break;
-            default:
-                break;
-        }
+    /**
+     * Sets a new value for an attribute for all edges and creates an array
+     * of corresponding ChangeObjects.
+     * @param {String} name Name of the attribute to set
+     * @param {*} value Value to set for the attribute
+     * @returns An array of ChangeObjects representing the changes
+     */
+    #setEdgeAttributeAll(name, value) {
+        // Keep an array of ChangeObjects for the delete step
+        const changeObjects = [];
+
+        // Get the edges
+        const edges = [];
+        this.#nodes.forEach(node => {
+            node.edges.forEach((edge) => {
+                if (edge.source === node.id) {
+                    edges.push(edge);
+                }
+            });
+        });
+
+        edges.forEach(edge => {
+            // Store the old value
+            let oldValue = edge.attributes.get(name);
+
+            // Update the edge's attribute
+            edge.attributes.set(name, value);
+
+            // Push a new change object
+            changeObjects.push(new ChangeObject("setEdgeAttribute", {
+                source: edge.source,
+                target: edge.target,
+                attribute: {
+                    name: name,
+                    value: oldValue
+                }
+            }, {
+                source: edge.source,
+                target: edge.target,
+                attribute: {
+                    name: name,
+                    value: value
+                }
+            }));
+        });
+
+        return changeObjects;
+    }
+
+    /**
+     * Undoes the ChangeObjects in a given step
+     * @param {Array[ChangeObject]} changes Array of ChangeObjects in the step
+     */
+    #undoStep(changes) {
+        // Reverse the changes to go through them backwards
+        changes = changes.toReversed();
+
+        changes.forEach(change => {
+            switch (change.action) {
+                case "addNode":
+                    this.#nodes.delete(change.current.id);
+                    break;
+                case "deleteNode":
+                    this.#nodes.set(change.previous.id, new Node(change.previous.id, change.previous.position.x, change.previous.position.y));
+                    let node = this.#nodes.get(change.previous.id);
+                    change.previous.attributes.forEach((value, key) => {
+                        node.attributes.set(key, value);
+                    });
+                    break;
+                case "addEdge":
+                    this.#nodes.get(change.current.source).edges.delete(`${change.current.source},${change.current.target}`);
+                    this.#nodes.get(change.current.target).edges.delete(`${change.current.source},${change.current.target}`);
+                    break;
+                case "deleteEdge":
+                    this.#nodes.get(change.previous.source).edges.set(`${change.previous.source},${change.previous.target}`, new Edge(change.previous.source, change.previous.target));
+                    this.#nodes.get(change.previous.target).edges.set(`${change.previous.source},${change.previous.target}`, new Edge(change.previous.source, change.previous.target));
+                    let edge = this.#nodes.get(change.previous.source).edges.get(`${change.previous.source},${change.previous.target}`);
+                    change.previous.attributes.forEach((value, key) => {
+                        edge.attributes.set(key, value);
+                    });
+                    break;
+                case "setNodePosition":
+                    this.#nodes.get(change.previous.id).position = change.previous.position;
+                    break;
+                case "setNodeAttribute":
+                    this.#nodes.get(change.previous.id).attributes.set(change.previous.attribute.name, change.previous.attribute.value);
+                    break;
+                case "setEdgeAttribute":
+                    this.#nodes.get(change.previous.source).edges.get(`${change.previous.source},${change.previous.target}`).attributes.set(change.previous.attribute.name, change.previous.attribute.value);
+                    break;
+                default:
+                    break;
+            }
+        });
     }
     
-    /** Breifly implemented, debugging and polishing needed */
-    #redoChange(change) {
-        switch (change.type) {
-            case "addNode":
-                this.#nodes.set(change.new.id, new Node(change.new.id, change.new.position.x, change.new.position.y));
-                break;
-            case "deleteNode":
-                this.#nodes.delete(change.old.id);
-                break;
-            case "addEdge":
-                this.#nodes.get(change.new.source).edges.set(`${change.new.source},${change.new.target}`, new Edge(change.new.source, change.new.target));
-                this.#nodes.get(change.new.target).edges.set(`${change.new.source},${change.new.target}`, new Edge(change.new.source, change.new.target));
-                break;
-            case "deleteEdge":
-                this.#nodes.get(change.old.source).edges.delete(`${change.old.source},${change.old.target}`);
-                this.#nodes.get(change.old.target).edges.delete(`${change.old.source},${change.old.target}`);
-                break;
-            case "setNodePosition":
-                this.#nodes.get(change.new.id).position = change.new.position;
-                break;
-            case "setNodeAttribute":
-                this.#nodes.get(change.new.id).attributes.set(change.new.attribute.name, change.new.attribute.value);
-                break;
-            case "setEdgeAttribute":
-                this.#nodes.get(change.new.source).edges.get(`${change.new.source},${change.new.target}`).attributes.set(change.new.attribute.name, change.new.attribute.value);
-                break;
-            default:
-                break;
-        }
+    /**
+     * Redoes the ChangeObjects in a given step
+     * @param {Array[ChangeObject]} changes Array of ChangeObjects in the step
+     */
+    #redoStep(changes) {
+        changes.forEach(change => {
+            switch (change.action) {
+                case "addNode":
+                    this.#nodes.set(change.current.id, new Node(change.current.id, change.current.position.x, change.current.position.y));
+                    break;
+                case "deleteNode":
+                    this.#nodes.delete(change.previous.id);
+                    break;
+                case "addEdge":
+                    this.#nodes.get(change.current.source).edges.set(`${change.current.source},${change.current.target}`, new Edge(change.current.source, change.current.target));
+                    this.#nodes.get(change.current.target).edges.set(`${change.current.source},${change.current.target}`, new Edge(change.current.source, change.current.target));
+                    break;
+                case "deleteEdge":
+                    this.#nodes.get(change.previous.source).edges.delete(`${change.previous.source},${change.previous.target}`);
+                    this.#nodes.get(change.previous.target).edges.delete(`${change.previous.source},${change.previous.target}`);
+                    break;
+                case "setNodePosition":
+                    this.#nodes.get(change.current.id).position = change.current.position;
+                    break;
+                case "setNodeAttribute":
+                    this.#nodes.get(change.current.id).attributes.set(change.current.attribute.name, change.current.attribute.value);
+                    break;
+                case "setEdgeAttribute":
+                    this.#nodes.get(change.current.source).edges.get(`${change.current.source},${change.current.target}`).attributes.set(change.current.attribute.name, change.current.attribute.value);
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
     /**
@@ -446,7 +952,6 @@ export class Graph {
     #privateMethods = {
         clear: this.#clear,
         scale: this.#scale,
-        getScalar: this.#getScalar,
         getNodes: this.#getNodes,
         addNode: this.#addNode,
         addEdge: this.#addEdge,
@@ -455,11 +960,15 @@ export class Graph {
         deleteEdge: this.#deleteEdge,
         setNodePosition: this.#setNodePosition,
         setNodeAttribute: this.#setNodeAttribute,
+        setNodeAttributeAll: this.#setNodeAttributeAll,
         setEdgeAttribute: this.#setEdgeAttribute,
-        undoChange: this.#undoChange,
-        redoChange: this.#redoChange,
+        setEdgeAttributeAll: this.#setEdgeAttributeAll,
+        undoStep: this.#undoStep,
+        redoStep: this.#redoStep,
+        addComment: this.#addComment
     }
 }
 
 /** Export a single instance of Graph */
-export default new Graph();
+const graphInstance = new Graph();
+export default graphInstance;

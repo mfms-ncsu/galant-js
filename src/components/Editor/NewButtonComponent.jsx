@@ -15,7 +15,6 @@ import { Fragment } from "react";
 import { PlusIcon } from '@heroicons/react/24/solid';
 import { Menu, Transition } from '@headlessui/react';
 import { useRef, useEffect } from "react";
-import { useGraphContext } from 'pages/GraphView/utils/GraphContext';
 
 
 /**
@@ -25,7 +24,6 @@ import { useGraphContext } from 'pages/GraphView/utils/GraphContext';
  * @returns {React.ReactElement}
  */
 export default function NewButtonComponent({addTab, examples}) {
-    const graphContext = useGraphContext();
     const button = useRef(null);
 
     // Effect hook to handle keyboard shortcut for opening New button

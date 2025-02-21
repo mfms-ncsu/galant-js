@@ -5,10 +5,6 @@
  * @author Julian Madrigal
  */
 
-import Graph from "utils/Graph";
-import { StringifyGraphSnapshot } from "./PredicateToFile";
-import { transformPositions, roundPositions, applyPositions, extractPositions } from "./GraphUtils";
-
 const sharedWorker = new SharedWorker('./worker.js');
 const messageHandlers = {};
 
@@ -20,27 +16,6 @@ const messageHandlers = {};
  */
 export function postMessage(data) {
     sharedWorker.port.postMessage([data])
-}
-
-/**
- * Sends a graph-update message to the SharedWorker which will broadcast the message to the graph editor
- * This function handles tranforming the positions based on its scalar.
- * @param {Graph} graph The graph to save
- */
-export function saveGraph(graphSnapshot) {
-    const positions = extractPositions(graphSnapshot);
-    // Tranforming positions is causing problems. Solution is to have a scalar defined in the graph text to avoid scalar issues. This can be generated after the fact for small graphs without it
-    const transformedPositions = transformPositions(positions, 1);// 1 / graphSnapshot.scalar);
-    const finalPositions = roundPositions(transformedPositions);
-    console.log("SCALAR", graphSnapshot.scalar);
-    const finalGraph = applyPositions(graphSnapshot, finalPositions);
-    const graphText = StringifyGraphSnapshot(finalGraph);
-    
-    postMessage({
-        message: 'graph-update',
-        name: graphSnapshot.name,
-        graph: graphText
-    });
 }
 
 /**
@@ -83,4 +58,4 @@ sharedWorker.port.onmessage = (({ data }) => {
 })
 
 
-export default { saveGraph, on, postMessage, remove }
+export default { on, postMessage, remove }
