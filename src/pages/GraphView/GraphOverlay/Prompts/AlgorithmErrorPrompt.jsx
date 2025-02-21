@@ -10,7 +10,7 @@
  * @returns {React.ReactElement} Returns modal displaying error information
  * @author Julian Madrigal
  */
-export default function AlgorithmErrorPrompt({prompt, callback}) {
+export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
     const errorObject = prompt.errorObject;
     const algorithmCode = prompt.algorithmCode;
 
@@ -47,13 +47,11 @@ export default function AlgorithmErrorPrompt({prompt, callback}) {
     }
 
     return (
-        <div className="absolute flex items-center justify-center inset-0 z-10 py-8">
-            <div className="flex flex-col max-h-full bg-gray-50 p-4 rounded shadow-lg ring-1 ring-gray-200">
-                <span className="block text-center text-red-500 font-semibold">{title}</span>
-                <span className="block text-center text-red-500">{error}</span>
-                <pre className="overflow-auto">{code}</pre>
-                <button className="w-full py-2 mt-8 rounded font-semibold bg-blue-500 text-white" onClick={callback}>Okay</button>
-            </div>
+        <div className="flex flex-col max-h-full bg-gray-100 p-4 rounded-xl" ref={promptRef}>
+            <span className="block text-center text-red-500 font-semibold pointer-events-none select-none">{title}</span>
+            <span className="block text-center text-red-500 pointer-events-none select-none">{error}</span>
+            <pre className="overflow-auto my-4">{code}</pre>
+            <button className="w-full py-2 rounded-full font-semibold bg-blue-500 hover:bg-blue-600 transition-all text-white" onClick={callback}>Okay</button>
         </div>
     )
 }
