@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Graph from "graph/Graph";
+import { useAlgorithmContext } from 'pages/GraphView/utils/AlgorithmContext';
 
 /**
  * EdgeContextMenu defines the React Component that should be displayed when a user right clicks an edge in cytoscape.
@@ -11,6 +12,7 @@ import Graph from "graph/Graph";
  * @returns {React.ReactElement}
  */
 export default function EdgeContextMenu() {
+    const { algorithm, setAlgorithm } = useAlgorithmContext();
     const [visible, setVisible] = useState(false);
     const [edge, setEdge] = useState(null);
     const [renderedPosition, setRenderedPosition] = useState({x: 0, y: 0});
@@ -40,7 +42,7 @@ export default function EdgeContextMenu() {
 
             // Set the rendering position
             event.renderedPosition = event.renderedPosition || {x: 0, y: 0}; // During cypress, renderedPosition is null
-            setRenderedPosition({x: event.renderedPosition.x + 50, y: event.renderedPosition.y + 60});
+            setRenderedPosition({x: event.renderedPosition.x + 15, y: event.renderedPosition.y + 15});
 
             // Use click to hide the menu
             document.addEventListener('click', () => setVisible(false), { once: true });
@@ -81,22 +83,19 @@ export default function EdgeContextMenu() {
         event.target.blur();
     }
 
-    return (visible && 
+    return !algorithm && (visible && 
         // This div contains the position settings, and onClick, to stop propagation to document.
-        <div id="edge-context-menu" className="p-2 ring-1 rounded bg-white shadow-lg ring-gray-300"  onClick={(event) => event.stopPropagation()} style={{position: 'fixed', top: renderedPosition.y + 'px', left: renderedPosition.x + 'px'}}>
-
+        <div id="edge-context-menu" className="p-4 rounded-xl bg-white shadow-lg"  onClick={(event) => event.stopPropagation()} style={{position: 'fixed', top: renderedPosition.y + 'px', left: renderedPosition.x + 'px'}}>
             <div>
                 <label className="block text-gray-500">Weight</label>
                 <input id="edge-weight" className="p-1 rounded bg-gray-200" value={values.weight} onChange={(event) => onChangeValue('weight', event.target.value)} onBlur={update} onKeyDown={onEnterPressed} placeholder="Enter weight"/>
             </div>
-
-            
-            <div>
+            <div className="mt-1">
                 <label className="block text-gray-500">Label</label>
                 <input id="edge-label" className="p-1 rounded bg-gray-200" value={values.label} onChange={(event) => onChangeValue('label', event.target.value)} onBlur={update} onKeyDown={onEnterPressed} placeholder="Enter label"/>
             </div>
             
-            <button id="edge-delete-button" className="block w-full p-1 mt-2 rounded bg-red-500 text-white font-semibold hover:bg-red-700" onClick={deleteEdge}>Delete Edge</button>
+            <button id="edge-delete-button" className="block w-full p-2 mt-2 rounded-full bg-red-500 text-white font-semibold hover:bg-red-600 transition-all" onClick={deleteEdge}>Delete Edge</button>
         </div>
 
 

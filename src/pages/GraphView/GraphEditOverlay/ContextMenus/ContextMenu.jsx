@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Graph from "graph/Graph";
+import { useAlgorithmContext } from 'pages/GraphView/utils/AlgorithmContext';
 
 
 /**
@@ -14,6 +15,7 @@ import Graph from "graph/Graph";
  * @returns {React.ReactElement}
  */
 export default function ContextMenu() {
+    const { algorithm, setAlgorithm } = useAlgorithmContext();
     const [visible, setVisible] = useState(false);
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [renderedPosition, setRenderedPosition] = useState({ x: 0, y: 0 });
@@ -30,7 +32,7 @@ export default function ContextMenu() {
 
             // Position the menu
             setPosition(event.position);
-            setRenderedPosition({ x: event.renderedPosition.x + 40, y: event.renderedPosition.y + 50 });
+            setRenderedPosition({ x: event.renderedPosition.x + 15, y: event.renderedPosition.y + 15 });
             setValues({});
             setVisible(true);
 
@@ -84,16 +86,18 @@ export default function ContextMenu() {
     }
 
 
-    return (visible &&
-        <div id="edit-context-menu" className="p-2 ring-1 rounded bg-white ring-gray-300 shadow-lg" style={{ position: 'fixed', top: renderedPosition.y + 'px', left: renderedPosition.x + 'px' }} onMouseDown={(event) => event.stopPropagation()}>
-            <button className="block w-full p-1 rounded bg-blue-500 text-white font-semibold hover:bg-blue-700" onClick={addNode}>New Node</button>
+    return !algorithm && (visible &&
+        <div id="edit-context-menu" className="p-4 rounded-xl bg-white shadow-lg" style={{ position: 'fixed', top: renderedPosition.y + 'px', left: renderedPosition.x + 'px' }} onMouseDown={(event) => event.stopPropagation()}>
+            <button className="block w-full p-2 rounded-full bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-all" onClick={addNode}>New Node</button>
 
-            <div className="h-[1px] w-full my-2 bg-gray-200" />
+            <div className="h-[1px] w-full my-4 bg-gray-300" />
 
             <div className="mt-2">
+                <div className="flex flex-row">
                 <input className="p-1 rounded bg-gray-200" size={12} placeholder="Source" value={values.source} onChange={(event) => changeValue('source', event.target.value)} />
                 <input className="p-1 ml-2 rounded bg-gray-200" size={12} placeholder="Destionation" onChange={(event) => changeValue('destination', event.target.value)} />
-                <button className="block w-full p-1 mt-1 rounded bg-blue-500 text-white font-semibold" onClick={addEdge}>New Edge</button>
+                </div>
+                <button className="block w-full p-2 mt-2 rounded-full bg-blue-500 hover:bg-blue-600 transition-all text-white font-semibold" onClick={addEdge}>New Edge</button>
             </div>
         </div>
 
