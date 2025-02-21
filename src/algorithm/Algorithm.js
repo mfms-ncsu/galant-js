@@ -116,6 +116,7 @@ export default class Algorithm {
         if (Graph.algorithmChangeManager.getIndex() === Graph.algorithmChangeManager.getLength()) {
             this.fetchingSteps = true;
             this.resumeThread(); // Resume the thread
+            this.#setupTimeout() // Set the timer
 
             // Once the step is complete:
             this.onStepAdded = () => {
@@ -138,6 +139,7 @@ export default class Algorithm {
         if (Graph.algorithmChangeManager.getIndex() === Graph.algorithmChangeManager.getLength()) {
             this.fetchingSteps = true;
             this.resumeThread(); // Resume the thread
+            this.#setupTimeout() // Set the timer
 
             // Once the step is complete:
             this.onStepAdded = () => {
@@ -246,7 +248,6 @@ export default class Algorithm {
                 break;
  
             case "startRecording":
-                this.#setupTimeout(); // Start the timeout timer
                 Graph.algorithmChangeManager.startRecording();
                 break;
             case "endRecording":
@@ -255,9 +256,11 @@ export default class Algorithm {
                 if (this.onStepAdded) this.onStepAdded();
                 break;
             case "step":
+                clearTimeout(this.#timeoutId);
                 if (this.onStepAdded) this.onStepAdded();
                 break;
             case "complete":
+                clearTimeout(this.#timeoutId);
                 if (this.onStepAdded) this.onStepAdded();
                 this.completed = true;
                 break;
