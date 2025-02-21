@@ -18,7 +18,6 @@ const typeMapping = {
 export default function PromptComponent() {
     const PromptService = useContext(PromptContext);
     const [currentPrompt, setCurrentPrompt] = useState(null);
-    const [promptPosition, setPromptPosition] = useState({x: 0, y: 0});
     const [dragPosition, setDragPosition] = useState({ x: 50, y: 50 });
     const promptRef = useRef();
 
@@ -37,13 +36,12 @@ export default function PromptComponent() {
         setCurrentPrompt(null); 
     }
 
+    let promptX, promptY; // Store the location within the prompt being clicked here
     function onMouseDown(event) {
         if (event.target !== promptRef.current) return;
         let pos = event.target.getBoundingClientRect();
-        setPromptPosition({
-            x: event.pageX - pos.x,
-            y: event.pageY - pos.y
-        });
+        promptX = event.pageX - pos.x;
+        promptY = event.pageY - pos.y;
         event.stopPropagation();
         event.preventDefault();
         document.addEventListener('mousemove', onMouseMove);
@@ -60,8 +58,8 @@ export default function PromptComponent() {
     function onMouseMove(event) {
         if (event.target !== promptRef.current) return;
         setDragPosition({
-            x: event.pageX - promptPosition.x,
-            y: event.pageY - promptPosition.y
+            x: event.pageX - promptX,
+            y: event.pageY - promptY
         });
         event.stopPropagation();
         event.preventDefault();
