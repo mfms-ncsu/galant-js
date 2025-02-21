@@ -1,4 +1,5 @@
 import { Graph } from "graph/Graph";
+import { useAlgorithmContext } from 'pages/GraphView/utils/AlgorithmContext';
 
 /**
  * Execution environment for algorithms. This file provides all necessary functions
@@ -9,9 +10,15 @@ import { Graph } from "graph/Graph";
  */
 
 /**
- * The array has one purpose: telling the thread to run or wait with Atomics.wait().
+ * The array has one main purpose: telling the thread to run or wait with Atomics.wait().
  * If sharedArray[0] is 0, that means the Thread should wait. Once it is changed, the 
  * Thread wakes up from Atoimics.notify() from the Handler.
+ * 
+ * The array has a secondary purpose as well. If sharedArray[1] is 1,
+ * then the algoriithm is currently running in debug mode. This means
+ * that we should not execute code in a step() method atomically, we
+ * should execute the statements in the step one at a time, as if they
+ * weren't in a step at all.
  */
 let sharedArray;
 
@@ -59,13 +66,23 @@ function step(code=null) {
     if (code == null || code == undefined) {
         throw new Error("Invalid code in step. Code cannot be null or undefined.");
     }
-    
-    // Tell the ChangeManager to start recording our changes
-    postMessage({action: "startRecording"});
-    isInStep = true;
+
+    // Set the debug flag, if necessary
+    graph.algorithmChangeManager.setDebugMode(sharedArray[1] == 1);
+
+    // Tell the ChangeManager to start recording our changes, but only
+    // if we are not in debug mode
+    if (sharedArray[1] == 0) {
+        postMessage({action: "startRecording"});
+        isInStep = true;
+    }
 
     // Execute the code in this step
     code();
+    
+    // Set the debug mode again, since it may have changed in the
+    // code
+    graph.algorithmChangeManager.setDebugMode(sharedArray[1] == 1);
     
     // End the recording of the steps
     postMessage({action: "endRecording"});
@@ -574,7 +591,6 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
     message = message.data;
     if (message[0] === "shared") {
         sharedArray = message[1];
-
     } else if (message[0] === "graph/algorithm") {
         // Load the graph with isDirected flag
         graph.fileParser.loadGraph(message[1]);

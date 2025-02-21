@@ -13,6 +13,9 @@ export default class Algorithm {
     /** The number of miliseconds before a timeout happens. DONT CHANGE THIS */
     #timeoutPeriod = 5000;
 
+    /** A flag that determines if the algorithm is in debug mode */
+    debugMode = false;
+
     /**
      * Constructs a new Algorithm with name, code, a shared array, and a thread worker.
      * @param {String} name Algorithm name
@@ -22,6 +25,7 @@ export default class Algorithm {
         this.name = name;
         this.code = code;
         this.array = new Int32Array(new SharedArrayBuffer(1024));
+        this.array[1] = 0;
 
         this.PromptService = PromptService;
 
@@ -62,6 +66,28 @@ export default class Algorithm {
                 algorithmCode: this.code
             }, () => { });
         }, this.#timeoutPeriod);
+    }
+    
+    /**
+     * Returns the step of the current algorithm
+     */
+    getAlgorithmStep() {
+        return Graph.algorithmChangeManager.getStepNumber();
+    }
+
+    /**
+     * Returns the total length of the algorithm
+     */
+    getTotalSteps() {
+        return Graph.algorithmChangeManager.getLastStep();
+    }
+
+    /**
+     * Toggles the debug mode on or off
+     */
+    toggleDebugMode() {
+        this.debugMode = !this.debugMode;
+        this.array[1] = this.debugMode ? 1 : 0;
     }
 
     /**
@@ -239,14 +265,20 @@ export default class Algorithm {
             case "setEdgeAttributeAll":
                 Graph.algorithmChangeManager.setEdgeAttributeAll(message.name, message.value);
                 break;
- 
             case "startRecording":
                 this.#setupTimeout(); // Start the timeout timer
                 Graph.algorithmChangeManager.startRecording();
                 break;
             case "endRecording":
+                
                 clearTimeout(this.#timeoutId);
-                Graph.algorithmChangeManager.endRecording();
+                // End the recording, but only if it started. It is
+                // possible that the user was in debug mode, which
+                // means that the recording was never actually
+                // started
+                if (Graph.algorithmChangeManager.isRecording()) {
+                    Graph.algorithmChangeManager.endRecording();
+                }
                 if (this.onStepAdded) this.onStepAdded();
                 break;
             case "step":

@@ -8,10 +8,23 @@
  * @author Krisjian Smith
  */
 export default class ChangeManager {
+    
+    /**
+     * This flag is set to true if this ChangeManager is being used
+     * during the debug mode of an algorithm executing
+     */
+    #debug = false;
+
     /** Graph object for which change */
     #graph;
     /** List of steps containing changes */
     #changes;
+    /**
+     * List of step numbers associated with the above changes. Usually,
+     * this will just be [1, 2, 3, ... n ], but if the user enters
+     * debug mode during algorithm execution, it will be different
+     */
+    #changeSteps
     /** Current index within changes */
     #index;
 
@@ -47,6 +60,7 @@ export default class ChangeManager {
 
         // Create an empty representation of changes
         this.#changes = [];
+        this.#changeSteps = [];
         this.#index = 0;
 
         // Set up the temporary change list and isRecording flags
@@ -317,6 +331,33 @@ export default class ChangeManager {
         }
         return null;
     }
+    
+    /**
+     * Returns the step number of the last executed step
+     * @return the last step number executed
+     */
+    getStepNumber() {
+        if (this.#changeSteps.length === 0) {
+            return 0;
+        }
+        return this.#changeSteps[this.#index - 1];
+    }
+
+    /**
+     * Returns the step number of the last step in the list
+     */
+    getLastStep() {
+        return this.#changeSteps[this.#changeSteps.length - 1];
+    }
+
+    /**
+     * Controls the debug mode for this ChangeManager. When debug mode
+     * is active, the ChangeManager will record individual changes, even
+     * if startRecording() is called
+     */
+    setDebugMode(bool) {
+        this.#debug = bool;
+    }
 
     /**
      * Records a change and updates the index.
@@ -328,15 +369,21 @@ export default class ChangeManager {
         
         // Remove all changes after the current index
         this.#changes = this.#changes.slice(0, this.#index);
+        this.#changeSteps = this.#changeSteps.slice(0, this.#index);
 
-        // If we are recording, save the change to the temporary list of changes and
-        // return.
-        // NOTE: When recording, the cytoscape window will not be updated. This is important, as
-        //       we do not want the window to be updated when a recording is happening. Recordings
-        //       should be started when an algorithm is doing multiple things in one step. In this
-        //       case, we want everything to appear to happen at one time, but if the window was updated
-        //       with every change, we would be able to see every individual change
-        if (this.#isRecording) {
+        // If we are recording, save the change to the temporary
+        // list of changes and return.
+        // NOTE: When recording, the cytoscape window will not
+        //       be updated. This is important, as
+        //       we do not want the window to be updated when
+        //       a recording is happening. Recordings
+        //       should be started when an algorithm
+        //       is doing multiple things in one step. In this
+        //       case, we want everything to appear to happen
+        //       at one time, but if the window was updated
+        //       with every change, we would be able to see
+        //       every individual change
+        if (this.#isRecording && !this.#debug) {
             
             for (let changeObj of change) {
                 this.#currentChangeList.push(changeObj);
@@ -347,6 +394,22 @@ export default class ChangeManager {
 
         // Push the new change
         this.#changes.push(change);
+
+        // Push the associated step number. If we are in debug mode,
+        // then use the same step as the previous step (or 0 if there
+        // is no previous step). If we are not in debug mode, use
+        // index + 1
+        let step;
+        if (!this.#debug) {
+            step = this.#index == 0 ? 1 : this.#changeSteps[this.#index - 1] + 1;
+        }
+        else {
+            step = this.#index == 0 ? 1 : this.#changeSteps[this.#index - 1];
+        }
+        
+        console.log(step);
+        this.#changeSteps.push(step);
+        console.log(this.#changeSteps);
 
         // Increment the index
         this.#index++;
