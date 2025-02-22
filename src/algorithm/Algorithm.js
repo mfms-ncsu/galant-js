@@ -138,45 +138,46 @@ export default class Algorithm {
     }
 
     /**
-     * Moves forward a step.
+     * Sets the fetchingSteps variable. Every time this happens, the
+     * screen will be redrawn, so that the forward/backward buttons
+     * on the frontend will appear grayed out while an algorithm is
+     * happening
+     *
+     * @param bool the value to set fetchingSteps to
      */
-    stepForward() {
+    #setFetchingSteps(bool) {
+        this.fetchingSteps = bool;
+        this.setStatus({});
+    }
+
+    /**
+     * Moves forward some amount of steps.
+     *
+     * @param count (optional) the number of algorithm steps to
+     * take. If no value is given, only one step is taken.
+     */
+    stepForward(count) {
+
         if (!this.canStepForward()) return;
         if (Graph.algorithmChangeManager.getIndex() === Graph.algorithmChangeManager.getLength()) {
-            this.fetchingSteps = true;
+            this.#setFetchingSteps(true);
             this.resumeThread(); // Resume the thread
             this.#setupTimeout() // Set the timer
 
             // Once the step is complete:
             this.onStepAdded = () => {
-                this.fetchingSteps = false;
+                this.#setFetchingSteps(false);
             }
         } else {
             // Use redo if there are pre-loaded steps ahead of the index
             Graph.algorithmChangeManager.redo();
         }
-    }
+        
+        if (count === undefined) return;
 
-    /**
-     * Recursive call for skipToEnd.
-     * @param {Function} callback Function to call upon completion
-     */
-    skipToEndStep(callback) {
-        if (!this.canStepForward()) return;
-        if (Graph.algorithmChangeManager.getIndex() === Graph.algorithmChangeManager.getLength()) {
-            this.fetchingSteps = true;
-            this.resumeThread(); // Resume the thread
-            this.#setupTimeout() // Set the timer
-
-            // Once the step is complete:
-            this.onStepAdded = () => {
-                this.fetchingSteps = false;
-                if (callback) callback();
-            }
-        } else {
-            // Use redo if there are pre-loaded steps ahead of the index
-            Graph.algorithmChangeManager.redo();
-            if (callback) callback();
+        count--;
+        if (count > 0) {
+            this.stepForward(count); 
         }
     }
 
@@ -184,15 +185,7 @@ export default class Algorithm {
      * Skips to the end of the algorithm execution.
      */
     skipToEnd() {
-        let count = 0;
-        const algorithm = this;
-        function recursiveNext() {
-            if (count >= 250) return;
-            count++;
-            algorithm.skipToEndStep(recursiveNext);
-        }
-
-        recursiveNext();
+        this.stepForward(250);
     }
 
     /**

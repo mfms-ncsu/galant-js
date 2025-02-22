@@ -107,6 +107,14 @@ export default function AlgorithmControls() {
         Graph.algorithmChangeManager.clear();
     }
 
+    /**
+     * Method called when the "Skip to end" button is clicked
+     */
+    function skipToEnd() {
+        algorithm.skipToEnd();
+        setTimeout(updateStepText, 10);
+    }
+
     // Effect hook to handle keyboard shortcuts for stepping through the algorithm
     useEffect(() => {
         function handleKeyPress(event) {
@@ -125,8 +133,6 @@ export default function AlgorithmControls() {
 
     // Return if no algorithm is available
     if (!algorithm) return null;
-
-    // Create the step text
 
     return (
         <div>
@@ -162,7 +168,7 @@ export default function AlgorithmControls() {
                     <XCircleIcon id="terminate-algorithm" onClick={terminateAlgorithm} className="h-5 fill-gray-500 pointer-events-auto cursor-pointer hover:fill-black"/>
                 </button>
 
-                <button id="skip-to-end" className="h-6 w-15 p-1 rounded bg-green-100 pointer-events-auto" disabled={!algorithm.canStepForward()} onClick={() => algorithm.skipToEnd()}>Skip to End</button>
+                <button id="skip-to-end" className="h-6 w-15 p-1 rounded bg-green-100 pointer-events-auto" disabled={!algorithm.canStepForward()} onClick={skipToEnd}>Skip to End</button>
             </div>
         </div>
     );
