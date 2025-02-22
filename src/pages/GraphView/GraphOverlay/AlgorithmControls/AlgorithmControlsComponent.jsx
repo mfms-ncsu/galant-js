@@ -13,17 +13,29 @@ export default function AlgorithmControls() {
     const { algorithm, setAlgorithm } = useAlgorithmContext();
 
     const [debug, setDebug] = useState(false);
-
+    const [stepText, setStepText] = useState("Step 0");
+    
+    /**
+     * Updates the text in the step counter to show the current
+     * algorithm step
+     */
+    function updateStepText() {
+        setStepText(`Step ${algorithm.getStepNumber()}` + (algorithm.completed ? ` / ${algorithm.getTotalSteps()}` : ''));
+    }
+    
     // Function to handle pressing the forward button
     function frontButtonPress() {
         if (!algorithm || !algorithm.canStepForward()) return;
         algorithm.stepForward();
+        setTimeout(updateStepText, 10); // A timeout is required to
+                                        // fix a race condition
     } 
 
     // Function to handle pressing the backward button
     function backButtonPress() {
         if (!algorithm || !algorithm.canStepBack()) return;
         algorithm.stepBack();
+        setTimeout(updateStepText, 10);
     }
 
     /**
@@ -115,7 +127,6 @@ export default function AlgorithmControls() {
     if (!algorithm) return null;
 
     // Create the step text
-    const stepText = `Step ${algorithm.getAlgorithmStep()}` + (algorithm.completed ? ` / ${algorithm.getTotalSteps()}` : '');
 
     return (
         <div>

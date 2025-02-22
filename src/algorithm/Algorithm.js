@@ -27,6 +27,12 @@ export default class Algorithm {
         this.array = new Int32Array(new SharedArrayBuffer(1024));
         this.array[1] = 0;
 
+        // This array is passed to the Thread running the algorithm.
+        // it holds status flags, such as whether the user has entered
+        // debug mode
+        this.flags = new Int32Array(new SharedArrayBuffer(4));
+        this.flags[0] = 0;
+
         this.PromptService = PromptService;
 
         const [status, setStatus] = stateVar;
@@ -35,16 +41,28 @@ export default class Algorithm {
         this.fetchingSteps = false;
         this.completed = false;
 
-        this.index = 0;
-        this.length = 0;
-        
         // Initialize the thread worker
         this.worker = new Worker(new URL("./Thread.js", import.meta.url));
         let handleMessage = (message) => { this.#onMessage(message.data) }
         this.worker.onmessage = handleMessage;
-        this.worker.postMessage(["shared", this.array]);
+        this.worker.postMessage(["shared", this.array, this.flags]);
         this.worker.postMessage(["graph/algorithm", Graph.toGraphString(), Graph.isDirected, this.code]);
         this.worker.postMessage(["algorithm", this.code]);
+    }
+
+    /**
+     * Returns the current step number of the algorithm
+     */
+    getStepNumber() {
+        return Graph.algorithmChangeManager.getIndex();
+    }
+
+    /**
+     * Returns the total number of steps taken in the algorithm.
+     * This can be different to the index because you can undo a step
+     */
+    getTotalSteps() {
+        return Graph.algorithmChangeManager.getLength();
     }
 
     /**
@@ -69,25 +87,11 @@ export default class Algorithm {
     }
     
     /**
-     * Returns the step of the current algorithm
-     */
-    getAlgorithmStep() {
-        return Graph.algorithmChangeManager.getStepNumber();
-    }
-
-    /**
-     * Returns the total length of the algorithm
-     */
-    getTotalSteps() {
-        return Graph.algorithmChangeManager.getLastStep();
-    }
-
-    /**
      * Toggles the debug mode on or off
      */
     toggleDebugMode() {
         this.debugMode = !this.debugMode;
-        this.array[1] = this.debugMode ? 1 : 0;
+        this.flags[0] = this.debugMode ? 1 : 0;
     }
 
     /**
@@ -131,7 +135,6 @@ export default class Algorithm {
     stepBack() {
         if (!this.canStepBack()) return;
         Graph.algorithmChangeManager.undo();
-        setTimeout(this.#updateStatus(), 10);
     }
 
     /**
@@ -146,12 +149,10 @@ export default class Algorithm {
             // Once the step is complete:
             this.onStepAdded = () => {
                 this.fetchingSteps = false;
-                setTimeout(this.#updateStatus(), 10);
             }
         } else {
             // Use redo if there are pre-loaded steps ahead of the index
             Graph.algorithmChangeManager.redo();
-            this.#updateStatus();
         }
     }
 
@@ -168,13 +169,11 @@ export default class Algorithm {
             // Once the step is complete:
             this.onStepAdded = () => {
                 this.fetchingSteps = false;
-                this.#updateStatus();
                 if (callback) callback();
             }
         } else {
             // Use redo if there are pre-loaded steps ahead of the index
             Graph.algorithmChangeManager.redo();
-            this.#updateStatus();
             if (callback) callback();
         }
     }
@@ -209,16 +208,6 @@ export default class Algorithm {
         this.resumeThread();
 
         if (this.onStepAdded) this.onStepAdded();
-    }
-
-    /**
-     * Triggers re-render and updates index/length
-     */
-    #updateStatus() {
-        this.setStatus({});
-
-        this.index = Graph.algorithmChangeManager.getIndex();
-        this.length = Graph.algorithmChangeManager.getLength();
     }
 
     /**
