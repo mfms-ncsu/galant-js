@@ -1,4 +1,5 @@
 import { React, useEffect, useRef, useState } from "react";
+import PrimaryButton from "components/Buttons/PrimaryButton";
 import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from "@heroicons/react/24/solid";
 import Graph from "graph/Graph";
 
@@ -99,9 +100,9 @@ export default function GraphEditOverlay({ setMode }) {
                         <label className="absolute -bottom-2 right-0 text-sm">y</label>
                     </button>
                 </div>
-                <div className="flex w-fit">
-                    <button className=" mt-4 mx-auto me-2 px-4 py-2 rounded-full font-semibold bg-blue-500 hover:bg-blue-600 text-white pointer-events-auto transition-all" onClick={revert}>Revert</button>
-                    <button className=" mt-4 mx-auto ms-2 px-4 py-2 rounded-full font-semibold bg-blue-500 hover:bg-blue-600 text-white pointer-events-auto transition-all" onClick={save}>Save Changes</button>
+                <div className="flex w-fit mt-4 gap-x-4">
+                    <PrimaryButton onClick={revert}>Revert</PrimaryButton>
+                    <PrimaryButton onClick={save}>Save Changes</PrimaryButton>
                 </div>
             </div>
         </div>
