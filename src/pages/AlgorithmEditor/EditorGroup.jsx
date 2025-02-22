@@ -8,6 +8,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Editor from '@monaco-editor/react';
 import EditorOverlayComponent from "../../components/Editor/EditorOverlay"
 import TabListComponent from "../../components/Editor/TabListComponent";
+import PrimaryButton from "components/Buttons/PrimaryButton";
+import ExitButton from "components/Buttons/ExitButton";
 import { addTab, getSelectedTab } from "../../components/Editor/TabUtils";
 import examples from './Examples.json';
 import { ArrowUpRightIcon } from "@heroicons/react/24/solid";
@@ -47,7 +49,6 @@ function LoadAlgorithmComponent({tab}) {
 
     // loads in an algorithm into a shared worker by sending a message to its port and preparing the necessary data
     function loadAlgorithm() {
-        
         try {     
             sharedWorker.port.postMessage([{
                 'message': 'algo-init',
@@ -75,27 +76,27 @@ function LoadAlgorithmComponent({tab}) {
     }
 
     return (
-        <div>
+        <>
             {/* Conditionally render the "Algorithm loaded" message */}
             {showLoadedMessage && (
-                <div className="absolute top-0 left-0 right-0 p-2 bg-green-500 text-white text-center">
-                    Algorithm loaded!
+                <div className="px-2 py-1 mb-3 bg-green-500 rounded-lg text-lg font-semibold text-white text-center">
+                    Algorithm loaded
                 </div>
             )}
 
             {/* Persistently display the error message until cleared */}
             {loadError && (
-                <div className="absolute top-0 left-0 right-0 p-2 bg-red-500 text-white text-center">
+                <div className="px-2 py-1 mb-3 bg-red-500 rounded-lg font-semibold text-white text-center">
                     {loadError}
-                    <button onClick={clearError} className="ml-4 px-2 py-1 bg-red-700 rounded">Clear</button>
+                    <ExitButton onClick={clearError}>Clear</ExitButton>
                 </div>
             )}
 
-            <button className="flex items-center justify-evenly space-x-2 px-3 py-2 rounded-full font-semibold shadow bg-gradient-to-r from-indigo-500 to-blue-500 text-white outline-2 outline-blue-200 hover:outline" onClick={loadAlgorithm}>
-                <ArrowUpRightIcon className="w-4 h-4 stroke-2 stroke-white"/>
-                <span>Load Algorithm</span>
-            </button>
-        </div>
+            <PrimaryButton onClick={loadAlgorithm}>
+                <ArrowUpRightIcon className="inline h-4 me-2 stroke-2 stroke-white"/>
+                Load Algorithm
+            </PrimaryButton>
+        </>
     )
 }
 
@@ -108,9 +109,8 @@ function LoadAlgorithmComponent({tab}) {
  */
 function EditorComponent({tab, onChange}) {
     return tab && (
-        <div className="w-full h-full rounded-b-lg bg-white">
+        <div className="w-full h-full mt-2">
             <Editor
-                height={"100%"}
                 onChange={onChange}
                 path={tab.name}
                 defaultLanguage="javascript"
@@ -180,7 +180,7 @@ export default function EditorGroup() {
     }, [tabs]);
 
     return (
-        <div className="flex flex-col p-2 pt-0 h-full">
+        <div className="flex flex-col h-full">
             <TabListComponent tabs={tabs} setTabs={setTabs} examples={examples} acceptFileType=".js" />
             <EditorComponent tab={selectedTab} onChange={onEditorChange} />
             <EditorOverlayComponent tab={selectedTab} saved={saved} LoadComponent={LoadAlgorithmComponent} />

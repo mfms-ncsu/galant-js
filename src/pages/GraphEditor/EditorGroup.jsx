@@ -9,6 +9,8 @@ import Editor from '@monaco-editor/react';
 import EditorOverlayComponent from "../../components/Editor/EditorOverlay"
 import TabListComponent from "../../components/Editor/TabListComponent";
 import { addTab, getSelectedTab } from "../../components/Editor/TabUtils";
+import PrimaryButton from "components/Buttons/PrimaryButton";
+import ExitButton from "components/Buttons/ExitButton";
 import { ArrowUpRightIcon } from "@heroicons/react/24/solid";
 import examples from './Examples.json';
 
@@ -66,27 +68,28 @@ function LoadGraphComponent({tab}) {
     return (
         <div>
             {showLoadedMessage && (
-                <div className="absolute top-0 left-0 right-0 p-2 bg-green-500 text-white text-center">
-                    Graph loaded!
+                <div className="px-2 py-1 mb-3 bg-green-500 rounded-lg text-lg font-semibold text-white text-center">
+                    Graph loaded
                 </div>
             )}
             {errorMessage && (
-                <div className="absolute top-0 left-0 right-0 p-2 bg-red-500 text-white text-center">
+                <div className="px-2 py-1 mb-3 bg-red-500 rounded-lg font-semibold text-white text-center">
                     {errorMessage}
-                    <button onClick={clearError} className="ml-4 px-2 py-1 bg-red-700 rounded">Clear Error</button>
+                    <ExitButton onClick={clearError}>Clear</ExitButton>
                 </div>
             )}
-            <button className="flex items-center justify-evenly space-x-2 px-3 py-2 rounded-full font-semibold shadow bg-gradient-to-r from-indigo-500 to-blue-500 text-white outline-2 outline-blue-200 hover:outline" onClick={loadGraph}>
-                <ArrowUpRightIcon className="w-4 h-4 stroke-2 stroke-white"/>
-                <span>Load Graph</span>
-            </button>
+
+            <PrimaryButton onClick={loadGraph}>
+                <ArrowUpRightIcon className="inline h-4 me-2 stroke-2 stroke-white"/>
+                Load Graph
+            </PrimaryButton>
         </div>
     )
 }
 
 function EditorComponent({tab, onChange}) {
     return tab && (
-        <div className="w-full h-full rounded-b-lg bg-white">
+        <div className="w-full h-full mt-2">
             <Editor
                 height={"100%"}
                 onChange={onChange}
@@ -166,7 +169,7 @@ export default function EditorGroup() {
     }, [tabs]);
 
     return (
-        <div className="flex flex-col p-2 pt-0 h-full">
+        <div className="flex flex-col h-full">
             <TabListComponent tabs={tabs} setTabs={setTabs} examples={examples} acceptFileType=".txt, .gph, .sgf" />
             <EditorComponent tab={selectedTab} onChange={onEditorChange} />
             <EditorOverlayComponent tab={selectedTab} saved={saved} LoadComponent={LoadGraphComponent} />

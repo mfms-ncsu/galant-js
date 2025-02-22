@@ -62,19 +62,31 @@ export default function TabComponent({tab, onClick, onRename, onRemove}) {
 
 
     return(
-        <div tabIndex={0} className={`tab group flex space-x-1 px-2 py-1 rounded-t-md font-semibold outline-2 outline-blue-300 focus-within:outline ${tab.selected ? "bg-white" : "bg-gray-100"}`} onClick={() => onClick(tab)} onKeyDown={onTabSelectByKey}>
-            <div className="relative overflow-hidden cursor-default whitespace-nowrap">
-                <span className="opacity-0 pr-1">{editMode ? intermediateName : tab.name}</span>
-                <input className={`absolute inset-x-0 bg-transparent outline-none caret-blue-500 ${!editMode && 'pointer-events-none' }`} ref={inputField} value={editMode ? intermediateName : tab.name} size={intermediateName.length} disabled={!editMode} onChange={(event) => setIntermediateName(event.target.value.trim())} onKeyUp={onEnter} onBlur={() => setEditMode(false)} ></input>
+        <div tabIndex={0} className={`flex bg-transparent`} onClick={() => onClick(tab)} onKeyDown={onTabSelectByKey}>
+            <div className={`${(tab.selected) ? "bg-white" : ""}`}>
+                <div className={`h-full ${(tab.selected) ? "px-1 bg-neutral-300 rounded-br-lg" : ""}`}>
+                </div>
             </div>
 
-            <button className="p-1 rounded bg-transparent hover:bg-black/10" onClick={onEdit}>
-                <PencilIcon className="w-4 h-4"/>
-            </button>
+            <div className={`flex items-center py-1 ps-2 pe-1 ${(tab.selected) ? "rounded-t-lg bg-white font-semibold" : ""}`}>
+                <div className="relative overflow-hidden cursor-default whitespace-nowrap">
+                    <span className="opacity-0 pr-1">{editMode ? intermediateName : tab.name}</span>
+                    <input className={`absolute inset-x-0 bg-transparent outline-none caret-blue-500 ${!editMode && 'pointer-events-none' }`} ref={inputField} value={editMode ? intermediateName : tab.name} size={intermediateName.length} disabled={!editMode} onChange={(event) => setIntermediateName(event.target.value.trim())} onKeyUp={onEnter} onBlur={() => setEditMode(false)} ></input>
+                </div>
 
-            <button className="p-1 rounded bg-transparent hover:bg-black/10" onClick={onRemoveClick}>
-                <XMarkIcon className="w-4 h-4"/>
-            </button>
+                <button className="p-1 rounded-full hover:bg-black/10" onClick={onEdit}>
+                    <PencilIcon className="h-4"/>
+                </button>
+
+                <button className="p-1 rounded-full hover:bg-black/10" onClick={onRemoveClick}>
+                    <XMarkIcon className="h-4 stroke stroke-black"/>
+                </button>
+            </div>
+            
+            <div className={`${(tab.selected) ? "bg-white" : ""}`}>
+                <div className={`h-full ${(tab.selected) ? "px-1 bg-neutral-300 rounded-bl-lg" : ""}`}>
+                </div>
+            </div>
         </div>
     )
 }
