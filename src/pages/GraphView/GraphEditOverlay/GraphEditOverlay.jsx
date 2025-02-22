@@ -87,7 +87,7 @@ export default function GraphEditOverlay({ setMode }) {
 
 
     return length > 0 && (
-        <div id="edit-overlay" className="absolute left-0 right-0 bottom-2 flex flex-col items-center pointer-events-none">
+        <div id="edit-overlay" className="absolute left-0 right-0 bottom-1 flex flex-col items-center pointer-events-none">
             <div className="flex flex-col items-center">
                 <div className="flex space-x-6">
                     <button className="relative pointer-events-auto stroke-0 stroke-black hover:stroke-1 transition-all" onClick={undo}>

@@ -3,8 +3,6 @@ import { useEffect } from "react";
 export default function Button({ shortcut, callback, onClick, className, children }) {
     useEffect(() => {
         function onKeyDown(event) {
-            console.log(event.key);
-
             if (event.target.tagName.toLowerCase() === 'input') return;
             if (event.key === shortcut) callback();
         }
@@ -14,7 +12,7 @@ export default function Button({ shortcut, callback, onClick, className, childre
 
     return(
         <div
-            className={`flex items-center justify-center pointer-events-auto select-none cursor-pointer rounded-lg transition-all ${className}`}
+            className={`flex items-center justify-center pointer-events-auto select-none cursor-pointer rounded-lg text-lg font-semibold transition-all ${className}`}
             onClick={onClick}
         >
             {children}
