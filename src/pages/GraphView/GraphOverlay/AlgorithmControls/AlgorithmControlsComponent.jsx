@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useAlgorithmContext } from 'pages/GraphView/utils/AlgorithmContext';
 import Graph from "graph/Graph";
 
+
 /**
  * AlgorithmControls component renders controls for stepping through an algorithm.
  * @returns {JSX.Element} - Returns the JSX for AlgorithmControls component.
@@ -96,6 +97,10 @@ export default function AlgorithmControls() {
     }
 
     function terminateAlgorithm() {
+        
+        // Remove any prompts the algorithm had up
+        algorithm.clearPrompts();
+
         // Set the algorithm to null
         setAlgorithm(null);
 

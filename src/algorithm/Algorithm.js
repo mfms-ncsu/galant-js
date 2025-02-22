@@ -55,6 +55,13 @@ export default class Algorithm {
     }
 
     /**
+     * Clears any prompts that were open
+     */
+    clearPrompts() {
+        this.PromptService.clearPrompts();
+    }
+
+    /**
      * Returns the current step number of the algorithm
      */
     getStepNumber() {
