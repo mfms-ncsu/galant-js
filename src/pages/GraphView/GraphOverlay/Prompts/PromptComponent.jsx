@@ -22,6 +22,10 @@ export default function PromptComponent() {
     const promptRef = useRef();
 
     useEffect(() => {
+        if (PromptService.clear) {
+            setCurrentPrompt(null); // If the prompt queue was cleared, set the CurrentPrompt to null
+            PromptService.clear = false // Reset the clear flag, since we just cleared it. There's no reason to clear it again.
+        }
         if (currentPrompt) return; // Do nothing if there's already a current prompt
         const prompt = PromptService.getNextPrompt(); // Get the next prompt from the PromptService
         if (prompt) setCurrentPrompt(prompt); // Set the current prompt if there's any

@@ -20,6 +20,7 @@ export default class PromptService {
     constructor([queue, setQueue]) {
         this.queue = queue;
         this.setQueue = setQueue;
+        this.clear = false;             // Set this flag if you want to remove all active prompts
     }
 
     /**
@@ -38,6 +39,15 @@ export default class PromptService {
         const prompt = this.queue.shift();
         this.setQueue([...this.queue]);
         return prompt;
+    }
+    
+    /**
+     * Removes all prompts from the queue
+     */
+    clearPrompts() {
+        this.queue = [];
+        this.setQueue([...this.queue]);
+        this.clear = true;
     }
 }
 
