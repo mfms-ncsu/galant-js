@@ -1,4 +1,6 @@
 import { useRef, useEffect } from "react"
+import PrimaryButton from "components/Buttons/PrimaryButton";
+import SecondaryButton from "components/Buttons/SecondaryButton";
 
 /**
  * Creates a modal requesting the user for confirmation.
@@ -11,27 +13,15 @@ import { useRef, useEffect } from "react"
  * @returns {React.ReactElement} Modal that prompts the user for confirmation
  */
 export default function ConfirmationPrompt({prompt, callback, promptRef}) {
-    const button = useRef(null);
-
     const message = prompt.message;
     const confirmationText = prompt.confirmationText || "Confirm";
     const cancelText = prompt.cancelText || "Cancel";
 
-    useEffect(() => {
-        if (!button.current) return;
-        function onKeyPress(event) {
-            if (event.key !== 'Enter') return;
-            button.current.click();
-        }
-        document.addEventListener('keypress', onKeyPress);
-        return () => document.removeEventListener('keypress', onKeyPress);
-    }, []);
-
     return (
-        <div id="confirmation-prompt" className="bg-gray-100 p-4 rounded shadow-lg ring-1 ring-gray-200" ref={promptRef}>
+        <div className="bg-gray-100 p-4 rounded-xl shadow-lg" ref={promptRef}>
             <span className="block text-lg font-semibold">{message}</span>
-            <button id="confirmation-prompt-confirm" ref={button} className="w-full py-2 mt-4 rounded-full bg-blue-500 hover:bg-blue-600 transition-all font-semibold text-white" onClick={() => callback(true)}>{confirmationText}</button>
-            <button id="confirmation-prompt-cancel" className="w-full mt-1 text-black" onClick={() => callback(false)}>{cancelText}</button>
+            <PrimaryButton onClick={() => callback(true)}>{confirmationText}</PrimaryButton>
+            <SecondaryButton onClick={() => callback(false)}>{cancelText}</SecondaryButton>
         </div>
     )
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ExitButton from "components/Buttons/ExitButton";
 import Graph from "graph/Graph";
 import { useAlgorithmContext } from 'pages/GraphView/utils/AlgorithmContext';
 
@@ -90,12 +91,12 @@ export default function EdgeContextMenu() {
                 <label className="block text-gray-500">Weight</label>
                 <input id="edge-weight" className="p-1 rounded bg-gray-200" value={values.weight} onChange={(event) => onChangeValue('weight', event.target.value)} onBlur={update} onKeyDown={onEnterPressed} placeholder="Enter weight"/>
             </div>
-            <div className="mt-1">
+            <div className="mt-1 mb-2">
                 <label className="block text-gray-500">Label</label>
                 <input id="edge-label" className="p-1 rounded bg-gray-200" value={values.label} onChange={(event) => onChangeValue('label', event.target.value)} onBlur={update} onKeyDown={onEnterPressed} placeholder="Enter label"/>
             </div>
             
-            <button id="edge-delete-button" className="block w-full p-2 mt-2 rounded-full bg-red-500 text-white font-semibold hover:bg-red-600 transition-all" onClick={deleteEdge}>Delete Edge</button>
+            <ExitButton onClick={deleteEdge}>Delete Edge</ExitButton>
         </div>
 
 

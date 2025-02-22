@@ -87,9 +87,9 @@ export default function GraphEditOverlay({ setMode }) {
 
 
     return length > 0 && (
-        <div id="edit-overlay" className="absolute inset-0 flex flex-col items-center p-4 pointer-events-none">
-            <div className="mt-auto mb-4">
-                <div className="flex space-x-12 w-fit mx-auto">
+        <div id="edit-overlay" className="absolute left-0 right-0 bottom-2 flex flex-col items-center pointer-events-none">
+            <div className="flex flex-col items-center">
+                <div className="flex space-x-6">
                     <button className="relative pointer-events-auto stroke-0 stroke-black hover:stroke-1 transition-all" onClick={undo}>
                         <ArrowUturnLeftIcon className="w-6 h-6" />
                         <label className="absolute -bottom-2 left-0 text-sm">z</label>

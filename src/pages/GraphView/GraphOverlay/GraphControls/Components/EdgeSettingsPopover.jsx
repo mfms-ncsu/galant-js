@@ -16,7 +16,7 @@ function BinarySwitchComponent({enabled, setEnabled}) {
             checked={enabled}
             onChange={setEnabled}
             className={`${
-                enabled ? 'bg-gradient-to-r from-indigo-500 to-blue-500' : 'bg-gray-200'
+                enabled ? 'bg-blue-500' : 'bg-gray-200'
             } relative inline-flex h-6 w-11 items-center rounded-full`}
         >
             <span className="sr-only">Toggle</span>
