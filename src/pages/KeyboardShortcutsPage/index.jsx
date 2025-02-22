@@ -39,6 +39,7 @@ export default function KeyboardShortcutsPage() {
                 - I - Autolayout <br />
                 - 'S' Key - Export Graph <br />
                 - Windows/Cmd + Right Arrow - Skip To End<br />
+                - 1 - Enter debug mode<br />
                 <br />
                 
                 <h2 className="font-semibold text-lg">CONTROL SETTINGS POPOVER:</h2>

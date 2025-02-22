@@ -8,6 +8,7 @@
  * @author Krisjian Smith
  */
 export default class ChangeManager {
+    
     /** Graph object for which change */
     #graph;
     /** List of steps containing changes */
@@ -319,7 +320,7 @@ export default class ChangeManager {
         }
         return null;
     }
-
+    
     /**
      * Records a change and updates the index.
      * @param {ChangeObject} change Change object to record
@@ -331,13 +332,18 @@ export default class ChangeManager {
         // Remove all changes after the current index
         this.#changes = this.#changes.slice(0, this.#index);
 
-        // If we are recording, save the change to the temporary list of changes and
-        // return.
-        // NOTE: When recording, the cytoscape window will not be updated. This is important, as
-        //       we do not want the window to be updated when a recording is happening. Recordings
-        //       should be started when an algorithm is doing multiple things in one step. In this
-        //       case, we want everything to appear to happen at one time, but if the window was updated
-        //       with every change, we would be able to see every individual change
+        // If we are recording, save the change to the temporary
+        // list of changes and return.
+        // NOTE: When recording, the cytoscape window will not
+        //       be updated. This is important, as
+        //       we do not want the window to be updated when
+        //       a recording is happening. Recordings
+        //       should be started when an algorithm
+        //       is doing multiple things in one step. In this
+        //       case, we want everything to appear to happen
+        //       at one time, but if the window was updated
+        //       with every change, we would be able to see
+        //       every individual change
         if (this.#isRecording) {
             
             for (let changeObj of change) {
@@ -349,7 +355,7 @@ export default class ChangeManager {
 
         // Push the new change
         this.#changes.push(change);
-
+ 
         // Increment the index
         this.#index++;
 

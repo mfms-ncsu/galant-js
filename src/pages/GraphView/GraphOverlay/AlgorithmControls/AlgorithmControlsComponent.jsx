@@ -1,5 +1,5 @@
 import { ArrowLeftIcon, ArrowPathIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAlgorithmContext } from 'pages/GraphView/utils/AlgorithmContext';
 import { XCircleIcon } from "@heroicons/react/16/solid";
 import Graph from "graph/Graph";
@@ -12,16 +12,30 @@ export default function AlgorithmControls() {
     // Retrieve algorithm context
     const { algorithm, setAlgorithm } = useAlgorithmContext();
 
+    const [debug, setDebug] = useState(false);
+    const [stepText, setStepText] = useState("Step 0");
+    
+    /**
+     * Updates the text in the step counter to show the current
+     * algorithm step
+     */
+    function updateStepText() {
+        setStepText(`Step ${algorithm.getStepNumber()}` + (algorithm.completed ? ` / ${algorithm.getTotalSteps()}` : ''));
+    }
+    
     // Function to handle pressing the forward button
     function frontButtonPress() {
         if (!algorithm || !algorithm.canStepForward()) return;
         algorithm.stepForward();
+        setTimeout(updateStepText, 10); // A timeout is required to
+                                        // fix a race condition
     } 
 
     // Function to handle pressing the backward button
     function backButtonPress() {
         if (!algorithm || !algorithm.canStepBack()) return;
         algorithm.stepBack();
+        setTimeout(updateStepText, 10);
     }
 
     /**
@@ -71,6 +85,18 @@ export default function AlgorithmControls() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
+    
+    /**
+     * Toggles the debug mode of algorithm execution, which allows
+     * the user to step through individual actions inside a "step"
+     * function
+     */
+    function debugMode() {
+        if (algorithm) {
+            algorithm.toggleDebugMode();
+            setDebug(algorithm.debugMode);
+        }
+    }
 
     function terminateAlgorithm() {
         // Set the algorithm to null
@@ -89,6 +115,7 @@ export default function AlgorithmControls() {
             else if (!event.metaKey && event.key === 'ArrowRight') frontButtonPress();
             else if (event.key === 'x') terminateAlgorithm();
             else if (event.key === 's') exportGraph();
+            else if (event.key === '1') debugMode();
             else if (event.metaKey && event.key === 'ArrowRight') algorithm.skipToEnd();
         }
 
@@ -100,13 +127,16 @@ export default function AlgorithmControls() {
     if (!algorithm) return null;
 
     // Create the step text
-    const stepText = `Step ${algorithm.index}` + (algorithm.completed ? ` / ${algorithm.length}` : '');
 
     return (
         <div>
             <div id="algorithm-controls" className="absolute bottom-1 left-1 mt-auto mb-2">
-                <div className="flex justify-left items-center space-x-1">
+                <div className="flex justify-center items-center space-x-1">
                     <p id="algorithm-name" className="text-black whitespace-nowrap">{algorithm.name}</p>
+                </div>
+
+                <div className="flex justify-center items-center space-x-1">
+                    <p className='text-black whitespace-nowrap' hidden={!debug}>DEBUG MODE - Press 1 to toggle </p>
                 </div>
                 <div className="flex justify-center items-center space-x-4 mt-auto">
                     <button id="step-back" className="h-8 w-8 p-3 rounded bg-blue-300 pointer-events-auto disabled:opacity-75" disabled={!algorithm.canStepBack()} onClick={() => backButtonPress()}>
