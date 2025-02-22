@@ -12,11 +12,11 @@ import PrimaryButton from "components/Buttons/PrimaryButton"
 function Header() {
     // Return JSX representing the header section of the GraphEditorView
     return (
-        <div className="flex items-center justify-between px-2 pt-1 w-auto h-12 bg-neutral-300">
+        <div className="flex items-start justify-between px-2 pt-1 w-auto h-12 bg-neutral-300">
             <img src="img/galant_full_logo_without_words.svg" alt="logo" className="h-full w-auto"/>
 
             <PrimaryButton>
-                <a className="" href="/documentation.pdf"><label>User Manual</label></a>
+                <a target="_blank" href="/documentation.pdf">User Manual</a>
             </PrimaryButton>
         </div>
     )

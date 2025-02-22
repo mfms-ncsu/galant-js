@@ -34,7 +34,7 @@ export default function UploadButtonComponent({onUpload, acceptFileType}) {
     }
 
     return (
-        <PrimaryButton className="mb-2 me-2">
+        <PrimaryButton className="mx-2 mb-1">
             <label htmlFor="file-upload" className="cursor-pointer"> 
                 <ArrowUpTrayIcon className="inline h-4 me-2 fill-white stroke stroke-white"/>
                 Upload

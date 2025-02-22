@@ -70,7 +70,7 @@ export default function TabListComponent({tabs, setTabs, acceptFileType, example
     
     return (
         <div className="flex justify-between bg-neutral-300">
-            <div className={`flex items-end ${(tabs.length > 0 && !tabs[tabs.length-1].selected) && "space-x-2"}`}>
+            <div className={`flex items-end ${(tabs.length > 0 && !tabs[tabs.length-1].selected) && "space-x-1"}`}>
                 <div className="flex">
                     {tabs.map((tab, i) => 
                         <div key={i} className="relative">
