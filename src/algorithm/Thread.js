@@ -1,4 +1,5 @@
 import { Graph } from "graph/Graph";
+import { useAlgorithmContext } from 'pages/GraphView/utils/AlgorithmContext';
 
 /**
  * Execution environment for algorithms. This file provides all necessary functions
@@ -15,6 +16,13 @@ import { Graph } from "graph/Graph";
  * Thread wakes up from Atoimics.notify() from the Handler.
  */
 let sharedArray;
+
+/**
+ * An integer array that holds status flags for the thread. If flags[0]
+ * is 1, then debug mode is active, and step() functions should be
+ * ignored.
+ */
+let flags;
 
 /** 
  * Flag that is set to true when the algorithm is in a step. When
@@ -60,20 +68,31 @@ function step(code=null) {
     if (code == null || code == undefined) {
         throw new Error("Invalid code in step. Code cannot be null or undefined.");
     }
-    
-    // Tell the ChangeManager to start recording our changes
-    postMessage({action: "startRecording"});
-    isInStep = true;
 
-    // Execute the code in this step
-    code();
-    
-    // End the recording of the steps
-    postMessage({action: "endRecording"});
-    isInStep = false;
+    // Tell the ChangeManager to start recording our changes, but only
+    // if we are not in debug mode
+    if (flags[0] == 0) {
+        postMessage({action: "startRecording"});
+        isInStep = true;
 
-    // Wait until we should start the next step
-    wait();
+        // Execute the code in this step
+        code();
+        
+        // End the recording of the steps
+        postMessage({action: "endRecording"});
+        isInStep = false;
+
+        // Wait until we should start the next step
+        wait();
+    }
+    else {
+        
+        // If we are in debug mode, then just execute the code as if
+        // there is no step
+        code();
+    }
+
+    
 
 }
 
@@ -692,7 +711,7 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
     message = message.data;
     if (message[0] === "shared") {
         sharedArray = message[1];
-
+        flags = message[2];
     } else if (message[0] === "graph/algorithm") {
         // Load the graph with isDirected flag
         graph.fileParser.loadGraph(message[1]);

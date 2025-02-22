@@ -6,6 +6,7 @@
  * @author Henry Morris
  */
 export default class ChangeObject {
+    
     /**
      * Constructs a new ChangeObject with the requisite description
      * and objects containing the changes in the graph.
