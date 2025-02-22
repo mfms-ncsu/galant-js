@@ -30,8 +30,12 @@ export default class Algorithm {
         // This array is passed to the Thread running the algorithm.
         // it holds status flags, such as whether the user has entered
         // debug mode
-        this.flags = new Int32Array(new SharedArrayBuffer(4));
+        // 0: debug mode
+        // 1: skip to end mode (continues taking steps until 250 steps
+        //    are taken, or the end of the algorithm is reached
+        this.flags = new Int32Array(new SharedArrayBuffer(8));
         this.flags[0] = 0;
+        this.flags[1] = 0;
 
         this.PromptService = PromptService;
 
@@ -135,64 +139,81 @@ export default class Algorithm {
     stepBack() {
         if (!this.canStepBack()) return;
         Graph.algorithmChangeManager.undo();
+        this.redraw();
     }
 
     /**
-     * Moves forward a step.
+     * Moves forward one step. If you want to step until the
+     * end of the algorithm (Or 250 steps, whichever comes first),
+     * you can supply the optional skipToEnd parameter.
+     *
+     * @param {bool} skipToEnd true if you want to skip all the way
+     * to the end of the algorithm. False or undefined if you only
+     * want to take one step
      */
-    stepForward() {
+    stepForward(skipToEnd) {
+
+        // Set skipToEnd to false if nothing was given
+        if (skipToEnd === undefined) skipToEnd = false;
+        
+        // Immediately return if the algorithm cannot continue
         if (!this.canStepForward()) return;
-        if (Graph.algorithmChangeManager.getIndex() === Graph.algorithmChangeManager.getLength()) {
+
+        // If skipToEnd is set to true, redo all saved steps in the
+        // ChangeManager
+        if (skipToEnd) {
+            while (Graph.algorithmChangeManager.getIndex() !==
+                   Graph.algorithmChangeManager.getLength()) {
+                
+                Graph.algorithmChangeManager.redo();
+                this.redraw();
+            }
+        }
+
+        // Again, check if we can step forward. If we can't, immediately
+        // return
+        if (!this.canStepForward()) return;
+
+        // If we are at the end of the list of changes, we need to
+        // wake up the thread to generate a new step
+        if (Graph.algorithmChangeManager.getIndex() ===
+            Graph.algorithmChangeManager.getLength()) { 
+
             this.fetchingSteps = true;
+            
+            // Set the skipToEnd flag to true if necessary
+            this.flags[1] = skipToEnd ? 1 : 0;
+
             this.resumeThread(); // Resume the thread
             this.#setupTimeout() // Set the timer
 
             // Once the step is complete:
             this.onStepAdded = () => {
                 this.fetchingSteps = false;
+                this.flags[1] = 0;
             }
+
         } else {
             // Use redo if there are pre-loaded steps ahead of the index
             Graph.algorithmChangeManager.redo();
+            this.redraw();
         }
+
     }
-
+    
     /**
-     * Recursive call for skipToEnd.
-     * @param {Function} callback Function to call upon completion
+     * Tells React to redraw the screen. This is used to update
+     * the step coun number after each step.
      */
-    skipToEndStep(callback) {
-        if (!this.canStepForward()) return;
-        if (Graph.algorithmChangeManager.getIndex() === Graph.algorithmChangeManager.getLength()) {
-            this.fetchingSteps = true;
-            this.resumeThread(); // Resume the thread
-            this.#setupTimeout() // Set the timer
-
-            // Once the step is complete:
-            this.onStepAdded = () => {
-                this.fetchingSteps = false;
-                if (callback) callback();
-            }
-        } else {
-            // Use redo if there are pre-loaded steps ahead of the index
-            Graph.algorithmChangeManager.redo();
-            if (callback) callback();
-        }
+    redraw() {
+        this.setStatus({}); 
     }
 
     /**
      * Skips to the end of the algorithm execution.
      */
     skipToEnd() {
-        let count = 0;
-        const algorithm = this;
-        function recursiveNext() {
-            if (count >= 250) return;
-            count++;
-            algorithm.skipToEndStep(recursiveNext);
-        }
-
-        recursiveNext();
+        this.stepForward(true);
     }
 
     /**
@@ -284,6 +305,10 @@ export default class Algorithm {
                 clearTimeout(this.#timeoutId);
                 if (this.onStepAdded) this.onStepAdded();
                 this.completed = true;
+                this.redraw();
+                break;
+            case "redraw":
+                this.redraw();
                 break;
             case "error":
                 this.PromptService.addPrompt({

@@ -15,29 +15,24 @@ export default function AlgorithmControls() {
     const { algorithm, setAlgorithm } = useAlgorithmContext();
 
     const [debug, setDebug] = useState(false);
-    const [stepText, setStepText] = useState("Step 0");
+    // const [stepText, setStepText] = useState("Step 0");
     
-    /**
-     * Updates the text in the step counter to show the current
-     * algorithm step
-     */
-    function updateStepText() {
-        setStepText(`Step ${algorithm.getStepNumber()}` + (algorithm.completed ? ` / ${algorithm.getTotalSteps()}` : ''));
+    /** The text to display in the bottom left of the screen */
+    let stepText = "Step 0";
+    if (algorithm) {
+        stepText = `Step ${algorithm.getStepNumber()}` + (algorithm.completed ? ` / ${algorithm.getTotalSteps()}` : '');
     }
     
     // Function to handle pressing the forward button
     function frontButtonPress() {
         if (!algorithm || !algorithm.canStepForward()) return;
         algorithm.stepForward();
-        setTimeout(updateStepText, 10); // A timeout is required to
-                                        // fix a race condition
     } 
 
     // Function to handle pressing the backward button
     function backButtonPress() {
         if (!algorithm || !algorithm.canStepBack()) return;
         algorithm.stepBack();
-        setTimeout(updateStepText, 10);
     }
 
     /**
@@ -107,6 +102,14 @@ export default function AlgorithmControls() {
         // Undo all changes made by the algorithm
         Graph.algorithmChangeManager.revert();
         Graph.algorithmChangeManager.clear();
+        stepText = "Step 0";
+    }
+
+    /**
+     * Method called when the "Skip to end" button is clicked
+     */
+    function skipToEnd() {
+        algorithm.skipToEnd();
     }
 
     // Effect hook to handle keyboard shortcuts for stepping through the algorithm
@@ -127,8 +130,6 @@ export default function AlgorithmControls() {
 
     // Return if no algorithm is available
     if (!algorithm) return null;
-
-    // Create the step text
 
     return (
         <div className="absolute left-0 bottom-0 w-full p-1 flex flex-row items-center justify-between">
@@ -153,7 +154,7 @@ export default function AlgorithmControls() {
             <div className="space-y-1">
                 <PrimaryButton onClick={exportGraph}>Export Graph (s)</PrimaryButton>
                 <ExitButton onClick={terminateAlgorithm}>Exit (x)</ExitButton>
-                <SecondaryButton onClick={() => algorithm.skipToEnd()}>Skip to End</SecondaryButton>
+                <SecondaryButton onClick={skipToEnd}>Skip to End</SecondaryButton>
             </div>
         </div>
     );

@@ -94,6 +94,7 @@ export class Graph {
         this.#nodes.forEach(node => {
             node.edges.forEach(edge => {
                 if (edge.source === node.id) {
+                    console.log([...edge.attributes.entries()]);
                     // Get the attributes string
                     let attributesString = " " + [...edge.attributes.entries()]
                         .filter(([key, value]) => key !== "weight" && value !== undefined && value !== false && value !== "")

@@ -32,6 +32,13 @@ let flags;
 let isInStep;
 
 /**
+ * The number of steps to take before waiting again. Usually, this
+ * is 1, but if the skipToEnd() method in Algorithm is called, this
+ * will be 250
+ */
+let stepsToTake;
+
+/**
  * This thread's copy of the graph
  */
 let graph = new Graph();
@@ -40,15 +47,38 @@ let graph = new Graph();
  * This function uses Atomics to cause the algorithm to wait for user input before continuing
  */
 function wait() {
+    
+    // If we are waiting, then the algorithm step is complete. It is
+    // safe for the main thread to redraw the window
+    postMessage({action: "redraw"});
+
+    // Store a 0 in the sharedArray buffer
     Atomics.store(sharedArray, 0, 0);
+
+    // Wait until the sharedArray buffer's first element is not 0.
     Atomics.wait(sharedArray, 0, 0);
+
+    // Check if the skip to end flag is set. If so, set stepsToTake
+    // to 250, otherwise set it to 1. If the skipToEnd flag is on, then
+    // we want to take 250 steps, otherwise we only want to take a single
+    // step
+    stepsToTake = flags[1] == 1 ? 250 : 1;
 }
 
 /**
- * Waits, but only if the algorithm is not in a step
+ * Waits, but only if the algorithm is not in a step and stepsToTake is
+ * 0.
  */
 function waitIfNeeded() {
+    
+    // If we are not in a step (implying we just finished a step),
+    // then decrement the stepsToTake counter
     if (!isInStep) {
+        stepsToTake--;
+    }
+    
+    // Wait if we are finished taking all our steps
+    if (stepsToTake == 0) {
         wait();
     }
 }
@@ -83,7 +113,7 @@ function step(code=null) {
         isInStep = false;
 
         // Wait until we should start the next step
-        wait();
+        waitIfNeeded();
     }
     else {
         
