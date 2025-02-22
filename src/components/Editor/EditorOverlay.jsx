@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from "react";
+import PrimaryButton from "components/Buttons/PrimaryButton";
 import { ArrowDownTrayIcon, ArrowPathIcon, ArrowUpRightIcon, CheckIcon } from "@heroicons/react/24/solid";
+
 /**
  * Basic heuristic to detect if the content is JavaScript.
  * @param {string} content
@@ -83,10 +85,10 @@ function DownloadComponent({ tab }) {
     if (!tab || tab.content.length <= 0) return null;
 
     return (
-        <button onClick={() => downloadFile(tab)} className="flex items-center justify-evenly space-x-2 px-3 py-2 rounded-full font-semibold shadow bg-gradient-to-r from-indigo-500 to-blue-500 text-white outline-2 outline-blue-200 hover:outline">
-            <ArrowDownTrayIcon className="w-4 h-4 stroke-2 stroke-white" />
-            <span>Download File</span>
-        </button>
+        <PrimaryButton onClick={() => downloadFile(tab)}>
+            <ArrowDownTrayIcon className="inline h-4 me-2 stroke-2 stroke-white" />
+            Download File
+        </PrimaryButton>
     )
 }
 
@@ -103,15 +105,16 @@ function DownloadComponent({ tab }) {
 export default function EditorOverlayComponent({ onLoad, tab, saved, LoadComponent }) {
     return (
         <div className="absolute bottom-0 right-0 p-2">
-            <div className="flex flex-col space-y-2 pr-3 pb-3">
-                <div className={`flex items-center space-x-2 h-6 w-fit ml-auto px-2 py-1 rounded-full ${saved ? 'fill-green-500 text-green-700' : 'font-semibold'}`}>
+            <div className="space-y-2">
+                <div className={`flex items-center ml-auto w-fit text-xl font-semibold ${saved ? 'fill-green-600 text-green-600' : 'font-semibold'}`}>
                     {saved ?
-                        <CheckIcon className="h-full" />
+                        <CheckIcon className="h-6 me-2 stroke stroke-green-600" />
                         :
-                        <ArrowPathIcon className="h-full animate-spin" />
+                        <ArrowPathIcon className="h-6 me-2 stroke stroke-black animate-spin" />
                     }
                     <span>{saved ? 'Saved' : 'Saving'}</span>
                 </div>
+
                 <LoadComponent tab={tab} />
                 <DownloadComponent tab={tab} />
             </div>

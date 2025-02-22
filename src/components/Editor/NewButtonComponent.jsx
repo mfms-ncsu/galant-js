@@ -53,9 +53,8 @@ export default function NewButtonComponent({addTab, examples}) {
          */
          <div className="relative">
          <Menu>
-             <Menu.Button ref={button} id="new-button" className="menu-button">
-                 <PlusIcon className="h-4 w-4" />
-                 <span>New</span>
+             <Menu.Button ref={button} className="flex items-center h-8">
+                 <PlusIcon className="h-6 p-1 fill-black stroke stroke-black hover:bg-black/10 transition-all rounded-full" />
              </Menu.Button>
              <Transition
                  as={Fragment}

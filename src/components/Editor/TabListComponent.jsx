@@ -69,19 +69,24 @@ export default function TabListComponent({tabs, setTabs, acceptFileType, example
 
     
     return (
-        /**
-         * @todo SD 2024-8
-         * I'm not sure what a tab component is. You may want to see where this is used and/or play around with changes and see what effect they have.
-         */
-    <div className="flex items-end space-x-[2px] max-w-[98%]">
-        <div className="flex overflow-x-auto space-x-[2px] pt-1">
-            {tabs.map((tab) => <TabComponent key={tab.name} tab={tab} onClick={onTabClick} onRename={onTabRename} onRemove={onTabRemove} />)}
+        <div className="flex justify-between bg-neutral-300">
+            <div className={`flex items-end ${(tabs.length > 0 && !tabs[tabs.length-1].selected) && "space-x-2"}`}>
+                <div className="flex">
+                    {tabs.map((tab, i) => 
+                        <div key={i} className="relative">
+                            <TabComponent key={tab.name} tab={tab} onClick={onTabClick} onRename={onTabRename} onRemove={onTabRemove} />
+                            {!(tab.selected || (tabs[i+1] && tabs[i+1].selected)) && <span className="absolute bg-black w-px right-0 top-1 bottom-1"></span>}
+                        </div>
+                    )}
+                </div>
+
+                <NewButtonComponent 
+                    addTab={(data) => {return addTab(data, tabs, setTabs)}}
+                    examples={examples}
+                />
+            </div>
+            <UploadButtonComponent onUpload={onFileUpload} acceptFileType={acceptFileType}/>
         </div>
-        <NewButtonComponent 
-            addTab={(data) => {return addTab(data, tabs, setTabs)}} // Wrapper of addTab
-            examples={examples} />
-        <UploadButtonComponent onUpload={onFileUpload} acceptFileType={acceptFileType}/>
-    </div>
     )
 }
 

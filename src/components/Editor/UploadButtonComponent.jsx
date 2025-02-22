@@ -1,10 +1,10 @@
+import { ArrowUpTrayIcon } from '@heroicons/react/24/solid';
+import PrimaryButton from 'components/Buttons/PrimaryButton';
+
 /**
  * @fileoverview Contains and returns @see {@link UploadButtonComponent}
  * @author Julian Madrigal
  */
-
-
-import { ArrowUpTrayIcon } from '@heroicons/react/24/solid';
 
 /**
  * Returns component for uploading files and adding them as tabs.
@@ -34,10 +34,12 @@ export default function UploadButtonComponent({onUpload, acceptFileType}) {
     }
 
     return (
-        <div className="relative flex items-center space-x-2 px-2 py-1 rounded-t overflow-hidden font-semibold bg-blue-400 text-white outline-2 outline-offset-1 outline-blue-700 hover:bg-blue-500 focus-within:outline">
-            <ArrowUpTrayIcon className="w-4 h-4"/>
-            <span className="">Upload</span>
-            <input type="file" accept={acceptFileType} multiple className="absolute inset-0 z-10 opacity-0" onChange={onFileUploadEvent}></input>
-        </div>
+        <PrimaryButton className="mb-2 me-2">
+            <label htmlFor="file-upload" className="cursor-pointer"> 
+                <ArrowUpTrayIcon className="inline h-4 me-2 fill-white stroke stroke-white"/>
+                Upload
+            </label>
+            <input id="file-upload" type="file" accept={acceptFileType} multiple className="hidden" onChange={onFileUploadEvent}></input>
+        </PrimaryButton>
     )
 }

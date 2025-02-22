@@ -7,14 +7,18 @@
 
 // Import EditorGroup component from the specified path
 import EditorGroup from "../AlgorithmEditor/EditorGroup"
+import PrimaryButton from "components/Buttons/PrimaryButton"
 
 // Header component responsible for displaying the header section
 function Header() {
     return (
         // Header section containing logo and documentation link
-        <div className="flex items-center justify-between px-2 pt-1 w-auto h-12">
+        <div className="flex items-center justify-between px-2 pt-1 w-auto h-12 bg-neutral-300">
             <img src="img/galant_full_logo_without_words.svg" alt="logo" className="h-full w-auto"/>
-            <a className="editor-buttons" href="/documentation.pdf"><label>User Manual</label></a>
+
+            <PrimaryButton>
+                <a className="" href="/documentation.pdf"><label>User Manual</label></a>
+            </PrimaryButton>
         </div>
     )
 }
