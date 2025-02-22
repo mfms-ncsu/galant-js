@@ -1,4 +1,5 @@
 import { React, useEffect, useRef, useState } from "react";
+import PrimaryButton from "components/Buttons/PrimaryButton";
 import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from "@heroicons/react/24/solid";
 import Graph from "graph/Graph";
 
@@ -86,9 +87,9 @@ export default function GraphEditOverlay({ setMode }) {
 
 
     return length > 0 && (
-        <div id="edit-overlay" className="absolute inset-0 flex flex-col items-center p-4 pointer-events-none">
-            <div className="mt-auto mb-4">
-                <div className="flex space-x-12 w-fit mx-auto">
+        <div id="edit-overlay" className="absolute left-0 right-0 bottom-1 flex flex-col items-center pointer-events-none">
+            <div className="flex flex-col items-center">
+                <div className="flex space-x-6">
                     <button className="relative pointer-events-auto stroke-0 stroke-black hover:stroke-1 transition-all" onClick={undo}>
                         <ArrowUturnLeftIcon className="w-6 h-6" />
                         <label className="absolute -bottom-2 left-0 text-sm">z</label>
@@ -99,9 +100,9 @@ export default function GraphEditOverlay({ setMode }) {
                         <label className="absolute -bottom-2 right-0 text-sm">y</label>
                     </button>
                 </div>
-                <div className="flex w-fit">
-                    <button className=" mt-4 mx-auto me-2 px-4 py-2 rounded-full font-semibold bg-blue-500 hover:bg-blue-600 text-white pointer-events-auto transition-all" onClick={revert}>Revert</button>
-                    <button className=" mt-4 mx-auto ms-2 px-4 py-2 rounded-full font-semibold bg-blue-500 hover:bg-blue-600 text-white pointer-events-auto transition-all" onClick={save}>Save Changes</button>
+                <div className="flex w-fit mt-4 gap-x-4">
+                    <PrimaryButton onClick={revert}>Revert</PrimaryButton>
+                    <PrimaryButton onClick={save}>Save Changes</PrimaryButton>
                 </div>
             </div>
         </div>

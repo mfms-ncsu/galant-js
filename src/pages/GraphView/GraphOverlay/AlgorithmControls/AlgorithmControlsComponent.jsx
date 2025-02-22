@@ -1,7 +1,9 @@
 import { ArrowLeftIcon, ArrowPathIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
+import PrimaryButton from "components/Buttons/PrimaryButton";
+import SecondaryButton from "components/Buttons/SecondaryButton";
+import ExitButton from "components/Buttons/ExitButton";
 import { useEffect, useState } from "react";
 import { useAlgorithmContext } from 'pages/GraphView/utils/AlgorithmContext';
-import { XCircleIcon } from "@heroicons/react/16/solid";
 import Graph from "graph/Graph";
 
 /**
@@ -135,40 +137,27 @@ export default function AlgorithmControls() {
     if (!algorithm) return null;
 
     return (
-        <div>
-            <div id="algorithm-controls" className="absolute bottom-1 left-1 mt-auto mb-2">
-                <div className="flex justify-center items-center space-x-1">
-                    <p id="algorithm-name" className="text-black whitespace-nowrap">{algorithm.name}</p>
-                </div>
-
-                <div className="flex justify-center items-center space-x-1">
-                    <p className='text-black whitespace-nowrap' hidden={!debug}>DEBUG MODE - Press 1 to toggle </p>
-                </div>
-                <div className="flex justify-center items-center space-x-4 mt-auto">
-                    <button id="step-back" className="h-8 w-8 p-3 rounded bg-blue-300 pointer-events-auto disabled:opacity-75" disabled={!algorithm.canStepBack()} onClick={() => backButtonPress()}>
-                        <ArrowLeftIcon className="fill-black stroke-1 stroke-black" />
-                    </button>
-                
-                    <p className="p-2 px-3 bg-gray-200 pointer-events-auto">{stepText}</p>
-                    <button id="step-forward" className={`relative h-8 w-8 p-3 rounded bg-blue-300 pointer-events-auto disabled:opacity-75 ${algorithm.fetchingSteps && 'cursor-progress'}`} disabled={!algorithm.canStepForward()} onClick={() => frontButtonPress()}>
+        <div className="absolute left-0 bottom-0 w-full p-1 flex flex-row items-center justify-between">
+            <div className="flex flex-col items-center bg-white rounded-lg font-semibold text-lg">
+                <p className='text-black whitespace-nowrap' hidden={!debug}>DEBUG MODE (1)</p>
+                <p id="algorithm-name" className="text-black whitespace-nowrap">{algorithm.name}</p>
+                <div className="flex justify-center items-center space-x-4 mt-1">
+                    <PrimaryButton onClick={() => backButtonPress()}>
+                        <ArrowLeftIcon className="h-5 fill-white stroke-1 stroke-white" />
+                    </PrimaryButton>
+                    <p className="select-none">{stepText}</p>
+                    <PrimaryButton onClick={() => frontButtonPress()}>
                         {!algorithm.fetchingSteps ?
-                            <ArrowRightIcon className="fill-black stroke-1 stroke-black"/>
+                            <ArrowRightIcon className="h-5 fill-white stroke-1 stroke-white"/>
                         :
-                            <ArrowPathIcon className="fill-gray-500 animate-spin"/>
+                            <ArrowPathIcon className="h-5 fill-white stroke-1 stroke-white animate-spin"/>
                         }
-                    </button>
+                    </PrimaryButton>
                 </div>
             </div>
-
-            <div className="absolute bottom-1 right-1">
-                <button id="export-graph" className={`${algorithm.currentIndex <= 0 && 'hidden'} absolute bottom-20 right-0 py-2 px-4 bg-gradient-to-r from-indigo-500 to-blue-500 shadow rounded-full font-semibold text-white pointer-events-auto`} onClick={exportGraph}>Export Graph</button>
-
-                <button id="terminate-algorithm" className="flex items-center h-6 w-15 space-x-4 px-2 py-1 bg-red-100 text-black rounded shadow-lg hover:bg-gray-300 cursor-alias">
-                    <label><span>Exit (x)</span></label>
-                    <XCircleIcon id="terminate-algorithm" onClick={terminateAlgorithm} className="h-5 fill-gray-500 pointer-events-auto cursor-pointer hover:fill-black"/>
-                </button>
-
-                <button id="skip-to-end" className="h-6 w-15 p-1 rounded bg-green-100 pointer-events-auto" disabled={!algorithm.canStepForward()} onClick={skipToEnd}>Skip to End</button>
+                <PrimaryButton onClick={exportGraph}>Export Graph (s)</PrimaryButton>
+                <ExitButton onClick={terminateAlgorithm}>Exit (x)</ExitButton>
+                <SecondaryButton onClick={skipToEnd}>Skip to End</SecondaryButton>
             </div>
         </div>
     );

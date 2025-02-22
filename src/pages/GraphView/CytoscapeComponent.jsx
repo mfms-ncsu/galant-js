@@ -5,7 +5,6 @@ import nodeHtmlLabel from "cytoscape-node-html-label";
 import coseBilkent from "cytoscape-cose-bilkent";
 import Graph from "graph/Graph";
 
-
 cytoscape.use(coseBilkent); // This registers coseBilkent as a extension
 nodeHtmlLabel(cytoscape);
 
@@ -120,9 +119,9 @@ export default function CytoscapeComponent() {
     return (
         <div className="w-full h-full">
             <div className="flex justify-center">
-                <p className="absolute z-10 font-semibold">{message}</p>
+                {message && <p className="absolute z-10 px-2 py-1 rounded-b-lg bg-neutral-500 text-white text-lg font-semibold">{message}</p>}
             </div>
-            <div id="cytoscape-instance" ref={cytoscapeElement} className="w-full h-full bg-white ring-2 ring-slate-300 rounded-md" />
+            <div id="cytoscape-instance" ref={cytoscapeElement} className="w-full h-full bg-white" />
         </div>
     );
 }

@@ -1,4 +1,4 @@
-
+import PrimaryButton from "components/Buttons/PrimaryButton";
 
 /**
  * Displays an AlgorithmError based on an Error Object, along with the algorithm code which failed
@@ -47,11 +47,11 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
     }
 
     return (
-        <div className="flex flex-col max-h-full bg-gray-100 p-4 rounded-xl" ref={promptRef}>
+        <div className="flex flex-col max-h-full bg-white shadow-lg p-4 rounded-xl" ref={promptRef}>
             <span className="block text-center text-red-500 font-semibold pointer-events-none select-none">{title}</span>
             <span className="block text-center text-red-500 pointer-events-none select-none">{error}</span>
             <pre className="overflow-auto my-4">{code}</pre>
-            <button className="w-full py-2 rounded-full font-semibold bg-blue-500 hover:bg-blue-600 transition-all text-white" onClick={callback}>Okay</button>
+            <PrimaryButton onClick={callback}>Okay</PrimaryButton>
         </div>
     )
 }

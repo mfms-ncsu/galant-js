@@ -1,4 +1,5 @@
 import { Popover, Switch } from '@headlessui/react'
+import PreferenceButton from 'components/Buttons/PreferenceButton';
 import { useState, useRef, useEffect } from 'react'
 import Graph from "graph/Graph";
 
@@ -15,7 +16,7 @@ function BinarySwitchComponent({enabled, setEnabled}) {
             checked={enabled}
             onChange={setEnabled}
             className={`${
-                enabled ? 'bg-gradient-to-r from-indigo-500 to-blue-500' : 'bg-gray-200'
+                enabled ? 'bg-blue-500' : 'bg-gray-200'
             } relative inline-flex h-6 w-11 items-center rounded-full`}
         >
             <span className="sr-only">Toggle</span>
@@ -40,18 +41,6 @@ export default function EdgeSettingsPopover() {
     // Ref for popover button
     const button = useRef(null);
 
-    // Effect hook to handle keyboard shortcut for opening popover
-    useEffect(() => {
-        if (!button.current) return;
-        function onKeyPress(event) {
-            if (event.target.tagName.toLowerCase() === 'input') return;
-            if (event.key !== 'e') return;
-            button.current.click();
-        }
-        document.addEventListener('keypress', onKeyPress);
-        return () => document.removeEventListener('keypress', onKeyPress);
-    }, []);
-
     // Set edgeLabels in graph
     useEffect(() => {
         Graph.cytoscapeManager.edgeLabels = displayLabels;
@@ -70,28 +59,32 @@ export default function EdgeSettingsPopover() {
         window.updateCytoscape();
     }, [isDirected]);
 
+    // Function to toggle the popover menu
+    function toggle() {
+        button.current && button.current.click();
+    }
    
     return (
         <Popover className="relative">
-            <Popover.Button ref={button} className="group h-8 w-15 p-1 pointer-events-auto preference-button">
-                <label>Edges (e)</label>
-            </Popover.Button>
+            <PreferenceButton shortcut="e" callback={toggle} buttonRef={button}>
+                Edges (e)
+            </PreferenceButton>
 
-            <Popover.Panel className="absolute z-10 right-1/2 translate-x-1/8 w-max p-4 pt-2 mt-4 rounded min-h-24 bg-white border border-gray-200 shadow pointer-events-auto">
+            <Popover.Panel className="absolute right-0 z-10 w-64 p-4 pt-2 rounded-xl bg-white shadow-lg pointer-events-auto">
                 <p className='text-lg font-semibold text-center'>Edge Settings</p>
 
-                <div className="flex flex-col space-y-4 mt-4">
-                    <div className='flex justify-between align-middle space-x-6'>
+                <div className="flex flex-col space-y-2 mt-2">
+                    <div className='flex justify-between align-middle'>
                         <span className='text-gray-700 font-medium'>Display Labels</span>
                         <BinarySwitchComponent enabled={displayLabels} setEnabled={setDisplayLabels} />
                     </div>
 
-                    <div className='flex justify-between align-middle space-x-6'>
+                    <div className='flex justify-between align-middle'>
                         <span className='text-gray-700 font-medium'>Display Weights</span>
                         <BinarySwitchComponent enabled={displayWeights} setEnabled={setDisplayWeights} />
                     </div>
 
-                    <div className='flex justify-between align-middle space-x-6'>
+                    <div className='flex justify-between align-middle'>
                         <span className='text-gray-700 font-medium'>Directed</span>
                         <BinarySwitchComponent enabled={isDirected} setEnabled={setIsDirected} />
                     </div>
