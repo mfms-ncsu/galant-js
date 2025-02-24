@@ -335,6 +335,13 @@ function promptEdge(message) {
     return reversedEdges.get(promptResult) || promptResult; // Check if the edge is reversed or not
 }
 
+function setDirected() {
+    if (!isInStep) { postMessage({ action: "step" }) }
+    graph.isDirected = true;
+    postMessage({ action: "setDirected" });
+    waitIfNeeded();
+}
+
 function addNode(x, y) {
     if (!isInStep) { postMessage({ action: "step" }) }
     let id = graph.algorithmChangeManager.addNode(x, y);
