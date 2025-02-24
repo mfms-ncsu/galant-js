@@ -76,7 +76,6 @@ function DownloadComponent({ tab }) {
         }
         document.addEventListener("keydown", handleKeydown);
         return () => document.removeEventListener("keydown", handleKeydown);
-
     }, [tab]);
 
     if (!tab || tab.content.length <= 0) return null;
