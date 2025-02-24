@@ -68,18 +68,15 @@ function DownloadComponent({ tab }) {
 
     // Keyboard shortcut for downloading file
     useEffect(() => {
-        
-        function onKeyPress(event) {
-            if (event.target.tagName.toLowerCase() === 'textarea') return;
-            // Check for Command + S or Control + S
-            // Currently this will be control + d
-            if ((event.metaKey || event.ctrlKey) && event.key === 'd') {
-                event.preventDefault(); // Prevent the default browser behavior
+        function handleKeydown(event) {
+            if (event.keyCode === 83 && (event.metaKey || event.ctrlKey)) {
+                event.preventDefault();
                 downloadFile(tab);
             }
         }
-        document.addEventListener('keydown', onKeyPress);
-        return () => document.removeEventListener('keydown', onKeyPress);
+        document.addEventListener("keydown", handleKeydown);
+        return () => document.removeEventListener("keydown", handleKeydown);
+
     }, [tab]);
 
     if (!tab || tab.content.length <= 0) return null;
