@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect } from "react";
 import PrimaryButton from "components/Buttons/PrimaryButton";
-import { ArrowDownTrayIcon, ArrowPathIcon, ArrowUpRightIcon, CheckIcon } from "@heroicons/react/24/solid";
+import { ArrowDownTrayIcon, ArrowPathIcon, CheckIcon } from "@heroicons/react/24/solid";
 
 /**
  * Basic heuristic to detect if the content is JavaScript.
