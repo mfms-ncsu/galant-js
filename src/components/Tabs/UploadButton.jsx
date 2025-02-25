@@ -35,7 +35,7 @@ export default function UploadButton({onUpload, acceptFileType}) {
 
     return (
         <PrimaryButton className="mx-2 mb-1">
-            <label htmlFor="file-upload" className="cursor-pointer"> 
+            <label htmlFor="file-upload" className="cursor-pointer flex items-center"> 
                 <ArrowUpTrayIcon className="inline h-4 me-2 fill-white stroke stroke-white"/>
                 Upload
             </label>

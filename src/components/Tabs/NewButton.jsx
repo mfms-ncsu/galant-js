@@ -9,7 +9,7 @@ import { useRef, useEffect } from "react";
  * @param {Example[]} examples Examples that will be shown in the dropdown
  * @returns {React.ReactElement}
  */
-export default function NewButton({addTab, examples}) {
+export default function NewButton({ addTab, examples }) {
     const button = useRef(null);
 
     // Effect hook to handle keyboard shortcut for opening New button
@@ -22,7 +22,7 @@ export default function NewButton({addTab, examples}) {
 
             // Only if the user enters the designated keyboard shortcut - n - the button is clicked
             if (event.key == 'n') button.current.click();
-            
+
         }
 
         document.addEventListener('keypress', onKeyPress);
@@ -30,69 +30,63 @@ export default function NewButton({addTab, examples}) {
     }, []);
 
     return (
-        /**
-         * @todo SD 2024-8
-         * I think this is where the style for a drop down menu is defined.
-         * There's a lot of clutter here.
-         * It may be useful to define a uniform style in index.css.
-         * I'm not happy with the positioning of some drop downs or popups; it would be good to understand how to control these.
-         */
-         <div className="relative">
-         <Menu>
-             <Menu.Button ref={button} className="flex items-center h-8">
-                 <PlusIcon className="h-6 p-1 fill-black stroke stroke-black hover:bg-black/10 transition-all rounded-full" />
-             </Menu.Button>
-             <Transition
-                 as={Fragment}
-                 enter="transition ease-out duration-100"
-                 enterFrom="transform opacity-0 scale-95"
-                 enterTo="transform opacity-100 scale-100"
-             >
-                 <Menu.Items id="examples-dropdown" className="dropdown-menu">
-                     <Menu.Item>
-                         <button 
-                             className="dropdown-item" 
-                             onClick={() => { 
-                                 try {
-                                     console.log('Adding a blank tab...');
-                                     addTab({ 'name': 'Blank' });
-                                     console.log('Blank tab added successfully.');
-                                 } catch (error) {
-                                     console.error('Error adding a blank tab:', error);
-                                     alert('An error occurred while adding the blank tab. Please try again.');
-                                 }
-                             }}
-                         >
-                             Blank
-                         </button>
-                     </Menu.Item>
-     
-                     <div className="dropdown-section">
-                         <span className="dropdown-section-header">Examples</span>
-                         {examples.map(data => (
-                             <Menu.Item key={data.name}>
-                                 <button 
-                                     className="dropdown-item" 
-                                     onClick={() => {
-                                         try {
-                                             console.log(`Adding tab for example: ${data.name}`);
-                                             addTab(data);
-                                             console.log(`Tab for example ${data.name} added successfully.`);
-                                         } catch (error) {
-                                             console.error(`Error adding tab for example ${data.name}:`, error);
-                                             alert(`An error occurred while adding the tab for ${data.name}. Please try again.`);
-                                         }
-                                     }}
-                                 >
-                                     {data.name}
-                                 </button>
-                             </Menu.Item>
-                         ))}
-                     </div>
-                 </Menu.Items>
-             </Transition>
-         </Menu>
-     </div>
+        <div className="relative">
+            <Menu>
+                <Menu.Button ref={button} className="flex items-center h-8">
+                    <PlusIcon className="h-6 p-1 fill-black stroke stroke-black hover:bg-black/10 transition-all rounded-full" />
+                </Menu.Button>
+                <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-100"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    className="absolute z-20 p-4 w-fit bg-white rounded-xl shadow-lg"
+                >
+                    <Menu.Items className="">
+                        <Menu.Item>
+                            <button
+                                className="hover:underline"
+                                onClick={() => {
+                                    try {
+                                        console.log('Adding a blank tab...');
+                                        addTab({ 'name': 'Blank' });
+                                        console.log('Blank tab added successfully.');
+                                    } catch (error) {
+                                        console.error('Error adding a blank tab:', error);
+                                        alert('An error occurred while adding the blank tab. Please try again.');
+                                    }
+                                }}
+                            >
+                                Blank
+                            </button>
+                        </Menu.Item>
+
+                        <div className="mt-2 flex flex-col items-start">
+                            <span className="font-bold">Examples</span>
+                            {examples.map(data => (
+                                <Menu.Item key={data.name}>
+                                    <button
+                                        className="text-nowrap hover:underline"
+                                        onClick={() => {
+                                            try {
+                                                console.log(`Adding tab for example: ${data.name}`);
+                                                addTab(data);
+                                                console.log(`Tab for example ${data.name} added successfully.`);
+                                            } catch (error) {
+                                                console.error(`Error adding tab for example ${data.name}:`, error);
+                                                alert(`An error occurred while adding the tab for ${data.name}. Please try again.`);
+                                            }
+                                        }}
+                                    >
+                                        {data.name}
+                                    </button>
+                                </Menu.Item>
+                            ))}
+                        </div>
+                    </Menu.Items>
+                </Transition>
+            </Menu>
+        </div>
 
     )
 }
