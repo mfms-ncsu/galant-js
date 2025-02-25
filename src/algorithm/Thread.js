@@ -335,10 +335,10 @@ function promptEdge(message) {
     return reversedEdges.get(promptResult) || promptResult; // Check if the edge is reversed or not
 }
 
-function setDirected() {
+function setDirected(isDirected) {
     if (!isInStep) { postMessage({ action: "step" }) }
-    graph.isDirected = true;
-    postMessage({ action: "setDirected" });
+    graph.isDirected = isDirected;
+    postMessage({ action: "setDirected", isDirected: isDirected });
     waitIfNeeded();
 }
 

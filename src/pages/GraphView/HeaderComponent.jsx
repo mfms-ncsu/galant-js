@@ -12,7 +12,7 @@ import EditorButton from "components/Buttons/EditorButton";
  * Preferred over a Link to ensure only one instance open at a time. 
  */
 function openGraphEditor() {
-    window.open('/grapheditor','Graph Editor','width=600,height=900');
+    window.open('/grapheditor','Graph Editor',`width=${window.screen.width / 2}, height=${window.screen.height}`);
 }
 
 /**
@@ -20,11 +20,11 @@ function openGraphEditor() {
  * Preferred over a Link to ensure only one instance open at a time. 
  */
 function openAlgorithmEditor() {
-    window.open('/algorithmeditor','Algorithm Editor','width=600,height=900');
+    window.open('/algorithmeditor','Algorithm Editor',`width=${window.screen.width / 2}, height=${window.screen.height}`);
 }
 
 function openInstructionsPage() {
-    window.open('/instructions', 'Getting started with Galant-JS', 'width=600,height=1000');
+    window.open('/instructions', 'Getting started with Galant-JS', `width=${window.screen.width / 2}, height=${window.screen.height}`);
 }
 
 /**

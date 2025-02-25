@@ -247,7 +247,7 @@ export default class Algorithm {
     #onMessage(message) {
         switch (message.action) {
             case "setDirected":
-                Graph.isDirected = true;
+                Graph.isDirected = message.isDirected;
                 break;
             case "addNode":
                 Graph.algorithmChangeManager.addNode(message.x, message.y);

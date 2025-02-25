@@ -31,12 +31,12 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
         // make sure we offset by enough characters
         let offsetSize = ("" + numLines).length;
         let adjustedAlgText = "";
-        splitAlg.forEach(function (line, i) {
+        splitAlg.forEach((line, i) =>{
             // generate the line number and offset
             // we star the line if it is the bad one
             let starTags = ["  ", "   "]
             // eslint-disable-next-line
-            if (i + 1 == errorObject.lineNumber) {
+            if (i === errorObject.lineNumber-1) {
                 starTags = ["**", "** "];
             }
             let offset = starTags[0] + ("" + (i + 1)).padStart(offsetSize) + starTags[1]
