@@ -1,5 +1,5 @@
-import { Graph } from "graph/Graph";
-import Edge from "graph/GraphElement/Edge";
+import { Graph } from "utils/graph/Graph";
+import Edge from "utils/graph/GraphElement/Edge";
 
 /**
  * Mock window functions for testing environment

@@ -1,6 +1,6 @@
-import { Graph } from "graph/Graph";
-import Edge from "graph/GraphElement/Edge";
-import ChangeManager from "graph/ChangeManager/ChangeManager";
+import { Graph } from "utils/graph/Graph";
+import Edge from "utils/graph/GraphElement/Edge";
+import ChangeManager from "utils/graph/ChangeManager/ChangeManager";
 
 /**
  * Mock window functions for testing environment
