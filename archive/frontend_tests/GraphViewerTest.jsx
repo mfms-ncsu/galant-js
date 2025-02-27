@@ -1,7 +1,7 @@
 import './GraphViewerTest.scss';
 
 import Graph from 'utils/Graph';
-import CytoscapeComponent from 'pages/GraphView/CytoscapeComponent';
+import CytoscapeComponent from 'pages/Graph/Cytoscape';
 import GraphContext from 'pages/GraphView/utils/GraphContext';
 
 import { useContext } from 'react'
