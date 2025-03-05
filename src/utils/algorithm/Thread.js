@@ -1,5 +1,6 @@
-import { Graph } from "utils/graph/Graph";
-import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
+import GraphInterface from 'utils/graph/GraphInterface/GraphInterface';
+import FileParser from 'utils/graph/FileParser/FileParser';
+import ChangeManager from 'utils/graph/ChangeManager/ChangeManager';
 
 /**
  * Execution environment for algorithms. This file provides all necessary functions
@@ -8,6 +9,9 @@ import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
  * @author Henry Morris
  * @author Krisjian Smith
  */
+
+/** File parser to read in the graph */
+const fileParser = new FileParser();
 
 /**
  * Used to inform the thread when to run and storing prompt results to be accessed in
@@ -41,7 +45,8 @@ let stepsToTake;
 /**
  * This thread's copy of the graph
  */
-let graph = new Graph();
+let graph;
+let changeManager = new ChangeManager();
 
 /**
  * This function uses Atomics to cause the algorithm to wait for user input before continuing
@@ -188,12 +193,12 @@ function setAttribute(id, name, value) {
         // Handle edge attribute
         let split = id.split(",");
         let source = split[0], target = split[1];
-        graph.algorithmChangeManager.setEdgeAttribute(source, target, name, value);
+        [graph, changeManager] = GraphInterface.setEdgeAttribute(graph, changeManager, source, target, name, value);
         postMessage({ action: "setEdgeAttribute", source: source, target: target, name: name, value: value });
     
     } else {
         // Handle node attribute
-        graph.algorithmChangeManager.setNodeAttribute(id, name, value);
+        [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, id, name, value);
         postMessage({ action: "setNodeAttribute", nodeId: id, name: name, value: value });
     }
     waitIfNeeded();
@@ -209,11 +214,11 @@ function setAttributeAll(type, name, value) {
     if (!isInStep) { postMessage({ action: "step" }) }
 
     if (type === "nodes") {
-        graph.algorithmChangeManager.setNodeAttributeAll(name, value);
+        [graph, changeManager] = GraphInterface.setNodeAttributeAll(graph, changeManager, name, value);
         postMessage({ action: "setNodeAttributeAll", name: name, value: value });
 
     } else {
-        graph.algorithmChangeManager.setEdgeAttributeAll(name, value);
+        [graph, changeManager] = GraphInterface.setEdgeAttributeAll(graph, changeManager, name, value);
         postMessage({ action: "setEdgeAttributeAll", name: name, value: value });
     }
     waitIfNeeded();
@@ -229,11 +234,11 @@ function getAttribute(id, name) {
         // Handle edge attribute
         let split = id.split(",");
         let source = split[0], target = split[1];
-        return graph.getEdgeAttribute(source, target, name);
+        return GraphInterface.getEdgeAttribute(graph, source, target, name);
 
     } else {
         // Handle node attribute
-        return graph.getNodeAttribute(id, name);
+        return GraphInterface.getNodeAttribute(graph, id, name);
     }
 }
 
@@ -280,6 +285,7 @@ function promptNumber(message) {
 
 function promptNode(message, error) {
     let nodes = getNodes();
+
     if (nodes.length === 0) {
         throw new Error("Cannot prompt for a node when no valid nodes exist.");
     }
@@ -344,34 +350,35 @@ function setDirected(isDirected) {
 
 function addNode(x, y) {
     if (!isInStep) { postMessage({ action: "step" }) }
-    let id = graph.algorithmChangeManager.addNode(x, y);
+    let newNode;
+    [graph, changeManager, newNode] = GraphInterface.addNode(graph, changeManager, x, y);
     postMessage({ action: "addNode", x: x, y: y });
     waitIfNeeded();
-    return id;
+    return newNode;
 }
 
 function addEdge(source, target) {
     if (!isInStep) { postMessage({ action: "step" }) }
-    graph.algorithmChangeManager.addEdge(source, target);
+    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, source, target);
     postMessage({ action: "addEdge", source: source, target: target });
     waitIfNeeded();
 }
 
 function setPosition(nodeId, x, y) {
     if (!isInStep) { postMessage({ action: "step" }) }
-    graph.algorithmChangeManager.setNodePosition(nodeId, x, y);
+    [graph, changeManager] = GraphInterface.setNodePosition(graph, changeManager, nodeId, x, y);
     postMessage({ action: "setNodePosition", nodeId: nodeId, x: x, y: y });
     waitIfNeeded();
 }
 
 function incrementPosition(nodeId, x, y) {
-    let currPos = graph.getNodePosition(nodeId);
+    let currPos = GraphInterface.getNodePosition(graph, nodeId);
     currPos && setPosition(nodeId, currPos.x + x, currPos.y + y);
 }
 
 function deleteNode(nodeId) {
     if (!isInStep) { postMessage({ action: "step" }) }
-    graph.algorithmChangeManager.deleteNode(nodeId);
+    [graph, changeManager] = GraphInterface.deleteNode(graph, changeManager, nodeId);
     postMessage({ action: "deleteNode", nodeId: nodeId });
     waitIfNeeded();
 }
@@ -380,73 +387,73 @@ function deleteEdge(edgeId) {
     if (!isInStep) { postMessage({ action: "step" }) }
     let split = edgeId.split(",");
     let source = split[0], target = split[1];
-    graph.algorithmChangeManager.deleteEdge(source, target);
+    [graph, changeManager] = GraphInterface.deleteEdge(graph, changeManager, source, target);
     postMessage({ action: "deleteEdge", source: source, target: target });
     waitIfNeeded();
 }
 
 function getNodes() {
-    return graph.getNodeArray();
+    return GraphInterface.getNodeIds(graph);
 }
 
 function getNumberOfNodes() {
-    return graph.getNumberOfNodes();
+    return GraphInterface.getNumberOfNodes(graph);
 }
 
 function getEdges() {
-    return graph.getEdgeIds();
+    return GraphInterface.getEdgeIds(graph);
 }
 
 function getNumberOfEdges() {
-    return graph.getNumberOfEdges();
+    return GraphInterface.getNumberOfEdges(graph);
 }
 
 function source(edge) {
-    return graph.getSource(edge);
+    return GraphInterface.getSource(graph, edge);
 }
 
 function target(edge) {
-    return graph.getTarget(edge);
+    return GraphInterface.getTarget(graph, edge);
 }
 
 function other(nodeId, edgeId) {
-    return graph.getOppositeNode(nodeId, edgeId);
+    return GraphInterface.getOppositeNode(graph, nodeId, edgeId);
 }
 
 function incident(nodeId) {
-    return graph.getIncidentEdges(nodeId);
+    return GraphInterface.getIncidentEdges(graph, nodeId);
 }
 
 function incoming(nodeId) {
-    return graph.getIncomingEdges(nodeId);
+    return GraphInterface.getIncomingEdges(graph, nodeId);
 }
 
 function outgoing(nodeId) {
-    return graph.getOutgoingEdges(nodeId);
+    return GraphInterface.getOutgoingEdges(graph, nodeId);
 }
 
 function adjacentNodes(nodeId) {
-    return graph.getAdjacentNodes(nodeId);
+    return GraphInterface.getAdjacentNodes(graph, nodeId);
 }
 
 function incomingNodes(nodeId) {
-    return graph.getIncomingNodes(nodeId);
+    return GraphInterface.getIncomingNodes(graph, nodeId);
 }
 
 function outgoingNodes(nodeId) {
-    return graph.getOutgoingNodes(nodeId);
+    return GraphInterface.getOutgoingNodes(graph, nodeId);
 }
 
 function degree(nodeId) {
-    return graph.getIncidentEdges(nodeId).length;
+    return GraphInterface.getIncidentEdges(graph, nodeId).length;
 }
 
 function inDegree(nodeId) {
-    return graph.getIncomingEdges(nodeId).length;
+    return GraphInterface.getIncomingEdges(graph, nodeId).length;
 }
 
 function outDegree(nodeId) {
-    return graph.getOutgoingEdges(nodeId).length;
+    return GraphInterface.getOutgoingEdges(graph, nodeId).length;
 }
 
 function mark(nodeId) {
@@ -751,7 +758,7 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         flags = message[2];
     } else if (message[0] === "graph/algorithm") {
         // Load the graph with isDirected flag
-        graph.fileParser.loadGraph(message[1]);
+        graph = fileParser.loadGraph(message[1]);
         graph.isDirected = message[2];
 
         // Make sure that the isInStep variable is initialized

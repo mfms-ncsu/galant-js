@@ -2,7 +2,7 @@ import { Popover } from '@headlessui/react'
 import PreferenceButton from 'components/Buttons/PreferenceButton';
 import SecondaryButton from 'components/Buttons/SecondaryButton';
 import { useEffect, useRef } from 'react'
-import Graph from 'utils/graph/Graph'
+import Graph from 'utils/graph/Graph/Graph'
 
 /**
  * ControlSettingsPopover component renders a popover for control settings.

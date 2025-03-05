@@ -1,18 +1,17 @@
-import Graph from "utils/graph/Graph";
+import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
 
 /**
  * Representation of the algorithm loaded into the program. Contains a name and code. Controls a
  * web worker called Thread, which is the execution environment for the code.
  * 
  * @author Henry Morris
+ * @author Krisjian Smith
  */
 export default class Algorithm {
-
     /** The ID of the timeout instance so that it can be canceled if we get a good message */
     #timeoutId;
     /** The number of miliseconds before a timeout happens. DONT CHANGE THIS */
     #timeoutPeriod = 5000;
-
     /** A flag that determines if the algorithm is in debug mode */
     debugMode = false;
 
@@ -21,7 +20,14 @@ export default class Algorithm {
      * @param {String} name Algorithm name
      * @param {String} code Algorithm code
      */
-    constructor(name, code, PromptService, stateVar) {
+    constructor(graphState, algorithmChangeManagerState, name, code, PromptService, stateVar) {
+        const [graph, setGraph] = graphState;
+        this.graph = graph;
+        this.setGraph = setGraph;
+        const [algorithmChangeManager, setAlgorithmChangeManager] = algorithmChangeManagerState;
+        this.algorithmChangeManager = algorithmChangeManager;
+        this.setAlgorithmChangeManager = setAlgorithmChangeManager;
+
         this.name = name;
         this.code = code;
         this.array = new Int32Array(new SharedArrayBuffer(1024));
@@ -50,7 +56,7 @@ export default class Algorithm {
         let handleMessage = (message) => { this.#onMessage(message.data) }
         this.worker.onmessage = handleMessage;
         this.worker.postMessage(["shared", this.array, this.flags]);
-        this.worker.postMessage(["graph/algorithm", Graph.toGraphString(), Graph.isDirected, this.code]);
+        this.worker.postMessage(["graph/algorithm", GraphInterface.toString(this.graph), this.graph.isDirected, this.code]);
         this.worker.postMessage(["algorithm", this.code]);
     }
 
@@ -59,21 +65,6 @@ export default class Algorithm {
      */
     clearPrompts() {
         this.PromptService.clearPrompts();
-    }
-
-    /**
-     * Returns the current step number of the algorithm
-     */
-    getStepNumber() {
-        return Graph.algorithmChangeManager.getIndex();
-    }
-
-    /**
-     * Returns the total number of steps taken in the algorithm.
-     * This can be different to the index because you can undo a step
-     */
-    getTotalSteps() {
-        return Graph.algorithmChangeManager.getLength();
     }
 
     /**
@@ -127,7 +118,7 @@ export default class Algorithm {
      * @returns True if it can, false otherwise
      */
     canStepBack() {
-        return Graph.algorithmChangeManager.getIndex() > 0;
+        return this.algorithmChangeManager.index > 0;
     }
 
     /**
@@ -136,7 +127,7 @@ export default class Algorithm {
      */
     canStepForward() {
         if (this.fetchingSteps) return false;
-        if (this.completed && Graph.algorithmChangeManager.getIndex() >= Graph.algorithmChangeManager.getLength()) return false;
+        if (this.completed && this.algorithmChangeManager.index >= this.algorithmChangeManager.changes.length) return false;
         return true;
     }
 
@@ -145,7 +136,7 @@ export default class Algorithm {
      */
     stepBack() {
         if (!this.canStepBack()) return;
-        Graph.algorithmChangeManager.undo();
+        GraphInterface.undo(this.graph, this.algorithmChangeManager);
         this.redraw();
     }
 
@@ -159,7 +150,6 @@ export default class Algorithm {
      * want to take one step
      */
     stepForward(skipToEnd) {
-
         // Set skipToEnd to false if nothing was given
         if (skipToEnd === undefined) skipToEnd = false;
         
@@ -169,10 +159,8 @@ export default class Algorithm {
         // If skipToEnd is set to true, redo all saved steps in the
         // ChangeManager
         if (skipToEnd) {
-            while (Graph.algorithmChangeManager.getIndex() !==
-                   Graph.algorithmChangeManager.getLength()) {
-                
-                Graph.algorithmChangeManager.redo();
+            while (this.algorithmChangeManager.index !== this.algorithmChangeManager.changes.length-1) {
+                GraphInterface.redo();
                 this.redraw();
             }
         }
@@ -183,9 +171,7 @@ export default class Algorithm {
 
         // If we are at the end of the list of changes, we need to
         // wake up the thread to generate a new step
-        if (Graph.algorithmChangeManager.getIndex() ===
-            Graph.algorithmChangeManager.getLength()) { 
-
+        if (this.algorithmChangeManager.index !== this.algorithmChangeManager.changes.length-1) {
             this.fetchingSteps = true;
             
             // Set the skipToEnd flag to true if necessary
@@ -202,10 +188,9 @@ export default class Algorithm {
 
         } else {
             // Use redo if there are pre-loaded steps ahead of the index
-            Graph.algorithmChangeManager.redo();
+            GraphInterface.redo(this.graph, this.algorithmChangeManager);
             this.redraw();
         }
-
     }
     
     /**
@@ -213,7 +198,7 @@ export default class Algorithm {
      * the step coun number after each step.
      */
     redraw() {
-        this.setStatus({}); 
+        this.setStatus({...this.status}); 
     }
 
     /**
@@ -245,15 +230,23 @@ export default class Algorithm {
      * @param {Object} message Message from thread
      */
     #onMessage(message) {
+        // Create new variables to set
+        let [newGraph, newChangeManager] = [];
+
         switch (message.action) {
             case "setDirected":
-                Graph.isDirected = message.isDirected;
+                newGraph = GraphInterface.setDirected(this.graph, message.isDirected);
+                this.setGraph(newGraph);
                 break;
             case "addNode":
-                Graph.algorithmChangeManager.addNode(message.x, message.y);
+                [newGraph, newChangeManager] = GraphInterface.addNode(this.graph, this.algorithmChangeManager, message.x, message.y);
+                this.setGraph(newGraph);
+                this.setAlgorithmChangeManager(newChangeManager);
                 break;
             case "addEdge":
-                Graph.algorithmChangeManager.addEdge(message.source, message.target);
+                [newGraph, newChangeManager] = GraphInterface.addEdge(this.graph, this.algorithmChangeManager, message.source, message.target);
+                this.setGraph(newGraph);
+                this.setAlgorithmChangeManager(newChangeManager);
                 break;
             case "prompt":
                 clearTimeout(this.#timeoutId); // Cancel the timer while the prompt is up
@@ -266,50 +259,66 @@ export default class Algorithm {
                 );
                 break;
             case "message":
-                Graph.algorithmChangeManager.addMessage(message.message);
+                newChangeManager = GraphInterface.addMessage(this.algorithmChangeManager, message.message);
+                this.setAlgorithmChangeManager(newChangeManager);
                 break;
             case "print":
                 console.log(message.message);
                 break;
             case "deleteNode":
-                Graph.algorithmChangeManager.deleteNode(message.nodeId);
+                [newGraph, newChangeManager] = GraphInterface.deleteNode(this.graph, this.algorithmChangeManager, message.nodeId);
+                this.setGraph(newGraph);
+                this.setAlgorithmChangeManager(newChangeManager);
                 break;
             case "setNodePosition":
-                Graph.algorithmChangeManager.setNodePosition(message.nodeId, message.x, message.y);
+                [newGraph, newChangeManager] = GraphInterface.setNodePosition(this.graph, this.algorithmChangeManager, message.nodeId, message.x, message.y);
+                this.setGraph(newGraph);
+                this.setAlgorithmChangeManager(newChangeManager);
                 break;
             case "deleteEdge":
-                Graph.algorithmChangeManager.deleteEdge(message.source, message.target);
+                [newGraph, newChangeManager] = GraphInterface.deleteEdge(this.graph, this.algorithmChangeManager, message.source, message.target);
+                this.setGraph(newGraph);
+                this.setAlgorithmChangeManager(newChangeManager);
                 break;
             case "setNodeAttribute":
-                Graph.algorithmChangeManager.setNodeAttribute(message.nodeId, message.name, message.value);
+                [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(this.graph, this.algorithmChangeManager, message.nodeId, message.name, message.value);
+                this.setGraph(newGraph);
+                this.setAlgorithmChangeManager(newChangeManager);
                 break;
             case "setNodeAttributeAll":
-                Graph.algorithmChangeManager.setNodeAttributeAll(message.name, message.value);
+                [newGraph, newChangeManager] = GraphInterface.setNodeAttributeAll(this.graph, this.algorithmChangeManager, message.name, message.value);
+                this.setGraph(newGraph);
+                this.setAlgorithmChangeManager(newChangeManager);
                 break;
             case "setEdgeAttribute":
-                Graph.algorithmChangeManager.setEdgeAttribute(message.source, message.target, message.name, message.value);
+                [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(this.graph, this.algorithmChangeManager, message.source, message.target, message.name, message.value);
+                this.setGraph(newGraph);
+                this.setAlgorithmChangeManager(newChangeManager);
                 break;
             case "setEdgeAttributeAll":
-                Graph.algorithmChangeManager.setEdgeAttributeAll(message.name, message.value);
+                [newGraph, newChangeManager] = GraphInterface.setEdgeAttributeAll(this.graph, this.algorithmChangeManager, message.name, message.value);
+                this.setGraph(newGraph);
+                this.setAlgorithmChangeManager(newChangeManager);
                 break;
             case "startRecording":
-                Graph.algorithmChangeManager.startRecording();
+                newChangeManager = GraphInterface.startRecording(this.algorithmChangeManager);
+                this.setAlgorithmChangeManager(newChangeManager);
                 break;
             case "endRecording":
-                
                 clearTimeout(this.#timeoutId);
-                // End the recording, but only if it started. It is
-                // possible that the user was in debug mode, which
-                // means that the recording was never actually
-                // started
-                if (Graph.algorithmChangeManager.isRecording()) {
-                    Graph.algorithmChangeManager.endRecording();
+                // End the recording, but only if it started. It is possible that the user was in debug mode, which
+                // means that the recording was never actually started
+                if (this.algorithmChangeManager.isRecording) {
+                    newChangeManager = GraphInterface.endRecording(this.algorithmChangeManager);
+                    this.setAlgorithmChangeManager(newChangeManager);
                 }
                 if (this.onStepAdded) this.onStepAdded();
                 break;
             case "step":
                 clearTimeout(this.#timeoutId);
                 if (this.onStepAdded) this.onStepAdded();
+                this.setGraph(newGraph);
+                this.setAlgorithmChangeManager(newChangeManager);
                 break;
             case "complete":
                 clearTimeout(this.#timeoutId);
@@ -327,9 +336,8 @@ export default class Algorithm {
                     algorithmCode: this.code
                 }, () => { });
             default:
-                // If the message was not a type we define here, then we probably just made
-                // a mistake or typo when sending this message. Throw an error to let us
-                // know about it
+                // If the message was not a type we define here, then we probably just made a mistake 
+                // or typo when sending this message. Throw an error to let us know about it
                 throw new Error("Unexpected message type: " + message.action);
         }
     }

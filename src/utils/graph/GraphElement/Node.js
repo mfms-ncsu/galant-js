@@ -13,8 +13,10 @@ export default class Node extends GraphElement {
      * @param {String} nodeId Unique string id
      * @param {Number} x X-position
      * @param {Number} y Y-position
+     * @param {Number} index Layer index (layered only)
+     * @param {Number} layer Graph layer (layered only)
      */
-    constructor(nodeId, x, y) {
+    constructor(nodeId, x, y, index, layer) {
         // Call the super constructor with the map of attributes
         super(new Map([
             ["backgroundOpacity", undefined],
@@ -36,6 +38,10 @@ export default class Node extends GraphElement {
             x: x,
             y: y
         }
+
+        // Set the index and layer
+        this.index = index;
+        this.layer = layer;
 
         // Create a map between adjacent nodes and their edge objects
         this.edges = new Map();

@@ -1,10 +1,13 @@
+import { useEffect, useState } from "react";
+import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
+import { useAtom } from "jotai";
+import { algorithmChangeManagerAtom, graphAtom } from "utils/atoms/atoms";
+import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
+import ChangeManager from "utils/graph/ChangeManager/ChangeManager";
 import { ArrowLeftIcon, ArrowPathIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
 import PrimaryButton from "components/Buttons/PrimaryButton";
 import SecondaryButton from "components/Buttons/SecondaryButton";
 import ExitButton from "components/Buttons/ExitButton";
-import { useEffect, useState } from "react";
-import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
-import Graph from "utils/graph/Graph";
 
 
 /**
@@ -12,17 +15,10 @@ import Graph from "utils/graph/Graph";
  * @returns {JSX.Element} - Returns the JSX for AlgorithmControls component.
  */
 export default function AlgorithmControls() {
-    // Retrieve algorithm context
+    const [graph, setGraph] = useAtom(graphAtom);
     const { algorithm, setAlgorithm } = useAlgorithmContext();
-
+    const [algorithmChangeManager, setAlgorithmChangeManager] = useAtom(algorithmChangeManagerAtom);
     const [debug, setDebug] = useState(false);
-    // const [stepText, setStepText] = useState("Step 0");
-    
-    /** The text to display in the bottom left of the screen */
-    let stepText = "Step 0";
-    if (algorithm) {
-        stepText = `Step ${algorithm.getStepNumber()}` + (algorithm.completed ? ` / ${algorithm.getTotalSteps()}` : '');
-    }
     
     // Function to handle pressing the forward button
     function frontButtonPress() {
@@ -51,7 +47,7 @@ export default function AlgorithmControls() {
                 ],
             });
             const writableStream = await fileHandle.createWritable();
-            const content = Graph.toGraphString();
+            const content = GraphInterface.toString();
             await writableStream.write(content);
             await writableStream.close();
         } else {
@@ -72,7 +68,7 @@ export default function AlgorithmControls() {
             return; // Exit the function if the user cancelled
         }
 
-        const content = Graph.toGraphString();
+        const content = GraphInterface.toString(graph);
         const blob = new Blob([content], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -97,7 +93,6 @@ export default function AlgorithmControls() {
     }
 
     function terminateAlgorithm() {
-        
         // Remove any prompts the algorithm had up
         algorithm.clearPrompts();
 
@@ -105,9 +100,7 @@ export default function AlgorithmControls() {
         setAlgorithm(null);
 
         // Undo all changes made by the algorithm
-        Graph.algorithmChangeManager.revert();
-        Graph.algorithmChangeManager.clear();
-        stepText = "Step 0";
+        setAlgorithmChangeManager(new ChangeManager());
     }
 
     /**
@@ -145,7 +138,7 @@ export default function AlgorithmControls() {
                     <PrimaryButton onClick={() => backButtonPress()}>
                         <ArrowLeftIcon className="h-5 fill-white stroke-1 stroke-white" />
                     </PrimaryButton>
-                    <p className="select-none">{stepText}</p>
+                    <p className="select-none">Step {algorithmChangeManager.index}</p>
                     <PrimaryButton onClick={() => frontButtonPress()}>
                         {!algorithm.fetchingSteps ?
                             <ArrowRightIcon className="h-5 fill-white stroke-1 stroke-white"/>

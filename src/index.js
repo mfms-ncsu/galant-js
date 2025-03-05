@@ -12,9 +12,10 @@ import * as ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 
-import GraphView from "pages/Graph/Graph";
+import Graph from "pages/Graph/Graph";
 import Editor from "pages/Editor/Editor"
-import InstructionsPage from "pages/Instructions/Instructions"
+import Instructions from "pages/Instructions/Instructions"
+import { Provider } from "jotai";
 
 // Check if service workers are supported by the browser
 if ('serviceWorker' in navigator) {
@@ -37,7 +38,7 @@ if ('serviceWorker' in navigator) {
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <GraphView />,
+        element: <Graph />,
     },
     {
         path: '/algorithmeditor',
@@ -49,11 +50,15 @@ const router = createBrowserRouter([
     },
     {
         path: '/instructions',
-        element: <InstructionsPage />
+        element: <Instructions />
     }
 ]);
 
 // Render the router wrapped in RouterProvider to provide routing context
 ReactDOM.createRoot(document.getElementById("root")).render(
-    <RouterProvider router={router} />
+    <React.StrictMode>
+        <Provider>
+            <RouterProvider router={router} />
+        </Provider>
+    </React.StrictMode>
 );

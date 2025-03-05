@@ -1,9 +1,8 @@
 import { Popover, Switch } from '@headlessui/react'
 import PreferenceButton from 'components/Buttons/PreferenceButton';
-import { useEffect, useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import Graph from 'utils/graph/Graph';
 
 /**
  * BinarySwitchComponent renders a binary switch component.
@@ -42,26 +41,6 @@ export default function NodeSettingsPopover() {
     
     // Ref for popover button
     const button = useRef(null);
-
-    // Effect to update display labels preference
-    useEffect(() => {
-        Graph.cytoscapeManager.nodeLabels = displayLabels;
-        window.updateCytoscape();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [displayLabels]);
-
-    // Effect to update display weights preference
-    useEffect(() => {
-        Graph.cytoscapeManager.nodeWeights = displayWeights;
-        window.updateCytoscape();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [displayWeights]);
-
-    // Effect to update node radius preference
-    useEffect(() => {
-        Graph.cytoscapeManager.nodeSize = nodeRadius;
-        window.updateCytoscape();
-    }, [nodeRadius]);
 
     // Function to toggle the popover menu
     function toggle() {

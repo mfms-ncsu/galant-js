@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useAtom } from "jotai";
+import { graphAtom, userChangeManagerAtom } from "utils/atoms/atoms";
+import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
 import ExitButton from "components/Buttons/ExitButton";
-import Graph from "utils/graph/Graph";
 import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
+
 /**
  * NodeContextMenu defines the React Component for the menu that should be opened to display and allow edits to a node's attributes.
  * Displayed attributes include id, label, and weight.
@@ -13,6 +16,8 @@ import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
  * @returns {React.ReactElement} React component
  */
 export default function NodeContextMenu() {
+    const [graph, setGraph] = useAtom(graphAtom);
+    const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
     const { algorithm, setAlgorithm } = useAlgorithmContext();
     const [visible, setVisible] = useState(false);
     const [node, setNode] = useState(null);
@@ -69,14 +74,20 @@ export default function NodeContextMenu() {
         const weight = values.weight.trim();
 
         // Set the changes
-        Graph.userChangeManager.setNodeAttribute(nodeId, "label", label);
-        Graph.userChangeManager.setNodeAttribute(nodeId, "weight", weight);
+        let [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graph, userChangeManager, nodeId, "label", label);
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
+        [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graph, userChangeManager, nodeId, "weight", weight);
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
     }
 
     // Deletes the node and closes the context menu
     function deleteNode() {
-        setVisible(false); // Hide the menu
-        Graph.userChangeManager.deleteNode(nodeId); // Delete the node
+        setVisible(false);
+        let [newGraph, newChangeManager] = GraphInterface.deleteNode(graph, userChangeManager, nodeId);
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
     }
 
     function onEnterPressed(event) {

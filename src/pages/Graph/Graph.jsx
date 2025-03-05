@@ -17,20 +17,23 @@ import NodeContextMenu from "components/ContextMenus/NodeContextMenu";
 import EdgeContextMenu from "components/ContextMenus/EdgeContextMenu";
 import EditControls from "./Overlays/EditControls";
 import SharedWorker from "utils/services/SharedWorker";
-import Graph from "utils/graph/Graph";
 import AlgorithmControls from "./Overlays/AlgorithmControls";
 
+import { useAtom } from "jotai";
+import FileParser from "utils/graph/FileParser/FileParser";
+import { algorithmChangeManagerAtom, graphAtom } from "utils/atoms/atoms";
 
-export default function GraphView() {
+export default function Graph() {
     // Define state variables using React hooks
     const [PromptService] = useState(new PromptServiceObject(useState([])));
     const [currentAlgorithm, setCurrentAlgorithm] = useState(null);
     const [algorithmStatus, setAlgorithmStatus] = useState(null);
-    const [mode, setMode] = useState("normal") // "normal", "undo", "redo"
-
     const sentAliveMessage = useRef();
-
     const algorithmContext = createAlgorithmContextObject(currentAlgorithm, setCurrentAlgorithm);
+
+    const [graph, setGraph] = useAtom(graphAtom);
+    const [algorithmChangeManager, setAlgorithmChangeManager] = useAtom(algorithmChangeManagerAtom);
+    const fileParser = new FileParser(graph, setGraph);
     
     /**
      * Creates SharedWorker instance on mount.
@@ -55,9 +58,9 @@ export default function GraphView() {
 
             // Load the graph
             try {
-                Graph.fileParser.loadGraph(graphText);
+                setGraph(fileParser.loadGraph(graphText));
             } catch (e) {
-                alert(e);
+                console.error(e);
             }
 
             // We have to wait for cytoscape to read graph changes, and add graph.
@@ -69,8 +72,7 @@ export default function GraphView() {
          */
         function onAlgorithmLoad(data) {
             // Load the algorithm
-            Graph.algorithmChangeManager.clear(); // Clear any changes
-            let newAlgorithm = new Algorithm(data.name, data.algorithm, PromptService, [algorithmStatus, setAlgorithmStatus]); // Create a new algorithm object
+            let newAlgorithm = new Algorithm([graph, setGraph], [algorithmChangeManager, setAlgorithmChangeManager], data.name, data.algorithm, PromptService, [algorithmStatus, setAlgorithmStatus]); // Create a new algorithm object
             setCurrentAlgorithm(newAlgorithm); // Set the state
         }
 
@@ -80,7 +82,6 @@ export default function GraphView() {
         return () => SharedWorker.remove(onGraphLoad, onAlgorithmLoad);
         // eslint-disable-next-line
     }, [window.cytoscape]);
-
 
     return (
         <>
@@ -99,5 +100,6 @@ export default function GraphView() {
                     </PromptContext.Provider>
                 </AlgorithmContext.Provider>
             </div>
-        </>);
+        </>
+    );
 }

@@ -1,7 +1,6 @@
 import { Popover, Switch } from '@headlessui/react'
 import PreferenceButton from 'components/Buttons/PreferenceButton';
 import { useState, useRef, useEffect } from 'react'
-import Graph from "utils/graph/Graph";
 
 /**
  * BinarySwitchComponent renders a binary switch component.
@@ -40,24 +39,6 @@ export default function EdgeSettingsPopover() {
 
     // Ref for popover button
     const button = useRef(null);
-
-    // Set edgeLabels in graph
-    useEffect(() => {
-        Graph.cytoscapeManager.edgeLabels = displayLabels;
-        window.updateCytoscape();
-    }, [displayLabels]);
-
-    // Set edgeWeights in graph
-    useEffect(() => {
-        Graph.cytoscapeManager.edgeWeights = displayWeights;
-        window.updateCytoscape();
-    }, [displayWeights]);
-
-    // Set isDirected in graph
-    useEffect(() => {
-        Graph.isDirected = isDirected;
-        window.updateCytoscape();
-    }, [isDirected]);
 
     // Function to toggle the popover menu
     function toggle() {

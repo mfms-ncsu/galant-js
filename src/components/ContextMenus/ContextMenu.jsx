@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { useAtom } from "jotai";
+import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
 import PrimaryButton from "components/Buttons/PrimaryButton";
-import Graph from "utils/graph/Graph";
 import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
+import { graphAtom, userChangeManagerAtom } from 'utils/atoms/atoms';
 
 
 /**
@@ -16,12 +18,13 @@ import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
  * @returns {React.ReactElement}
  */
 export default function ContextMenu() {
+    const [graph, setGraph] = useAtom(graphAtom);
+    const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
     const { algorithm, setAlgorithm } = useAlgorithmContext();
     const [visible, setVisible] = useState(false);
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [renderedPosition, setRenderedPosition] = useState({ x: 0, y: 0 });
     const [values, setValues] = useState({});
-
 
     // Display the popup on right-click to graph
     useEffect(() => {
@@ -52,7 +55,9 @@ export default function ContextMenu() {
             const newPosition = node.position();
 
             // Set the node position
-            Graph.userChangeManager.setNodePosition(id, newPosition.x / Graph.getScalar(), newPosition.y / Graph.getScalar());
+            let [newGraph, newChangeManager] = GraphInterface.setNodePosition(graph, userChangeManager, id, newPosition.x / graph.scalar, newPosition.y / graph.scalar);
+            setGraph(newGraph);
+            setUserChangeManager(newChangeManager);
         }
 
         let timeOut = null;
@@ -63,11 +68,14 @@ export default function ContextMenu() {
 
         window.cytoscape.on('free', 'node', onPositionMoved);
         return () => window.cytoscape.removeListener('free', onPositionMoved);
-    }, [window.cytoscape])
+    }, [window.cytoscape, graph]);
 
     // Add a new node to the graph
     function addNode() {
-        Graph.userChangeManager.addNode(position.x / Graph.getScalar(), position.y / Graph.getScalar());
+        let [newGraph, newChangeManager] = GraphInterface.addNode(graph, userChangeManager, position.x / graph.scalar, position.y / graph.scalar);
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
+
         setVisible(false);
     }
 
@@ -75,7 +83,11 @@ export default function ContextMenu() {
     function addEdge() {
         const source = values.source;
         const destination = values.destination;
-        Graph.userChangeManager.addEdge(source, destination);
+
+        let [newGraph, newChangeManager] = GraphInterface.addEdge(graph, userChangeManager, source, destination);
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
+
         setVisible(false);
     }
 
@@ -87,12 +99,10 @@ export default function ContextMenu() {
     }
 
 
-    return !algorithm && (visible &&
+    return(!algorithm && visible &&
         <div id="edit-context-menu" className="p-4 rounded-xl bg-white shadow-lg" style={{ position: 'fixed', top: renderedPosition.y + 'px', left: renderedPosition.x + 'px' }} onMouseDown={(event) => event.stopPropagation()}>
             <PrimaryButton onClick={addNode}>New Node</PrimaryButton>
-
             <div className="h-[1px] w-full my-4 bg-gray-300" />
-
             <div>
                 <div className="flex flex-row mb-2">
                     <input className="p-1 rounded bg-gray-200" size={12} placeholder="Source" value={values.source} onChange={(event) => changeValue('source', event.target.value)} />
@@ -101,7 +111,5 @@ export default function ContextMenu() {
                 <PrimaryButton onClick={addEdge}>New Edge</PrimaryButton>
             </div>
         </div>
-
-
     )
 }

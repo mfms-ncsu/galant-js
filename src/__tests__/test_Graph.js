@@ -1,4 +1,4 @@
-import { Graph } from "utils/graph/Graph";
+import { Graph } from "utils/graph/Graph/Graph";
 import Edge from "utils/graph/GraphElement/Edge";
 
 /**

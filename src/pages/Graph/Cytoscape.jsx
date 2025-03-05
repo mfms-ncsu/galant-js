@@ -3,7 +3,11 @@ import { renderToString } from "react-dom/server";
 import cytoscape from "cytoscape";
 import nodeHtmlLabel from "cytoscape-node-html-label";
 import coseBilkent from "cytoscape-cose-bilkent";
-import Graph from "utils/graph/Graph";
+
+import { useAtom } from "jotai";
+import { algorithmChangeManagerAtom, graphAtom } from "utils/atoms/atoms";
+import CytoscapeManager from "utils/graph/CytoscapeManager/CytoscapeManager";
+import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
 
 cytoscape.use(coseBilkent); // This registers coseBilkent as a extension
 nodeHtmlLabel(cytoscape);
@@ -15,10 +19,10 @@ nodeHtmlLabel(cytoscape);
  * @author Andrew Lanning
  */
 export default function CytoscapeComponent() {
-    // Get a reference to the element into which cytoscape is loaded
+    const cytoscapeManager = new CytoscapeManager();
+    const [graph, setGraph] = useAtom(graphAtom);
+    const [algorithmChangeManager, setAlgorithmChangeManager] = useAtom(algorithmChangeManagerAtom)
     const cytoscapeElement = useRef();
-
-    // State for the message to display
     const [message, setMessage] = useState(null);
 
     /**
@@ -30,8 +34,8 @@ export default function CytoscapeComponent() {
         // Create the cytoscape object
         const cy = cytoscape({
             container: cytoscapeElement.current,
-            elements: Graph.cytoscapeManager.getElements(),
-            style: Graph.cytoscapeManager.getStyle(),
+            elements: cytoscapeManager.getElements(graph),
+            style: cytoscapeManager.getStyle(graph),
             autounselectify: true,
             wheelSensitivity: 0.35,
         });
@@ -46,19 +50,15 @@ export default function CytoscapeComponent() {
                 valignBox: "top",
                 tpl: (data) => {
 
-                    const showWeights =
-                        Graph.cytoscapeManager.nodeWeights;
-					const showLabels =
-                        Graph.cytoscapeManager.nodeLabels;
+                    const showWeights = true;
+                    const showLabels = true;
 
-                    if ( (showWeights && !data.weightHidden) ||
-                         (showLabels && !data.labelHidden)   ){
+                    if ( (showWeights && !data.weightHidden) || (showLabels && !data.labelHidden)   ){
                         
                         // This flag determines whether or not there
                         // is anything to render. If both the weight
                         // and label of the node are empty, then
                         // we should not draw the label
-
                         let hasWeight = 
                             data.weight !== undefined &&
                             data.weight !== "" &&
@@ -100,21 +100,21 @@ export default function CytoscapeComponent() {
     /**
      * Create a function to call whenever cytoscape needs to be updated
      */
-    window.updateCytoscape = () => {
+    useEffect(() => {
         if (!window.cytoscape) return;
         window.cytoscape.elements().remove();// Remove elements
-        window.cytoscape.add(Graph.cytoscapeManager.getElements()); // Get new elements
+        window.cytoscape.add(cytoscapeManager.getElements(graph)); // Get new elements
         window.cytoscape.style().resetToDefault(); // Reset style
-        window.cytoscape.style(Graph.cytoscapeManager.getStyle()).update(); // Update style
-    };
+        window.cytoscape.style(cytoscapeManager.getStyle(graph)).update(); // Update style
+    }, [graph]);
 
     /**
      * Function to call whenever the messages need to be updated
      */
-    window.updateMessage = () => {
-        const newMessage = Graph.algorithmChangeManager.getMessage();
+    useEffect(() => {
+        const newMessage = GraphInterface.getMessage(algorithmChangeManager);
         setMessage(newMessage);
-    }
+    }, [graph, algorithmChangeManager]);
 
     return (
         <div className="w-full h-full">

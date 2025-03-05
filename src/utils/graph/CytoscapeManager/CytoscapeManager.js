@@ -1,3 +1,5 @@
+import GraphInterface from "../GraphInterface/GraphInterface"
+
 /**
  * CytoscapeManager is an interface for its graph which returns the graph
  * represented in cytoscape element format. Also generates a stylesheet for
@@ -5,50 +7,23 @@
  * 
  * @author Henry Morris
  */
-export default class CytoscapeManager {
-    /** Graph for which to create cytoscape elements */
-    #graph
-    
-    /**
-     * Constructs a CytoscapeManager with its associated Graph object. Takes 
-     * in the public graph object as well as its private methods, which are
-     * necessary for directly modifying the graph representation.
-     * @param {Graph} graph Graph for which to create cytoscape elements
-     * @param {Object} privateMethods Object containing the graph's private methods
-     */
-    constructor(graph, privateMethods) {
-        // Import the graph object with private methods
-        this.#graph = graph;
-        for (let method in privateMethods) {
-            this.#graph[method] = privateMethods[method];
-        }
-
-        // Use a variable for node size scaling
-        this.nodeSize = 25;
-
-        // Flags for showing labels and weights
-        this.nodeLabels = true;
-        this.nodeWeights = true;
-        this.edgeLabels = true;
-        this.edgeWeights = true;
-    }
-
+export default class CytoscapeManager { 
     /**
      * Generates an array of cytoscape elements from the current graph representation.
      * @returns Array of cytoscape elements to display
      */
-    getElements() {
+    getElements(graph) {
         // Create an array of elements
         let elements = [];
 
         // Loop over each node
-        this.#graph.getNodes().forEach(node => {
-            elements.push(this.#parseNode(node));
+        GraphInterface.getNodes(graph).forEach(node => {
+            elements.push(this.#parseNode(graph, node));
 
             // Loop over each edge sourced at this node
             node.edges.forEach(edge => {
                 if (node.id === edge.source) {
-                    elements.push(this.#parseEdge(edge));
+                    elements.push(this.#parseEdge(graph, edge));
                 }
             });
         });
@@ -61,8 +36,8 @@ export default class CytoscapeManager {
      * @param {Node} node Node to parse
      * @returns Cytoscape node element
      */
-    #parseNode(node) {
-        let scalar = this.#graph.getScalar();
+    #parseNode(graph, node) {
+        let scalar = graph.scalar;
 
         // Identifying data
         let element = {
@@ -87,18 +62,18 @@ export default class CytoscapeManager {
      * is not undefined, not an empty string, and is not hidden.
      */
     #edgeHasAttribute(edge, attribute) {
-        
         return edge.attributes.has(attribute) &&
                edge.attributes.get(attribute) !== "" &&
                edge.attributes.get(attribute) !== undefined &&
                !edge.attributes.get(attribute + "Hidden");
     }
+    
     /**
      * Converts an Edge into a cytoscape element.
      * @param {Edge} edge Edge to parse
      * @returns Cytoscape edge element
      */
-    #parseEdge(edge) {
+    #parseEdge(graph, edge) {
         // Identifying data
         let element = {
             group: "edges",
@@ -113,7 +88,6 @@ export default class CytoscapeManager {
         // Add the edge label to display. Since we put both the
         // label and weight in the same textbox, we need to
         // put them together
-        
         let text = "";
         let addedWeight = false;
 
@@ -124,9 +98,7 @@ export default class CytoscapeManager {
             text += edge.attributes.get("weight");
         }
         
-        if (this.#edgeHasAttribute(edge, "label") &&
-            this.edgeLabels) {
-
+        if (this.#edgeHasAttribute(edge, "label") && this.edgeLabels) {
             // If we added a weight, separate the label and
             // weight with a newline
             if (addedWeight) {
@@ -140,8 +112,8 @@ export default class CytoscapeManager {
 
         // If either the source or target nodes are hidden, then this
         // edge should also be hidden
-        if (this.#graph.getNodeAttribute(edge.source, "hidden") ||
-            this.#graph.getNodeAttribute(edge.target, "hidden")) {
+        if (GraphInterface.getNodeAttribute(graph, edge.source, "hidden") ||
+            GraphInterface.getNodeAttribute(graph, edge.target, "hidden")) {
             
             element.data["hidden"] = true;
         }
@@ -153,37 +125,37 @@ export default class CytoscapeManager {
      * Gets the cytoscape stylesheet for the graph.
      * @returns Cytoscape stylesheet
      */
-    getStyle() {
+    getStyle(graph) {
         return [
             {
                 "selector": "node",
                 "style": {
-                    "width": `${this.nodeSize}px`,
-                    "height": `${this.nodeSize}px`,
+                    "width": `${25}px`,
+                    "height": `${25}px`,
                     "backgroundColor": "#FFFFFF",
                     "color": "#000000",
-                    "borderWidth": `${this.nodeSize / 10}px`,
+                    "borderWidth": `${25 / 10}px`,
                     "borderStyle": "solid",
                     "borderColor": "#AAAAAA",
                     "backgroundOpacity": 1,
                     "shape": "ellipse",
                     "textValign": "center",
                     "visibility": "visible",
-                    "fontSize": `${this.nodeSize / 2}px`,
-                    "overlay-padding": `${this.nodeSize / 5}px`
+                    "fontSize": `${25 / 2}px`,
+                    "overlay-padding": `${25 / 5}px`
                 }
             },
             {
                 "selector": "edge",
                 "style": {
                     "label": "data(id)",
-                    "width": this.nodeSize / 10,
+                    "width": 25 / 10,
                     "lineColor": "#444444",
                     "color": "#AA0000",
                     "targetArrowColor": "#444444",
-                    "targetArrowShape": (this.#graph.isDirected) ? "triangle" : "none",
+                    "targetArrowShape": (graph.isDirected) ? "triangle" : "none",
                     "curveStyle": "bezier",
-                    "overlay-padding": `${this.nodeSize / 5}px`
+                    "overlay-padding": `${25 / 5}px`
                 }
             },
             {
@@ -195,7 +167,7 @@ export default class CytoscapeManager {
             {
                 "selector": "node[?highlighted]",
                 "style": {
-                    "borderWidth": `${this.nodeSize / 5}px`
+                    "borderWidth": `${25 / 5}px`
                 }
             },
             {
@@ -213,21 +185,21 @@ export default class CytoscapeManager {
             {
                 "selector": "edge[?highlighted]",
                 "style": {
-                    "width": `${this.nodeSize / 2.5}px`
+                    "width": `${25 / 2.5}px`
                 }
             },
             {
                 "selector": "edge[label]",
                 "style": {
                     "label": "data(textToDisplay)",
-                    "fontSize": `${this.nodeSize / 2.5}px`,
+                    "fontSize": `${25 / 2.5}px`,
                     "textWrap": "wrap",
                     "textBackgroundColor": "white",
                     "textBackgroundOpacity": "1.0",
-                    "textBackgroundPadding": `${this.nodeSize / 12.5}px`,
+                    "textBackgroundPadding": `${25 / 12.5}px`,
                     "textBorderOpacity": "1.0",
                     "textBorderStyle": "solid",
-                    "textBorderWidth": `${this.nodeSize / 25}px`,
+                    "textBorderWidth": `${25 / 25}px`,
                     "textBorderColor": "black"
                 }
             },

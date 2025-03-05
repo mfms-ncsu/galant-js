@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useAtom } from "jotai";
+import { graphAtom, userChangeManagerAtom } from "utils/atoms/atoms";
+import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
 import ExitButton from "components/Buttons/ExitButton";
-import Graph from "utils/graph/Graph";
 import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
 
 /**
@@ -13,6 +15,8 @@ import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
  * @returns {React.ReactElement}
  */
 export default function EdgeContextMenu() {
+    const [graph, setGraph] = useAtom(graphAtom);
+    const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
     const { algorithm, setAlgorithm } = useAlgorithmContext();
     const [visible, setVisible] = useState(false);
     const [edge, setEdge] = useState(null);
@@ -31,7 +35,7 @@ export default function EdgeContextMenu() {
             const edge = event.target;
 
             // Set the values to display
-            const edgeObject = Graph.getEdge(edge.data().source, edge.data().target);
+            const edgeObject = GraphInterface.getEdge(graph, edge.data().source, edge.data().target);
             setValues({
                 label: edgeObject.getAttribute("label") || "",
                 weight: edgeObject.getAttribute("weight") ? edgeObject.getAttribute("weight").toString() : "",
@@ -68,14 +72,20 @@ export default function EdgeContextMenu() {
         const weight = values.weight.trim();
 
         // Set the changes
-        Graph.userChangeManager.setEdgeAttribute(data.source, data.target, "label", label);
-        Graph.userChangeManager.setEdgeAttribute(data.source, data.target, "weight", weight);
+        let [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(graph, userChangeManager, data.source, data.target, "label", label);
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
+        [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(graph, userChangeManager, data.source, data.target, "weight", weight);
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
     }
 
     // Deletes the edge and closes the context menu
     function deleteEdge() {
         setVisible(false);
-        Graph.userChangeManager.deleteEdge(data.source, data.target);
+        let [newGraph, newChangeManager] = GraphInterface.deleteEdge(graph, userChangeManager, data.source, data.target);
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
     }
 
     // Label/Weight is already updated on blur, so enter should just blur to apply changes.

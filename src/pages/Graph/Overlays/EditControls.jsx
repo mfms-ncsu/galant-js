@@ -1,7 +1,9 @@
-import { React, useEffect, useRef, useState } from "react";
+import { React, useEffect, useRef } from "react";
+import { useAtom } from "jotai";
+import { graphAtom, userChangeManagerAtom } from "utils/atoms/atoms";
+import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
 import PrimaryButton from "components/Buttons/PrimaryButton";
 import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from "@heroicons/react/24/solid";
-import Graph from "utils/graph/Graph";
 
 /**
  * GraphEditOverlay component represents an overlay for editing graph with functionalities like undo, redo, save, and revert.
@@ -9,6 +11,9 @@ import Graph from "utils/graph/Graph";
  * @returns {JSX.Element} - Returns the JSX for GraphEditOverlay component.
  */
 export default function EditControls() {
+    const [graph, setGraph] = useAtom(graphAtom)
+    const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
+
     // useRef to hold a reference to a SharedWorker instance
     const sharedworkerContainer = useRef();
     sharedworkerContainer.sharedworker = new SharedWorker("./worker.js");
@@ -18,7 +23,7 @@ export default function EditControls() {
         // Get the graph as a JSON object
         const graphData = {
             name: "Saved Graph",
-            content: Graph.toGraphString(),
+            content: GraphInterface.toString(graph),
         };
 
         const storageItem = localStorage.getItem(`GraphFiles`); // Get the existing local storage
@@ -37,23 +42,27 @@ export default function EditControls() {
         !added && dataList.push(graphData);
 
         localStorage.setItem(`GraphFiles`, JSON.stringify(dataList)); // Set the local storage
-
-
     }
 
     // Function to revert graph edits (node movements, etc.)
     function revert() {
-        Graph.userChangeManager.revert();
+        let [newGraph, newChangeManager] = GraphInterface.revert(graph, userChangeManager);
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
     }
 
     // Function to perform undo operation
     function undo() {
-        Graph.userChangeManager.undo();
+        let [newGraph, newChangeManager] = GraphInterface.undo(graph, userChangeManager);
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
     }
 
     // Function to perform redo operation
     function redo() {
-        Graph.userChangeManager.redo();
+        let [newGraph, newChangeManager] = GraphInterface.redo(graph, userChangeManager);
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
     }
 
     // Add event listener for keyboard shortcuts
@@ -74,17 +83,7 @@ export default function EditControls() {
         }
     }, []);
 
-    const [index, setIndex] = useState(0);
-    const [length, setLength] = useState(0);
-    window.updateStep = () => {
-        let newIndex = Graph.userChangeManager.getIndex();
-        let newLength = Graph.userChangeManager.getLength();
-        setIndex(newIndex);
-        setLength(newLength);
-    };
-
-
-    return length > 0 && (
+    return userChangeManager.changes.length > 0 && (
         <div id="edit-overlay" className="absolute left-0 right-0 bottom-1 flex flex-col items-center pointer-events-none">
             <div className="flex flex-col items-center">
                 <div className="flex space-x-6">
@@ -92,7 +91,7 @@ export default function EditControls() {
                         <ArrowUturnLeftIcon className="w-6 h-6" />
                         <label className="absolute -bottom-2 left-0 text-sm">z</label>
                     </button>
-                    <span>{index} / {length}</span>
+                    <span>{userChangeManager.index} / {userChangeManager.changes.length}</span>
                     <button className="relative pointer-events-auto stroke-0 stroke-black hover:stroke-1 transition-all" onClick={redo}>
                         <ArrowUturnRightIcon className="w-6 h-6" />
                         <label className="absolute -bottom-2 right-0 text-sm">y</label>
