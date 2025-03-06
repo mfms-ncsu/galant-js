@@ -44,8 +44,8 @@ export default class CytoscapeManager {
             group: "nodes",
             data: { id: node.id },
             position: {
-                x: scalar * node.position.x, // Scale the position
-                y: scalar * node.position.y
+                x: scalar.x * node.position.x, // Scale the position
+                y: scalar.y * node.position.y
             }
         };
 

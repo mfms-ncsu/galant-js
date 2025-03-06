@@ -22,7 +22,7 @@ export default function EditControls() {
     function save() {
         // Get the graph as a JSON object
         const graphData = {
-            name: "Saved Graph",
+            name: GraphInterface.getFileName(graph) ?? 'New Graph',
             content: GraphInterface.toString(graph),
         };
 

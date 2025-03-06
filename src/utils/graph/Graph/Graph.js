@@ -6,19 +6,22 @@
 export default class Graph {
     /** Directed graph flag */
     isDirected;
+    /** Name of the graph */
+    name;
     /** Map of nodes in the graph */
     nodes;
     /** Graph type */
     type;
-    /** Scale */
+    /** Array of x and y scales */
     scalar;
 
     /**
      * Creates a new graph with nodes.
      */
-    constructor(type) {
+    constructor(name, type) {
         this.isDirected = false;
         this.type = type;
+        this.name = name;
         this.nodes = new Map();
     }
 }

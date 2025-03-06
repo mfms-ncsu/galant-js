@@ -187,6 +187,15 @@ function getEdgeIds(graph) {
 }
 
 /**
+ * Gets the name of the graph and the appropriate file extension.
+ * @param {Graph} graph Graph on which to operate 
+ * @returns String file name for graph.
+ */
+function getFileName(graph) {
+    return graph.name;
+}
+
+/**
  * Gets all edges into and out of the given node.
  * @param {Graph} graph Graph on which to operate
  * @param {String} nodeId Node id
@@ -439,17 +448,18 @@ function getOutgoingNodes(graph, source) {
     }
 }
 
+//TODO: Implement x and y scales.
 /**
  * Calculates the scalar for the given graph to equalize its size.
  * @param {Graph} graph Graph on which to operate
- * @returns Scalar for the given graph
+ * @returns Object of Scalars for the x and y scales
  */
 function getScalar(graph) {
     let max = 1;
     graph.nodes.forEach(node => {
         max = Math.max(max, Math.abs(node.position.x), Math.abs(node.position.y));
     });
-    return 500 / max;
+    return {x: 500 / max, y: 500 / max};
 }
 
 /**
@@ -1119,6 +1129,7 @@ const GraphInterface = {
     getEdgeAttribute,
     getEdgeBetween,
     getEdgeIds,
+    getFileName,
     getIncidentEdges,
     getIncomingEdges,
     getIncomingNodes,

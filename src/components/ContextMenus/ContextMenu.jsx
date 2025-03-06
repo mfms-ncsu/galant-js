@@ -55,7 +55,7 @@ export default function ContextMenu() {
             const newPosition = node.position();
 
             // Set the node position
-            let [newGraph, newChangeManager] = GraphInterface.setNodePosition(graph, userChangeManager, id, newPosition.x / graph.scalar, newPosition.y / graph.scalar);
+            let [newGraph, newChangeManager] = GraphInterface.setNodePosition(graph, userChangeManager, id, newPosition.x / graph.scalar.x, newPosition.y / graph.scalar.y);
             setGraph(newGraph);
             setUserChangeManager(newChangeManager);
         }
@@ -72,7 +72,7 @@ export default function ContextMenu() {
 
     // Add a new node to the graph
     function addNode() {
-        let [newGraph, newChangeManager] = GraphInterface.addNode(graph, userChangeManager, position.x / graph.scalar, position.y / graph.scalar);
+        let [newGraph, newChangeManager] = GraphInterface.addNode(graph, userChangeManager, position.x / graph.scalar.x, position.y / graph.scalar.y);
         setGraph(newGraph);
         setUserChangeManager(newChangeManager);
 

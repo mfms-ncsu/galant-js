@@ -16,23 +16,28 @@ function isJavascript(content) {
  * the file will be saved with a .js extension, otherwise with a .gph extension.
  * @param {Tab} tab 
  */
-function downloadFile(tab) {
+function downloadFile(type, tab) {
     if (!tab) return;
+    const isAlgorithm = type === 'Algorithm';
     
-    const isJS = isJavascript(tab.content);
-    const ext = isJS ? '.js' : '.gph';
-    // Remove existing .js or .gph extension and append the correct one.
-    const baseName = tab.name.replace(/\.(js|gph)$/, '');
-    const defaultName = `${baseName}${ext}`;
+    //Update the file extension if it is missing or incorrect
+    let name = tab.name;
+    if (isAlgorithm && !tab.name.match(/\.js$/)) {
+        name = name.replace(/[a-z]+$/).concat('.js')
+    }
+    if (!isAlgorithm && !tab.name.match(/\.(?:gph|sgf)$/)) {
+        name = name.replace(/[a-z]+$/).concat('.gph')
+    }
+    const ext = name.match(/\.[a-zA-Z0-9]+$/);
 
     if (window.showSaveFilePicker) {
         (async () => {
             try {
                 const fileHandle = await window.showSaveFilePicker({
-                    suggestedName: defaultName,
+                    suggestedName: name,
                     types: [{
-                        description: isJS ? 'JavaScript Files' : 'Text Files',
-                        accept: isJS ? { 'text/javascript': [ext] } : { 'text/plain': [ext] },
+                        description: isAlgorithm ? 'JavaScript Files' : 'Text Files',
+                        accept:isAlgorithm ? { 'text/javascript': [ext] } : { 'text/plain': [ext] },
                     }],
                 });
                 const writableStream = await fileHandle.createWritable();
@@ -43,9 +48,9 @@ function downloadFile(tab) {
             }
         })();
     } else {
-        const fileName = window.prompt("Enter the filename to save:", defaultName);
+        const fileName = window.prompt("Enter the filename to save:");
         if (!fileName) return;
-        const blob = new Blob([tab.content], { type: isJS ? "text/javascript" : "text/plain" });
+        const blob = new Blob([tab.content], { type: isAlgorithm ? "text/javascript" : "text/plain" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -64,7 +69,7 @@ function downloadFile(tab) {
  * @param {Tab} props.tab 
  * @returns {React.ReactElement}
  */
-function DownloadButton({ tab }) {
+function DownloadButton({ editorType, tab }) {
     // Keyboard shortcut for downloading file
     useEffect(() => {
         function handleKeydown(event) {
@@ -80,7 +85,7 @@ function DownloadButton({ tab }) {
     if (!tab || tab.content.length <= 0) return null;
 
     return (
-        <PrimaryButton onClick={() => downloadFile(tab)}>
+        <PrimaryButton onClick={() => downloadFile(editorType, tab)}>
             <ArrowDownTrayIcon className="inline h-4 me-2 stroke-2 stroke-white" />
             Download File
         </PrimaryButton>
@@ -106,7 +111,7 @@ export default function Overlay({ tab, saved, editorType, LoadButton }) {
                 </div>
 
                 <LoadButton editorType={editorType} tab={tab} />
-                <DownloadButton tab={tab} />
+                <DownloadButton editorType={editorType} tab={tab} />
             </div>
         </div>
     )

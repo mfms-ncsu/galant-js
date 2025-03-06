@@ -58,7 +58,7 @@ export default function Graph() {
 
             // Load the graph
             try {
-                setGraph(fileParser.loadGraph(graphText));
+                setGraph(fileParser.loadGraph(graphName, graphText));
             } catch (e) {
                 console.error(e);
             }

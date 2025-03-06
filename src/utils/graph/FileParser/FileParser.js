@@ -15,13 +15,17 @@ export default class FileParser {
      * Loads the given file text into the graph.
      * @param {String} file File text
      */
-    loadGraph(file) {
+    loadGraph(name, file) {
         // Split the file on the new line character and parse each line
         const lines = file.split("\n");
+
+        //Initialize the proper graph type
+        const graph = isLayeredGraph(name, file)
+            ? new LayeredGraph()
+            : new StandardGraph();
         
-        // TODO: Determine graph type and make a new Graph object
-        const graph = new StandardGraph();
-        
+        //Add name
+        graph.name = name;
         // Parse each line
         lines.forEach(line => { this.#parseLine(graph, line) });
 
@@ -43,7 +47,7 @@ export default class FileParser {
         const values = line.split(" ");
 
         // Regex to match comments
-        const commentRegex = /^([gc].*)?$/;
+        const commentRegex = /^([gct].*)?$/;
 
         // Regexes to match simple node and edge lines
         const nodeRegex = /^n \S+ -?\d+.?\d* -?\d+.?\d*( -?\d+)?( [^ \n\t:]+:[^ \n\t:]+)*$/;
@@ -110,8 +114,12 @@ export default class FileParser {
         // If the nodeId argument is passed, use that, otherwise generate an id
         nodeId = nodeId || generateId(graph.nodes);
 
+        //TODO take a look at this
         // Create the node
-        let node = new Node(nodeId, x, y);
+        let node = graph.type === 'layered' 
+            ? new Node(nodeId, y, x, y, x)
+            : new Node(nodeId, x, y);
+
         graph.nodes.set(nodeId, node);
 
         // Set the attributes
@@ -194,4 +202,34 @@ export default class FileParser {
         if (typeof str !== "string") return false;
         return !Number.isNaN(Number(str)) && !Number.isNaN(parseFloat(str));
     }
+}
+
+/**
+ * Helper method for determing the graph file format.
+ * A graph is in SGF if the extension is .sgf, or there is a header line starting with a 't'
+ * Otherwise it is assumed to be in GPH
+ * @param {*} name Name of the graph file
+ * @param {*} file The text of the graph file
+ * @returns True if the graph is in SGF format.
+ */
+function isLayeredGraph(name, file) {
+    let isLayeredGraph = false;
+    const lines = file.split("\n");
+
+    //Check for the .sgf extension
+    if ( name.endsWith('.sgf') ) {
+        isLayeredGraph = true;
+    }
+
+    //Check for a header or tag line beginning with 't'
+    lines.forEach((line) => {
+        line = line.trim();
+        const values = line.split(" ");
+
+        if (values[0] === 't') {
+            isLayeredGraph = true;
+        };
+    });
+
+    return isLayeredGraph;
 }
