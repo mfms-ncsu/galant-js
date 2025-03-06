@@ -56,22 +56,6 @@ function recordChange(changeManager, change) {
 }
 
 /**
- * Creates clones of the given graph and change manager to force React to
- * re-render.
- * @param {Graph} graph Graph to return
- * @param {ChangeManager} changeManager ChangeManager to return
- * @returns Deep copies of graph and changeManager
- */
-function returnClones(graph, changeManager) {
-    // Clone the return values to trigger a state update
-    let newGraph = structuredClone(graph);
-    let newChangeManager = structuredClone(changeManager);
-
-    // Return the updated graph and changeManager
-    return [newGraph, newChangeManager];
-}
-
-/**
  * Verifies that both source and target nodes exist in the graph.
  * @param {Graph} graph Graph to check
  * @param {String} source Source node
@@ -540,7 +524,7 @@ function addEdge(graph, changeManager, source, target, attributes) {
         target: target
     })]);
 
-    // Return cloned graph and change manager to trigger re-render
+    // Return mutated graph and change manager to trigger re-render
     return [newGraph, newChangeManager];
 }
 
@@ -597,7 +581,7 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
         }
     })]);
 
-    // Return cloned graph and change manager to trigger re-render
+    // Return mutated graph and change manager to trigger re-render
     // Add the node id as the third return value
     return [newGraph, newChangeManager, nodeId];
 }
@@ -630,7 +614,7 @@ function deleteEdge(graph, changeManager, source, target) {
         attributes: attributes
     }, null)]);
 
-    // Return cloned graph and change manager to trigger re-render
+    // Return mutated graph and change manager to trigger re-render
     return [newGraph, newChangeManager];
 }
 
@@ -678,7 +662,7 @@ function deleteNode(graph, changeManager, nodeId) {
     // Add the change objects to the changeManager
     const newChangeManager = recordChange(changeManager, changeObjects);
 
-    // Return cloned graph and change manager to trigger re-render
+    // Return mutated graph and change manager to trigger re-render
     return [newGraph, newChangeManager];    
 }
 
@@ -727,40 +711,49 @@ function redo(graph, changeManager) {
     // Check if there are any changes to redo
     if (changeManager.index < changeManager.changes.length) {
         // Get the next step
-        const step = changeManager.changes[changeManager.index++];
+        const step = changeManager.changes[changeManager.index];
 
         // Redo the change
-        step.forEach(change => {
-            switch (change.action) {
-                case "addNode":
-                    graph.nodes.set(change.current.id, new Node(change.current.id, change.current.position.x, change.current.position.y));
-                    break;
-                case "deleteNode":
-                    graph.nodes.delete(change.previous.id);
-                    break;
-                case "addEdge":
-                    graph.nodes.get(change.current.source).edges.set(`${change.current.source},${change.current.target}`, new Edge(change.current.source, change.current.target));
-                    graph.nodes.get(change.current.target).edges.set(`${change.current.source},${change.current.target}`, new Edge(change.current.source, change.current.target));
-                    break;
-                case "deleteEdge":
-                    graph.nodes.get(change.previous.source).edges.delete(`${change.previous.source},${change.previous.target}`);
-                    graph.nodes.get(change.previous.target).edges.delete(`${change.previous.source},${change.previous.target}`);
-                    break;
-                case "setNodePosition":
-                    graph.nodes.get(change.current.id).position = change.current.position;
-                    break;
-                case "setNodeAttribute":
-                    graph.nodes.get(change.current.id).attributes.set(change.current.attribute.name, change.current.attribute.value);
-                    break;
-                case "setEdgeAttribute":
-                    graph.nodes.get(change.current.source).edges.get(`${change.current.source},${change.current.target}`).attributes.set(change.current.attribute.name, change.current.attribute.value);
-                    break;
-            }
+        const newGraph = produce(graph, draft => {
+            step.forEach(change => {
+                switch (change.action) {
+                    case "addNode":
+                        draft.nodes.set(change.current.id, new Node(change.current.id, change.current.position.x, change.current.position.y));
+                        break;
+                    case "deleteNode":
+                        draft.nodes.delete(change.previous.id);
+                        break;
+                    case "addEdge":
+                        draft.nodes.get(change.current.source).edges.set(`${change.current.source},${change.current.target}`, new Edge(change.current.source, change.current.target));
+                        draft.nodes.get(change.current.target).edges.set(`${change.current.source},${change.current.target}`, new Edge(change.current.source, change.current.target));
+                        break;
+                    case "deleteEdge":
+                        draft.nodes.get(change.previous.source).edges.delete(`${change.previous.source},${change.previous.target}`);
+                        draft.nodes.get(change.previous.target).edges.delete(`${change.previous.source},${change.previous.target}`);
+                        break;
+                    case "setNodePosition":
+                        draft.nodes.get(change.current.id).position = change.current.position;
+                        break;
+                    case "setNodeAttribute":
+                        draft.nodes.get(change.current.id).attributes.set(change.current.attribute.name, change.current.attribute.value);
+                        break;
+                    case "setEdgeAttribute":
+                        draft.nodes.get(change.current.source).edges.get(`${change.current.source},${change.current.target}`).attributes.set(change.current.attribute.name, change.current.attribute.value);
+                        break;
+                }
+            });
         });
+
+        const newChangeManager = produce(changeManager, draft => {
+            draft.index++;
+        });
+
+        // Return mutated graph and change manager to trigger re-render
+        return [newGraph, newChangeManager];
     }
 
-    // Return cloned graph and change manager to trigger re-render
-    return returnClones(graph, changeManager);
+    // If there aren't any changes to redo, just return the original objects
+    return [graph, changeManager];
 }
 
 /**
@@ -774,7 +767,7 @@ function revert(graph, changeManager) {
         [graph, changeManager] = undo(graph, changeManager);
     }
 
-    return returnClones(graph, changeManager);
+    return [graph, changeManager];
 }
 
 /**
@@ -817,7 +810,7 @@ function setEdgeAttribute(graph, changeManager, source, target, name, value) {
         }
     })]);
 
-    // Return cloned graph and change manager to trigger re-render
+    // Return mutated graph and change manager to trigger re-render
     return [newGraph, newChangeManager];
 }
 
@@ -873,7 +866,7 @@ function setEdgeAttributeAll(graph, changeManager, name, value) {
     // Add the change objects to the change manager
     const newChangeManager = recordChange(changeManager, changeObjects);
 
-    // Return cloned graph and change manager to trigger re-render
+    // Return mutated graph and change manager to trigger re-render
     return [newGraph, newChangeManager];
 }
 
@@ -925,7 +918,7 @@ function setNodeAttribute(graph, changeManager, nodeId, name, value) {
         }
     })]);
 
-    // Return cloned graph and change manager to trigger re-render
+    // Return mutated graph and change manager to trigger re-render
     return [newGraph, newChangeManager];
 }
 
@@ -971,7 +964,7 @@ function setNodeAttributeAll(graph, changeManager, name, value) {
     // Add the change objects to the change manager
     const newChangeManager = recordChange(changeManager, changeObjects);
 
-    // Return cloned graph and change manager to trigger re-render
+    // Return mutated graph and change manager to trigger re-render
     return [newGraph, newChangeManager];
 }
 
@@ -1014,7 +1007,7 @@ function setNodePosition(graph, changeManager, nodeId, x, y) {
         position: newPosition
     })]);
 
-    // Return cloned graph and change manager to trigger re-render
+    // Return mutated graph and change manager to trigger re-render
     return [newGraph, newChangeManager];
 }
 
@@ -1040,7 +1033,7 @@ function startRecording(changeManager) {
         draft.isRecording = true;
     });
 
-    // Return a clone of the change manager
+    // Return a mutation of the change manager
     return newChangeManager;
 }
 
@@ -1102,48 +1095,57 @@ function undo(graph, changeManager) {
     // Check if there are any changes to undo
     if (changeManager.index > 0) {
         // Get the previous step
-        const step = changeManager.changes[--changeManager.index];
+        const step = changeManager.changes[changeManager.index - 1];
 
         // Undo the change
-        step.forEach(change => {
-            switch (change.action) {
-                case "addNode":
-                    graph.nodes.delete(change.current.id);
-                    break;
-                case "deleteNode":
-                    graph.nodes.set(change.previous.id, new Node(change.previous.id, change.previous.position.x, change.previous.position.y));
-                    let node = graph.nodes.get(change.previous.id);
-                    change.previous.attributes.forEach((value, key) => {
-                        node.attributes.set(key, value);
-                    });
-                    break;
-                case "addEdge":
-                    graph.nodes.get(change.current.source).edges.delete(`${change.current.source},${change.current.target}`);
-                    graph.nodes.get(change.current.target).edges.delete(`${change.current.source},${change.current.target}`);
-                    break;
-                case "deleteEdge":
-                    graph.nodes.get(change.previous.source).edges.set(`${change.previous.source},${change.previous.target}`, new Edge(change.previous.source, change.previous.target));
-                    graph.nodes.get(change.previous.target).edges.set(`${change.previous.source},${change.previous.target}`, new Edge(change.previous.source, change.previous.target));
-                    let edge = graph.nodes.get(change.previous.source).edges.get(`${change.previous.source},${change.previous.target}`);
-                    change.previous.attributes.forEach((value, key) => {
-                        edge.attributes.set(key, value);
-                    });
-                    break;
-                case "setNodePosition":
-                    graph.nodes.get(change.previous.id).position = change.previous.position;
-                    break;
-                case "setNodeAttribute":
-                    graph.nodes.get(change.previous.id).attributes.set(change.previous.attribute.name, change.previous.attribute.value);
-                    break;
-                case "setEdgeAttribute":
-                    graph.nodes.get(change.previous.source).edges.get(`${change.previous.source},${change.previous.target}`).attributes.set(change.previous.attribute.name, change.previous.attribute.value);
-                    break;
-            }
+        const newGraph = produce(graph, draft => {
+            step.forEach(change => {
+                switch (change.action) {
+                    case "addNode":
+                        draft.nodes.delete(change.current.id);
+                        break;
+                    case "deleteNode":
+                        draft.nodes.set(change.previous.id, new Node(change.previous.id, change.previous.position.x, change.previous.position.y));
+                        let node = draft.nodes.get(change.previous.id);
+                        change.previous.attributes.forEach((value, key) => {
+                            node.attributes.set(key, value);
+                        });
+                        break;
+                    case "addEdge":
+                        draft.nodes.get(change.current.source).edges.delete(`${change.current.source},${change.current.target}`);
+                        draft.nodes.get(change.current.target).edges.delete(`${change.current.source},${change.current.target}`);
+                        break;
+                    case "deleteEdge":
+                        draft.nodes.get(change.previous.source).edges.set(`${change.previous.source},${change.previous.target}`, new Edge(change.previous.source, change.previous.target));
+                        draft.nodes.get(change.previous.target).edges.set(`${change.previous.source},${change.previous.target}`, new Edge(change.previous.source, change.previous.target));
+                        let edge = draft.nodes.get(change.previous.source).edges.get(`${change.previous.source},${change.previous.target}`);
+                        change.previous.attributes.forEach((value, key) => {
+                            edge.attributes.set(key, value);
+                        });
+                        break;
+                    case "setNodePosition":
+                        draft.nodes.get(change.previous.id).position = change.previous.position;
+                        break;
+                    case "setNodeAttribute":
+                        draft.nodes.get(change.previous.id).attributes.set(change.previous.attribute.name, change.previous.attribute.value);
+                        break;
+                    case "setEdgeAttribute":
+                        draft.nodes.get(change.previous.source).edges.get(`${change.previous.source},${change.previous.target}`).attributes.set(change.previous.attribute.name, change.previous.attribute.value);
+                        break;
+                }
+            });
         });
+
+        const newChangeManager = produce(changeManager, draft => {
+            draft.index--;
+        });
+
+        // Return mutated graph and change manager to trigger re-render
+        return [newGraph, newChangeManager];
     }
 
-    // Return cloned graph and change manager to trigger re-render
-    return returnClones(graph, changeManager);
+    // If there are no changes, just return the original objects
+    return [graph, changeManager];
 }
 
 
