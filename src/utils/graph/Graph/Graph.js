@@ -12,7 +12,7 @@ export default class Graph {
     nodes;
     /** Graph type */
     type;
-    /** Array of x and y scales */
+    /** Object of x and y scales */
     scalar;
 
     /**
