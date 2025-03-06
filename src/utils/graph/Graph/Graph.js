@@ -1,9 +1,13 @@
+import { immerable } from "immer";
+
 /**
  * Graph stores the representation of the current graph.
  * 
  * @author Henry Morris
  */
 export default class Graph {
+    /** Enable immer */
+    [immerable] = true;
     /** Directed graph flag */
     isDirected;
     /** Name of the graph */

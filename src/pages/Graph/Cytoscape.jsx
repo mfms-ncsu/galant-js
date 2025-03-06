@@ -1,11 +1,10 @@
 import { React, useEffect, useRef, useState } from "react";
+import { useAtom } from "jotai";
+import { algorithmChangeManagerAtom, graphAtom } from "utils/atoms/atoms";
 import { renderToString } from "react-dom/server";
 import cytoscape from "cytoscape";
 import nodeHtmlLabel from "cytoscape-node-html-label";
 import coseBilkent from "cytoscape-cose-bilkent";
-
-import { useAtom } from "jotai";
-import { algorithmChangeManagerAtom, graphAtom } from "utils/atoms/atoms";
 import CytoscapeManager from "utils/graph/CytoscapeManager/CytoscapeManager";
 import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
 
@@ -50,6 +49,7 @@ export default function CytoscapeComponent() {
                 valignBox: "top",
                 tpl: (data) => {
 
+                    // TODO
                     const showWeights = true;
                     const showLabels = true;
 

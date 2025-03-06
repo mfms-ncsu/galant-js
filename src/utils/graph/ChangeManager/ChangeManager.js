@@ -1,3 +1,5 @@
+import { immerable } from "immer";
+
 /**
  * ChangeManager is an interface for its graph which allows either the
  * algorithm or a user to modify the graph representation. ChangeManager
@@ -10,6 +12,8 @@
 export default class ChangeManager {
     /** List of steps containing changes */
     changes;
+    /** Enable immer */
+    [immerable] = true;
     /** Current index within changes */
     index;
     /** Boolean flag for whether the manager is recording changes */
@@ -24,5 +28,8 @@ export default class ChangeManager {
         // Create an empty representation of changes
         this.changes = [];
         this.index = 0;
+
+        this.isRecording = false;
+        this.recordedChanges = [];
     }
 }

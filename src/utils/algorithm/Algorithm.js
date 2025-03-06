@@ -226,6 +226,24 @@ export default class Algorithm {
     }
 
     /**
+     * Updates the global state and local representation of the graph
+     * @param {Graph} newGraph New graph
+     */
+    #updateGraph(newGraph) {
+        this.setGraph(newGraph);
+        this.graph = newGraph;
+    }
+
+    /**
+     * Updates the global state and local representation of the change manager
+     * @param {ChangeManager} newChangeManager New change manager
+     */
+    #updateChangeManager(newChangeManager) {
+        this.setAlgorithmChangeManager(newChangeManager);
+        this.algorithmChangeManager = newChangeManager;
+    }
+
+    /**
      * Handles messages from thread.
      * @param {Object} message Message from thread
      */
@@ -236,17 +254,17 @@ export default class Algorithm {
         switch (message.action) {
             case "setDirected":
                 newGraph = GraphInterface.setDirected(this.graph, message.isDirected);
-                this.setGraph(newGraph);
+                this.#updateGraph(newGraph);
                 break;
             case "addNode":
                 [newGraph, newChangeManager] = GraphInterface.addNode(this.graph, this.algorithmChangeManager, message.x, message.y);
-                this.setGraph(newGraph);
-                this.setAlgorithmChangeManager(newChangeManager);
+                this.#updateGraph(newGraph);
+                this.#updateChangeManager(newChangeManager);
                 break;
             case "addEdge":
                 [newGraph, newChangeManager] = GraphInterface.addEdge(this.graph, this.algorithmChangeManager, message.source, message.target);
-                this.setGraph(newGraph);
-                this.setAlgorithmChangeManager(newChangeManager);
+                this.#updateGraph(newGraph);
+                this.#updateChangeManager(newChangeManager);
                 break;
             case "prompt":
                 clearTimeout(this.#timeoutId); // Cancel the timer while the prompt is up
@@ -260,49 +278,49 @@ export default class Algorithm {
                 break;
             case "message":
                 newChangeManager = GraphInterface.addMessage(this.algorithmChangeManager, message.message);
-                this.setAlgorithmChangeManager(newChangeManager);
+                this.#updateChangeManager(newChangeManager);
                 break;
             case "print":
                 console.log(message.message);
                 break;
             case "deleteNode":
                 [newGraph, newChangeManager] = GraphInterface.deleteNode(this.graph, this.algorithmChangeManager, message.nodeId);
-                this.setGraph(newGraph);
-                this.setAlgorithmChangeManager(newChangeManager);
+                this.#updateGraph(newGraph);
+                this.#updateChangeManager(newChangeManager);
                 break;
             case "setNodePosition":
                 [newGraph, newChangeManager] = GraphInterface.setNodePosition(this.graph, this.algorithmChangeManager, message.nodeId, message.x, message.y);
-                this.setGraph(newGraph);
-                this.setAlgorithmChangeManager(newChangeManager);
+                this.#updateGraph(newGraph);
+                this.#updateChangeManager(newChangeManager);
                 break;
             case "deleteEdge":
                 [newGraph, newChangeManager] = GraphInterface.deleteEdge(this.graph, this.algorithmChangeManager, message.source, message.target);
-                this.setGraph(newGraph);
-                this.setAlgorithmChangeManager(newChangeManager);
+                this.#updateGraph(newGraph);
+                this.#updateChangeManager(newChangeManager);
                 break;
             case "setNodeAttribute":
                 [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(this.graph, this.algorithmChangeManager, message.nodeId, message.name, message.value);
-                this.setGraph(newGraph);
-                this.setAlgorithmChangeManager(newChangeManager);
+                this.#updateGraph(newGraph);
+                this.#updateChangeManager(newChangeManager);
                 break;
             case "setNodeAttributeAll":
                 [newGraph, newChangeManager] = GraphInterface.setNodeAttributeAll(this.graph, this.algorithmChangeManager, message.name, message.value);
-                this.setGraph(newGraph);
-                this.setAlgorithmChangeManager(newChangeManager);
+                this.#updateGraph(newGraph);
+                this.#updateChangeManager(newChangeManager);
                 break;
             case "setEdgeAttribute":
                 [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(this.graph, this.algorithmChangeManager, message.source, message.target, message.name, message.value);
-                this.setGraph(newGraph);
-                this.setAlgorithmChangeManager(newChangeManager);
+                this.#updateGraph(newGraph);
+                this.#updateChangeManager(newChangeManager);
                 break;
             case "setEdgeAttributeAll":
                 [newGraph, newChangeManager] = GraphInterface.setEdgeAttributeAll(this.graph, this.algorithmChangeManager, message.name, message.value);
-                this.setGraph(newGraph);
-                this.setAlgorithmChangeManager(newChangeManager);
+                this.#updateGraph(newGraph);
+                this.#updateChangeManager(newChangeManager);
                 break;
             case "startRecording":
                 newChangeManager = GraphInterface.startRecording(this.algorithmChangeManager);
-                this.setAlgorithmChangeManager(newChangeManager);
+                this.#updateChangeManager(newChangeManager);
                 break;
             case "endRecording":
                 clearTimeout(this.#timeoutId);
@@ -310,15 +328,15 @@ export default class Algorithm {
                 // means that the recording was never actually started
                 if (this.algorithmChangeManager.isRecording) {
                     newChangeManager = GraphInterface.endRecording(this.algorithmChangeManager);
-                    this.setAlgorithmChangeManager(newChangeManager);
+                    this.#updateChangeManager(newChangeManager);
                 }
                 if (this.onStepAdded) this.onStepAdded();
                 break;
             case "step":
                 clearTimeout(this.#timeoutId);
                 if (this.onStepAdded) this.onStepAdded();
-                this.setGraph(newGraph);
-                this.setAlgorithmChangeManager(newChangeManager);
+                this.#updateGraph(newGraph);
+                this.#updateChangeManager(newChangeManager);
                 break;
             case "complete":
                 clearTimeout(this.#timeoutId);
