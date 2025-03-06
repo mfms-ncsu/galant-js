@@ -20,12 +20,10 @@ export default class FileParser {
         const lines = file.split("\n");
 
         //Initialize the proper graph type
-        const graph = isLayeredGraph(name, file)
-            ? new LayeredGraph()
-            : new StandardGraph();
+        const graph = this.#isLayeredGraph(name, file)
+            ? new LayeredGraph(name)
+            : new StandardGraph(name);
         
-        //Add name
-        graph.name = name;
         // Parse each line
         lines.forEach(line => { this.#parseLine(graph, line) });
 
@@ -54,17 +52,19 @@ export default class FileParser {
         const edgeRegex = /^e \S+ \S+( -?\d+)?( [^ \n\t:]+:[^ \n\t:]+)*$/;
 
         // Check which regex matches and send the values to be parsed as either a node or edge
-        if (line.match(commentRegex)) {
-            // Ignore comments
-            return;
-        }
-        else if (line.match(nodeRegex)) {
-            this.#parseNode(graph, values);
-        } else if (line.match(edgeRegex)) {
-            this.#parseEdge(graph, values);
-        } else {
-            // If the line was not a node or an edge, throw an exception
-            throw new Error("input line from file: \"" + line + "\" is not a valid node or edge.");
+        switch (true) {
+            case commentRegex.test(line):
+                // Ignore comments
+                return;
+            case nodeRegex.test(line):
+                this.#parseNode(graph, values);
+                return;
+            case edgeRegex.test(line):
+                this.#parseEdge(graph, values);
+                return;
+            default:
+                // If the line was not a node or an edge, throw an exception
+                throw new Error("input line from file: \"" + line + "\" is not a valid node or edge.");
         }
     }
 
@@ -193,6 +193,36 @@ export default class FileParser {
     }
 
     /**
+     * Helper method for determing the graph file format.
+     * A graph is in SGF if the extension is .sgf, or there is a header line starting with a 't'
+     * Otherwise it is assumed to be in GPH
+     * @param {String} name Name of the graph file
+     * @param {String} file The text of the graph file
+     * @returns True if the graph is in SGF format.
+     */
+    #isLayeredGraph(name, file) {
+        let isLayeredGraph = false;
+        const lines = file.split("\n");
+
+        //Check for the .sgf extension
+        if ( name.endsWith('.sgf') ) {
+            isLayeredGraph = true;
+        }
+
+        //Check for a header or tag line beginning with 't'
+        lines.forEach((line) => {
+            line = line.trim();
+            const values = line.split(" ");
+
+            if (values[0] === 't') {
+                isLayeredGraph = true;
+            };
+        });
+
+        return isLayeredGraph;
+    }
+
+    /**
      * Checks if a string can be parsed into a number.
      * @author see: https://stackoverflow.com/a/175787
      * @param {String} str String to check
@@ -202,34 +232,4 @@ export default class FileParser {
         if (typeof str !== "string") return false;
         return !Number.isNaN(Number(str)) && !Number.isNaN(parseFloat(str));
     }
-}
-
-/**
- * Helper method for determing the graph file format.
- * A graph is in SGF if the extension is .sgf, or there is a header line starting with a 't'
- * Otherwise it is assumed to be in GPH
- * @param {*} name Name of the graph file
- * @param {*} file The text of the graph file
- * @returns True if the graph is in SGF format.
- */
-function isLayeredGraph(name, file) {
-    let isLayeredGraph = false;
-    const lines = file.split("\n");
-
-    //Check for the .sgf extension
-    if ( name.endsWith('.sgf') ) {
-        isLayeredGraph = true;
-    }
-
-    //Check for a header or tag line beginning with 't'
-    lines.forEach((line) => {
-        line = line.trim();
-        const values = line.split(" ");
-
-        if (values[0] === 't') {
-            isLayeredGraph = true;
-        };
-    });
-
-    return isLayeredGraph;
 }

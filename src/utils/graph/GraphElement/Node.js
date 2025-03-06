@@ -13,10 +13,10 @@ export default class Node extends GraphElement {
      * @param {String} nodeId Unique string id
      * @param {Number} x X-position
      * @param {Number} y Y-position
-     * @param {Number} index Layer index (layered only)
      * @param {Number} layer Graph layer (layered only)
+     * @param {Number} index Layer index (layered only)
      */
-    constructor(nodeId, x, y, index, layer) {
+    constructor(nodeId, x, y, layer, index) {
         // Call the super constructor with the map of attributes
         super(new Map([
             ["backgroundOpacity", undefined],

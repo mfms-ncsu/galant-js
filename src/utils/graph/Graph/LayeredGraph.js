@@ -4,8 +4,8 @@ export default class LayeredGraph extends Graph {
     /** Graph layers */
     layers;
 
-    constructor() {
-        super("layered");
+    constructor(name) {
+        super(name, "layered");
         this.layers = [];
     }
 }
