@@ -1,8 +1,8 @@
+import Cytoscape from 'globals/Cytoscape';
 import { Popover } from '@headlessui/react'
 import PreferenceButton from 'components/Buttons/PreferenceButton';
 import SecondaryButton from 'components/Buttons/SecondaryButton';
-import { useEffect, useRef } from 'react'
-import Graph from 'utils/graph/Graph/Graph'
+import { useRef } from 'react'
 
 /**
  * ControlSettingsPopover component renders a popover for control settings.
@@ -14,13 +14,12 @@ export default function ControlSettingsPopover() {
 
     // Function to handle auto camera action
     function autoCamera() {
-        window.cytoscape.fit();
+        Cytoscape.fit();
     }
 
     // Function to handle auto layout action
     function autoLayout() {
-        window.cytoscape.layout({ name: "cose-bilkent" });
-        window.updateCytoscape();
+        Cytoscape.layout({ name: "cose-bilkent" });
     }
 
     // Function to toggle the popover menu

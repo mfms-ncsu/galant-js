@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { graphAtom, userChangeManagerAtom } from "utils/atoms/atoms";
+import Cytoscape from "globals/Cytoscape";
 import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
 import ExitButton from "components/Buttons/ExitButton";
 import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
@@ -11,8 +12,6 @@ import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
  * EdgeContextMenu also defines the event listeners for when the user right clicks on an edge. 
  * 
  * @author Julian Madrigal
- * @param {Object} props
- * @returns {React.ReactElement}
  */
 export default function EdgeContextMenu() {
     const [graph, setGraph] = useAtom(graphAtom);
@@ -25,7 +24,6 @@ export default function EdgeContextMenu() {
 
 
     useEffect(() => {
-        if (!window.cytoscape) return;
         function onContextClick(event) {
             // Initially hide the menu and prevent default functionality
             setVisible(false);
@@ -52,9 +50,9 @@ export default function EdgeContextMenu() {
             // Use click to hide the menu
             document.addEventListener('click', () => setVisible(false), { once: true });
         }
-        window.cytoscape.on('cxttap', 'edge', onContextClick);
-        return (() => window.cytoscape.removeListener('cxttap', onContextClick));
-    }, [window.cytoscape])
+        Cytoscape.on('cxttap', 'edge', onContextClick);
+        return (() => Cytoscape.removeListener('cxttap', onContextClick));
+    }, [])
 
     const data = edge && edge.data();
 
@@ -108,7 +106,5 @@ export default function EdgeContextMenu() {
             
             <ExitButton onClick={deleteEdge}>Delete Edge</ExitButton>
         </div>
-
-
-    )
+    );
 }

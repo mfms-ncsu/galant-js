@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
+import Cytoscape from "globals/Cytoscape";
 import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
 import PrimaryButton from "components/Buttons/PrimaryButton";
 import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
@@ -28,10 +29,9 @@ export default function ContextMenu() {
 
     // Display the popup on right-click to graph
     useEffect(() => {
-        if (!window.cytoscape) return;
-        window.cytoscape.on('cxttap', (event) => {
+        Cytoscape.on('cxttap', (event) => {
             // Don't show popup if right clicked on a node/edge.
-            if (event.target !== window.cytoscape) return;
+            if (event.target !== Cytoscape) return;
             event.preventDefault();
 
             // Position the menu
@@ -43,11 +43,10 @@ export default function ContextMenu() {
             // Click away to hide
             document.addEventListener('mousedown', () => setVisible(false), { once: true });
         });
-    }, [window.cytoscape])
+    }, [])
 
     // Update the edit history when a node is moved
     useEffect(() => {
-        if (!window.cytoscape) return;
         function onNodeMoved(event) {
             // Get the node, its id, and position
             const node = event.target;
@@ -66,9 +65,9 @@ export default function ContextMenu() {
             timeOut = setTimeout(() => onNodeMoved(event), 0);
         }
 
-        window.cytoscape.on('free', 'node', onPositionMoved);
-        return () => window.cytoscape.removeListener('free', onPositionMoved);
-    }, [window.cytoscape, graph]);
+        Cytoscape.on('free', 'node', onPositionMoved);
+        return () => Cytoscape.removeListener('free', onPositionMoved);
+    }, [graph]);
 
     // Add a new node to the graph
     function addNode() {

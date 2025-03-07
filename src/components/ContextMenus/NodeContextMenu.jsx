@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { graphAtom, userChangeManagerAtom } from "utils/atoms/atoms";
+import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
+import Cytoscape from "globals/Cytoscape";
 import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
 import ExitButton from "components/Buttons/ExitButton";
-import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
 
 /**
  * NodeContextMenu defines the React Component for the menu that should be opened to display and allow edits to a node's attributes.
@@ -26,7 +27,6 @@ export default function NodeContextMenu() {
 
 
     useEffect(() => {
-        if (!window.cytoscape) return;
         function onContextClick(event) {
             // Initially hide the menu and prevent default functionality
             setVisible(false);
@@ -53,9 +53,9 @@ export default function NodeContextMenu() {
             // Use a click to hide the menu
             document.addEventListener('click', () => setVisible(false), { once: true });
         }
-        window.cytoscape.on('cxttap', 'node', onContextClick);
-        return (() => window.cytoscape.removeListener('cxttap', onContextClick));
-    }, [window.cytoscape])
+        Cytoscape.on('cxttap', 'node', onContextClick);
+        return (() => Cytoscape.removeListener('cxttap', onContextClick));
+    }, [])
 
     const data = node && node.data();
     const nodeId = node && node.id();

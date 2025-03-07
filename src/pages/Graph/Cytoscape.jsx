@@ -1,15 +1,10 @@
 import { React, useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import { algorithmChangeManagerAtom, graphAtom } from "utils/atoms/atoms";
+import Cytoscape from "globals/Cytoscape";
 import { renderToString } from "react-dom/server";
-import cytoscape from "cytoscape";
-import nodeHtmlLabel from "cytoscape-node-html-label";
-import coseBilkent from "cytoscape-cose-bilkent";
 import CytoscapeManager from "utils/graph/CytoscapeManager/CytoscapeManager";
 import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
-
-cytoscape.use(coseBilkent); // This registers coseBilkent as a extension
-nodeHtmlLabel(cytoscape);
 
 /**
  * A React component that displays a cytoscape instance.
@@ -28,71 +23,58 @@ export default function CytoscapeComponent() {
      * Initialize cytoscape on mount (When cytoscapeElement ref is set to the div element)
      */
     useEffect(() => {
-        if (window.cytoscape) return;
+        // Return if window.cytoscape has already been mounted
+        if (Cytoscape.container()) return;
 
-        // Create the cytoscape object
-        const cy = cytoscape({
-            container: cytoscapeElement.current,
-            elements: cytoscapeManager.getElements(graph),
-            style: cytoscapeManager.getStyle(graph),
-            autounselectify: true,
-            wheelSensitivity: 0.35,
-        });
+        // Initialize the cytoscape instance
+        Cytoscape.mount(cytoscapeElement.current);
+        Cytoscape.add(cytoscapeManager.getElements(graph));
+        Cytoscape.style(cytoscapeManager.getStyle(graph)).update();
+        Cytoscape.nodeHtmlLabel([{
+            query: "node",
+            valign: "top",
+            valignBox: "top",
+            tpl: (data) => {
+                // TODO
+                const showWeights = true;
+                const showLabels = true;
 
-        /**
-         * Render node labels
-         */
-        cy.nodeHtmlLabel([
-            {
-                query: "node",
-                valign: "top",
-                valignBox: "top",
-                tpl: (data) => {
+                if ((showWeights && !data.weightHidden) || (showLabels && !data.labelHidden)) {
+                    // This flag determines whether or not there is anything to render. If both the weight
+                    // and label of the node are empty, then we should not draw the label
+                    let hasWeight = 
+                        data.weight !== undefined &&
+                        data.weight !== "" &&
+                        showWeights &&
+                        !data.weightHidden;
 
-                    // TODO
-                    const showWeights = true;
-                    const showLabels = true;
+                    let hasLabel =
+                        data.label !== undefined &&
+                        data.label !== "" &&
+                        showLabels &&
+                        !data.labelHidden;
 
-                    if ( (showWeights && !data.weightHidden) || (showLabels && !data.labelHidden)   ){
-                        
-                        // This flag determines whether or not there
-                        // is anything to render. If both the weight
-                        // and label of the node are empty, then
-                        // we should not draw the label
-                        let hasWeight = 
-                            data.weight !== undefined &&
-                            data.weight !== "" &&
-                            showWeights &&
-                            !data.weightHidden;
+                    let hasWeightOrLabel = hasWeight || hasLabel;
 
-                        let hasLabel =
-                            data.label !== undefined &&
-                            data.label !== "" &&
-                            showLabels &&
-                            !data.labelHidden;
-
-                        let hasWeightOrLabel = hasWeight || hasLabel;
-
-                        return renderToString(
-                            <div className=
-                                {`flex flex-col items-center justify-center border bg-white border-black  ${(data.hidden || !hasWeightOrLabel) && "hidden"}`
-                                }>
-                                <p className="leading-none">
-                                    {(!data.weightHidden && showWeights) ? data.weight : ""}
-                                </p>
-                                <p className="leading-none">
-                                    {(!data.labelHidden && showLabels) ? data.label : ""}
-                                </p>
-                            </div>
-                        );
-                    }
+                    return renderToString(
+                        <div className=
+                            {`flex flex-col items-center justify-center border bg-white border-black  ${(data.hidden || !hasWeightOrLabel) && "hidden"}`
+                            }>
+                            <p className="leading-none">
+                                {(!data.weightHidden && showWeights) ? data.weight : ""}
+                            </p>
+                            <p className="leading-none">
+                                {(!data.labelHidden && showLabels) ? data.label : ""}
+                            </p>
+                        </div>
+                    );
                 }
-            },
-        ]);
+            }
+        }]);
 
         // Allows cypress to access cytoscape via window.cytoscape and read the graph state
         // Also allows this cytoscape instance to be referenced across the application
-        window.cytoscape = cy;
+        window.cytoscape = Cytoscape;
 
         // react-hooks/exhaustive-deps
     }, [cytoscapeElement]);
@@ -101,11 +83,10 @@ export default function CytoscapeComponent() {
      * Create a function to call whenever cytoscape needs to be updated
      */
     useEffect(() => {
-        if (!window.cytoscape) return;
-        window.cytoscape.elements().remove();// Remove elements
-        window.cytoscape.add(cytoscapeManager.getElements(graph)); // Get new elements
-        window.cytoscape.style().resetToDefault(); // Reset style
-        window.cytoscape.style(cytoscapeManager.getStyle(graph)).update(); // Update style
+        Cytoscape.elements().remove();// Remove elements
+        Cytoscape.add(cytoscapeManager.getElements(graph)); // Get new elements
+        Cytoscape.style().resetToDefault(); // Reset style
+        Cytoscape.style(cytoscapeManager.getStyle(graph)).update(); // Update style
     }, [graph]);
 
     /**
