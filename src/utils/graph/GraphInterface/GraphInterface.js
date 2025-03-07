@@ -40,7 +40,7 @@ function generateId(nodes) {
  * Records a new change in the given change manager.
  * @param {ChangeManager} changeManager Change manager to which to add
  * @param {ChangeObject[]} change Changes to log
- * @returns TODO
+ * @returns Updated change manager
  */
 function recordChange(changeManager, change) {
     return produce(changeManager, draft => {
@@ -640,7 +640,6 @@ function deleteNode(graph, changeManager, nodeId) {
         const node = draft.nodes.get(nodeId);
 
         // Delete each edge and push the change objects into the array
-        // TODO: does this work?!?
         node.edges.forEach(edge => {
             let [newGraph, newChangeManager] = deleteEdge(draft, changeManager, edge.source, edge.target);
             draft = newGraph;
@@ -684,7 +683,6 @@ function endRecording(changeManager) {
 
         // Record the list of changes, but only if changes were actually made. If
         // the recordedChanges list is empty, do nothing.
-        // TODO: Fix this?
         if (draft.recordedChanges.length !== 0) {
             // Remove all changes after the current index
             draft.changes = draft.changes.slice(0, draft.index);
