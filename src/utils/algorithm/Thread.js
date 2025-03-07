@@ -758,7 +758,7 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         flags = message[2];
     } else if (message[0] === "graph/algorithm") {
         // Load the graph with isDirected flag
-        graph = fileParser.loadGraph(message[1]);
+        graph = fileParser.loadGraph("", message[1]);
         graph.isDirected = message[2];
 
         // Make sure that the isInStep variable is initialized
