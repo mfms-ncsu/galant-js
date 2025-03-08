@@ -1,4 +1,4 @@
-import { React, useEffect, useRef } from "react";
+import { React, useEffect } from "react";
 import { useAtom } from "jotai";
 import { graphAtom, userChangeManagerAtom } from "states/_atoms/atoms";
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
@@ -6,42 +6,38 @@ import PrimaryButton from "components/Buttons/PrimaryButton";
 import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from "@heroicons/react/24/solid";
 
 /**
- * GraphEditOverlay component represents an overlay for editing graph with functionalities like undo, redo, save, and revert.
- * @param {Object} props - The props for the GraphEditOverlay component.
- * @returns {JSX.Element} - Returns the JSX for GraphEditOverlay component.
+ * GraphEditOverlay component represents an overlay for editing graph with 
+ * functionalities like undo, redo, save, and revert.
  */
 export default function EditControls() {
-    const [graph, setGraph] = useAtom(graphAtom)
+    const [graph, setGraph] = useAtom(graphAtom);
     const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
 
-    // useRef to hold a reference to a SharedWorker instance
-    const sharedworkerContainer = useRef();
-    sharedworkerContainer.sharedworker = new SharedWorker("./worker.js");
-
     // Function to save the graph state
+    // TODO: IMPROVE THIS!!
     function save() {
-        // Get the graph as a JSON object
-        const graphData = {
-            name: GraphInterface.getFileName(graph) ?? 'New Graph',
-            content: GraphInterface.toString(graph),
-        };
+        // // Get the graph as a JSON object
+        // const graphData = {
+        //     name: GraphInterface.getFileName(graph) ?? 'New Graph',
+        //     content: GraphInterface.toString(graph),
+        // };
 
-        const storageItem = localStorage.getItem(`GraphFiles`); // Get the existing local storage
-        const dataList = (storageItem) ? JSON.parse(storageItem) : []; // Parse it
+        // const storageItem = localStorage.getItem(`GraphFiles`); // Get the existing local storage
+        // const dataList = (storageItem) ? JSON.parse(storageItem) : []; // Parse it
         
-        // Attempt to overwrite the existing graph
-        let added = false;
-        dataList.forEach((graph, i) => {
-            if (graph.name === graphData.name) {
-                dataList[i] = graphData;
-                added = true;
-            }
-        });
+        // // Attempt to overwrite the existing graph
+        // let added = false;
+        // dataList.forEach((graph, i) => {
+        //     if (graph.name === graphData.name) {
+        //         dataList[i] = graphData;
+        //         added = true;
+        //     }
+        // });
 
-        // If there isn't one, save it
-        !added && dataList.push(graphData);
+        // // If there isn't one, save it
+        // !added && dataList.push(graphData);
 
-        localStorage.setItem(`GraphFiles`, JSON.stringify(dataList)); // Set the local storage
+        // localStorage.setItem(`GraphFiles`, JSON.stringify(dataList)); // Set the local storage
     }
 
     // Function to revert graph edits (node movements, etc.)

@@ -11,29 +11,17 @@ import ExitButton from "components/Buttons/ExitButton";
 
 /**
  * AlgorithmControls component renders controls for stepping through an algorithm.
- * @returns {JSX.Element} - Returns the JSX for AlgorithmControls component.
  */
 export default function AlgorithmControls() {
-    const [graph, setGraph] = useAtom(graphAtom);
+    const [graph] = useAtom(graphAtom);
     const [algorithmChangeManager, setAlgorithmChangeManager] = useAtom(algorithmChangeManagerAtom);
     const [algorithm, setAlgorithm] = useAtom(algorithmAtom);
-    const [promptQueue, setPromptQueue] = useAtom(promptQueueAtom);
+    const [_, setPromptQueue] = useAtom(promptQueueAtom);
     const [debug, setDebug] = useState(false);
-    
-    // Function to handle pressing the forward button
-    function frontButtonPress() {
-        if (!algorithm || !algorithm.canStepForward()) return;
-        algorithm.stepForward();
-    } 
-
-    // Function to handle pressing the backward button
-    function backButtonPress() {
-        if (!algorithm || !algorithm.canStepBack()) return;
-        algorithm.stepBack();
-    }
 
     /**
-     * Function to export the graph to a file using the File System Access API on Chrome based browser.
+     * Function to export the graph to a file using the File System Access API 
+     * on Chrome based browser.
      */
     async function exportGraph() {
         if (window.showSaveFilePicker) {
@@ -57,7 +45,7 @@ export default function AlgorithmControls() {
 
     /**
      * Fallback function to export the graph if the browser does not support the 
-     * File System Access API(This API only supported by chrome and edge).
+     * File System Access API (This API is only supported by chromium browsers).
      */
     async function exportGraphFallback() {
         // Prompt user for the desired file name, defaulting to "graph.gph"
@@ -92,6 +80,24 @@ export default function AlgorithmControls() {
         }
     }
 
+    // Function to handle pressing the forward button
+    function frontButtonPress() {
+        if (!algorithm || !algorithm.canStepForward()) return;
+        algorithm.stepForward();
+    } 
+
+    // Function to handle pressing the backward button
+    function backButtonPress() {
+        if (!algorithm || !algorithm.canStepBack()) return;
+        algorithm.stepBack();
+    }
+
+    // Method called when the "Skip to end" button is clicked
+    function skipToEnd() {
+        algorithm.skipToEnd();
+    }
+
+    // Kills the algorithm
     function terminateAlgorithm() {
         // Remove any prompts the algorithm had up
         setPromptQueue([]);
@@ -101,13 +107,6 @@ export default function AlgorithmControls() {
 
         // Undo all changes made by the algorithm
         setAlgorithmChangeManager(new ChangeManager());
-    }
-
-    /**
-     * Method called when the "Skip to end" button is clicked
-     */
-    function skipToEnd() {
-        algorithm.skipToEnd();
     }
 
     // Effect hook to handle keyboard shortcuts for stepping through the algorithm

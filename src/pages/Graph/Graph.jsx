@@ -5,7 +5,7 @@ import Cytoscape from "globals/Cytoscape";
 import SharedWorker from "globals/SharedWorker";
 import Algorithm from "states/Algorithm/Algorithm";
 import FileParser from "interfaces/FileParser/FileParser";
-import HeaderComponent from "./Header";
+import Header from "./Header";
 import CytoscapeComponent from "./Cytoscape"
 import PromptComponent from "components/Prompts/PromptComponent";
 import ContextMenu from "components/ContextMenus/ContextMenu"
@@ -17,8 +17,6 @@ import AlgorithmControls from "./Overlays/AlgorithmControls";
 /**
  * Graph component is responsible for rendering and managing the main view of the application.
  * This component handles loading new graph and algorithm objects into the state variables.
- * 
- * @author Henry Morris
  */
 export default function Graph() {
     // Define state variables using React hooks
@@ -29,9 +27,8 @@ export default function Graph() {
     const sentAliveMessage = useRef();
     
     /**
-     * Creates SharedWorker instance on mount.
-     * Whenever graph updates, onMessage is rewritten to allow reading of most 
-     * current graph.
+     * Creates SharedWorker instance on mount. Whenever graph updates, onMessage 
+     * is rewritten to allow reading of most current graph.
      */
     useEffect(() => {
         if (!sentAliveMessage.current) {
@@ -39,37 +36,29 @@ export default function Graph() {
             SharedWorker.postMessage({ message: "alive" });
         }
 
-        /**
-         * Load a new graph.
-         */
+        // Load a new graph
         function onGraphLoad(data, isInit) {
             // Get the name and graph text from the data
-            const { name: graphName, graph: graphText } = data;
+            const { name: graphName, payload: graphText } = data;
             if (!graphText) return;
 
             // Remove any running algorithm
             setAlgorithm(null);
 
             // Load the graph
-            try {
-                setGraph(FileParser.loadGraph(graphName, graphText));
-            } catch (e) {
-                console.error(e);
-            }
+            setGraph(FileParser.loadGraph(graphName, graphText));
 
             // We have to wait for cytoscape to read graph changes, and add graph.
             if (isInit) setTimeout(() => Cytoscape.fit(), 25);
         }
 
-        /**
-         * Load a new algorithm.
-         */
+        // Load a new algorithm
         function onAlgorithmLoad(data) {
             // Load the algorithm
-            let newAlgorithm = new Algorithm(data.name, data.algorithm, [graph, setGraph], [algorithmChangeManager, setAlgorithmChangeManager], [promptQueue, setPromptQueue]);
-            setAlgorithm(newAlgorithm);
+            setAlgorithm(new Algorithm(data.name, data.payload, [graph, setGraph], [algorithmChangeManager, setAlgorithmChangeManager], [promptQueue, setPromptQueue]));
         }
 
+        // Register the functions in shared worker
         SharedWorker.on("graph-init", data => onGraphLoad(data, true));
         SharedWorker.on("graph-rename", onGraphLoad);
         SharedWorker.on("algo-init", onAlgorithmLoad);
@@ -79,7 +68,7 @@ export default function Graph() {
     return (
         <>
             <link rel="manifest" id="manifest-placeholder" href="./manifest.webmanifest" />
-            <HeaderComponent />
+            <Header />
             <div className="relative w-full h-full">
                 <PromptComponent />
                 <CytoscapeComponent />

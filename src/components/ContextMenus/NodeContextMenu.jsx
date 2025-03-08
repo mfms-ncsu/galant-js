@@ -6,14 +6,8 @@ import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import ExitButton from "components/Buttons/ExitButton";
 
 /**
- * NodeContextMenu defines the React Component for the menu that should be opened to display and allow edits to a node's attributes.
- * Displayed attributes include id, label, and weight.
- * NodeContextMenu also defines the listeners for when the user right clicks on a node in cytoscape.
- * Changed attributes get saved to the graph object. 
- * 
- * @author Julian Madrigal
- * @param {Object} props
- * @returns {React.ReactElement} React component
+ * Opens when a user right-clicks on a node. Allows a user to set 
+ * weight or label, and ability to delete a node.
  */
 export default function NodeContextMenu() {
     const [graph, setGraph] = useAtom(graphAtom);
@@ -24,7 +18,7 @@ export default function NodeContextMenu() {
     const [renderedPosition, setRenderedPosition] = useState({ x: 0, y: 0 });
     const [values, setValues] = useState({});
 
-
+    // Listen for clicks to open the menu
     useEffect(() => {
         function onContextClick(event) {
             // Initially hide the menu and prevent default functionality
@@ -36,13 +30,13 @@ export default function NodeContextMenu() {
 
             // Set the values to display
             setValues({
-                id: node.id(),
-                label: node.data().label || "",
+                id: event.target.id(),
+                label: node.data().label,
                 weight: node.data().weight || "",
             });
 
             // Get the node as a state variable and set the visibility to true
-            setNode(event.target);
+            setNode(node);
             setVisible(true);
 
             // Set rendering position
@@ -54,10 +48,7 @@ export default function NodeContextMenu() {
         }
         Cytoscape.on('cxttap', 'node', onContextClick);
         return (() => Cytoscape.removeListener('cxttap', onContextClick));
-    }, [])
-
-    const data = node && node.data();
-    const nodeId = node && node.id();
+    }, []);
 
     // Updates the values state whenever an input is changed
     function onChangeValue(value, newValue) {
@@ -70,13 +61,11 @@ export default function NodeContextMenu() {
     function update() {
         // Get the new label and weight
         const label = values.label.trim();
-        const weight = values.weight.trim();
+        const weight = parseInt(String(values.weight).trim()) || undefined;
 
         // Set the changes
-        let [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graph, userChangeManager, nodeId, "label", label);
-        setGraph(newGraph);
-        setUserChangeManager(newChangeManager);
-        [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graph, userChangeManager, nodeId, "weight", weight);
+        let [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graph, userChangeManager, node.id(), "label", label);
+        [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(newGraph, newChangeManager, node.id(), "weight", weight);
         setGraph(newGraph);
         setUserChangeManager(newChangeManager);
     }
@@ -84,11 +73,12 @@ export default function NodeContextMenu() {
     // Deletes the node and closes the context menu
     function deleteNode() {
         setVisible(false);
-        let [newGraph, newChangeManager] = GraphInterface.deleteNode(graph, userChangeManager, nodeId);
+        let [newGraph, newChangeManager] = GraphInterface.deleteNode(graph, userChangeManager, node.id());
         setGraph(newGraph);
         setUserChangeManager(newChangeManager);
     }
 
+    // Hide the context menu when enter is pressed
     function onEnterPressed(event) {
         if (event.key !== 'Enter') return;
         event.target.blur();

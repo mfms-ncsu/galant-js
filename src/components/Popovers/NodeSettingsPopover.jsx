@@ -1,11 +1,14 @@
-import { Popover, Switch } from '@headlessui/react'
+import { useRef } from 'react';
+import { useAtom } from 'jotai';
+import { graphAtom } from 'states/_atoms/atoms';
+import { Popover, Switch } from '@headlessui/react';
 import PreferenceButton from 'components/Buttons/PreferenceButton';
-import { useState, useRef } from 'react'
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
+import GraphInterface from 'interfaces/GraphInterface/GraphInterface';
 
 /**
- * BinarySwitchComponent renders a binary switch component.
+ * Binary switch component.
  */
 function BinarySwitchComponent({enabled, setEnabled}) {
     return (
@@ -27,12 +30,10 @@ function BinarySwitchComponent({enabled, setEnabled}) {
 }
 
 /**
- * NodeSettingsPopover component renders a popover for node settings.
+ * Popover for node settings.
  */
 export default function NodeSettingsPopover() {
-    const [displayLabels, setDisplayLabels] =  useState(true);
-    const [displayWeights, setDisplayWeights] =  useState(true);
-    const [nodeRadius, setNodeRadius] = useState(25);
+    const [graph, setGraph] = useAtom(graphAtom);
     
     // Ref for popover button
     const button = useRef(null);
@@ -54,22 +55,22 @@ export default function NodeSettingsPopover() {
                 <div className="flex flex-col space-y-2 mt-2">
                     <div className='flex justify-between align-middle'>
                         <span className='text-gray-700 font-medium'>Display Labels</span>
-                        <BinarySwitchComponent enabled={displayLabels} setEnabled={setDisplayLabels}/>
+                        <BinarySwitchComponent enabled={graph.showNodeLabels} setEnabled={val => setGraph(GraphInterface.setShowNodeLabels(graph, val))} />
                     </div>
 
                     <div className='flex justify-between align-middle'>
                         <span className='text-gray-700 font-medium'>Display Weights</span>
-                        <BinarySwitchComponent enabled={displayWeights} setEnabled={setDisplayWeights}/>
+                        <BinarySwitchComponent enabled={graph.showNodeWeights} setEnabled={val => setGraph(GraphInterface.setShowNodeWeights(graph, val))} />
                     </div>
 
                     <div>
                         <div className='flex justify-between align-middle'>
                             <span className='text-gray-700 font-medium'>Node Radius</span>
-                            <input className='appearance-none text-sm font-semibold text-blue-500' size={Math.max(nodeRadius.toString().length, 2)} type="text" value={nodeRadius} onChange={(event) => setNodeRadius(event.target.value)} />
+                            <span className='text-sm font-semibold text-blue-500'>{graph.nodeSize}</span>
                         </div>
                         <Slider 
-                            value={nodeRadius}
-                            onChange={setNodeRadius}
+                            value={graph.nodeSize}
+                            onChange={val => setGraph(GraphInterface.setNodeSize(graph, val))}
                             styles={{
                                 track: {
                                     background: '#007bff'

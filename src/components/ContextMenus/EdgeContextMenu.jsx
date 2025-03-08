@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { algorithmAtom, graphAtom, userChangeManagerAtom } from "states/_atoms/atoms";
-import Cytoscape from "globals/Cytoscape";
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
+import Cytoscape from "globals/Cytoscape";
 import ExitButton from "components/Buttons/ExitButton";
 
 /**
- * EdgeContextMenu defines the React Component that should be displayed when a user right clicks an edge in cytoscape.
- * The displayed/editable attributes include: weight, label, and ability to delete node.
- * EdgeContextMenu also defines the event listeners for when the user right clicks on an edge. 
- * 
- * @author Julian Madrigal
+ * Opens when a user right-clicks on an edge. Allows a user to set 
+ * weight or label, and ability to delete an edge.
  */
 export default function EdgeContextMenu() {
     const [graph, setGraph] = useAtom(graphAtom);
@@ -21,7 +18,7 @@ export default function EdgeContextMenu() {
     const [renderedPosition, setRenderedPosition] = useState({x: 0, y: 0});
     const [values, setValues] = useState({});
 
-
+    // Listen for clicks to open the menu
     useEffect(() => {
         function onContextClick(event) {
             // Initially hide the menu and prevent default functionality
@@ -29,17 +26,16 @@ export default function EdgeContextMenu() {
             event.preventDefault();
 
             // Get the edge from cytoscape
-            const edge = event.target;
+            const edge = event.target.data();
 
             // Set the values to display
-            const edgeObject = GraphInterface.getEdge(graph, edge.data().source, edge.data().target);
             setValues({
-                label: edgeObject.getAttribute("label") || "",
-                weight: edgeObject.getAttribute("weight") ? edgeObject.getAttribute("weight").toString() : "",
+                label: edge.label,
+                weight: edge.weight || "",
             });
 
             // Set the edge state and show the menu
-            setEdge(event.target);
+            setEdge(edge);
             setVisible(true);
 
             // Set the rendering position
@@ -51,9 +47,7 @@ export default function EdgeContextMenu() {
         }
         Cytoscape.on('cxttap', 'edge', onContextClick);
         return (() => Cytoscape.removeListener('cxttap', onContextClick));
-    }, [])
-
-    const data = edge && edge.data();
+    }, []);
 
     // Updates the values state whenever an input is changed
     function onChangeValue(value, newValue) {
@@ -66,13 +60,11 @@ export default function EdgeContextMenu() {
     function update() {
         // Get the new label and weight
         const label = values.label.trim();
-        const weight = values.weight.trim();
+        const weight = parseInt(String(values.weight).trim()) || undefined;
 
         // Set the changes
-        let [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(graph, userChangeManager, data.source, data.target, "label", label);
-        setGraph(newGraph);
-        setUserChangeManager(newChangeManager);
-        [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(graph, userChangeManager, data.source, data.target, "weight", weight);
+        let [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(graph, userChangeManager, edge.source, edge.target, "label", label);
+        [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(newGraph, newChangeManager, edge.source, edge.target, "weight", weight);
         setGraph(newGraph);
         setUserChangeManager(newChangeManager);
     }
@@ -80,7 +72,7 @@ export default function EdgeContextMenu() {
     // Deletes the edge and closes the context menu
     function deleteEdge() {
         setVisible(false);
-        let [newGraph, newChangeManager] = GraphInterface.deleteEdge(graph, userChangeManager, data.source, data.target);
+        let [newGraph, newChangeManager] = GraphInterface.deleteEdge(graph, userChangeManager, edge.source, edge.target);
         setGraph(newGraph);
         setUserChangeManager(newChangeManager);
     }

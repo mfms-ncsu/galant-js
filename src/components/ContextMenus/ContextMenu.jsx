@@ -6,15 +6,7 @@ import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import PrimaryButton from "components/Buttons/PrimaryButton";
 
 /**
- * ContextMenu defines the HTML component displayed for the main context menu. This allows the user to
- * create a new node, or create a new edge.
- * ContextMenu also creates events for context actions related to the graph. This includes:
- * Right click on cytoscape opening the main context menu.
- * Change of a node's position in cytoscape gets saved to the graph.
- * 
- * @author Julian Madrigal
- * @param {Object} props
- * @returns {React.ReactElement}
+ * Allows the user to create a new node or edge.
  */
 export default function ContextMenu() {
     const [graph, setGraph] = useAtom(graphAtom);
@@ -41,7 +33,7 @@ export default function ContextMenu() {
             // Click away to hide
             document.addEventListener('mousedown', () => setVisible(false), { once: true });
         });
-    }, [])
+    }, []);
 
     // Update the edit history when a node is moved
     useEffect(() => {

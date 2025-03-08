@@ -1,11 +1,14 @@
-import { Popover, Switch } from '@headlessui/react'
+import { useRef } from 'react';
+import { useAtom } from 'jotai';
+import { graphAtom } from 'states/_atoms/atoms';
+import { Popover, Switch } from '@headlessui/react';
 import PreferenceButton from 'components/Buttons/PreferenceButton';
-import { useState, useRef } from 'react'
+import GraphInterface from 'interfaces/GraphInterface/GraphInterface';
 
 /**
- * BinarySwitchComponent renders a binary switch component.
+ * Binary switch component.
  */
-function BinarySwitchComponent({enabled, setEnabled}) {
+function BinarySwitchComponent({ enabled, setEnabled }) {
     return (
         <Switch
             checked={enabled}
@@ -25,12 +28,10 @@ function BinarySwitchComponent({enabled, setEnabled}) {
 }
 
 /**
- * EdgeSettingsPopover component renders a popover for edge settings.
+ * Popover for edge settings.
  */
 export default function EdgeSettingsPopover() {
-    const [displayLabels, setDisplayLabels] = useState(true);
-    const [displayWeights, setDisplayWeights] = useState(true);
-    const [isDirected, setIsDirected] = useState(false);
+    const [graph, setGraph] = useAtom(graphAtom);
 
     // Ref for popover button
     const button = useRef(null);
@@ -52,20 +53,19 @@ export default function EdgeSettingsPopover() {
                 <div className="flex flex-col space-y-2 mt-2">
                     <div className='flex justify-between align-middle'>
                         <span className='text-gray-700 font-medium'>Display Labels</span>
-                        <BinarySwitchComponent enabled={displayLabels} setEnabled={setDisplayLabels} />
+                        <BinarySwitchComponent enabled={graph.showEdgeLabels} setEnabled={val => setGraph(GraphInterface.setShowEdgeLabels(graph, val))} />
                     </div>
 
                     <div className='flex justify-between align-middle'>
                         <span className='text-gray-700 font-medium'>Display Weights</span>
-                        <BinarySwitchComponent enabled={displayWeights} setEnabled={setDisplayWeights} />
+                        <BinarySwitchComponent enabled={graph.showEdgeWeights} setEnabled={val => setGraph(GraphInterface.setShowEdgeWeights(graph, val))} />
                     </div>
 
                     <div className='flex justify-between align-middle'>
                         <span className='text-gray-700 font-medium'>Directed</span>
-                        <BinarySwitchComponent enabled={isDirected} setEnabled={setIsDirected} />
+                        <BinarySwitchComponent enabled={graph.isDirected} setEnabled={val => setGraph(GraphInterface.setDirected(graph, val))} />
                     </div>
                 </div>
-
             </Popover.Panel>
         </Popover>
     );

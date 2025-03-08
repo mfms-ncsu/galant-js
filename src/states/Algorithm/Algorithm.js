@@ -232,6 +232,7 @@ export default class Algorithm {
 
         switch (message.action) {
             case "setDirected":
+                console.log(message);
                 newGraph = GraphInterface.setDirected(this.graph, message.isDirected);
                 this.#updateGraph(newGraph);
                 break;

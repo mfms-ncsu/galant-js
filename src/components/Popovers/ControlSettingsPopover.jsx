@@ -5,7 +5,7 @@ import SecondaryButton from 'components/Buttons/SecondaryButton';
 import { useRef } from 'react'
 
 /**
- * ControlSettingsPopover component renders a popover for control settings.
+ * Popover for control settings.
  */
 export default function ControlSettingsPopover() {
     // Ref for popover button

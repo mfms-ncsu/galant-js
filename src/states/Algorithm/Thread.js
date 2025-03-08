@@ -10,9 +10,6 @@ import ChangeManager from 'states/ChangeManager/ChangeManager';
  * @author Krisjian Smith
  */
 
-/** File parser to read in the graph */
-const fileParser = new FileParser();
-
 /**
  * Used to inform the thread when to run and storing prompt results to be accessed in
  * the thread.
@@ -43,7 +40,7 @@ let isInStep;
 let stepsToTake;
 
 /**
- * This thread's copy of the graph
+ * This thread's copy of the graph and its change manager.
  */
 let graph;
 let changeManager = new ChangeManager();
@@ -52,7 +49,6 @@ let changeManager = new ChangeManager();
  * This function uses Atomics to cause the algorithm to wait for user input before continuing
  */
 function wait() {
-    
     // If we are waiting, then the algorithm step is complete. It is
     // safe for the main thread to redraw the window
     postMessage({action: "redraw"});
@@ -75,7 +71,6 @@ function wait() {
  * 0.
  */
 function waitIfNeeded() {
-    
     // If we are not in a step (implying we just finished a step),
     // then decrement the stepsToTake counter
     if (!isInStep) {
@@ -92,7 +87,6 @@ function waitIfNeeded() {
  * Tells the thread to wait after running a step.
  */
 function step(code=null) {
-    
     // If we are already in a step, something probably went wrong,
     // since it doesn't make sense to have a step within a step.
     if (isInStep) {
@@ -126,9 +120,6 @@ function step(code=null) {
         // there is no step
         code();
     }
-
-    
-
 }
 
 /**************************************************************/
@@ -756,9 +747,10 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
     if (message[0] === "shared") {
         sharedArray = message[1];
         flags = message[2];
+
     } else if (message[0] === "graph/algorithm") {
         // Load the graph with isDirected flag
-        graph = fileParser.loadGraph("", message[1]);
+        graph = FileParser.loadGraph("", message[1]);
         graph.isDirected = message[2];
 
         // Make sure that the isInStep variable is initialized

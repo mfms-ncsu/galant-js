@@ -1,21 +1,17 @@
 import { React, useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import { algorithmChangeManagerAtom, graphAtom } from "states/_atoms/atoms";
+import CytoscapeInterface from "interfaces/CytoscapeInterface/CytoscapeInterface";
+import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import Cytoscape from "globals/Cytoscape";
 import { renderToString } from "react-dom/server";
-import CytoscapeManager from "interfaces/CytoscapeManager/CytoscapeManager";
-import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 
 /**
- * A React component that displays a cytoscape instance.
- * Reads graph data from GraphContext, which is defined in GraphView/index.js
- * @author Julian Madrigal
- * @author Andrew Lanning
+ * A React component that renders the cytoscape instance.
  */
 export default function CytoscapeComponent() {
-    const cytoscapeManager = new CytoscapeManager();
-    const [graph, setGraph] = useAtom(graphAtom);
-    const [algorithmChangeManager, setAlgorithmChangeManager] = useAtom(algorithmChangeManagerAtom)
+    const [graph] = useAtom(graphAtom);
+    const [algorithmChangeManager] = useAtom(algorithmChangeManagerAtom)
     const cytoscapeElement = useRef();
     const [message, setMessage] = useState(null);
 
@@ -28,32 +24,21 @@ export default function CytoscapeComponent() {
 
         // Initialize the cytoscape instance
         Cytoscape.mount(cytoscapeElement.current);
-        Cytoscape.add(cytoscapeManager.getElements(graph));
-        Cytoscape.style(cytoscapeManager.getStyle(graph)).update();
+        Cytoscape.add(CytoscapeInterface.getElements(graph));
+        Cytoscape.style(CytoscapeInterface.getStyle(graph)).update();
         Cytoscape.nodeHtmlLabel([{
             query: "node",
             valign: "top",
             valignBox: "top",
             tpl: (data) => {
-                // TODO
-                const showWeights = true;
-                const showLabels = true;
+                const showWeights = graph.showNodeWeights;
+                const showLabels = graph.showNodeLabels;
 
                 if ((showWeights && !data.weightHidden) || (showLabels && !data.labelHidden)) {
                     // This flag determines whether or not there is anything to render. If both the weight
                     // and label of the node are empty, then we should not draw the label
-                    let hasWeight = 
-                        data.weight !== undefined &&
-                        data.weight !== "" &&
-                        showWeights &&
-                        !data.weightHidden;
-
-                    let hasLabel =
-                        data.label !== undefined &&
-                        data.label !== "" &&
-                        showLabels &&
-                        !data.labelHidden;
-
+                    let hasWeight = data.weight !== undefined && data.weight !== "" && showWeights && !data.weightHidden;
+                    let hasLabel = data.label !== undefined && data.label !== "" && showLabels && !data.labelHidden;
                     let hasWeightOrLabel = hasWeight || hasLabel;
 
                     return renderToString(
@@ -84,9 +69,9 @@ export default function CytoscapeComponent() {
      */
     useEffect(() => {
         Cytoscape.elements().remove();// Remove elements
-        Cytoscape.add(cytoscapeManager.getElements(graph)); // Get new elements
+        Cytoscape.add(CytoscapeInterface.getElements(graph)); // Get new elements
         Cytoscape.style().resetToDefault(); // Reset style
-        Cytoscape.style(cytoscapeManager.getStyle(graph)).update(); // Update style
+        Cytoscape.style(CytoscapeInterface.getStyle(graph)).update(); // Update style
     }, [graph]);
 
     /**

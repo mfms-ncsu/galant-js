@@ -29,6 +29,63 @@ function getTabByName(tabs, name) {
  */
 
 /**
+ * Exports the tab content to a file. If the content is detected as JavaScript,
+ * the file will be saved with a .js extension, otherwise with a .gph extension.
+ * 
+ * 
+ * TODO: MAKE THIS MORE READABLE
+ * 
+ * 
+ * @param {String} type Tab type (Algorithm/Graph)
+ * @param {Tab} tab Tab value
+ */
+function downloadTab(tab, type) {
+    if (!tab) return;
+    const isAlgorithm = type === "Algorithm";
+    
+    //Update the file extension if it is missing or incorrect
+    let name = tab.name;
+    if (isAlgorithm && !tab.name.match(/\.js$/)) {
+        name = name.replace(/[a-z]+$/).concat(".js")
+    }
+    if (!isAlgorithm && !tab.name.match(/\.(?:gph|sgf)$/)) {
+        name = name.replace(/[a-z]+$/).concat(".gph")
+    }
+    const ext = name.match(/\.[a-zA-Z0-9]+$/);
+
+    if (window.showSaveFilePicker) {
+        (async () => {
+            try {
+                const fileHandle = await window.showSaveFilePicker({
+                    suggestedName: name,
+                    types: [{
+                        description: isAlgorithm ? "JavaScript Files" : "Text Files",
+                        accept:isAlgorithm ? { "text/javascript": [ext] } : { "text/plain": [ext] },
+                    }],
+                });
+                const writableStream = await fileHandle.createWritable();
+                await writableStream.write(tab.content);
+                await writableStream.close();
+            } catch (error) {
+                console.error("Error saving file:", error);
+            }
+        })();
+    } else {
+        const fileName = window.prompt("Enter the filename to save:");
+        if (!fileName) return;
+        const blob = new Blob([tab.content], { type: isAlgorithm ? "text/javascript" : "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+}
+
+/**
  * Gets the selected tab from a list of tabs.
  * @param {Tab[]} tabs List of tabs
  * @returns Selected tab
@@ -131,6 +188,7 @@ function setSelected(tabs, tab) {
 }
 
 const TabInterface = {
+    downloadTab,
     getSelectedTab,
     addTab,
     deleteTab,

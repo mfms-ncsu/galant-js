@@ -641,9 +641,17 @@ function deleteNode(graph, changeManager, nodeId) {
 
         // Delete each edge and push the change objects into the array
         node.edges.forEach(edge => {
-            let [newGraph, newChangeManager] = deleteEdge(draft, changeManager, edge.source, edge.target);
-            draft = newGraph;
-            changeManager = newChangeManager;
+            // Delete the edge in the nodes
+            draft.nodes.get(edge.source).edges.delete(`${edge.source},${edge.target}`);
+            draft.nodes.get(edge.target).edges.delete(`${edge.source},${edge.target}`);
+
+            // Push the change object
+            // Get the attributes from graph instead of draft so they aren't immer-ized
+            changeObjects.push(new ChangeObject("deleteEdge", {
+                source: edge.source,
+                target: edge.target,
+                attributes: graph.nodes.get(edge.source).edges.get(`${edge.source},${edge.target}`).attributes
+            }, null));
         });
 
         // Finally, delete the node from the nodes list
@@ -1010,6 +1018,71 @@ function setNodePosition(graph, changeManager, nodeId, x, y) {
 }
 
 /**
+ * Updates the node size for the given graph.
+ * @param {Graph} graph Graph on which to operate
+ * @param {Number} nodeSize New node size
+ * @returns Updated graph object
+ */
+function setNodeSize(graph, nodeSize) {
+    const newGraph = produce(graph, draft => {
+        draft.nodeSize = nodeSize;
+    });
+    return newGraph;
+}
+
+/**
+ * Sets a new value for showEdgeLabels within the graph.
+ * @param {Graph} graph Graph on which to operate
+ * @param {Boolean} showEdgeLabels Flag for whether to show edge labels
+ * @returns Updated graph object
+ */
+function setShowEdgeLabels(graph, showEdgeLabels) {
+    const newGraph = produce(graph, draft => {
+        draft.showEdgeLabels = showEdgeLabels;
+    });
+    return newGraph;
+}
+
+/**
+ * Sets a new value for showEdgeWeights within the graph.
+ * @param {Graph} graph Graph on which to operate
+ * @param {Boolean} showEdgeWeights Flag for whether to show edge weights
+ * @returns Updated graph object
+ */
+function setShowEdgeWeights(graph, showEdgeWeights) {
+    const newGraph = produce(graph, draft => {
+        draft.showEdgeWeights = showEdgeWeights;
+    });
+    return newGraph;
+}
+
+/**
+ * Sets a new value for showNodeLabels within the graph.
+ * @param {Graph} graph Graph on which to operate
+ * @param {Boolean} showNodeLabels Flag for whether to show node labels
+ * @returns Updated graph object
+ */
+function setShowNodeLabels(graph, showNodeLabels) {
+    const newGraph = produce(graph, draft => {
+        draft.showNodeLabels = showNodeLabels;
+    });
+    return newGraph;
+}
+
+/**
+ * Sets a new value for showNodeWeights within the graph.
+ * @param {Graph} graph Graph on which to operate
+ * @param {Boolean} showNodeWeights Flag for whether to show node weights
+ * @returns Updated graph object
+ */
+function setShowNodeWeights(graph, showNodeWeights) {
+    const newGraph = produce(graph, draft => {
+        draft.showNodeWeights = showNodeWeights;
+    });
+    return newGraph;
+}
+
+/**
  * Makes the ChangeManager start recording. When recording, the ChangeManager
  * will not save any new ChangeObjects until the recording is over. When the
  * recording is over, it will save all the ChangeObjects at once, so that they
@@ -1093,7 +1166,7 @@ function undo(graph, changeManager) {
     // Check if there are any changes to undo
     if (changeManager.index > 0) {
         // Get the previous step
-        const step = changeManager.changes[changeManager.index - 1];
+        const step = changeManager.changes[changeManager.index - 1].toReversed();
 
         // Undo the change
         const newGraph = produce(graph, draft => {
@@ -1185,6 +1258,11 @@ const GraphInterface = {
     setNodeAttribute,
     setNodeAttributeAll,
     setNodePosition,
+    setNodeSize,
+    setShowEdgeLabels,
+    setShowEdgeWeights,
+    setShowNodeLabels,
+    setShowNodeWeights,
     startRecording,
     toString,
     undo
