@@ -1,7 +1,7 @@
 import { React, useEffect, useRef } from "react";
 import { useAtom } from "jotai";
-import { graphAtom, userChangeManagerAtom } from "utils/atoms/atoms";
-import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
+import { graphAtom, userChangeManagerAtom } from "states/_atoms/atoms";
+import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import PrimaryButton from "components/Buttons/PrimaryButton";
 import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from "@heroicons/react/24/solid";
 

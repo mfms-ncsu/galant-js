@@ -1,6 +1,7 @@
 /**
  * This file centralizes all the code for SharedWorker on the GraphView end.
  * Other components can utilize these functions to communicate with SharedWorker.
+ * 
  * @author Julian Madrigal
  */
 

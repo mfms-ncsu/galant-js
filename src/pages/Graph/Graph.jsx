@@ -1,19 +1,10 @@
-/**
- * Graph component is responsible for rendering and managing the main view of the application.
- * This component includes state management for the graph, current algorithm, algorithm status,
- * graph edit history, and various context providers for child components.
- * @author Christina Albores
- */
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
-import { algorithmChangeManagerAtom, graphAtom } from "utils/atoms/atoms";
+import { algorithmAtom, algorithmChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_atoms/atoms";
 import Cytoscape from "globals/Cytoscape";
 import SharedWorker from "globals/SharedWorker";
-import Algorithm from "utils/algorithm/Algorithm";
-import AlgorithmContext, { createAlgorithmContextObject } from "utils/algorithm/AlgorithmContext";
-import FileParser from "utils/graph/FileParser/FileParser";
-import { PromptContext } from "utils/services/PromptService";
-import PromptServiceObject from "utils/services/PromptService";
+import Algorithm from "states/Algorithm/Algorithm";
+import FileParser from "interfaces/FileParser/FileParser";
 import HeaderComponent from "./Header";
 import CytoscapeComponent from "./Cytoscape"
 import PromptComponent from "components/Prompts/PromptComponent";
@@ -23,22 +14,24 @@ import EdgeContextMenu from "components/ContextMenus/EdgeContextMenu";
 import EditControls from "./Overlays/EditControls";
 import AlgorithmControls from "./Overlays/AlgorithmControls";
 
+/**
+ * Graph component is responsible for rendering and managing the main view of the application.
+ * This component handles loading new graph and algorithm objects into the state variables.
+ * 
+ * @author Henry Morris
+ */
 export default function Graph() {
     // Define state variables using React hooks
     const [graph, setGraph] = useAtom(graphAtom);
     const [algorithmChangeManager, setAlgorithmChangeManager] = useAtom(algorithmChangeManagerAtom);
-    const [currentAlgorithm, setCurrentAlgorithm] = useState(null);
-    const algorithmContext = createAlgorithmContextObject(currentAlgorithm, setCurrentAlgorithm);
-    const [algorithmStatus, setAlgorithmStatus] = useState(null);
-    const [PromptService] = useState(new PromptServiceObject(useState([])));
+    const [_, setAlgorithm] = useAtom(algorithmAtom);
+    const [promptQueue, setPromptQueue] = useAtom(promptQueueAtom);
     const sentAliveMessage = useRef();
-
-    const fileParser = new FileParser(graph, setGraph);
     
     /**
      * Creates SharedWorker instance on mount.
      * Whenever graph updates, onMessage is rewritten to allow reading of most 
-     * current graph
+     * current graph.
      */
     useEffect(() => {
         if (!sentAliveMessage.current) {
@@ -55,17 +48,17 @@ export default function Graph() {
             if (!graphText) return;
 
             // Remove any running algorithm
-            setCurrentAlgorithm(null);
+            setAlgorithm(null);
 
             // Load the graph
-            try { 
-                setGraph(fileParser.loadGraph(graphName, graphText));
+            try {
+                setGraph(FileParser.loadGraph(graphName, graphText));
             } catch (e) {
                 console.error(e);
             }
 
             // We have to wait for cytoscape to read graph changes, and add graph.
-            if (isInit) setTimeout(() => Cytoscape.fit(), 75);
+            if (isInit) setTimeout(() => Cytoscape.fit(), 25);
         }
 
         /**
@@ -73,8 +66,8 @@ export default function Graph() {
          */
         function onAlgorithmLoad(data) {
             // Load the algorithm
-            let newAlgorithm = new Algorithm([graph, setGraph], [algorithmChangeManager, setAlgorithmChangeManager], data.name, data.algorithm, PromptService, [algorithmStatus, setAlgorithmStatus]);
-            setCurrentAlgorithm(newAlgorithm);
+            let newAlgorithm = new Algorithm(data.name, data.algorithm, [graph, setGraph], [algorithmChangeManager, setAlgorithmChangeManager], [promptQueue, setPromptQueue]);
+            setAlgorithm(newAlgorithm);
         }
 
         SharedWorker.on("graph-init", data => onGraphLoad(data, true));
@@ -88,17 +81,13 @@ export default function Graph() {
             <link rel="manifest" id="manifest-placeholder" href="./manifest.webmanifest" />
             <HeaderComponent />
             <div className="relative w-full h-full">
-                <AlgorithmContext.Provider value={algorithmContext}>
-                    <PromptContext.Provider value={PromptService}>
-                        <PromptComponent />
-                        <CytoscapeComponent />
-                        <AlgorithmControls />
-                        <EditControls />
-                        <ContextMenu />
-                        <NodeContextMenu />
-                        <EdgeContextMenu />
-                    </PromptContext.Provider>
-                </AlgorithmContext.Provider>
+                <PromptComponent />
+                <CytoscapeComponent />
+                <AlgorithmControls />
+                <EditControls />
+                <ContextMenu />
+                <NodeContextMenu />
+                <EdgeContextMenu />
             </div>
         </>
     );

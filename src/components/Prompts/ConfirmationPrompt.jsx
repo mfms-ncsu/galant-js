@@ -1,4 +1,3 @@
-import { useRef, useEffect } from "react"
 import PrimaryButton from "components/Buttons/PrimaryButton";
 import SecondaryButton from "components/Buttons/SecondaryButton";
 

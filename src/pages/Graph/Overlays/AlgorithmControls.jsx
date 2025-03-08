@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
 import { useAtom } from "jotai";
-import { algorithmChangeManagerAtom, graphAtom } from "utils/atoms/atoms";
-import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
-import ChangeManager from "utils/graph/ChangeManager/ChangeManager";
+import { algorithmAtom, algorithmChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_atoms/atoms";
+import GraphInterface from "interfaces/GraphInterface/GraphInterface";
+import ChangeManager from "states/ChangeManager/ChangeManager";
 import { ArrowLeftIcon, ArrowPathIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
 import PrimaryButton from "components/Buttons/PrimaryButton";
 import SecondaryButton from "components/Buttons/SecondaryButton";
@@ -16,8 +15,9 @@ import ExitButton from "components/Buttons/ExitButton";
  */
 export default function AlgorithmControls() {
     const [graph, setGraph] = useAtom(graphAtom);
-    const { algorithm, setAlgorithm } = useAlgorithmContext();
     const [algorithmChangeManager, setAlgorithmChangeManager] = useAtom(algorithmChangeManagerAtom);
+    const [algorithm, setAlgorithm] = useAtom(algorithmAtom);
+    const [promptQueue, setPromptQueue] = useAtom(promptQueueAtom);
     const [debug, setDebug] = useState(false);
     
     // Function to handle pressing the forward button
@@ -94,7 +94,7 @@ export default function AlgorithmControls() {
 
     function terminateAlgorithm() {
         // Remove any prompts the algorithm had up
-        algorithm.clearPrompts();
+        setPromptQueue([]);
 
         // Set the algorithm to null
         setAlgorithm(null);

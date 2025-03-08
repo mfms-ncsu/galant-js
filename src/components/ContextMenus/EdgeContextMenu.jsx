@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
-import { graphAtom, userChangeManagerAtom } from "utils/atoms/atoms";
+import { algorithmAtom, graphAtom, userChangeManagerAtom } from "states/_atoms/atoms";
 import Cytoscape from "globals/Cytoscape";
-import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
+import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import ExitButton from "components/Buttons/ExitButton";
-import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
 
 /**
  * EdgeContextMenu defines the React Component that should be displayed when a user right clicks an edge in cytoscape.
@@ -16,7 +15,7 @@ import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
 export default function EdgeContextMenu() {
     const [graph, setGraph] = useAtom(graphAtom);
     const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
-    const { algorithm, setAlgorithm } = useAlgorithmContext();
+    const [algorithm] = useAtom(algorithmAtom);
     const [visible, setVisible] = useState(false);
     const [edge, setEdge] = useState(null);
     const [renderedPosition, setRenderedPosition] = useState({x: 0, y: 0});

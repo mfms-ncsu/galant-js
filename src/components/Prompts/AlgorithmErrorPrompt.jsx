@@ -2,12 +2,7 @@ import PrimaryButton from "components/Buttons/PrimaryButton";
 
 /**
  * Displays an AlgorithmError based on an Error Object, along with the algorithm code which failed
- * @param {Object} props The props passed to the component
- * @param {Object} props.prompt The prompt object and its data
- * @param {ReferenceError} props.prompt.errorObject The error that was returned
- * @param {string} props.prompt.algorithmCode The code which failed to execute
- * @param {Function} props.callback Callback when the modal is closed.
- * @returns {React.ReactElement} Returns modal displaying error information
+ * 
  * @author Julian Madrigal
  */
 export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
@@ -41,7 +36,7 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
             }
             let offset = starTags[0] + ("" + (i + 1)).padStart(offsetSize) + starTags[1]
             adjustedAlgText = adjustedAlgText.concat("\n", offset, line)
-        })
+        });
 
         code = adjustedAlgText;
     }

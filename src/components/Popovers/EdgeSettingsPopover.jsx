@@ -1,13 +1,9 @@
 import { Popover, Switch } from '@headlessui/react'
 import PreferenceButton from 'components/Buttons/PreferenceButton';
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 
 /**
  * BinarySwitchComponent renders a binary switch component.
- * @param {Object} props - The props for the BinarySwitchComponent.
- * @param {boolean} props.enabled - Indicates whether the switch is enabled.
- * @param {Function} props.setEnabled - Function to toggle the switch.
- * @returns {JSX.Element} - Returns the JSX for BinarySwitchComponent.
  */
 function BinarySwitchComponent({enabled, setEnabled}) {
     return (
@@ -25,12 +21,11 @@ function BinarySwitchComponent({enabled, setEnabled}) {
                 } inline-block h-4 w-4 transform rounded-full bg-white transition`}
             />
         </Switch>
-    )
+    );
 }
 
 /**
  * EdgeSettingsPopover component renders a popover for edge settings.
- * @returns {JSX.Element} - Returns the JSX for EdgeSettingsPopover component.
  */
 export default function EdgeSettingsPopover() {
     const [displayLabels, setDisplayLabels] = useState(true);
@@ -73,5 +68,5 @@ export default function EdgeSettingsPopover() {
 
             </Popover.Panel>
         </Popover>
-    )
+    );
 }

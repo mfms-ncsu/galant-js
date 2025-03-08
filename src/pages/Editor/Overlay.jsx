@@ -3,15 +3,6 @@ import PrimaryButton from "components/Buttons/PrimaryButton";
 import { ArrowDownTrayIcon, ArrowPathIcon, CheckIcon } from "@heroicons/react/24/solid";
 
 /**
- * Basic heuristic to detect if the content is JavaScript.
- * @param {string} content
- * @returns {boolean}
- */
-function isJavascript(content) {
-    return /(?:import|export|function|const|let|var)/.test(content);
-}
-
-/**
  * Exports the tab content to a file. If the content is detected as JavaScript,
  * the file will be saved with a .js extension, otherwise with a .gph extension.
  * @param {Tab} tab 
@@ -65,9 +56,6 @@ function downloadFile(type, tab) {
 /**
  * Create button for exporting the graph (tab content)
  * Having it a separate function allows it to return null if tab is null. Maintains readability.
- * @param {Object} props
- * @param {Tab} props.tab 
- * @returns {React.ReactElement}
  */
 function DownloadButton({ editorType, tab }) {
     // Keyboard shortcut for downloading file
@@ -89,7 +77,7 @@ function DownloadButton({ editorType, tab }) {
             <ArrowDownTrayIcon className="inline h-4 me-2 stroke-2 stroke-white" />
             Download File
         </PrimaryButton>
-    )
+    );
 }
 
 /**
@@ -114,5 +102,5 @@ export default function Overlay({ tab, saved, editorType, LoadButton }) {
                 <DownloadButton editorType={editorType} tab={tab} />
             </div>
         </div>
-    )
+    );
 }

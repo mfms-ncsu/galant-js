@@ -7,12 +7,6 @@ import UploadButton from './UploadButton';
  * Given a list of tabs, create a tablist component that lists each tab component (@see {@link Tab}).
  * Also adds buttons "new" (@see {@link NewButton}) and "import" (@see {@link UploadButton}) to the end of component.
  * Contains function handlers for several functionalities such as when a tab is selected, renamed, or deleted. (These could possibly be moved to be closer to their components)
- * @param {Object} props Props 
- * @param {Array<Tab>} props.tabs - List of tab objects
- * @param {Function} props.setTabs Setter for the tabs
- * @param {string} props.acceptFileType The string of comma seperated file extensions to allow
- * @param {Example[]} props.examples The examples of text that the use can add via new dropdown
- * @returns {React.ReactElement} React Component
  */
 export default function TabList({tabs, setTabs, acceptFileType, examples}) {
     /**
@@ -72,6 +66,6 @@ export default function TabList({tabs, setTabs, acceptFileType, examples}) {
             </div>
             <UploadButton onUpload={onFileUpload} acceptFileType={acceptFileType}/>
         </div>
-    )
+    );
 }
 

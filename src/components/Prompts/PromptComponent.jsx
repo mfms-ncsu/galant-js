@@ -1,5 +1,7 @@
-import { useEffect, useState, useContext, useRef } from "react"
-import { PromptContext } from "utils/services/PromptService";
+import { useState, useRef } from "react"
+import { useAtom } from "jotai";
+import { promptAtom, promptQueueAtom } from "states/_atoms/atoms";
+import PromptInterface from "interfaces/PromptInterface/PromptInterface";
 import AlgorithmErrorPrompt from "./AlgorithmErrorPrompt";
 import InputPrompt from "./InputPrompt";
 import ConfirmationPrompt from "./ConfirmationPrompt";
@@ -12,32 +14,25 @@ const typeMapping = {
 }
 
 /**
- * PromptComponent renders the appropriate prompt based on the type received from the PromptService.
- * @returns {JSX.Element|null} - Returns the JSX for PromptComponent or null if no prompt is available.
+ * PromptComponent renders the appropriate prompt based on the type current prompt
+ * at the front of the prompt queue.
  */
 export default function PromptComponent() {
-    const PromptService = useContext(PromptContext);
-    const [currentPrompt, setCurrentPrompt] = useState(null);
+    const [promptQueue, setPromptQueue] = useAtom(promptQueueAtom);
+    const [prompt] = useAtom(promptAtom);
     const [dragPosition, setDragPosition] = useState({ x: 50, y: 50 });
     const promptRef = useRef();
 
-    useEffect(() => {
-        if (PromptService.clear) {
-            setCurrentPrompt(null); // If the prompt queue was cleared, set the CurrentPrompt to null
-            PromptService.clear = false // Reset the clear flag, since we just cleared it. There's no reason to clear it again.
-        }
-        if (currentPrompt) return; // Do nothing if there's already a current prompt
-        const prompt = PromptService.getNextPrompt(); // Get the next prompt from the PromptService
-        if (prompt) setCurrentPrompt(prompt); // Set the current prompt if there's any
-    }, [PromptService, PromptService.queue, currentPrompt]);
-
     /**
      * Function to handle the callback from the prompt component.
-     * @param {*} value - The value passed from the prompt component.
+     * @param {any} value The value passed from the prompt component.
      */
     function onCallback(value) {
-        currentPrompt.callback(value); 
-        setCurrentPrompt(null); 
+        // Run the callback
+        prompt.callback(value);
+
+        // Dequeue the prompt
+        setPromptQueue(PromptInterface.dequeuePrompt(promptQueue));
     }
 
     let promptX, promptY; // Store the location within the prompt being clicked here
@@ -69,16 +64,16 @@ export default function PromptComponent() {
         event.preventDefault();
     }
 
-    if (!currentPrompt) return null;
-    const TypeComponent = typeMapping[currentPrompt.data.type];
+    if (!prompt) return null;
+    const TypeComponent = typeMapping[prompt.data.type];
     if (!TypeComponent) {
-        throw new Error(`Received a Prompt with an invalid type attribute ${currentPrompt.data.type}`);
+        throw new Error(`Received a Prompt with an invalid type attribute ${prompt.data.type}`);
     }
 
     return (
         <div className="relative z-50">
             <div className="max-w-lg h-fit absolute active:cursor-move" style={{"top": dragPosition.y, "left": dragPosition.x}} onMouseDown={onMouseDown}>
-                <TypeComponent prompt={currentPrompt.data} callback={onCallback} promptRef={promptRef} />
+                <TypeComponent prompt={prompt.data} callback={onCallback} promptRef={promptRef} />
             </div>
         </div>
     );

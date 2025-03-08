@@ -92,7 +92,7 @@ function LoadButton({ tab, editorType }) {
                 Load {editorType}
             </PrimaryButton>
         </>
-    )
+    );
 }
 
 // Header component responsible for displaying the header section
@@ -122,7 +122,7 @@ function InnerEditor({tab, editorType, onChange}) {
                 defaultValue={tab.content}
             />
         </div>
-    )
+    );
 }
 
 /**
@@ -192,5 +192,5 @@ export default function Editor({ editorType }) {
                 <Overlay tab={selectedTab} saved={saved} editorType={editorType} LoadButton={LoadButton} />
             </div>
         </>
-    )
+    );
 }

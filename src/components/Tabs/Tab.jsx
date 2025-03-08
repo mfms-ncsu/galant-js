@@ -5,12 +5,6 @@ import { PencilIcon, XMarkIcon } from '@heroicons/react/24/solid';
 /**
  * Returns a tab component, which displays its name and allows you to change its name.
  * In edit mode, tab shows intermediateName, and allows user to focus on input box to change name.
- * @param {Object} props props
- * @param {Tab} props.tab The tab data related to the tab
- * @param {function} props.onClick The callback function for when a user clicks a tab
- * @param {function} props.onRename The callback function for when a user renames a tab
- * @param {function} props.onRemove The callback function for when a user removes a tab
- * @returns {React.ReactElement}
  */
 export default function Tab({tab, onClick, onRename, onRemove}) {
     const [editMode, setEditMode] = useState(false);
@@ -73,5 +67,5 @@ export default function Tab({tab, onClick, onRename, onRemove}) {
                 </div>
             </div>
         </div>
-    )
+    );
 }

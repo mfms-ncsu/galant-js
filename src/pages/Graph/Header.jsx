@@ -26,7 +26,6 @@ function openInstructionsPage() {
 
 /**
  * Header component for Graph.
- * @returns {React.ReactElement}
  */
 export default function Header() {
     return (
@@ -51,5 +50,5 @@ export default function Header() {
                 <EdgeSettingsPopover />
             </div>
         </header>
-    )
+    );
 }

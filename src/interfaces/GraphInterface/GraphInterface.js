@@ -1,8 +1,8 @@
 import produce, { enableMapSet } from "immer";
-import ChangeObject from "../ChangeManager/ChangeObject";
-import Graph from "../Graph/Graph";
-import Edge from "../GraphElement/Edge";
-import Node from "../GraphElement/Node";
+import ChangeObject from "states/ChangeManager/ChangeObject"
+import Graph from "states/Graph/Graph";
+import Edge from "states/Graph/GraphElement/Edge";
+import Node from "states/Graph/GraphElement/Node";
 
 /** Enable maps in immer */
 enableMapSet();

@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
-import { graphAtom, userChangeManagerAtom } from "utils/atoms/atoms";
-import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
+import { algorithmAtom, graphAtom, userChangeManagerAtom } from "states/_atoms/atoms";
 import Cytoscape from "globals/Cytoscape";
-import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
+import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import ExitButton from "components/Buttons/ExitButton";
 
 /**
@@ -19,7 +18,7 @@ import ExitButton from "components/Buttons/ExitButton";
 export default function NodeContextMenu() {
     const [graph, setGraph] = useAtom(graphAtom);
     const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
-    const { algorithm, setAlgorithm } = useAlgorithmContext();
+    const [algorithm] = useAtom(algorithmAtom);
     const [visible, setVisible] = useState(false);
     const [node, setNode] = useState(null);
     const [renderedPosition, setRenderedPosition] = useState({ x: 0, y: 0 });

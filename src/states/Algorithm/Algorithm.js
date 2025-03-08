@@ -1,4 +1,5 @@
-import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
+import GraphInterface from "interfaces/GraphInterface/GraphInterface";
+import PromptInterface from "interfaces/PromptInterface/PromptInterface";
 
 /**
  * Representation of the algorithm loaded into the program. Contains a name and code. Controls a
@@ -20,34 +21,25 @@ export default class Algorithm {
      * @param {String} name Algorithm name
      * @param {String} code Algorithm code
      */
-    constructor(graphState, algorithmChangeManagerState, name, code, PromptService, stateVar) {
-        const [graph, setGraph] = graphState;
-        this.graph = graph;
-        this.setGraph = setGraph;
-        const [algorithmChangeManager, setAlgorithmChangeManager] = algorithmChangeManagerState;
-        this.algorithmChangeManager = algorithmChangeManager;
-        this.setAlgorithmChangeManager = setAlgorithmChangeManager;
+    constructor(name, code, graphState, changeManagerState, promptQueueState) {
+        [this.graph, this.setGraph] = graphState;
+        [this.algorithmChangeManager, this.setAlgorithmChangeManager] = changeManagerState;
+        [this.promptQueue, this.setPromptQueue] = promptQueueState;
 
         this.name = name;
         this.code = code;
+        
         this.array = new Int32Array(new SharedArrayBuffer(1024));
         this.array[1] = 0;
 
         // This array is passed to the Thread running the algorithm.
-        // it holds status flags, such as whether the user has entered
-        // debug mode
+        // It holds status flags, such as whether the user has entered debug mode
         // 0: debug mode
-        // 1: skip to end mode (continues taking steps until 250 steps
-        //    are taken, or the end of the algorithm is reached
+        // 1: skip to end mode (continues taking steps until 250 steps / end of algorithm)
         this.flags = new Int32Array(new SharedArrayBuffer(8));
         this.flags[0] = 0;
         this.flags[1] = 0;
 
-        this.PromptService = PromptService;
-
-        const [status, setStatus] = stateVar;
-        this.status = status;
-        this.setStatus = setStatus;
         this.fetchingSteps = false;
         this.completed = false;
 
@@ -58,13 +50,6 @@ export default class Algorithm {
         this.worker.postMessage(["shared", this.array, this.flags]);
         this.worker.postMessage(["graph/algorithm", GraphInterface.toString(this.graph), this.graph.isDirected, this.code]);
         this.worker.postMessage(["algorithm", this.code]);
-    }
-
-    /**
-     * Clears any prompts that were open
-     */
-    clearPrompts() {
-        this.PromptService.clearPrompts();
     }
 
     /**
@@ -80,11 +65,12 @@ export default class Algorithm {
             err.lineNumber = -1;
 
             // Prompt the user with the error
-            this.PromptService.addPrompt({
-                type: 'algorithmError',
-                errorObject: err,
-                algorithmCode: this.code
-            }, () => { });
+            let newQueue = PromptInterface.queuePrompt(
+                this.promptQueue,
+                { type: 'algorithmError', errorObject: err, algorithmCode: this.code },
+                () => {}
+            );
+            this.#updateQueue(newQueue);
         }, this.#timeoutPeriod);
     }
     
@@ -137,17 +123,13 @@ export default class Algorithm {
     stepBack() {
         if (!this.canStepBack()) return;
         GraphInterface.undo(this.graph, this.algorithmChangeManager);
-        this.redraw();
     }
 
     /**
-     * Moves forward one step. If you want to step until the
-     * end of the algorithm (Or 250 steps, whichever comes first),
-     * you can supply the optional skipToEnd parameter.
-     *
-     * @param {bool} skipToEnd true if you want to skip all the way
-     * to the end of the algorithm. False or undefined if you only
-     * want to take one step
+     * Moves forward one step. If you want to step until the end of the algorithm 
+     * (Or 250 steps, whichever comes first), you can supply the optional skipToEnd parameter.
+     * @param {Boolean} skipToEnd true if you want to skip all the way to the end of the 
+     *                         algorithm. False or undefined if you only want to take one step
      */
     stepForward(skipToEnd) {
         // Set skipToEnd to false if nothing was given
@@ -156,21 +138,17 @@ export default class Algorithm {
         // Immediately return if the algorithm cannot continue
         if (!this.canStepForward()) return;
 
-        // If skipToEnd is set to true, redo all saved steps in the
-        // ChangeManager
+        // If skipToEnd is set to true, redo all saved steps in the ChangeManager
         if (skipToEnd) {
             while (this.algorithmChangeManager.index !== this.algorithmChangeManager.changes.length-1) {
                 GraphInterface.redo();
-                this.redraw();
             }
         }
 
-        // Again, check if we can step forward. If we can't, immediately
-        // return
+        // Again, check if we can step forward. If we can't, immediately return
         if (!this.canStepForward()) return;
 
-        // If we are at the end of the list of changes, we need to
-        // wake up the thread to generate a new step
+        // If we are at the end of the list of changes, we need to wake up the thread to generate a new step
         if (this.algorithmChangeManager.index !== this.algorithmChangeManager.changes.length-1) {
             this.fetchingSteps = true;
             
@@ -189,16 +167,7 @@ export default class Algorithm {
         } else {
             // Use redo if there are pre-loaded steps ahead of the index
             GraphInterface.redo(this.graph, this.algorithmChangeManager);
-            this.redraw();
         }
-    }
-    
-    /**
-     * Tells React to redraw the screen. This is used to update
-     * the step coun number after each step.
-     */
-    redraw() {
-        this.setStatus({...this.status}); 
     }
 
     /**
@@ -244,12 +213,22 @@ export default class Algorithm {
     }
 
     /**
+     * Updates the global state and local representation of the prompt queue
+     * @param {Object[]} newChangeManager New prompt queue
+     */
+    #updateQueue(newQueue) {
+        this.setPromptQueue(newQueue);
+        this.promptQueue = newQueue;
+    }
+
+    /**
      * Handles messages from thread.
      * @param {Object} message Message from thread
      */
     #onMessage(message) {
         // Create new variables to set
         let [newGraph, newChangeManager] = [];
+        let newQueue;
 
         switch (message.action) {
             case "setDirected":
@@ -268,13 +247,15 @@ export default class Algorithm {
                 break;
             case "prompt":
                 clearTimeout(this.#timeoutId); // Cancel the timer while the prompt is up
-                this.PromptService.addPrompt(
-                    { type: 'input', label: message.content[1] || message.content[0], },
+                newQueue = PromptInterface.queuePrompt(
+                    this.promptQueue,
+                    { type: 'input', label: message.content[1] || message.content[0] },
                     (value) => {
                         this.#setupTimeout(); // Start the timeout timer back up
-                        this.enterPromptResult(value);
+                        this.enterPromptResult(value); // Send the enetered value to the thread
                     }
                 );
+                this.#updateQueue(newQueue);
                 break;
             case "message":
                 newChangeManager = GraphInterface.addMessage(this.algorithmChangeManager, message.message);
@@ -342,17 +323,16 @@ export default class Algorithm {
                 clearTimeout(this.#timeoutId);
                 if (this.onStepAdded) this.onStepAdded();
                 this.completed = true;
-                this.redraw();
                 break;
             case "redraw":
-                this.redraw();
                 break;
             case "error":
-                this.PromptService.addPrompt({
-                    type: "algorithmError",
-                    errorObject: message.error,
-                    algorithmCode: this.code
-                }, () => { });
+                newQueue = PromptInterface.queuePrompt(
+                    this.promptQueue,
+                    { type: "algorithmError", errorObject: message.error, algorithmCode: this.code },
+                    () => {}
+                );
+                this.#updateQueue(newQueue);
             default:
                 // If the message was not a type we define here, then we probably just made a mistake 
                 // or typo when sending this message. Throw an error to let us know about it

@@ -2,16 +2,7 @@ import { ArrowUpTrayIcon } from '@heroicons/react/24/solid';
 import PrimaryButton from 'components/Buttons/PrimaryButton';
 
 /**
- * @fileoverview Contains and returns @see {@link UploadButton}
- * @author Julian Madrigal
- */
-
-/**
  * Returns component for uploading files and adding them as tabs.
- * @param {Object} props Props 
- * @param {function} props.onUpload The function that should run when a user uploads
- * @param {string} props.acceptFileType The string of comma seperated file extensions to allow
- * @returns {React.ReactElement} React component
  */
 export default function UploadButton({onUpload, acceptFileType}) {
     function onFileUploadEvent(event) {
@@ -41,5 +32,5 @@ export default function UploadButton({onUpload, acceptFileType}) {
             </label>
             <input id="file-upload" type="file" accept={acceptFileType} multiple className="hidden" onChange={onFileUploadEvent}></input>
         </PrimaryButton>
-    )
+    );
 }

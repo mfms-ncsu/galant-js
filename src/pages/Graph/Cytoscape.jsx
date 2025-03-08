@@ -1,10 +1,10 @@
 import { React, useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
-import { algorithmChangeManagerAtom, graphAtom } from "utils/atoms/atoms";
+import { algorithmChangeManagerAtom, graphAtom } from "states/_atoms/atoms";
 import Cytoscape from "globals/Cytoscape";
 import { renderToString } from "react-dom/server";
-import CytoscapeManager from "utils/graph/CytoscapeManager/CytoscapeManager";
-import GraphInterface from "utils/graph/GraphInterface/GraphInterface";
+import CytoscapeManager from "interfaces/CytoscapeManager/CytoscapeManager";
+import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 
 /**
  * A React component that displays a cytoscape instance.

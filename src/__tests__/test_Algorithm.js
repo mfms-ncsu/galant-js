@@ -1,4 +1,4 @@
-import Algorithm from 'utils/algorithm/Algorithm';
+import Algorithm from 'states/Algorithm/Algorithm';
 import { AlgorithmConfiguration } from 'utils/Algorithm/AlgorithmConfiguration';
 import Graph from 'utils/Graph';
 import ChangeRecord from 'pages/GraphView/utils/ChangeRecord';

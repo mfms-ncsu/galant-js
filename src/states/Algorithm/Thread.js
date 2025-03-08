@@ -1,6 +1,6 @@
-import GraphInterface from 'utils/graph/GraphInterface/GraphInterface';
-import FileParser from 'utils/graph/FileParser/FileParser';
-import ChangeManager from 'utils/graph/ChangeManager/ChangeManager';
+import GraphInterface from 'interfaces/GraphInterface/GraphInterface';
+import FileParser from 'interfaces/FileParser/FileParser';
+import ChangeManager from 'states/ChangeManager/ChangeManager';
 
 /**
  * Execution environment for algorithms. This file provides all necessary functions

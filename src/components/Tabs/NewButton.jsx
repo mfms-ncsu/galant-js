@@ -5,9 +5,6 @@ import { useRef, useEffect } from "react";
 
 /**
  * Returns component for creating new tabs, including the button and dropdown.
- * @param {function({name, content})} addTab create tab given data object
- * @param {Example[]} examples Examples that will be shown in the dropdown
- * @returns {React.ReactElement}
  */
 export default function NewButton({ addTab, examples }) {
     const button = useRef(null);
@@ -87,6 +84,5 @@ export default function NewButton({ addTab, examples }) {
                 </Transition>
             </Menu>
         </div>
-
-    )
+    );
 }

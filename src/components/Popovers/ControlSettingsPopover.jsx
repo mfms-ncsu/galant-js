@@ -6,7 +6,6 @@ import { useRef } from 'react'
 
 /**
  * ControlSettingsPopover component renders a popover for control settings.
- * @returns {JSX.Element} - Returns the JSX for ControlSettingsPopover component.
  */
 export default function ControlSettingsPopover() {
     // Ref for popover button
@@ -39,5 +38,5 @@ export default function ControlSettingsPopover() {
                 <SecondaryButton onClick={autoLayout}>Auto Layout</SecondaryButton>
             </Popover.Panel>
         </Popover>
-    )
+    );
 }
