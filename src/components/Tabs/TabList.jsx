@@ -1,4 +1,4 @@
-import { addTab, getSelectedTab } from "./TabUtils";
+import TabInterface from "interfaces/TabInterface/TabInterface";
 import Tab from "./Tab";
 import NewButton from './NewButton';
 import UploadButton from './UploadButton';
@@ -6,44 +6,31 @@ import UploadButton from './UploadButton';
 /**
  * Given a list of tabs, create a tablist component that lists each tab component (@see {@link Tab}).
  * Also adds buttons "new" (@see {@link NewButton}) and "import" (@see {@link UploadButton}) to the end of component.
- * Contains function handlers for several functionalities such as when a tab is selected, renamed, or deleted. (These could possibly be moved to be closer to their components)
+ * Contains function handlers for several functionalities such as when a tab is selected, renamed, or deleted.
  */
 export default function TabList({tabs, setTabs, acceptFileType, examples}) {
-    /**
-     * Add list of data imported from file upload by user as tabs.
-     * Passed to {@link UploadButton} as a prop.
-     * NOTE: Skips setting tabs until last is added, in order to include all tabs. 
-     * @param {Array<{name, tab}>} dataList List of data that should be created and added as tabs.  
-     */
-    function onFileUpload(dataList) {
-        for (let data of dataList) {
-            addTab(data, tabs, setTabs, true);
-        }
+    function onAddTab(data) {
+        setTabs(TabInterface.addTab(tabs, data));
+    }
 
-        setTabs([...tabs]);
+    function onFileUpload(dataList) {
+        let newTabs;
+        for (let data of dataList) {
+            newTabs = TabInterface.addTab(tabs, data);
+        }
+        setTabs(newTabs);
     }
 
     function onTabClick(tab) {
-        const prev = getSelectedTab(tabs);
-        if (prev) prev.selected = false;
-
-        tab.selected = true;
-        setTabs([...tabs]);
+        setTabs(TabInterface.setSelected(tabs, tab));
     }
 
     function onTabRename(tab, name) {
-        if (name.length > 0 && !tabs.find(tab => tab.name === name)) {
-            tab.name = name;
-        };
-        setTabs([...tabs]);
+        setTabs(TabInterface.renameTab(tabs, tab, name));
     }
 
     function onTabRemove(tab) {
-        const newTabs = tabs.filter(aTab => aTab !== tab);
-        if (tab.selected && newTabs.length > 0) {
-            newTabs[0].selected = true;
-        }
-        setTabs(newTabs);
+        setTabs(TabInterface.deleteTab(tabs, tab));
     }
 
     
@@ -59,10 +46,7 @@ export default function TabList({tabs, setTabs, acceptFileType, examples}) {
                     )}
                 </div>
 
-                <NewButton 
-                    addTab={(data) => {return addTab(data, tabs, setTabs)}}
-                    examples={examples}
-                />
+                <NewButton addTab={onAddTab} examples={examples} />
             </div>
             <UploadButton onUpload={onFileUpload} acceptFileType={acceptFileType}/>
         </div>

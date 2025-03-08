@@ -19,7 +19,6 @@ export default function NewButton({ addTab, examples }) {
 
             // Only if the user enters the designated keyboard shortcut - n - the button is clicked
             if (event.key == 'n') button.current.click();
-
         }
 
         document.addEventListener('keypress', onKeyPress);
@@ -45,12 +44,9 @@ export default function NewButton({ addTab, examples }) {
                                 className="hover:underline"
                                 onClick={() => {
                                     try {
-                                        console.log('Adding a blank tab...');
                                         addTab({ 'name': 'Blank' });
-                                        console.log('Blank tab added successfully.');
                                     } catch (error) {
-                                        console.error('Error adding a blank tab:', error);
-                                        alert('An error occurred while adding the blank tab. Please try again.');
+                                        console.error('An error occurred while adding the blank tab. Please try again.', error);
                                     }
                                 }}
                             >
@@ -66,12 +62,9 @@ export default function NewButton({ addTab, examples }) {
                                         className="text-nowrap hover:underline"
                                         onClick={() => {
                                             try {
-                                                console.log(`Adding tab for example: ${data.name}`);
                                                 addTab(data);
-                                                console.log(`Tab for example ${data.name} added successfully.`);
                                             } catch (error) {
                                                 console.error(`Error adding tab for example ${data.name}:`, error);
-                                                alert(`An error occurred while adding the tab for ${data.name}. Please try again.`);
                                             }
                                         }}
                                     >

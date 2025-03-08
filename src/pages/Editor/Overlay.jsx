@@ -5,7 +5,8 @@ import { ArrowDownTrayIcon, ArrowPathIcon, CheckIcon } from "@heroicons/react/24
 /**
  * Exports the tab content to a file. If the content is detected as JavaScript,
  * the file will be saved with a .js extension, otherwise with a .gph extension.
- * @param {Tab} tab 
+ * @param {String} type Tab type (Algorithm/Graph)
+ * @param {Tab} tab Tab value
  */
 function downloadFile(type, tab) {
     if (!tab) return;
@@ -55,17 +56,18 @@ function downloadFile(type, tab) {
 
 /**
  * Create button for exporting the graph (tab content)
- * Having it a separate function allows it to return null if tab is null. Maintains readability.
+ * Having it a separate function allows it to return null if tab is null.
  */
 function DownloadButton({ editorType, tab }) {
     // Keyboard shortcut for downloading file
     useEffect(() => {
         function handleKeydown(event) {
-            if (event.keyCode === 83 && (event.metaKey || event.ctrlKey)) {
+            if (event.code === "KeyS" && (event.metaKey || event.ctrlKey)) {
                 event.preventDefault();
-                downloadFile(tab);
+                downloadFile(editorType, tab);
             }
         }
+
         document.addEventListener("keydown", handleKeydown);
         return () => document.removeEventListener("keydown", handleKeydown);
     }, [tab]);

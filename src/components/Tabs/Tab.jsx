@@ -1,7 +1,6 @@
 import { useState, useRef } from "react";
 import { PencilIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
-
 /**
  * Returns a tab component, which displays its name and allows you to change its name.
  * In edit mode, tab shows intermediateName, and allows user to focus on input box to change name.
@@ -38,7 +37,6 @@ export default function Tab({tab, onClick, onRename, onRemove}) {
         if (event.keyCode !== 13 && event.keyCode !== 32) return;
         onClick(tab);
     }
-
 
     return(
         <div tabIndex={0} className={`flex bg-transparent`} onClick={() => onClick(tab)} onKeyDown={onTabSelectByKey}>
