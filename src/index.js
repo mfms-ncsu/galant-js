@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Provider } from "jotai";
+import { getDefaultStore, Provider } from "jotai";
 import { algorithmTabsAtom, graphTabsAtom } from "states/_atoms/atoms";
 import Graph from "pages/Graph/Graph";
 import Editor from "pages/Editor/Editor";
@@ -57,7 +57,7 @@ const router = createBrowserRouter([
 // Render the router wrapped in RouterProvider to provide routing context
 ReactDOM.createRoot(document.getElementById("root")).render(
     <React.StrictMode>
-        <Provider>
+        <Provider store={getDefaultStore()}>
             <RouterProvider router={router} />
         </Provider>
     </React.StrictMode>

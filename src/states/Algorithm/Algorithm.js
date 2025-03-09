@@ -1,5 +1,20 @@
+import { getDefaultStore } from "jotai";
+import { algorithmChangeManagerAtom, graphAtom, promptQueueAtom } from "../_atoms/atoms";
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import PromptInterface from "interfaces/PromptInterface/PromptInterface";
+
+// Get the store with the atoms to access them outside of React
+const store = getDefaultStore();
+
+// Get the atom values from the store
+let graph = store.get(graphAtom);
+let changeManager = store.get(algorithmChangeManagerAtom);
+let promptQueue = store.get(promptQueueAtom);
+
+// Subscribe to atom changes to update the values here whenever the states update
+store.sub(graphAtom, () => { graph = store.get(graphAtom) });
+store.sub(algorithmChangeManagerAtom, () => { changeManager = store.get(algorithmChangeManagerAtom) });
+store.sub(promptQueueAtom, () => { promptQueue = store.get(promptQueueAtom) });
 
 /**
  * Representation of the algorithm loaded into the program. Contains a name and code. Controls a
@@ -21,11 +36,7 @@ export default class Algorithm {
      * @param {String} name Algorithm name
      * @param {String} code Algorithm code
      */
-    constructor(name, code, graphState, changeManagerState, promptQueueState) {
-        [this.graph, this.setGraph] = graphState;
-        [this.algorithmChangeManager, this.setAlgorithmChangeManager] = changeManagerState;
-        [this.promptQueue, this.setPromptQueue] = promptQueueState;
-
+    constructor(name, code) {
         this.name = name;
         this.code = code;
         
@@ -48,7 +59,7 @@ export default class Algorithm {
         let handleMessage = (message) => { this.#onMessage(message.data) }
         this.worker.onmessage = handleMessage;
         this.worker.postMessage(["shared", this.array, this.flags]);
-        this.worker.postMessage(["graph/algorithm", GraphInterface.toString(this.graph), this.graph.isDirected, this.code]);
+        this.worker.postMessage(["graph/algorithm", GraphInterface.toString(graph), graph.isDirected, this.code]);
         this.worker.postMessage(["algorithm", this.code]);
     }
 
@@ -70,7 +81,7 @@ export default class Algorithm {
                 { type: 'algorithmError', errorObject: err, algorithmCode: this.code },
                 () => {}
             );
-            this.#updateQueue(newQueue);
+            store.set(promptQueueAtom, newQueue);
         }, this.#timeoutPeriod);
     }
     
@@ -104,7 +115,7 @@ export default class Algorithm {
      * @returns True if it can, false otherwise
      */
     canStepBack() {
-        return this.algorithmChangeManager.index > 0;
+        return changeManager.index > 0;
     }
 
     /**
@@ -113,7 +124,7 @@ export default class Algorithm {
      */
     canStepForward() {
         if (this.fetchingSteps) return false;
-        if (this.completed && this.algorithmChangeManager.index >= this.algorithmChangeManager.changes.length) return false;
+        if (this.completed && changeManager.index >= changeManager.changes.length) return false;
         return true;
     }
 
@@ -122,7 +133,7 @@ export default class Algorithm {
      */
     stepBack() {
         if (!this.canStepBack()) return;
-        GraphInterface.undo(this.graph, this.algorithmChangeManager);
+        GraphInterface.undo(graph, changeManager);
     }
 
     /**
@@ -140,7 +151,7 @@ export default class Algorithm {
 
         // If skipToEnd is set to true, redo all saved steps in the ChangeManager
         if (skipToEnd) {
-            while (this.algorithmChangeManager.index !== this.algorithmChangeManager.changes.length-1) {
+            while (changeManager.index !== changeManager.changes.length-1) {
                 GraphInterface.redo();
             }
         }
@@ -149,7 +160,7 @@ export default class Algorithm {
         if (!this.canStepForward()) return;
 
         // If we are at the end of the list of changes, we need to wake up the thread to generate a new step
-        if (this.algorithmChangeManager.index !== this.algorithmChangeManager.changes.length-1) {
+        if (changeManager.index !== changeManager.changes.length-1) {
             this.fetchingSteps = true;
             
             // Set the skipToEnd flag to true if necessary
@@ -166,7 +177,7 @@ export default class Algorithm {
 
         } else {
             // Use redo if there are pre-loaded steps ahead of the index
-            GraphInterface.redo(this.graph, this.algorithmChangeManager);
+            GraphInterface.redo(graph, changeManager);
         }
     }
 
@@ -195,33 +206,6 @@ export default class Algorithm {
     }
 
     /**
-     * Updates the global state and local representation of the graph
-     * @param {Graph} newGraph New graph
-     */
-    #updateGraph(newGraph) {
-        this.setGraph(newGraph);
-        this.graph = newGraph;
-    }
-
-    /**
-     * Updates the global state and local representation of the change manager
-     * @param {ChangeManager} newChangeManager New change manager
-     */
-    #updateChangeManager(newChangeManager) {
-        this.setAlgorithmChangeManager(newChangeManager);
-        this.algorithmChangeManager = newChangeManager;
-    }
-
-    /**
-     * Updates the global state and local representation of the prompt queue
-     * @param {Object[]} newChangeManager New prompt queue
-     */
-    #updateQueue(newQueue) {
-        this.setPromptQueue(newQueue);
-        this.promptQueue = newQueue;
-    }
-
-    /**
      * Handles messages from thread.
      * @param {Object} message Message from thread
      */
@@ -232,93 +216,92 @@ export default class Algorithm {
 
         switch (message.action) {
             case "setDirected":
-                console.log(message);
-                newGraph = GraphInterface.setDirected(this.graph, message.isDirected);
-                this.#updateGraph(newGraph);
+                newGraph = GraphInterface.setDirected(graph, message.isDirected);
+                store.set(graphAtom, newGraph);
                 break;
             case "addNode":
-                [newGraph, newChangeManager] = GraphInterface.addNode(this.graph, this.algorithmChangeManager, message.x, message.y);
-                this.#updateGraph(newGraph);
-                this.#updateChangeManager(newChangeManager);
+                [newGraph, newChangeManager] = GraphInterface.addNode(graph, changeManager, message.x, message.y);
+                store.set(graphAtom, newGraph);
+                store.set(algorithmChangeManagerAtom, newChangeManager);
                 break;
             case "addEdge":
-                [newGraph, newChangeManager] = GraphInterface.addEdge(this.graph, this.algorithmChangeManager, message.source, message.target);
-                this.#updateGraph(newGraph);
-                this.#updateChangeManager(newChangeManager);
+                [newGraph, newChangeManager] = GraphInterface.addEdge(graph, changeManager, message.source, message.target);
+                store.set(graphAtom, newGraph);
+                store.set(algorithmChangeManagerAtom, newChangeManager);
                 break;
             case "prompt":
                 clearTimeout(this.#timeoutId); // Cancel the timer while the prompt is up
                 newQueue = PromptInterface.queuePrompt(
-                    this.promptQueue,
+                    promptQueue,
                     { type: 'input', label: message.content[1] || message.content[0] },
                     (value) => {
                         this.#setupTimeout(); // Start the timeout timer back up
                         this.enterPromptResult(value); // Send the enetered value to the thread
                     }
                 );
-                this.#updateQueue(newQueue);
+                store.set(promptQueueAtom, newQueue);
                 break;
             case "message":
-                newChangeManager = GraphInterface.addMessage(this.algorithmChangeManager, message.message);
-                this.#updateChangeManager(newChangeManager);
+                newChangeManager = GraphInterface.addMessage(changeManager, message.message);
+                store.set(algorithmChangeManagerAtom, newChangeManager);
                 break;
             case "print":
                 console.log(message.message);
                 break;
             case "deleteNode":
-                [newGraph, newChangeManager] = GraphInterface.deleteNode(this.graph, this.algorithmChangeManager, message.nodeId);
-                this.#updateGraph(newGraph);
-                this.#updateChangeManager(newChangeManager);
+                [newGraph, newChangeManager] = GraphInterface.deleteNode(graph, changeManager, message.nodeId);
+                store.set(graphAtom, newGraph);
+                store.set(algorithmChangeManagerAtom, newChangeManager);
                 break;
             case "setNodePosition":
-                [newGraph, newChangeManager] = GraphInterface.setNodePosition(this.graph, this.algorithmChangeManager, message.nodeId, message.x, message.y);
-                this.#updateGraph(newGraph);
-                this.#updateChangeManager(newChangeManager);
+                [newGraph, newChangeManager] = GraphInterface.setNodePosition(graph, changeManager, message.nodeId, message.x, message.y);
+                store.set(graphAtom, newGraph);
+                store.set(algorithmChangeManagerAtom, newChangeManager);
                 break;
             case "deleteEdge":
-                [newGraph, newChangeManager] = GraphInterface.deleteEdge(this.graph, this.algorithmChangeManager, message.source, message.target);
-                this.#updateGraph(newGraph);
-                this.#updateChangeManager(newChangeManager);
+                [newGraph, newChangeManager] = GraphInterface.deleteEdge(graph, changeManager, message.source, message.target);
+                store.set(graphAtom, newGraph);
+                store.set(algorithmChangeManagerAtom, newChangeManager);
                 break;
             case "setNodeAttribute":
-                [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(this.graph, this.algorithmChangeManager, message.nodeId, message.name, message.value);
-                this.#updateGraph(newGraph);
-                this.#updateChangeManager(newChangeManager);
+                [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graph, changeManager, message.nodeId, message.name, message.value);
+                store.set(graphAtom, newGraph);
+                store.set(algorithmChangeManagerAtom, newChangeManager);
                 break;
             case "setNodeAttributeAll":
-                [newGraph, newChangeManager] = GraphInterface.setNodeAttributeAll(this.graph, this.algorithmChangeManager, message.name, message.value);
-                this.#updateGraph(newGraph);
-                this.#updateChangeManager(newChangeManager);
+                [newGraph, newChangeManager] = GraphInterface.setNodeAttributeAll(graph, changeManager, message.name, message.value);
+                store.set(graphAtom, newGraph);
+                store.set(algorithmChangeManagerAtom, newChangeManager);
                 break;
             case "setEdgeAttribute":
-                [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(this.graph, this.algorithmChangeManager, message.source, message.target, message.name, message.value);
-                this.#updateGraph(newGraph);
-                this.#updateChangeManager(newChangeManager);
+                [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(graph, changeManager, message.source, message.target, message.name, message.value);
+                store.set(graphAtom, newGraph);
+                store.set(algorithmChangeManagerAtom, newChangeManager);
                 break;
             case "setEdgeAttributeAll":
-                [newGraph, newChangeManager] = GraphInterface.setEdgeAttributeAll(this.graph, this.algorithmChangeManager, message.name, message.value);
-                this.#updateGraph(newGraph);
-                this.#updateChangeManager(newChangeManager);
+                [newGraph, newChangeManager] = GraphInterface.setEdgeAttributeAll(graph, changeManager, message.name, message.value);
+                store.set(graphAtom, newGraph);
+                store.set(algorithmChangeManagerAtom, newChangeManager);
                 break;
             case "startRecording":
-                newChangeManager = GraphInterface.startRecording(this.algorithmChangeManager);
-                this.#updateChangeManager(newChangeManager);
+                newChangeManager = GraphInterface.startRecording(changeManager);
+                store.set(algorithmChangeManagerAtom, newChangeManager);
                 break;
             case "endRecording":
                 clearTimeout(this.#timeoutId);
                 // End the recording, but only if it started. It is possible that the user was in debug mode, which
                 // means that the recording was never actually started
-                if (this.algorithmChangeManager.isRecording) {
-                    newChangeManager = GraphInterface.endRecording(this.algorithmChangeManager);
-                    this.#updateChangeManager(newChangeManager);
+                if (changeManager.isRecording) {
+                    newChangeManager = GraphInterface.endRecording(changeManager);
+                    store.set(algorithmChangeManagerAtom, newChangeManager);
                 }
                 if (this.onStepAdded) this.onStepAdded();
                 break;
             case "step":
                 clearTimeout(this.#timeoutId);
                 if (this.onStepAdded) this.onStepAdded();
-                this.#updateGraph(newGraph);
-                this.#updateChangeManager(newChangeManager);
+                store.set(graphAtom, newGraph);
+                store.set(algorithmChangeManagerAtom, newChangeManager);
                 break;
             case "complete":
                 clearTimeout(this.#timeoutId);
@@ -329,11 +312,11 @@ export default class Algorithm {
                 break;
             case "error":
                 newQueue = PromptInterface.queuePrompt(
-                    this.promptQueue,
+                    promptQueue,
                     { type: "algorithmError", errorObject: message.error, algorithmCode: this.code },
                     () => {}
                 );
-                this.#updateQueue(newQueue);
+                store.set(promptQueueAtom, newQueue);
             default:
                 // If the message was not a type we define here, then we probably just made a mistake 
                 // or typo when sending this message. Throw an error to let us know about it

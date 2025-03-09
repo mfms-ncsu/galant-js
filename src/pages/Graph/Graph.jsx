@@ -55,7 +55,7 @@ export default function Graph() {
         // Load a new algorithm
         function onAlgorithmLoad(data) {
             // Load the algorithm
-            setAlgorithm(new Algorithm(data.name, data.payload, [graph, setGraph], [algorithmChangeManager, setAlgorithmChangeManager], [promptQueue, setPromptQueue]));
+            setAlgorithm(new Algorithm(data.name, data.payload));
         }
 
         // Register the functions in shared worker
