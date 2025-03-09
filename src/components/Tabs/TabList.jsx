@@ -4,6 +4,21 @@ import NewButton from './NewButton';
 import UploadButton from './UploadButton';
 
 /**
+ * Header section containing the GalantJS logo
+ */
+function Header({ children }) {
+    return (
+        <div className="w-full h-16 p-1 flex items-start justify-between bg-neutral-400">
+            <img src="img/galant_full_logo_without_words.svg" alt="GalantJS" className="m-1 h-full w-auto"/>
+
+            <div className="flex">
+                {children}
+            </div>
+        </div>
+    );
+}
+
+/**
  * Given a list of tabs, create a tablist component that lists each tab component (@see {@link Tab}).
  * Also adds buttons "new" (@see {@link NewButton}) and "import" (@see {@link UploadButton}) to the end of component.
  * Contains function handlers for several functionalities such as when a tab is selected, renamed, or deleted.
@@ -35,21 +50,20 @@ export default function TabList({tabs, setTabs, acceptFileType, examples}) {
 
     
     return (
-        <div className="flex justify-between bg-neutral-300">
-            <div className={`flex items-end w-full ${(tabs.length > 0 && !tabs[tabs.length-1].selected) && "space-x-1"}`}>
-                <div className="flex">
-                    {tabs.map((tab, i) => 
-                        <div key={i} className="relative">
-                            <Tab key={tab.name} tab={tab} onClick={onTabClick} onRename={onTabRename} onRemove={onTabRemove} />
-                            {!(tab.selected || (tabs[i+1] && tabs[i+1].selected)) && <span className="absolute bg-black w-px right-0 top-1 bottom-1"></span>}
-                        </div>
+        <>
+            <Header>
+                <NewButton addTab={onAddTab} examples={examples} />
+                <UploadButton onUpload={onFileUpload} acceptFileType={acceptFileType}/>
+            </Header>
+
+            <div className="flex bg-neutral-400">
+                <div className="flex space-x-1 overflow-x-scroll">
+                    {tabs.map(tab => 
+                        <Tab key={tab.name} tab={tab} onClick={onTabClick} onRename={onTabRename} onRemove={onTabRemove} />
                     )}
                 </div>
-
-                <NewButton addTab={onAddTab} examples={examples} />
             </div>
-            <UploadButton onUpload={onFileUpload} acceptFileType={acceptFileType}/>
-        </div>
+        </>
     );
 }
 

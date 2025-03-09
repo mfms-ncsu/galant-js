@@ -8,17 +8,6 @@ import algorithms from 'data/algorithms.json';
 import graphs from 'data/graphs.json';
 
 /**
- * Header section containing the GalantJS logo
- */
-function Header() {
-    return (
-        <div className="flex items-start justify-between px-2 pt-1 w-auto h-12 bg-neutral-300">
-            <img src="img/galant_full_logo_without_words.svg" alt="logo" className="h-full w-auto"/>
-        </div>
-    );
-}
-
-/**
  * Returns the monaco editor
  */
 function InnerEditor({tab, editorType, onChange}) {
@@ -60,14 +49,10 @@ export default function Editor({ editorType, tabsAtom }) {
     }, [tabs]);
 
     return (
-        <>
-            <Header />
-            <div className="flex flex-col h-full">
-                <TabList tabs={tabs} setTabs={setTabs} examples={(editorType === "Algorithm") ? algorithms : graphs} acceptFileType={(editorType === "Algorithm") ? ".js" : ".txt, .gph, .sgf"} />
-                <InnerEditor tab={selectedTab} onChange={onEditorChange} />
-                <Overlay tab={selectedTab} saved={saved} editorType={editorType} />
-            </div>
-        </>
-        
+        <div className="flex flex-col h-full">
+            <TabList tabs={tabs} setTabs={setTabs} examples={(editorType === "Algorithm") ? algorithms : graphs} acceptFileType={(editorType === "Algorithm") ? ".js" : ".txt, .gph, .sgf"} />
+            <InnerEditor tab={selectedTab} onChange={onEditorChange} />
+            <Overlay tab={selectedTab} saved={saved} editorType={editorType} />
+        </div>
     );
 }

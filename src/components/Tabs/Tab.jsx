@@ -39,13 +39,8 @@ export default function Tab({tab, onClick, onRename, onRemove}) {
     }
 
     return(
-        <div tabIndex={0} className={`flex bg-transparent`} onClick={() => onClick(tab)} onKeyDown={onTabSelectByKey}>
-            <div className={`${(tab.selected) ? "bg-white" : ""}`}>
-                <div className={`h-full ${(tab.selected) ? "px-1 bg-neutral-300 rounded-br-lg" : ""}`}>
-                </div>
-            </div>
-
-            <div className={`flex items-center py-1 ps-2 pe-1 ${(tab.selected) ? "rounded-t-lg bg-white font-semibold" : ""}`}>
+        <div tabIndex={0} className="flex bg-transparent" onClick={() => onClick(tab)} onKeyDown={onTabSelectByKey}>
+            <div className={`flex items-center py-1 ps-2 pe-1 rounded-t-lg text-xl font-semibold ${tab.selected ? "bg-white" : "bg-neutral-300"}`}>
                 <div className="relative overflow-hidden cursor-default whitespace-nowrap">
                     <span className="opacity-0 pr-1">{editMode ? intermediateName : tab.name}</span>
                     <input className={`absolute inset-x-0 bg-transparent outline-none caret-blue-500 ${!editMode && 'pointer-events-none' }`} ref={inputField} value={editMode ? intermediateName : tab.name} size={intermediateName.length} disabled={!editMode} onChange={(event) => setIntermediateName(event.target.value.trim())} onKeyUp={onEnter} onBlur={() => setEditMode(false)} ></input>
@@ -58,11 +53,6 @@ export default function Tab({tab, onClick, onRename, onRemove}) {
                 <button className="p-1 rounded-full hover:bg-black/10" onClick={onRemoveClick}>
                     <XMarkIcon className="h-4 stroke stroke-black"/>
                 </button>
-            </div>
-            
-            <div className={`${(tab.selected) ? "bg-white" : ""}`}>
-                <div className={`h-full ${(tab.selected) ? "px-1 bg-neutral-300 rounded-bl-lg" : ""}`}>
-                </div>
             </div>
         </div>
     );

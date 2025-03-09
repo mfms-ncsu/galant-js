@@ -1,7 +1,7 @@
-import { Fragment } from "react";
-import { PlusIcon } from '@heroicons/react/24/solid';
+import { Fragment, useRef, useEffect } from "react";
 import { Menu, Transition } from '@headlessui/react';
-import { useRef, useEffect } from "react";
+import PrimaryButton from 'components/Buttons/PrimaryButton';
+import { PlusIcon } from '@heroicons/react/24/solid';
 
 /**
  * Returns component for creating new tabs, including the button and dropdown.
@@ -28,9 +28,13 @@ export default function NewButton({ addTab, examples }) {
     return (
         <div className="relative">
             <Menu>
-                <Menu.Button ref={button} className="flex items-center h-8">
-                    <PlusIcon className="h-6 p-1 fill-black stroke stroke-black hover:bg-black/10 transition-all rounded-full" />
-                </Menu.Button>
+                <PrimaryButton className="m-1">
+                    <Menu.Button ref={button} className="flex items-center">
+                        <PlusIcon className="h-4 me-2 fill-white stroke stroke-white" />
+                        <span>New Tab</span>
+                    </Menu.Button>
+                </PrimaryButton>
+                
                 <Transition
                     as={Fragment}
                     enter="transition ease-out duration-100"
