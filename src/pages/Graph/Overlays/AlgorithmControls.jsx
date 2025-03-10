@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { algorithmAtom, algorithmChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_atoms/atoms";
+import AlgorithmInterface from "interfaces/AlgorithmInterface/AlgorithmInterface";
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import ChangeManager from "states/ChangeManager/ChangeManager";
 import { ArrowLeftIcon, ArrowPathIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
 import PrimaryButton from "components/Buttons/PrimaryButton";
 import SecondaryButton from "components/Buttons/SecondaryButton";
 import ExitButton from "components/Buttons/ExitButton";
-
 
 /**
  * AlgorithmControls component renders controls for stepping through an algorithm.
@@ -35,7 +35,7 @@ export default function AlgorithmControls() {
                 ],
             });
             const writableStream = await fileHandle.createWritable();
-            const content = GraphInterface.toString();
+            const content = GraphInterface.toString(graph);
             await writableStream.write(content);
             await writableStream.close();
         } else {
@@ -75,26 +75,28 @@ export default function AlgorithmControls() {
      */
     function debugMode() {
         if (algorithm) {
-            algorithm.toggleDebugMode();
+            let newAlgorithm = AlgorithmInterface.toggleDebugMode(algorithm);
+            setAlgorithm(newAlgorithm);
             setDebug(algorithm.debugMode);
         }
     }
 
     // Function to handle pressing the forward button
     function frontButtonPress() {
-        if (!algorithm || !algorithm.canStepForward()) return;
-        algorithm.stepForward();
+        if (!algorithm || !AlgorithmInterface.canStepForward(algorithm)) return;
+        AlgorithmInterface.stepForward(algorithm);
     } 
 
     // Function to handle pressing the backward button
     function backButtonPress() {
-        if (!algorithm || !algorithm.canStepBack()) return;
-        algorithm.stepBack();
+        if (!algorithm || !AlgorithmInterface.canStepBack()) return;
+        AlgorithmInterface.stepForward(algorithm);
     }
 
     // Method called when the "Skip to end" button is clicked
     function skipToEnd() {
-        algorithm.skipToEnd();
+        if (!algorithm || !AlgorithmInterface.canStepForward(algorithm)) return;
+        AlgorithmInterface.stepForward(algorithm);
     }
 
     // Kills the algorithm

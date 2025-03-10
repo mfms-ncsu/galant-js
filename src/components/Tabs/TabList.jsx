@@ -57,7 +57,7 @@ export default function TabList({tabs, setTabs, acceptFileType, examples}) {
             </Header>
 
             <div className="flex bg-neutral-400">
-                <div className="flex space-x-1 overflow-x-scroll">
+                <div className="min-w-full flex space-x-1 overflow-x-scroll">
                     {tabs.map(tab => 
                         <Tab key={tab.name} tab={tab} onClick={onTabClick} onRename={onTabRename} onRemove={onTabRemove} />
                     )}
