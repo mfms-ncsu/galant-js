@@ -13,7 +13,7 @@ export default function ControlSettingsPopover() {
 
     // Function to handle auto camera action
     function autoCamera() {
-        Cytoscape.fit();
+        Cytoscape.fit(Cytoscape.elements(), 100);
     }
 
     // Function to handle auto layout action
