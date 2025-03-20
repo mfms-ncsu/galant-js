@@ -98,7 +98,7 @@ function canStepForward(algorithm) {
  * * @param algorithm Algorithm on which to operate
  */
 function stepBack(algorithm) {
-    if (!algorithm.canStepBack()) return;
+    if (!canStepBack()) return;
     GraphInterface.undo(graph, changeManager);
 }
 

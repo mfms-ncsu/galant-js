@@ -90,13 +90,13 @@ export default function AlgorithmControls() {
     // Function to handle pressing the backward button
     function backButtonPress() {
         if (!algorithm || !AlgorithmInterface.canStepBack()) return;
-        AlgorithmInterface.stepForward(algorithm);
+        AlgorithmInterface.stepBack(algorithm);
     }
 
     // Method called when the "Skip to end" button is clicked
     function skipToEnd() {
         if (!algorithm || !AlgorithmInterface.canStepForward(algorithm)) return;
-        AlgorithmInterface.stepForward(algorithm);
+        AlgorithmInterface.skipToEnd(algorithm);
     }
 
     // Kills the algorithm
@@ -120,7 +120,7 @@ export default function AlgorithmControls() {
             else if (event.key === 'x') terminateAlgorithm();
             else if (event.key === 's') exportGraph();
             else if (event.key === '1') debugMode();
-            else if (event.metaKey && event.key === 'ArrowRight') algorithm.skipToEnd();
+            else if (event.metaKey && event.key === 'ArrowRight') skipToEnd();
         }
 
         document.addEventListener('keydown', handleKeyPress, true)
