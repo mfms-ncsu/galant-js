@@ -23,7 +23,7 @@
     "fireworks-js": "^2.10.2",
     "http-proxy-middleware": "^2.0.6",
     "immer": "^9.0.21",
-    "jotai": "^2.12.1",
+    "jotai": "^2.12.2",
     "jotai-devtools": "^0.11.0",
     "jotai-immer": "^0.4.1",
     "rc-slider": "^10.5.0",
