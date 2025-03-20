@@ -49,7 +49,7 @@ export default function Graph() {
             setGraph(FileParser.loadGraph(graphName, graphText));
 
             // We have to wait for cytoscape to read graph changes, and add graph.
-            if (isInit) setTimeout(() => Cytoscape.fit(), 25);
+            if (isInit) setTimeout(() => Cytoscape.fit(Cytoscape.elements(), 100), 25);
         }
 
         // Load a new algorithm

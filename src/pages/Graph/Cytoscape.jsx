@@ -13,6 +13,7 @@ export default function CytoscapeComponent() {
     const [graph] = useAtom(graphAtom);
     const [algorithmChangeManager] = useAtom(algorithmChangeManagerAtom)
     const cytoscapeElement = useRef();
+    const backgroundCanvas = useRef();
     const [message, setMessage] = useState(null);
 
     /**
@@ -26,6 +27,9 @@ export default function CytoscapeComponent() {
         Cytoscape.mount(cytoscapeElement.current);
         Cytoscape.add(CytoscapeInterface.getElements(graph));
         Cytoscape.style(CytoscapeInterface.getStyle(graph)).update();
+        Cytoscape.minZoom(0.1);
+        Cytoscape.maxZoom(10);
+        Cytoscape.autounselectify(true); // Disable multi-select for now (until supported in ChangeRecords)
         Cytoscape.nodeHtmlLabel([{
             query: "node",
             valign: "top",
@@ -82,12 +86,86 @@ export default function CytoscapeComponent() {
         setMessage(newMessage);
     }, [graph, algorithmChangeManager]);
 
+    useEffect(() => {
+        // Draw the background grid once and add an event listener to re-draw it when the viewport changes
+        const graphScalar = GraphInterface.getScalar(graph);
+        drawGrid(graphScalar.x, graphScalar.y);
+        Cytoscape.on('viewport', (event) => {
+            drawGrid(graphScalar.x, graphScalar.y);
+        });
+    }, [graph?.scalar]);
+
+    // Helper function to draw a background grid aligned with the graph's scaling
+    const drawGrid = (scaleX, scaleY) => {
+        if (!backgroundCanvas.current) return;
+
+        const canvas = backgroundCanvas.current;
+        const ctx = canvas.getContext('2d');
+        const { width, height } = cytoscapeElement.current.getBoundingClientRect();
+
+        // Get Cytoscape's pan and zoom values
+        const zoom = window.cytoscape.zoom();
+        const pan = window.cytoscape.pan();
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.clearRect(0, 0, width, height);
+
+        // If the grid scale is less than 10px, don't draw anything (for performance reasons)
+        if (scaleX < 10 || scaleY < 10) return;
+
+        ctx.strokeStyle = 'rgba(200, 200, 200, 0.5)';
+        ctx.lineWidth = 1;
+
+        const scaledGridSizeX = scaleX * zoom;
+        const scaledGridSizeY = scaleY * zoom;
+
+        // Offset the grid based on Cytoscape's pan values
+        const startX = (pan.x % scaledGridSizeX) -  scaledGridSizeX;
+        const startY = (pan.y % scaledGridSizeY) - scaledGridSizeY;
+
+        for (let x = startX; x < width; x += scaledGridSizeX) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, height);
+            ctx.stroke();
+        }
+
+        for (let y = startY; y < height; y += scaledGridSizeY) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(width, y);
+            ctx.stroke();
+        }
+
+        // Transform Cytoscape's (0,0) to canvas space
+        const originX = pan.x;
+        const originY = pan.y;
+
+        // Draw a small cross at the transformed origin
+        ctx.strokeStyle = 'gray';
+        ctx.lineWidth = 1;
+
+        // Horizontal line of the cross
+        ctx.beginPath();
+        ctx.moveTo(originX - 10, originY);
+        ctx.lineTo(originX + 10, originY);
+        ctx.stroke();
+
+        // Vertical line of the cross
+        ctx.beginPath();
+        ctx.moveTo(originX, originY - 10);
+        ctx.lineTo(originX, originY + 10);
+        ctx.stroke();
+    };
+
     return (
-        <div className="w-full h-full">
+        <div className="relative w-full h-full">
+            <canvas ref={backgroundCanvas} className="absolute top-0 left-0 pointer-events-none" />
             <div className="flex justify-center">
                 {message && <p className="absolute z-10 px-2 py-1 rounded-b-lg bg-black text-white text-lg font-semibold">{message}</p>}
             </div>
-            <div id="cytoscape-instance" ref={cytoscapeElement} className="w-full h-full bg-white" />
+            <div id="cytoscape-instance" ref={cytoscapeElement} className="w-full h-full bg-transparent" />
         </div>
     );
 }
