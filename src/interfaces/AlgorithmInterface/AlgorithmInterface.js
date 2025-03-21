@@ -104,56 +104,31 @@ function stepBack(algorithm) {
 
 /**
  * Moves forward one step. If you want to step until the end of the algorithm 
- * (Or 250 steps, whichever comes first), you can supply the optional skipToEnd parameter.
+ * (Or 250 steps, whichever comes first).
  * @param algorithm Algorithm on which to operate
- * @param {Boolean} skipToEnd true if you want to skip all the way to the end of the 
- *                         algorithm. False or undefined if you only want to take one step
  */
-function stepForward(algorithm, skipToEnd) {
-    // Set skipToEnd to false if nothing was given
-    skipToEnd = skipToEnd || false;
-    
+function stepForward(algorithm) {
     // Immediately return if the algorithm cannot continue
     if (!canStepForward(algorithm)) return;
-
-    // If skipToEnd is set to true, redo all saved steps in the ChangeManager
-    if (skipToEnd) {
-        while (changeManager.index !== changeManager.changes.length-1) {
-            GraphInterface.redo();
-        }
-    }
 
     // Again, check if we can step forward. If we can't, immediately return
     if (!canStepForward(algorithm)) return;
 
     // If we are at the end of the list of changes, we need to wake up the thread to generate a new step
-    if (changeManager.index !== changeManager.changes.length-1) {
+    if (changeManager.index !== changeManager.changes.length - 1) {
         algorithm.fetchingSteps = true;
-        
-        // Set the skipToEnd flag to true if necessary
-        algorithm.flags[1] = skipToEnd ? 1 : 0;
 
         resumeThread(algorithm); // Resume the thread
-        setupTimeout(algorithm) // Set the timer
+        setupTimeout(algorithm); // Set the timer
 
         // Once the step is complete:
         algorithm.onStepAdded = () => {
             algorithm.fetchingSteps = false;
-            algorithm.flags[1] = 0;
-        }
-
+        };
     } else {
         // Use redo if there are pre-loaded steps ahead of the index
         GraphInterface.redo(graph, changeManager);
     }
-}
-
-/**
- * Skips to the end of the algorithm execution.
- * @param algorithm Algorithm on which to operate
- */
-function skipToEnd(algorithm) {
-    stepForward(algorithm, true);
 }
 
 /**
@@ -293,6 +268,7 @@ function onMessage(algorithm, message) {
                 () => {}
             );
             store.set(promptQueueAtom, newQueue);
+        // eslint-disable-next-line no-fallthrough
         default:
             // If the message was not a type we define here, then we probably just made a mistake 
             // or typo when sending this message. Throw an error to let us know about it
@@ -306,7 +282,6 @@ const AlgorithmInterface = {
     enterPromptResult,
     onMessage,
     setupTimeout,
-    skipToEnd,
     stepBack,
     stepForward,
     toggleDebugMode

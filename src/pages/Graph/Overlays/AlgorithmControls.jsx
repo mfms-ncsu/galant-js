@@ -93,12 +93,6 @@ export default function AlgorithmControls() {
         AlgorithmInterface.stepBack(algorithm);
     }
 
-    // Method called when the "Skip to end" button is clicked
-    function skipToEnd() {
-        if (!algorithm || !AlgorithmInterface.canStepForward(algorithm)) return;
-        AlgorithmInterface.skipToEnd(algorithm);
-    }
-
     // Kills the algorithm
     function terminateAlgorithm() {
         // Remove any prompts the algorithm had up
@@ -120,7 +114,6 @@ export default function AlgorithmControls() {
             else if (event.key === 'x') terminateAlgorithm();
             else if (event.key === 's') exportGraph();
             else if (event.key === '1') debugMode();
-            else if (event.metaKey && event.key === 'ArrowRight') skipToEnd();
         }
 
         document.addEventListener('keydown', handleKeyPress, true)
@@ -153,7 +146,6 @@ export default function AlgorithmControls() {
             <div className="space-y-1">
                 <PrimaryButton onClick={exportGraph}>Export Graph (s)</PrimaryButton>
                 <ExitButton onClick={terminateAlgorithm}>Exit (x)</ExitButton>
-                <SecondaryButton onClick={skipToEnd}>Skip to End</SecondaryButton>
             </div>
         </div>
     );

@@ -33,9 +33,7 @@ let flags;
 let isInStep;
 
 /**
- * The number of steps to take before waiting again. Usually, this
- * is 1, but if the skipToEnd() method in Algorithm is called, this
- * will be 250
+ * The number of steps to take before waiting again.
  */
 let stepsToTake;
 
@@ -59,11 +57,8 @@ function wait() {
     // Wait until the sharedArray buffer's first element is not 0.
     Atomics.wait(sharedArray, 0, 0);
 
-    // Check if the skip to end flag is set. If so, set stepsToTake
-    // to 250, otherwise set it to 1. If the skipToEnd flag is on, then
-    // we want to take 250 steps, otherwise we only want to take a single
-    // step
-    stepsToTake = flags[1] == 1 ? 250 : 1;
+    // Set stepsToTake to 1 (default behavior)
+    stepsToTake = 1;
 }
 
 /**

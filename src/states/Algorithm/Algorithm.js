@@ -42,10 +42,8 @@ export default class Algorithm {
         // This array is passed to the Thread running the algorithm.
         // It holds status flags, such as whether the user has entered debug mode
         // 0: debug mode
-        // 1: skip to end mode (continues taking steps until 250 steps / end of algorithm)
         this.flags = new Int32Array(new SharedArrayBuffer(8));
         this.flags[0] = 0;
-        this.flags[1] = 0;
 
         // Initialize the thread worker
         this.worker = new Worker(new URL("./Thread.js", import.meta.url));
