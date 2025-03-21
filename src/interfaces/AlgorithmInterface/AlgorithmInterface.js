@@ -99,7 +99,10 @@ function canStepForward(algorithm) {
  */
 function stepBack(algorithm) {
     if (!canStepBack()) return;
-    GraphInterface.undo(graph, changeManager);
+    let [newGraph, newChangeManager] = [];
+    [newGraph, newChangeManager] = GraphInterface.undo(graph, changeManager);
+    store.set(graphAtom, newGraph);
+    store.set(algorithmChangeManagerAtom, newChangeManager);
 }
 
 /**
