@@ -743,6 +743,7 @@ function showEdgeLabel(edge) {
  * @param {Array} message Array containing a message type and message content
  */
 self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
+    
     message = message.data;
     if (message[0] === "shared") {
         sharedArray = message[1];

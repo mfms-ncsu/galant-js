@@ -30,7 +30,7 @@ store.sub(promptQueueAtom, () => { promptQueue = store.get(promptQueueAtom) });
 function setupTimeout(algorithm) {
     algorithm.timeoutId = setTimeout(() => {
         // Kill the thread
-        killThread();
+        killThread(algorithm);
         
         // Create an error
         var err = new Error("Timeout has occurred.");
@@ -270,8 +270,14 @@ function onMessage(algorithm, message) {
         case "step":
             clearTimeout(algorithm.timeoutId);
             if (algorithm.onStepAdded) algorithm.onStepAdded();
-            store.set(graphAtom, newGraph);
-            store.set(algorithmChangeManagerAtom, newChangeManager);
+            // The following two lines were causing the program to
+            // crash. I don't know their intended purpose, but they
+            // set the graph and changeManager to undefined. This causes
+            // a crash when the program next tries to access the graph
+            // or change manager.
+            //
+            // store.set(graphAtom, newGraph);
+            // store.set(algorithmChangeManagerAtom, newChangeManager);
             break;
         case "complete":
             clearTimeout(algorithm.timeoutId);

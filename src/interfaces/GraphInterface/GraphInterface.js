@@ -455,13 +455,21 @@ function getOutgoingNodes(graph, source) {
  * @returns Object of Scalars for the x and y scales
  */
 function getScalar(graph) {
+  
+  // If there is no window, then this graph is being loaded into
+  // the thread to run an algorithm. The scalar does not matter
+  // in this case, so just return 1, 1
+  if (typeof window === "undefined") {
+    return { x: 1, y: 1 };
+  }
+
   const boundingBox = {
     minX: 0,
     minY: 0,
     maxX: 1,
     maxY: 1,
   };
-
+    
   for (const node of graph.nodes.values()) {
     boundingBox.minX = Math.min(boundingBox.minX, node.position.x);
     boundingBox.minY = Math.min(boundingBox.minY, node.position.y);
@@ -567,6 +575,7 @@ function addEdge(graph, changeManager, source, target, attributes) {
  * @returns Updated change manager
  */
 function addMessage(changeManager, message) {
+  
   const newChangeManager = recordChange(changeManager, [
     new ChangeObject("message", null, {
       message: message,

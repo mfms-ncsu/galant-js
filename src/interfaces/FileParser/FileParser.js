@@ -28,7 +28,7 @@ import StandardGraph from "../../states/Graph/StandardGraph";
 function isLayeredGraph(name, file) {
     let isLayeredGraph = false;
     const lines = file.split("\n");
-
+    
     //Check for the .sgf extension
     if ( name.endsWith('.sgf') ) {
         isLayeredGraph = true;
