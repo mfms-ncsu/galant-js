@@ -1355,7 +1355,6 @@ function undo(graph, changeManager) {
 
     // Undo the change
     const newGraph = produce(graph, (draft) => {
-      console.log(step);
       step.forEach((change) => {
         switch (change.action) {
           case "addNode":

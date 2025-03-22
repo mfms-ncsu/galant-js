@@ -181,6 +181,16 @@ function enterPromptResult(algorithm, promptResult) {
 }
 
 /**
+ * This method undoes all changes that the current Algorithm did
+ */
+function revert() {
+    let [newGraph, newChangeManager] = GraphInterface.revert(graph, changeManager);
+
+    store.set(graphAtom, newGraph);
+    store.set(algorithmChangeManagerAtom, newChangeManager);
+}
+
+/**
  * Handles messages from thread.
  * @param algorithm Algorithm on which to operate
  * @param {Object} message Message from thread
@@ -230,7 +240,7 @@ function onMessage(algorithm, message) {
             break;
         case "message":
             newChangeManager = GraphInterface.addMessage(changeManagerToUse, message.message);
-            store.set(algorithmChangeManagerAtom, newChangeManager);
+            updateState(graphToUse, newChangeManager);
             break;
         case "print":
             console.log(message.message);
@@ -264,7 +274,6 @@ function onMessage(algorithm, message) {
             updateState(newGraph, newChangeManager);
             break;
         case "startRecording":
-            console.log("Starting recording");
             newChangeManager = GraphInterface.startRecording(changeManagerToUse);
 
             // Make clones of the graph and changeManager into the
@@ -278,7 +287,6 @@ function onMessage(algorithm, message) {
             store.set(algorithmChangeManagerAtom, newChangeManager);
             break;
         case "endRecording":
-            console.log("Ending recording");
             clearTimeout(algorithm.timeoutId);
             // End the recording, but only if it started. It is possible that the user was in debug mode, which
             // means that the recording was never actually started
@@ -331,6 +339,7 @@ const AlgorithmInterface = {
     setupTimeout,
     stepBack,
     stepForward,
-    toggleDebugMode
+    toggleDebugMode,
+    revert
 };
 export default AlgorithmInterface;
