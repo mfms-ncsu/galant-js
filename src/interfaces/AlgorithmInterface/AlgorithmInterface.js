@@ -99,8 +99,7 @@ function canStepForward(algorithm) {
  */
 function stepBack(algorithm) {
     if (!canStepBack()) return;
-    let [newGraph, newChangeManager] = [];
-    [newGraph, newChangeManager] = GraphInterface.undo(graph, changeManager);
+    let [newGraph, newChangeManager] = GraphInterface.undo(graph, changeManager);
     store.set(graphAtom, newGraph);
     store.set(algorithmChangeManagerAtom, newChangeManager);
 }
@@ -114,11 +113,8 @@ function stepForward(algorithm) {
     // Immediately return if the algorithm cannot continue
     if (!canStepForward(algorithm)) return;
 
-    // Again, check if we can step forward. If we can't, immediately return
-    if (!canStepForward(algorithm)) return;
-
     // If we are at the end of the list of changes, we need to wake up the thread to generate a new step
-    if (changeManager.index !== changeManager.changes.length - 1) {
+    if (changeManager.index === changeManager.changes.length) {
         algorithm.fetchingSteps = true;
 
         resumeThread(algorithm); // Resume the thread
@@ -130,7 +126,10 @@ function stepForward(algorithm) {
         };
     } else {
         // Use redo if there are pre-loaded steps ahead of the index
-        GraphInterface.redo(graph, changeManager);
+        let [newGraph, newChangeManager] = GraphInterface.redo(graph, changeManager);
+        store.set(graphAtom, newGraph);
+        store.set(algorithmChangeManagerAtom, newChangeManager);
+
     }
 }
 
