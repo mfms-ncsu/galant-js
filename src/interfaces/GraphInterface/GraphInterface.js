@@ -43,16 +43,30 @@ function generateId(nodes) {
  * @returns Updated change manager
  */
 function recordChange(changeManager, change) {
-  return produce(changeManager, (draft) => {
-    // Remove all changes after the current index
-    draft.changes = draft.changes.slice(0, draft.index);
+    
+    // If the change manager is not recording, save the change to the
+    // main list of changes
+    if (!changeManager.isRecording) {
+        return produce(changeManager, (draft) => {
+            // Remove all changes after the current index
+            draft.changes = draft.changes.slice(0, draft.index);
 
-    // Push the new change
-    draft.changes.push(change);
+            // Push the new change
+            draft.changes.push(change);
 
-    // Increment the index
-    draft.index++;
-  });
+            // Increment the index
+            draft.index++;
+        });
+    }
+    
+    // If the change manager is recording, save the change to the
+    // temporary list of changes, and return
+    return produce(changeManager, (draft) => {
+        
+        change.forEach( (changeObj) => {
+            draft.recordedChanges.push(changeObj);
+        });
+    });
 }
 
 /**
@@ -756,27 +770,19 @@ function endRecording(changeManager) {
   // If we are not recording, then we cannot stop recording.
   if (!changeManager.isRecording) {
     throw new Error(
-      "Cannot stop recording becausee this ChangeManager has not started recording"
+      "Cannot stop recording because this ChangeManager has not started recording"
     );
   }
 
-  const newChangeManager = produce(changeManager, (draft) => {
-    // Set the isRecording flag back to false
+  // Reset the isRecording flag
+  let newChangeManager = produce( changeManager, (draft) => {
     draft.isRecording = false;
-
-    // Record the list of changes, but only if changes were actually made. If
-    // the recordedChanges list is empty, do nothing.
-    if (draft.recordedChanges.length !== 0) {
-      // Remove all changes after the current index
-      draft.changes = draft.changes.slice(0, draft.index);
-
-      // Push the new changes
-      draft.changes.push(draft.recordedChanges);
-
-      // Increment the index
-      draft.index++;
-    }
   });
+
+  // Record the changes if any were made
+  if (newChangeManager.recordedChanges.length !== 0) {
+      return recordChange(newChangeManager, newChangeManager.recordedChanges);
+  }
 
   // Return the change manager
   return newChangeManager;
@@ -1349,6 +1355,7 @@ function undo(graph, changeManager) {
 
     // Undo the change
     const newGraph = produce(graph, (draft) => {
+      console.log(step);
       step.forEach((change) => {
         switch (change.action) {
           case "addNode":

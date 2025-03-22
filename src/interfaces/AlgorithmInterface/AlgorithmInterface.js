@@ -24,6 +24,36 @@ store.sub(algorithmChangeManagerAtom, () => { changeManager = store.get(algorith
 store.sub(promptQueueAtom, () => { promptQueue = store.get(promptQueueAtom) });
 
 /**
+ * When the algorithm is in a step, these will be updated instead of
+ * the main atom. This is to prevent the window from redrawing, so the
+ * change appears atomic.
+ */
+let [tempGraph, tempChangeManager] = [];
+
+
+/**
+ * Updates the state of the graph and changeManager, as long as we are
+ * not in a step function. If we are in a step function, then we will
+ * update the temporary graph and state instead.
+ *
+ * @param {graph} the graph to set as the state
+ * @param {changeManager} the changeManager to set as the state
+ */
+function updateState(graph, changeManager) {
+    
+    if (changeManager.isRecording) {
+        // Record the changes into the temporary graph and changeManager
+        [tempGraph, tempChangeManager] = [graph, changeManager];
+        return;
+    }
+
+    // Otherwise, record the change to the actual state to update
+    // the display
+    store.set(graphAtom, graph);
+    store.set(algorithmChangeManagerAtom, changeManager);
+}
+
+/**
  * Sets up a timeout for the thread to run a step.
  * @param algorithm Algorithm on which to operate
  */
@@ -129,7 +159,6 @@ function stepForward(algorithm) {
         let [newGraph, newChangeManager] = GraphInterface.redo(graph, changeManager);
         store.set(graphAtom, newGraph);
         store.set(algorithmChangeManagerAtom, newChangeManager);
-
     }
 }
 
@@ -160,21 +189,32 @@ function onMessage(algorithm, message) {
     // Create new variables to set
     let [newGraph, newChangeManager] = [];
     let newQueue;
+    
+    // Use the graph, unless we are in a recording. In that case,
+    // use the temporary graph
+    let graphToUse = graph;
+    if (changeManager.isRecording) {
+        graphToUse = tempGraph;
+    }
+
+    // Same for the changeManager
+    let changeManagerToUse = changeManager;
+    if (changeManager.isRecording) {
+        changeManagerToUse = tempChangeManager;
+    }
 
     switch (message.action) {
         case "setDirected":
-            newGraph = GraphInterface.setDirected(graph, message.isDirected);
+            newGraph = GraphInterface.setDirected(graphToUse, message.isDirected);
             store.set(graphAtom, newGraph);
             break;
         case "addNode":
-            [newGraph, newChangeManager] = GraphInterface.addNode(graph, changeManager, message.x, message.y);
-            store.set(graphAtom, newGraph);
-            store.set(algorithmChangeManagerAtom, newChangeManager);
+            [newGraph, newChangeManager] = GraphInterface.addNode(graphToUse, changeManagerToUse, message.x, message.y);
+            updateState(newGraph, newChangeManager);
             break;
         case "addEdge":
-            [newGraph, newChangeManager] = GraphInterface.addEdge(graph, changeManager, message.source, message.target);
-            store.set(graphAtom, newGraph);
-            store.set(algorithmChangeManagerAtom, newChangeManager);
+            [newGraph, newChangeManager] = GraphInterface.addEdge(graphToUse, changeManagerToUse, message.source, message.target);
+            updateState(newGraph, newChangeManager);
             break;
         case "prompt":
             clearTimeout(algorithm.timeoutId); // Cancel the timer while the prompt is up
@@ -189,58 +229,63 @@ function onMessage(algorithm, message) {
             store.set(promptQueueAtom, newQueue);
             break;
         case "message":
-            newChangeManager = GraphInterface.addMessage(changeManager, message.message);
+            newChangeManager = GraphInterface.addMessage(changeManagerToUse, message.message);
             store.set(algorithmChangeManagerAtom, newChangeManager);
             break;
         case "print":
             console.log(message.message);
             break;
         case "deleteNode":
-            [newGraph, newChangeManager] = GraphInterface.deleteNode(graph, changeManager, message.nodeId);
-            store.set(graphAtom, newGraph);
-            store.set(algorithmChangeManagerAtom, newChangeManager);
+            [newGraph, newChangeManager] = GraphInterface.deleteNode(graphToUse, changeManagerToUse, message.nodeId);
+            updateState(newGraph, newChangeManager);
             break;
         case "setNodePosition":
-            [newGraph, newChangeManager] = GraphInterface.setNodePosition(graph, changeManager, message.nodeId, message.x, message.y);
-            store.set(graphAtom, newGraph);
-            store.set(algorithmChangeManagerAtom, newChangeManager);
+            [newGraph, newChangeManager] = GraphInterface.setNodePosition(graphToUse, changeManagerToUse, message.nodeId, message.x, message.y);
+            updateState(newGraph, newChangeManager);
             break;
         case "deleteEdge":
-            [newGraph, newChangeManager] = GraphInterface.deleteEdge(graph, changeManager, message.source, message.target);
-            store.set(graphAtom, newGraph);
-            store.set(algorithmChangeManagerAtom, newChangeManager);
+            [newGraph, newChangeManager] = GraphInterface.deleteEdge(graphToUse, changeManagerToUse, message.source, message.target);
+            updateState(newGraph, newChangeManager);
             break;
         case "setNodeAttribute":
-            [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graph, changeManager, message.nodeId, message.name, message.value);
-            store.set(graphAtom, newGraph);
-            store.set(algorithmChangeManagerAtom, newChangeManager);
+            [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graphToUse, changeManagerToUse, message.nodeId, message.name, message.value);
+            updateState(newGraph, newChangeManager);
             break;
         case "setNodeAttributeAll":
-            [newGraph, newChangeManager] = GraphInterface.setNodeAttributeAll(graph, changeManager, message.name, message.value);
-            store.set(graphAtom, newGraph);
-            store.set(algorithmChangeManagerAtom, newChangeManager);
+            [newGraph, newChangeManager] = GraphInterface.setNodeAttributeAll(graphToUse, changeManagerToUse, message.name, message.value);
+            updateState(newGraph, newChangeManager);
             break;
         case "setEdgeAttribute":
-            [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(graph, changeManager, message.source, message.target, message.name, message.value);
-            store.set(graphAtom, newGraph);
-            store.set(algorithmChangeManagerAtom, newChangeManager);
+            [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(graphToUse, changeManagerToUse, message.source, message.target, message.name, message.value);
+            updateState(newGraph, newChangeManager);
             break;
         case "setEdgeAttributeAll":
-            [newGraph, newChangeManager] = GraphInterface.setEdgeAttributeAll(graph, changeManager, message.name, message.value);
-            store.set(graphAtom, newGraph);
-            store.set(algorithmChangeManagerAtom, newChangeManager);
+            [newGraph, newChangeManager] = GraphInterface.setEdgeAttributeAll(graphToUse, changeManagerToUse, message.name, message.value);
+            updateState(newGraph, newChangeManager);
             break;
         case "startRecording":
-            newChangeManager = GraphInterface.startRecording(changeManager);
+            console.log("Starting recording");
+            newChangeManager = GraphInterface.startRecording(changeManagerToUse);
+
+            // Make clones of the graph and changeManager into the
+            // tempGraph and tempChangeManager variables. These can
+            // be updated without redrawing the screen, since they
+            // are not react states
+            
+            tempGraph = structuredClone(graph);
+            tempChangeManager = structuredClone(newChangeManager);
+
             store.set(algorithmChangeManagerAtom, newChangeManager);
             break;
         case "endRecording":
+            console.log("Ending recording");
             clearTimeout(algorithm.timeoutId);
             // End the recording, but only if it started. It is possible that the user was in debug mode, which
             // means that the recording was never actually started
-            if (changeManager.isRecording) {
-                newChangeManager = GraphInterface.endRecording(changeManager);
+            if (changeManagerToUse.isRecording) {
+                newChangeManager = GraphInterface.endRecording(changeManagerToUse);
                 store.set(algorithmChangeManagerAtom, newChangeManager);
+                store.set(graphAtom, tempGraph);
             }
             if (algorithm.onStepAdded) algorithm.onStepAdded();
             break;
