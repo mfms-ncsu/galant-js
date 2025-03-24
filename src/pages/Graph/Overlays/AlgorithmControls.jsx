@@ -97,11 +97,12 @@ export default function AlgorithmControls() {
     function terminateAlgorithm() {
         // Remove any prompts the algorithm had up
         setPromptQueue([]);
+    
+        // Tell the algorithm to undo all changes
+        AlgorithmInterface.revert();
 
-        // Set the algorithm to null
+        // Set the algorithm to null and reset its changeManager
         setAlgorithm(null);
-
-        // Undo all changes made by the algorithm
         setAlgorithmChangeManager(new ChangeManager());
     }
 
