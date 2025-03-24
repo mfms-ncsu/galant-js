@@ -32,18 +32,18 @@ export default class LayeredGraph extends Graph {
      * @returns Returns sum of based on callback
      * @author Heath Dyer
      */
-    iterateEdges = (graph, callback) => {
-        let result = 0;
-        let visitedEdges = new Set();
-        graph.nodes.forEach(node => {
-            node.edges.forEach(edge => {
-                if (!visitedEdges.has(edge)) {
-                    result = callback(result, edge);
-                    visitedEdges.add(edge);
-                }
-            });
-        });
-        return result;
+    iterateEdges = (callback) => {
+        // let result = 0;
+        // let visitedEdges = new Set();
+        // graph.nodes.forEach(node => {
+        //     node.edges.forEach(edge => {
+        //         if (!visitedEdges.has(edge)) {
+        //             result = callback(result, edge);
+        //             visitedEdges.add(edge);
+        //         }
+        //     });
+        // });
+        // return result;
     }
 
     /**
@@ -52,12 +52,17 @@ export default class LayeredGraph extends Graph {
      * @author Heath Dyer
      */
     getEdgeCrossings(edge) {
-        return this.iterateEdges(graph, (count, e, visitedEdges) => {
-            if (e !== edge && !visitedEdges.has(e) && this.isEdgeCrossed(edge, e)) {
-                return count + 1;
-            }
-            return count;
+        let result = 0;
+        let visitedEdges = new Set();
+        graph.nodes.forEach(node => {
+            node.edges.forEach(e => {
+                if (e !== edge && !visitedEdges.has(edge) && this.isEdgeCrossed(edge, e)) {
+                    result += 1;
+                    visitedEdges.add(edge);
+                }
+            });
         });
+        return result;
     }
 
     /**
@@ -66,10 +71,14 @@ export default class LayeredGraph extends Graph {
      * each crossing is counted twice
      * @author Heath Dyer
      */
-    getTotalCrossings(graph) {
-        return this.iterateEdges(graph, (total, edge) => {
-            return (total + this.getEdgeCrossings(graph, edge)) / 2;
+    getTotalCrossings() {
+        let result = 0;
+        graph.nodes.forEach(node => {
+            node.edges.forEach(e => {
+                result += this.getEdgeCrossings(e);
+            });
         });
+        return result;
     }
 
     /**
@@ -77,19 +86,29 @@ export default class LayeredGraph extends Graph {
      * Bottleneck crossings = max over e of c(e)
      * @author Heath Dyer
      */
-    getBottleneckCrossings(graph) {
-        return this.iterateEdges(graph, (maxCrossings, edge) => {
-            return Math.max(maxCrossings, this.getEdgeCrossings(graph, edge));
+    getBottleneckCrossings() {
+        let max = 0;
+        graph.nodes.forEach(node => {
+            node.edges.forEach(e => {
+                const crossings = this.getEdgeCrossings(e);
+                if (crossings > max) {
+                    max = crossings;
+                }
+            });
         });
+        return max;
     }
 
     /**
      * Helper function to get non-verticality of edge
+     * layer =y ,,, index = x
      * Non-verticality of edge e = xy is (position(x) – position()y)2
      * @author Heath Dyer
      */
     getNonVerticality(edge) {
-        return (edge.source.position - edge.target.position) ** 2;
+        const source = getSource(graph, edge);
+        const target = getTarget(graph, edge);
+        return (source.index - target.index) ** 2;
     }
 
     /**
@@ -97,10 +116,14 @@ export default class LayeredGraph extends Graph {
      * Total non-verticality = sum over e of nv(e)
      * @author Heath Dyer
      */
-    getTotalNonVerticality(graph) {
-        return this.iterateEdges(graph, (total, edge) => {
-            return total + this.getNonVerticality(edge);
+    getTotalNonVerticality() {
+        let result = 0;
+        graph.nodes.forEach(node => {
+            node.edges.forEach(e => {
+                result += this.getNonVerticality(e);
+            });
         });
+        return result;
     }
 
     /**
@@ -108,9 +131,16 @@ export default class LayeredGraph extends Graph {
      * Bottleneck non-verticality = max over e of nv(e)
      * @author Heath Dyer
      */
-    getBottleneckVerticality(graph) {
-        return this.iterateEdges(graph, (maxVerticality, edge) => {
-            return Math.max(maxVerticality, this.getNonVerticality(edge));
+    getBottleneckVerticality() {
+        let max = 0;
+        graph.nodes.forEach(node => {
+            node.edges.forEach(e => {
+                const crossings = this.getTotalNonVerticality(e);
+                if (crossings > max) {
+                    max = crossings;
+                }
+            });
         });
+        return max;
     }
 }
