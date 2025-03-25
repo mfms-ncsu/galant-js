@@ -17,7 +17,13 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
         error = errorObject.toString();
         code = "Your code took longer than 5 seconds to execute.\nFor technical reasons, we're not able to discern where in your code this occured.\nSorry!";
     } else {
-        title = "Error on line " + errorObject.lineNumber;
+        
+
+        // let errNum = errorObject.stack.split("\n")[1].split(":")[1];
+        let errArr = errorObject.stack.split("\n")[0].split(":")
+        let errNum = parseInt(errArr[errArr.length - 2]);
+
+        title = "Error on line " + errNum;
         error = errorObject.toString();
         // its a regular error, so generate the data to go in the popup.
 
@@ -31,7 +37,7 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
             // we star the line if it is the bad one
             let starTags = ["  ", "   "]
             // eslint-disable-next-line
-            if (i === errorObject.lineNumber-1) {
+            if (i === errNum-1) {
                 starTags = ["**", "** "];
             }
             let offset = starTags[0] + ("" + (i + 1)).padStart(offsetSize) + starTags[1]
