@@ -23,6 +23,8 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
         let errArr = errorObject.stack.split("\n")[0].split(":")
         let errNum = parseInt(errArr[errArr.length - 2]);
 
+        console.log(errArr)
+
         title = "Error on line " + errNum;
         error = errorObject.toString();
         // its a regular error, so generate the data to go in the popup.
