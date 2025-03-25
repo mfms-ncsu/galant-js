@@ -21,7 +21,7 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
 
         // let errNum = errorObject.stack.split("\n")[1].split(":")[1];
         let errArr = errorObject.stack.split("\n")[0].split(":")
-        console.log(errorObject.stack)
+        console.log(errorObject.lineNumber)
         let errNum = parseInt(errArr[errArr.length - 2]);
 
         title = "Error on line " + errNum;
