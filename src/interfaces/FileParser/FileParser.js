@@ -172,7 +172,7 @@ function addNode(graph, x, y, nodeId, attributes) {
     //TODO take a look at this
     // Create the node
     let node = graph.type === 'layered' 
-        ? new Node(nodeId, y, x, y, x)
+        ? new Node(nodeId, y, x, x, y)
         : new Node(nodeId, x, y);
 
     graph.nodes.set(nodeId, node);

@@ -14,55 +14,56 @@ export default class LayeredGraph extends Graph {
      * Edge crossings: two edges e = wy and f = xz cross if one of the following holds
      * index(w) < index(x) and index(y) > index(z)
      * index(w) > index(x) and index(y) < index(z)
+     * @params e Edge 1 to check
+     * @params f Edge 2 to check
      * @author Heath Dyer
      */
-    isEdgeCrossed(e1, e2) {
-        if (e1.source.index < e2.source.index && e1.target.index > e2.target.index) {
+    isEdgeCrossed(e, f) {
+        //get nodes
+        let w = this.nodes.get(e.source);
+        let y = this.nodes.get(e.target);
+        let x = this.nodes.get(f.source);
+        let z = this.nodes.get(f.target);
+        // Check if layers are correct but swapped
+        if (w.layer == z.layer && y.layer == x.layer) {
+            //we must swap for algorithm correctness
+            let temp = x;
+            x = z;
+            z = temp;
+        }
+        // Now layers should be correct. If they aren't, they are on different layers
+        if (w.layer != x.layer && y.layer != z.layer) {
+            return false;
+        }
+        // Now check if they are crossed
+        if (w.index < x.index && y.index > z.index) {
             return true;
         }
-        else if (e1.source.index > e2.source.index && e1.target.index < e2.target.index) {
+        if (w.index > x.index && y.index < z.index) {
             return true;
         } 
         return false;
     }
 
     /**
-     * Helper function to keep track of nodes
-     * @param {*} callback Function to perform on edge
-     * @returns Returns sum of based on callback
-     * @author Heath Dyer
-     */
-    iterateEdges = (callback) => {
-        // let result = 0;
-        // let visitedEdges = new Set();
-        // graph.nodes.forEach(node => {
-        //     node.edges.forEach(edge => {
-        //         if (!visitedEdges.has(edge)) {
-        //             result = callback(result, edge);
-        //             visitedEdges.add(edge);
-        //         }
-        //     });
-        // });
-        // return result;
-    }
-
-    /**
      * Number of edges that cross edge in graph
      * c(e) = the number of edges that cross edge e
+     * @params e edge to check for crossings
      * @author Heath Dyer
      */
-    getEdgeCrossings(edge) {
-        let result = 0;
+    getEdgeCrossings(e) {
+        let crossings = 0;
         let visitedEdges = new Set();
-        graph.nodes.forEach(node => {
-            node.edges.forEach(e => {
-                if (e !== edge && !visitedEdges.has(edge) && this.isEdgeCrossed(edge, e)) {
-                    result += 1;
-                    visitedEdges.add(edge);
+        this.nodes.forEach(node => {
+            node.edges.forEach(f => {
+                if (e != f && !visitedEdges.has(f) && this.isEdgeCrossed(e, f)) {
+                    // console.log(`${e.attributes.get("label")} crosses ${f.attributes.get("label")}`);
+                    crossings += 1;
                 }
+                visitedEdges.add(f);
             });
         });
-        return result;
+        return crossings;
     }
 
     /**
@@ -72,13 +73,17 @@ export default class LayeredGraph extends Graph {
      * @author Heath Dyer
      */
     getTotalCrossings() {
-        let result = 0;
-        graph.nodes.forEach(node => {
+        let total = 0;
+        let visitedEdges = new Set();
+        this.nodes.forEach(node => {
             node.edges.forEach(e => {
-                result += this.getEdgeCrossings(e);
+                if (!visitedEdges.has(e)) {
+                    total += this.getEdgeCrossings(e);
+                    visitedEdges.add(e);
+                }
             });
         });
-        return result;
+        return total / 2;
     }
 
     /**
@@ -88,11 +93,15 @@ export default class LayeredGraph extends Graph {
      */
     getBottleneckCrossings() {
         let max = 0;
-        graph.nodes.forEach(node => {
+        let visitedEdges = new Set();
+        this.nodes.forEach(node => {
             node.edges.forEach(e => {
-                const crossings = this.getEdgeCrossings(e);
-                if (crossings > max) {
-                    max = crossings;
+                if (!visitedEdges.has(e)) {
+                    const crossings = this.getEdgeCrossings(e);
+                    if (crossings > max) {
+                        max = crossings;
+                    }
+                    visitedEdges.add(e);
                 }
             });
         });
@@ -101,14 +110,13 @@ export default class LayeredGraph extends Graph {
 
     /**
      * Helper function to get non-verticality of edge
-     * layer =y ,,, index = x
      * Non-verticality of edge e = xy is (position(x) – position()y)2
      * @author Heath Dyer
      */
-    getNonVerticality(edge) {
-        const source = getSource(graph, edge);
-        const target = getTarget(graph, edge);
-        return (source.index - target.index) ** 2;
+    getNonVerticality(e) {
+        const source = this.nodes.get(e.source);
+        const target = this.nodes.get(e.target);
+        return (source.position.x - target.position.x) ** 2;
     }
 
     /**
@@ -118,26 +126,34 @@ export default class LayeredGraph extends Graph {
      */
     getTotalNonVerticality() {
         let result = 0;
-        graph.nodes.forEach(node => {
+        let visitedEdges = new Set();
+        this.nodes.forEach(node => {
             node.edges.forEach(e => {
-                result += this.getNonVerticality(e);
+                if (!visitedEdges.has(e)) {
+                    result += this.getNonVerticality(e);
+                    visitedEdges.add(e);
+                }
             });
         });
         return result;
     }
 
     /**
-     * Gets bottleneck vertically of graph
+     * Gets bottleneck non-verticality of graph
      * Bottleneck non-verticality = max over e of nv(e)
      * @author Heath Dyer
      */
-    getBottleneckVerticality() {
+    getBottleneckNonVerticality() {
         let max = 0;
-        graph.nodes.forEach(node => {
+        let visitedEdges = new Set();
+        this.nodes.forEach(node => {
             node.edges.forEach(e => {
-                const crossings = this.getTotalNonVerticality(e);
-                if (crossings > max) {
-                    max = crossings;
+                if (!visitedEdges.has(e)) {
+                    const nonVerticality = this.getNonVerticality(e);
+                    if (nonVerticality > max) {
+                        max = nonVerticality;
+                    }
+                    visitedEdges.add(e);
                 }
             });
         });

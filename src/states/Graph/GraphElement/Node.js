@@ -40,8 +40,8 @@ export default class Node extends GraphElement {
         }
 
         // Set the index and layer
-        this.index = index;
         this.layer = layer;
+        this.index = index;
 
         // Create a map between adjacent nodes and their edge objects
         this.edges = new Map();
