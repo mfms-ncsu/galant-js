@@ -111,6 +111,7 @@ export default class LayeredGraph extends Graph {
     /**
      * Helper function to get non-verticality of edge
      * Non-verticality of edge e = xy is (position(x) – position()y)2
+     * @params e Edge to get non-verticality of
      * @author Heath Dyer
      */
     getNonVerticality(e) {

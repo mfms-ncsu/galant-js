@@ -1,10 +1,14 @@
+/**
+ * @author Heath Dyer
+ * Tests for Layered Graph functions related to crossings
+ */
+
 import Graph from "states/Graph/Graph";
 import LayeredGraph from "states/Graph/LayeredGraph";
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import Edge from "states/Graph/GraphElement/Edge";
 import Node from "states/Graph/GraphElement/Node";
 import FileParser from "interfaces/FileParser/FileParser";
-
 
 describe("LayeredGraph", () => {
     let graph;
