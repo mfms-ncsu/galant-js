@@ -3,6 +3,7 @@ import ChangeObject from "states/ChangeManager/ChangeObject";
 import Graph from "states/Graph/Graph";
 import Edge from "states/Graph/GraphElement/Edge";
 import Node from "states/Graph/GraphElement/Node";
+import LayeredGraph from "states/Graph/LayeredGraph";
 
 /** Enable maps in immer */
 enableMapSet();
@@ -1457,6 +1458,10 @@ function toString(graph) {
   // TODO: Headers
   let content = "";
 
+  graph.comments.forEach((comment) => {
+    content += `${comment}\n`;
+  })
+
   // Loop over each node
   graph.nodes.forEach((node) => {
     // Get the attributes string
@@ -1478,13 +1483,24 @@ function toString(graph) {
       node.attributes.get("weight") !== undefined
         ? ` ${node.attributes.get("weight")}`
         : "";
-
+    
     // Add the node line
-    content += `n ${node.id} ${node.position.x
-      .toFixed(4)
-      .replace(/[.,]0000$/, "")} ${node.position.y
-      .toFixed(4)
-      .replace(/[.,]0000$/, "")}${weightString}${attributesString}\n`;
+    if (graph instanceof LayeredGraph) {
+        // Add the node line
+            content += `n ${node.id} ${node.layer
+            .toFixed(4)
+            .replace(/[.,]0000$/, "")} ${node.index
+            .toFixed(4)
+            .replace(/[.,]0000$/, "")}${weightString}${attributesString}\n`;
+    }
+    else {
+        // Add the node line
+        content += `n ${node.id} ${node.position.x
+            .toFixed(4)
+            .replace(/[.,]0000$/, "")} ${node.position.y
+            .toFixed(4)
+            .replace(/[.,]0000$/, "")}${weightString}${attributesString}\n`;
+    }
   });
 
   // Loop over each edge
@@ -1516,7 +1532,6 @@ function toString(graph) {
       }
     });
   });
-
   // Return the string
   return content;
 }

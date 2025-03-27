@@ -110,6 +110,7 @@ function parseLine(graph, line) {
     switch (true) {
         case commentRegex.test(line):
             // Ignore comments
+            parseComment(graph, line);
             return;
         case nodeRegex.test(line):
             parseNode(graph, values);
@@ -121,6 +122,16 @@ function parseLine(graph, line) {
             // If the line was not a node or an edge, throw an exception
             throw new Error("input line from file: \"" + line + "\" is not a valid node or edge.");
     }
+}
+
+/**
+ * @author Heath Dyer (hadyer)
+ * TODO: add better comment & header handling system
+ * @param {*} graph Graph to update
+ * @param {*} line 
+ */
+function parseComment(graph, line) {
+    graph.comments.add(line);
 }
 
 /**

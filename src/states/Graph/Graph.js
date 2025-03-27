@@ -25,6 +25,8 @@ export default class Graph {
   showNodeWeights = true;
   /** Graph type */
   type;
+  /** Store graph comments */
+  comments;
 
   /**
    * Creates a new graph with nodes.
@@ -33,5 +35,6 @@ export default class Graph {
     this.type = type;
     this.name = name;
     this.nodes = new Map();
+    this.comments = new Set();
   }
 }

@@ -1,6 +1,8 @@
 import GraphInterface from 'interfaces/GraphInterface/GraphInterface';
 import FileParser from 'interfaces/FileParser/FileParser';
 import ChangeManager from 'states/ChangeManager/ChangeManager';
+import LayeredGraphInterface from 'interfaces/GraphInterface/LayeredGraphInterface';
+import { RampRightOutlined } from '@mui/icons-material';
 
 /**
  * Execution environment for algorithms. This file provides all necessary functions
@@ -723,6 +725,38 @@ function showNodeLabel(node) {
 function showEdgeLabel(edge) {
     setAttribute(edge, "labelHidden", false);
 }
+
+/** Layered graph functions 
+ * @author Heath Dyer
+*/
+
+function isEdgeCrossed(e, f) {
+    return LayeredGraphInterface.isEdgeCrossed(graph, e, f);
+}
+
+function getEdgeCrossings(e) {
+    return LayeredGraphInterface.getEdgeCrossings(graph, e);
+} 
+
+function getTotalCrossings() {
+    return LayeredGraphInterface.getTotalCrossings(graph);
+} 
+
+function getBottleneckCrossings() {
+    return LayeredGraphInterface.getBottleneckCrossings(graph);
+} 
+
+function getNonVerticality(e) {
+    return LayeredGraphInterface.getNonVerticality(graph, e);
+} 
+
+function getTotalNonVerticality() {
+    return LayeredGraphInterface.getTotalNonVerticality(graph);
+} 
+
+function getBottleneckNonVerticality() {
+    return LayeredGraphInterface.getBottleneckNonVerticality(graph);
+} 
 
 /**************************************************************/
 /*************** End of algorithm methods *********************/

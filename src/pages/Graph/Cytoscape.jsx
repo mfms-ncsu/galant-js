@@ -166,10 +166,6 @@ export default function CytoscapeComponent() {
                 {message && <p className="absolute z-10 px-2 py-1 rounded-b-lg bg-black text-white text-lg font-semibold">{message}</p>}
             </div>
             <div id="cytoscape-instance" ref={cytoscapeElement} className="w-full h-full bg-transparent" />
-            { graph && graph.type == "layered" &&
-            <h3 className="absolute top-5 left-1/2 -translate-x-1/2 rounded-lg text-lg outline outline-slate-200 p-2 bg-white">Crossings: {graph.getTotalCrossings()} | BottleneckCrossings: {graph.getBottleneckCrossings()} | 
-                Nonverticality: {graph.getTotalNonVerticality()} | BottleneckNonVerticality: {graph.getBottleneckNonVerticality()}</h3>
-            }
         </div>
     );
 }
