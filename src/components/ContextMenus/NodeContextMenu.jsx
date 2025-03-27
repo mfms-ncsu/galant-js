@@ -63,9 +63,19 @@ export default function NodeContextMenu() {
         const label = values.label.trim();
         const weight = parseInt(String(values.weight).trim()) || undefined;
 
+        // Start recording, so changing the label and weight happen
+        // in one step
+        let [newGraph, newChangeManager] = [];
+        newChangeManager = GraphInterface.startRecording(userChangeManager);
+
         // Set the changes
-        let [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graph, userChangeManager, node.id(), "label", label);
+        [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graph, newChangeManager, node.id(), "label", label);
         [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(newGraph, newChangeManager, node.id(), "weight", weight);
+
+        // Stop recording
+        newChangeManager = GraphInterface.endRecording(newChangeManager);
+
+        // Set the new graph and change manager
         setGraph(newGraph);
         setUserChangeManager(newChangeManager);
     }
