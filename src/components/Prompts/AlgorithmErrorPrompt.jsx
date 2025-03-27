@@ -53,7 +53,7 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
         <div className="flex flex-col max-h-full bg-white shadow-lg p-4 rounded-xl" ref={promptRef}>
             <span className="block text-center text-red-500 font-semibold pointer-events-none select-none">{title}</span>
             <span className="block text-center text-red-500 pointer-events-none select-none">{error}</span>
-            <pre className="overflow-auto my-4">{errorObject.stack}</pre>
+            <pre className="my-4">{errorObject.stack}</pre>
             <PrimaryButton onClick={callback}>Okay</PrimaryButton>
         </div>
     )
