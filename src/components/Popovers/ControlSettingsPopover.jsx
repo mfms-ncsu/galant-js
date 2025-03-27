@@ -18,7 +18,7 @@ export default function ControlSettingsPopover() {
 
     // Function to handle auto layout action
     function autoLayout() {
-        Cytoscape.layout({ name: "cose-bilkent" });
+        Cytoscape.layout({ name: "cose-bilkent" }).run();
     }
 
     // Function to toggle the popover menu
