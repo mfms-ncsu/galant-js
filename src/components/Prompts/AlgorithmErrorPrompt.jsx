@@ -18,7 +18,10 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
         code = "Your code took longer than 5 seconds to execute.\nFor technical reasons, we're not able to discern where in your code this occured.\nSorry!";
     } else {
         
-
+        // Get the stack trace of the error, split it by newlines, then
+        // split the first element by ":", and finally get the second
+        // to last element of that array. That will be the line number
+        // of the element.
         let errArr = errorObject.stack.split("\n")[0].split(":");
         let errNum = parseInt(errArr[errArr.length - 2]);
 
