@@ -77,7 +77,7 @@ export default function EditControls() {
         return () => {
             document.removeEventListener("keydown", onKeyDown);
         }
-    }, []);
+    }, [graph]);
 
     return userChangeManager.changes.length > 0 && (
         <div id="edit-overlay" className="absolute left-0 right-0 bottom-1 flex flex-col items-center pointer-events-none">
