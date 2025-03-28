@@ -1,6 +1,4 @@
 import GraphInterface from "../GraphInterface/GraphInterface"
-import Cytoscape from "../globals/Cytoscape"
-import { renderToString } from "react-dom/server";
 
 /**
  * CytoscapeInterface returns the graph represented in cytoscape 
