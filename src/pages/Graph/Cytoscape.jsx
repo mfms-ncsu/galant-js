@@ -21,15 +21,17 @@ export default function CytoscapeComponent() {
      */
     useEffect(() => {
         // Return if window.cytoscape has already been mounted
-        if (Cytoscape.container()) return;
-
-        // Initialize the cytoscape instance
-        Cytoscape.mount(cytoscapeElement.current);
-        Cytoscape.add(CytoscapeInterface.getElements(graph));
-        Cytoscape.style(CytoscapeInterface.getStyle(graph)).update();
-        Cytoscape.minZoom(0.1);
-        Cytoscape.maxZoom(10);
-        Cytoscape.autounselectify(true); // Disable multi-select for now (until supported in ChangeRecords)
+        // if (!Cytoscape.container()) {
+        
+            // Initialize the cytoscape instance
+            Cytoscape.mount(cytoscapeElement.current);
+            Cytoscape.add(CytoscapeInterface.getElements(graph));
+            Cytoscape.style(CytoscapeInterface.getStyle(graph)).update();
+            Cytoscape.minZoom(0.1);
+            Cytoscape.maxZoom(10);
+            Cytoscape.autounselectify(true); // Disable multi-select for now (until supported in ChangeRecords)
+        // }
+        
         Cytoscape.nodeHtmlLabel([{
             query: "node",
             valign: "top",
@@ -66,7 +68,7 @@ export default function CytoscapeComponent() {
         window.cytoscape = Cytoscape;
 
         // react-hooks/exhaustive-deps
-    }, [cytoscapeElement]);
+    }, [cytoscapeElement, graph]);
 
     /**
      * Create a function to call whenever cytoscape needs to be updated
