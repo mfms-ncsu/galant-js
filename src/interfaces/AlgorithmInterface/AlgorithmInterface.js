@@ -314,8 +314,6 @@ function onMessage(algorithm, message) {
             if (algorithm.onStepAdded) algorithm.onStepAdded();
             algorithm.completed = true;
             break;
-        case "redraw":
-            break;
         case "error":
             newQueue = PromptInterface.queuePrompt(
                 promptQueue,
