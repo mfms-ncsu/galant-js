@@ -21,6 +21,10 @@ export default function CytoscapeComponent() {
      */
     useEffect(() => {
         // Return if window.cytoscape has already been mounted
+
+        // TODO: To get the Node HTML labels to update properly, we need to
+        // restart cytoscape with each change. There must be a more efficient
+        // way to do this.
         // if (!Cytoscape.container()) {
         
             // Initialize the cytoscape instance
