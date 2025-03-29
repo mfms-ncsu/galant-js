@@ -678,6 +678,14 @@ function showAllNodeLabels() {
     setAttributeAll("nodes", "labelHidden", false);
 }
 
+function isHidden(id) {
+    return getAttribute(id, "hidden") == true;
+}
+
+function visibleNeighbors(node) {
+    return GraphInterface.getAdjacentNodes(graph, node).filter((node) => GraphInterface.getNodeAttribute(graph, node, "hidden") !== true);
+}
+
 function hideNode(node) {
     setAttribute(node, "hidden", true); 
 }
