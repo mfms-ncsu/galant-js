@@ -203,16 +203,16 @@ function evenlySpacedLayout(graph, changeManager) {
     }
 
     // Find the "widest" layer (most nodes) and the total number of layers
+    let minIndex = 0;
     let maxIndex = 0;
-    let widestLayer = 0;
     let maxLayer = 0;
     for (const node of graph.nodes.values()) {
-        if (node.index > maxIndex) {
-            maxIndex = node.index;
-            widestLayer = node.layer;
-        }
+        maxIndex = Math.max(maxIndex, node.index);
+        minIndex = Math.min(minIndex, node.index);
         maxLayer = Math.max(maxLayer, node.layer);
     }
+
+    const widestLayer = maxIndex - minIndex;
 
     // Iterate over each layer and space the nodes evenly to fit the "widest" layer
     let newGraph = graph;
@@ -220,7 +220,7 @@ function evenlySpacedLayout(graph, changeManager) {
     for (let i = 0; i <= maxLayer; i++) {
         const layer = nodesOnLayer(graph, i);
         const layerWidth = layer.length;
-        const stepSize = (maxIndex + 1) / layerWidth;
+        const stepSize = widestLayer / (layerWidth - 1);
         for (let j = 0; j < layerWidth; j++) {
             const node = layer[j];
 
