@@ -2,6 +2,7 @@ import Cytoscape from 'globals/Cytoscape';
 import { useAtom } from "jotai";
 import { graphAtom, userChangeManagerAtom } from 'states/_atoms/atoms';
 import GraphInterface from "interfaces/GraphInterface/GraphInterface.js";
+import LayeredGraphInterface from "interfaces/GraphInterface/LayeredGraphInterface.js";
 import { Popover } from '@headlessui/react'
 import PreferenceButton from 'components/Buttons/PreferenceButton';
 import SecondaryButton from 'components/Buttons/SecondaryButton';
@@ -60,6 +61,12 @@ export default function ControlSettingsPopover() {
         layout.run();
     }
 
+    function evenlySpacedLayout() {
+        const [newGraph, newChangeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, userChangeManager);
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
+    }
+
     // Function to toggle the popover menu
     function toggle() {
         button.current && button.current.click();
@@ -73,8 +80,9 @@ export default function ControlSettingsPopover() {
 
             <Popover.Panel className="absolute right-0 z-10 w-64 p-4 pt-2 rounded-xl bg-white shadow-lg pointer-events-auto">
                 <p className='text-lg font-semibold text-center'>Controls</p>
-                <SecondaryButton onClick={(e) => autoCamera()} className="my-2">Auto Camera</SecondaryButton>
-                <SecondaryButton onClick={(e) => autoLayout()}>Auto Layout</SecondaryButton>
+                <SecondaryButton onClick={(e) => autoCamera()} className="mb-2">Auto Camera</SecondaryButton>
+                <SecondaryButton onClick={(e) => autoLayout()} className="mb-2">Auto Layout</SecondaryButton>
+                <SecondaryButton onClick={(e) => evenlySpacedLayout()}>Evenly-Spaced Layout</SecondaryButton>
             </Popover.Panel>
         </Popover>
     );

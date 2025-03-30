@@ -1676,6 +1676,7 @@ const GraphInterface = {
   setNodeAttribute,
   setNodeAttributeAll,
   setNodePosition,
+  setNodePositionLayered,
   setNodeSize,
   setShowEdgeLabels,
   setShowEdgeWeights,

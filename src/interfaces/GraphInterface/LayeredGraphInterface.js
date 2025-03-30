@@ -1,4 +1,6 @@
 import LayeredGraph from "states/Graph/LayeredGraph";
+import produce, { enableMapSet } from "immer";
+import GraphInterface from "./GraphInterface";
 
 /**
  * Help function that checks if two nodes have an edge crossing
@@ -174,6 +176,69 @@ function getBottleneckNonVerticality(graph) {
     return max;
 }
 
+/**
+ * Returns an array (list) of all the nodes in the provided layer, sorted by index.
+ * @param {Graph} graph Graph on which to operate
+ * @param {Number} layerIndex the layer to return
+ */
+function nodesOnLayer(graph, layerIndex) {
+    return Array.from(graph.nodes.values())
+        // Filter the nodes to only those on the same layer
+        .filter(n => n.layer == layerIndex)
+        // Sort the nodes by X coordinate (ascending order)
+        .sort((a, b) => a.index - b.index);
+}
+
+/**
+ * Runs the evenly-spaced layout on the provided layered graph
+ * @param {Graph} graph Graph on which to operate
+ * @param {ChangeManager} changeManager ChangeManager to use for storing changes
+ */
+function evenlySpacedLayout(graph, changeManager) {
+
+    if (graph.type != "layered") {
+        throw new Error(
+            `Cannot run evenly-spaced layout because this is not a layered graph`
+        );
+    }
+
+    // Find the "widest" layer (most nodes) and the total number of layers
+    let maxIndex = 0;
+    let widestLayer = 0;
+    let maxLayer = 0;
+    for (const node of graph.nodes.values()) {
+        if (node.index > maxIndex) {
+            maxIndex = node.index;
+            widestLayer = node.layer;
+        }
+        maxLayer = Math.max(maxLayer, node.layer);
+    }
+
+    // Iterate over each layer and space the nodes evenly to fit the "widest" layer
+    let newGraph = graph;
+    let newChangeManager = changeManager;
+    for (let i = 0; i <= maxLayer; i++) {
+        const layer = nodesOnLayer(graph, i);
+        const layerWidth = layer.length;
+        const stepSize = (maxIndex + 1) / layerWidth;
+        for (let j = 0; j < layerWidth; j++) {
+            const node = layer[j];
+
+            const newPosition = {
+                x: Math.round(j * stepSize),
+                y: node.position.y,
+            };
+        
+            // Update the node's position
+            newGraph = produce(newGraph, (draft) => {
+                draft.nodes.get(node.id).position = newPosition;
+            });
+        }
+    }
+
+    return [newGraph, newChangeManager];
+}
+
 const LayeredGraphInterface = {
     isEdgeCrossed,
     getEdgeCrossings,
@@ -182,5 +247,7 @@ const LayeredGraphInterface = {
     getNonVerticality,
     getTotalNonVerticality,
     getBottleneckNonVerticality,
+    nodesOnLayer,
+    evenlySpacedLayout,
 };
 export default LayeredGraphInterface;
