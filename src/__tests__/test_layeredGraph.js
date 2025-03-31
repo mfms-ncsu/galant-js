@@ -12,13 +12,14 @@ import Node from "states/Graph/GraphElement/Node";
 import FileParser from "interfaces/FileParser/FileParser";
 
 describe("LayeredGraph", () => {
-    let graph;
+    let graph, standardGraph;
     let A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U , V, W, X, Y ,Z, AA, BB, CC, DD, EE, FF, GG, HH, II, JJ;
 
     // Load in graph
     beforeEach(() => {
         // this graph can be found in __tests__/test_files/layered-graph.sgf
         graph = FileParser.loadGraph("example 20", "c created by dot+ord2sgf, date/time = Sat Dec 19 21:09:50 UTC 2020\nc $Id: dot+ord2sgf 66 2014-03-29 16:58:11Z mfms $\nc ./minimization -h vertical_bary -i 10 -w _ ../testing/TestData/ex_20.sgf\nt ex_20 20 36 4\nn 0 0 1\nn 1 0 0\nn 2 0 2\nn 3 0 3\nn 4 0 4\nn 5 1 1\nn 6 1 0\nn 7 1 4\nn 8 1 3\nn 9 1 2\nn 10 2 1\nn 11 2 4\nn 12 2 2\nn 13 2 0\nn 14 2 3\nn 15 3 1\nn 16 3 3\nn 17 3 0\nn 18 3 2\nn 19 3 4\ne 0 5 label:A\ne 1 5 label:B\ne 3 5 label:C\ne 0 6 label:D\ne 1 6 label:E\ne 0 7 label:F\ne 3 7 label:G\ne 4 7 label:H\ne 2 8 label:I\ne 3 8 label:J\ne 4 8 label:K\ne 0 9 label:L\ne 6 10 label:M\ne 8 10 label:N\ne 7 11 label:O\ne 8 11 label:P\ne 5 12 label:Q\ne 9 12 label:R\ne 5 13 label:S\ne 5 14 label:T\ne 8 14 label:U\ne 9 14 label:V\ne 11 15 label:W\ne 12 15 label:X\ne 13 15 label:Y\ne 14 15 label:Z\ne 10 16 label:AA\ne 11 16 label:BB\ne 14 16 label:CC\ne 13 17 label:DD\ne 10 18 label:EE\ne 11 18 label:FF\ne 12 18 label:GG\ne 14 18 label:HH\ne 11 19 label:II\ne 12 19 label:JJ");
+        standardGraph = FileParser.loadGraph("example 20", "c created by dot+ord2sgf, date/time = Sat Dec 19 21:09:50 UTC 2020\nc $Id: dot+ord2sgf 66 2014-03-29 16:58:11Z mfms $\nc ./minimization -h vertical_bary -i 10 -w _ ../testing/TestData/ex_20.txt\nn 0 0 1\nn 1 0 0\nn 2 0 2\nn 3 0 3\nn 4 0 4\nn 5 1 1\nn 6 1 0\nn 7 1 4\nn 8 1 3\nn 9 1 2\nn 10 2 1\nn 11 2 4\nn 12 2 2\nn 13 2 0\nn 14 2 3\nn 15 3 1\nn 16 3 3\nn 17 3 0\nn 18 3 2\nn 19 3 4\ne 0 5 label:A\ne 1 5 label:B\ne 3 5 label:C\ne 0 6 label:D\ne 1 6 label:E\ne 0 7 label:F\ne 3 7 label:G\ne 4 7 label:H\ne 2 8 label:I\ne 3 8 label:J\ne 4 8 label:K\ne 0 9 label:L\ne 6 10 label:M\ne 8 10 label:N\ne 7 11 label:O\ne 8 11 label:P\ne 5 12 label:Q\ne 9 12 label:R\ne 5 13 label:S\ne 5 14 label:T\ne 8 14 label:U\ne 9 14 label:V\ne 11 15 label:W\ne 12 15 label:X\ne 13 15 label:Y\ne 14 15 label:Z\ne 10 16 label:AA\ne 11 16 label:BB\ne 14 16 label:CC\ne 13 17 label:DD\ne 10 18 label:EE\ne 11 18 label:FF\ne 12 18 label:GG\ne 14 18 label:HH\ne 11 19 label:II\ne 12 19 label:JJ");
         // get edges for easy reference
         A = GraphInterface.getEdge(graph, "0", "5");
         B = GraphInterface.getEdge(graph, "1", "5");
@@ -61,124 +62,435 @@ describe("LayeredGraph", () => {
     test("Can detect if two edges are crossing", () => {
         // Graph is loaded in
         expect(graph).toBeInstanceOf(LayeredGraph);
+        expect(() => { LayeredGraphInterface.isCrossed(standardGraph, B, D) }).toThrow(Error);
         // Testing some valid edge crossings
-        expect(LayeredGraphInterface.isEdgeCrossed(graph, B, D)).toBe(true);
-        expect(LayeredGraphInterface.isEdgeCrossed(graph, C, L)).toBe(true);
-        expect(LayeredGraphInterface.isEdgeCrossed(graph, C, F)).toBe(true);
-        expect(LayeredGraphInterface.isEdgeCrossed(graph, K, G)).toBe(true);
-        expect(LayeredGraphInterface.isEdgeCrossed(graph, M, S)).toBe(true);
+        expect(LayeredGraphInterface.isCrossed(graph, B, D)).toBe(true);
+        expect(LayeredGraphInterface.isCrossed(graph, C, L)).toBe(true);
+        expect(LayeredGraphInterface.isCrossed(graph, C, F)).toBe(true);
+        expect(LayeredGraphInterface.isCrossed(graph, K, G)).toBe(true);
+        expect(LayeredGraphInterface.isCrossed(graph, M, S)).toBe(true);
         // Testing invaid edge crossings
-        expect(LayeredGraphInterface.isEdgeCrossed(graph, A, B)).toBe(false);
-        expect(LayeredGraphInterface.isEdgeCrossed(graph, B, C)).toBe(false);
-        expect(LayeredGraphInterface.isEdgeCrossed(graph, L, K)).toBe(false);
-        expect(LayeredGraphInterface.isEdgeCrossed(graph, S, A)).toBe(false);
-        expect(LayeredGraphInterface.isEdgeCrossed(graph, M, F)).toBe(false);
+        expect(LayeredGraphInterface.isCrossed(graph, A, B)).toBe(false);
+        expect(LayeredGraphInterface.isCrossed(graph, B, C)).toBe(false);
+        expect(LayeredGraphInterface.isCrossed(graph, L, K)).toBe(false);
+        expect(LayeredGraphInterface.isCrossed(graph, S, A)).toBe(false);
+        expect(LayeredGraphInterface.isCrossed(graph, M, F)).toBe(false);
     });
 
     test("Can get edge crossings for single edge", () => {
         // Graph loaded in
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, A)).toBe(0);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, B)).toBe(1);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, C)).toBe(3);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, D)).toBe(1);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, E)).toBe(0);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, F)).toBe(4);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, G)).toBe(1);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, H)).toBe(0);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, I)).toBe(2);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, J)).toBe(1);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, K)).toBe(2);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, L)).toBe(1);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, M)).toBe(1);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, N)).toBe(4);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, O)).toBe(0);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, P)).toBe(0);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, Q)).toBe(1);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, R)).toBe(2);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, S)).toBe(1);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, T)).toBe(2);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, U)).toBe(0);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, V)).toBe(1);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, W)).toBe(6);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, X)).toBe(2);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, Y)).toBe(0);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, Z)).toBe(4);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, AA)).toBe(6);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, BB)).toBe(1);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, CC)).toBe(3);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, DD)).toBe(0);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, EE)).toBe(3);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, FF)).toBe(3);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, GG)).toBe(3);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, HH)).toBe(3);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, II)).toBe(0);
-        expect(LayeredGraphInterface.getEdgeCrossings(graph, JJ)).toBe(6);
+        expect(graph).toBeInstanceOf(LayeredGraph);
+        expect(() => { LayeredGraphInterface.crossings(standardGraph, A) }).toThrow(Error);
+        expect(LayeredGraphInterface.crossings(graph, A)).toBe(0);
+        expect(LayeredGraphInterface.crossings(graph, B)).toBe(1);
+        expect(LayeredGraphInterface.crossings(graph, C)).toBe(3);
+        expect(LayeredGraphInterface.crossings(graph, D)).toBe(1);
+        expect(LayeredGraphInterface.crossings(graph, E)).toBe(0);
+        expect(LayeredGraphInterface.crossings(graph, F)).toBe(4);
+        expect(LayeredGraphInterface.crossings(graph, G)).toBe(1);
+        expect(LayeredGraphInterface.crossings(graph, H)).toBe(0);
+        expect(LayeredGraphInterface.crossings(graph, I)).toBe(2);
+        expect(LayeredGraphInterface.crossings(graph, J)).toBe(1);
+        expect(LayeredGraphInterface.crossings(graph, K)).toBe(2);
+        expect(LayeredGraphInterface.crossings(graph, L)).toBe(1);
+        expect(LayeredGraphInterface.crossings(graph, M)).toBe(1);
+        expect(LayeredGraphInterface.crossings(graph, N)).toBe(4);
+        expect(LayeredGraphInterface.crossings(graph, O)).toBe(0);
+        expect(LayeredGraphInterface.crossings(graph, P)).toBe(0);
+        expect(LayeredGraphInterface.crossings(graph, Q)).toBe(1);
+        expect(LayeredGraphInterface.crossings(graph, R)).toBe(2);
+        expect(LayeredGraphInterface.crossings(graph, S)).toBe(1);
+        expect(LayeredGraphInterface.crossings(graph, T)).toBe(2);
+        expect(LayeredGraphInterface.crossings(graph, U)).toBe(0);
+        expect(LayeredGraphInterface.crossings(graph, V)).toBe(1);
+        expect(LayeredGraphInterface.crossings(graph, W)).toBe(6);
+        expect(LayeredGraphInterface.crossings(graph, X)).toBe(2);
+        expect(LayeredGraphInterface.crossings(graph, Y)).toBe(0);
+        expect(LayeredGraphInterface.crossings(graph, Z)).toBe(4);
+        expect(LayeredGraphInterface.crossings(graph, AA)).toBe(6);
+        expect(LayeredGraphInterface.crossings(graph, BB)).toBe(1);
+        expect(LayeredGraphInterface.crossings(graph, CC)).toBe(3);
+        expect(LayeredGraphInterface.crossings(graph, DD)).toBe(0);
+        expect(LayeredGraphInterface.crossings(graph, EE)).toBe(3);
+        expect(LayeredGraphInterface.crossings(graph, FF)).toBe(3);
+        expect(LayeredGraphInterface.crossings(graph, GG)).toBe(3);
+        expect(LayeredGraphInterface.crossings(graph, HH)).toBe(3);
+        expect(LayeredGraphInterface.crossings(graph, II)).toBe(0);
+        expect(LayeredGraphInterface.crossings(graph, JJ)).toBe(6);
     });
 
     test("Can get total crossings in whole LayeredGraphInterface", () => {
         // LayeredGraphInterface is loaded in
         expect(graph).toBeInstanceOf(LayeredGraph);
-        expect(LayeredGraphInterface.getTotalCrossings(graph)).toBe(34);
+        expect(() => { LayeredGraphInterface.totalCrossings(standardGraph) }).toThrow(Error);
+        expect(LayeredGraphInterface.totalCrossings(graph)).toBe(34);
     });
 
     test("Can calculate bottleneck crossings", () => {
         // Graph is loaded in
         expect(graph).toBeInstanceOf(LayeredGraph);
-        expect(LayeredGraphInterface.getBottleneckCrossings(graph)).toBe(6);
+        expect(() => { LayeredGraphInterface.bottleneckCrossings(standardGraph) }).toThrow(Error);
+        expect(LayeredGraphInterface.bottleneckCrossings(graph)).toBe(6);
     });
 
     test("Gets non-verticallity for single edge", () => {
         // Graph is loaded in
         expect(graph).toBeInstanceOf(LayeredGraph);
-        expect(LayeredGraphInterface.getNonVerticality(graph, A)).toBe(0);
-        expect(LayeredGraphInterface.getNonVerticality(graph, B)).toBe(1);
-        expect(LayeredGraphInterface.getNonVerticality(graph, C)).toBe(4);
-        expect(LayeredGraphInterface.getNonVerticality(graph, D)).toBe(1);
-        expect(LayeredGraphInterface.getNonVerticality(graph, E)).toBe(0);
-        expect(LayeredGraphInterface.getNonVerticality(graph, F)).toBe(9);
-        expect(LayeredGraphInterface.getNonVerticality(graph, G)).toBe(1);
-        expect(LayeredGraphInterface.getNonVerticality(graph, H)).toBe(0);
-        expect(LayeredGraphInterface.getNonVerticality(graph, I)).toBe(1);
-        expect(LayeredGraphInterface.getNonVerticality(graph, J)).toBe(0);
-        expect(LayeredGraphInterface.getNonVerticality(graph, K)).toBe(1);
-        expect(LayeredGraphInterface.getNonVerticality(graph, L)).toBe(1);
-        expect(LayeredGraphInterface.getNonVerticality(graph, M)).toBe(1);
-        expect(LayeredGraphInterface.getNonVerticality(graph, N)).toBe(4);
-        expect(LayeredGraphInterface.getNonVerticality(graph, O)).toBe(0);
-        expect(LayeredGraphInterface.getNonVerticality(graph, P)).toBe(1);
-        expect(LayeredGraphInterface.getNonVerticality(graph, Q)).toBe(1);
-        expect(LayeredGraphInterface.getNonVerticality(graph, R)).toBe(0);
-        expect(LayeredGraphInterface.getNonVerticality(graph, S)).toBe(1);
-        expect(LayeredGraphInterface.getNonVerticality(graph, T)).toBe(4);
-        expect(LayeredGraphInterface.getNonVerticality(graph, U)).toBe(0);
-        expect(LayeredGraphInterface.getNonVerticality(graph, V)).toBe(1);
-        expect(LayeredGraphInterface.getNonVerticality(graph, W)).toBe(9);
-        expect(LayeredGraphInterface.getNonVerticality(graph, X)).toBe(1);
-        expect(LayeredGraphInterface.getNonVerticality(graph, Y)).toBe(1);
-        expect(LayeredGraphInterface.getNonVerticality(graph, Z)).toBe(4);
-        expect(LayeredGraphInterface.getNonVerticality(graph, AA)).toBe(4);
-        expect(LayeredGraphInterface.getNonVerticality(graph, BB)).toBe(1);
-        expect(LayeredGraphInterface.getNonVerticality(graph, CC)).toBe(0);
-        expect(LayeredGraphInterface.getNonVerticality(graph, DD)).toBe(0);
-        expect(LayeredGraphInterface.getNonVerticality(graph, EE)).toBe(1);
-        expect(LayeredGraphInterface.getNonVerticality(graph, FF)).toBe(4);
-        expect(LayeredGraphInterface.getNonVerticality(graph, GG)).toBe(0);
-        expect(LayeredGraphInterface.getNonVerticality(graph, HH)).toBe(1);
-        expect(LayeredGraphInterface.getNonVerticality(graph, II)).toBe(0);
-        expect(LayeredGraphInterface.getNonVerticality(graph, JJ)).toBe(4);
+        expect(() => { LayeredGraphInterface.nonVerticality(standardGraph, A) }).toThrow(Error);
+        expect(LayeredGraphInterface.nonVerticality(graph, A)).toBe(0);
+        expect(LayeredGraphInterface.nonVerticality(graph, B)).toBe(1);
+        expect(LayeredGraphInterface.nonVerticality(graph, C)).toBe(4);
+        expect(LayeredGraphInterface.nonVerticality(graph, D)).toBe(1);
+        expect(LayeredGraphInterface.nonVerticality(graph, E)).toBe(0);
+        expect(LayeredGraphInterface.nonVerticality(graph, F)).toBe(9);
+        expect(LayeredGraphInterface.nonVerticality(graph, G)).toBe(1);
+        expect(LayeredGraphInterface.nonVerticality(graph, H)).toBe(0);
+        expect(LayeredGraphInterface.nonVerticality(graph, I)).toBe(1);
+        expect(LayeredGraphInterface.nonVerticality(graph, J)).toBe(0);
+        expect(LayeredGraphInterface.nonVerticality(graph, K)).toBe(1);
+        expect(LayeredGraphInterface.nonVerticality(graph, L)).toBe(1);
+        expect(LayeredGraphInterface.nonVerticality(graph, M)).toBe(1);
+        expect(LayeredGraphInterface.nonVerticality(graph, N)).toBe(4);
+        expect(LayeredGraphInterface.nonVerticality(graph, O)).toBe(0);
+        expect(LayeredGraphInterface.nonVerticality(graph, P)).toBe(1);
+        expect(LayeredGraphInterface.nonVerticality(graph, Q)).toBe(1);
+        expect(LayeredGraphInterface.nonVerticality(graph, R)).toBe(0);
+        expect(LayeredGraphInterface.nonVerticality(graph, S)).toBe(1);
+        expect(LayeredGraphInterface.nonVerticality(graph, T)).toBe(4);
+        expect(LayeredGraphInterface.nonVerticality(graph, U)).toBe(0);
+        expect(LayeredGraphInterface.nonVerticality(graph, V)).toBe(1);
+        expect(LayeredGraphInterface.nonVerticality(graph, W)).toBe(9);
+        expect(LayeredGraphInterface.nonVerticality(graph, X)).toBe(1);
+        expect(LayeredGraphInterface.nonVerticality(graph, Y)).toBe(1);
+        expect(LayeredGraphInterface.nonVerticality(graph, Z)).toBe(4);
+        expect(LayeredGraphInterface.nonVerticality(graph, AA)).toBe(4);
+        expect(LayeredGraphInterface.nonVerticality(graph, BB)).toBe(1);
+        expect(LayeredGraphInterface.nonVerticality(graph, CC)).toBe(0);
+        expect(LayeredGraphInterface.nonVerticality(graph, DD)).toBe(0);
+        expect(LayeredGraphInterface.nonVerticality(graph, EE)).toBe(1);
+        expect(LayeredGraphInterface.nonVerticality(graph, FF)).toBe(4);
+        expect(LayeredGraphInterface.nonVerticality(graph, GG)).toBe(0);
+        expect(LayeredGraphInterface.nonVerticality(graph, HH)).toBe(1);
+        expect(LayeredGraphInterface.nonVerticality(graph, II)).toBe(0);
+        expect(LayeredGraphInterface.nonVerticality(graph, JJ)).toBe(4);
     });
 
     test("Gets total non-verticallity for graph", () => {
         // Graph is loaded in
         expect(graph).toBeInstanceOf(LayeredGraph);
-        expect(LayeredGraphInterface.getTotalNonVerticality(graph)).toBe(62);
+        expect(() => { LayeredGraphInterface.totalNonVerticality(standardGraph) }).toThrow(Error);
+        expect(LayeredGraphInterface.totalNonVerticality(graph)).toBe(62);
     });
 
     test("Gets bottlnon-verticallity for single edge", () => {
         // Graph is loaded in
         expect(graph).toBeInstanceOf(LayeredGraph);
-        expect(LayeredGraphInterface.getBottleneckNonVerticality(graph)).toBe(9);
+        expect(() => { LayeredGraphInterface.bottleneckVerticality(standardGraph) }).toThrow(Error);
+        expect(LayeredGraphInterface.bottleneckVerticality(graph)).toBe(9);
     });
-    
+
+    test("Gets nodes on layer", () => {
+        // Graph is loaded in
+        expect(graph).toBeInstanceOf(LayeredGraph);
+        expect(() => { LayeredGraphInterface.nodesOnLayer(standardGraph, 0) }).toThrow(Error);
+
+        //test layer 0
+        const layer0 = LayeredGraphInterface.nodesOnLayer(graph, 0);
+        expect(layer0.length).toBe(5);
+        expect(layer0[0]).toBe(graph.nodes.get("1"));
+        expect(layer0[1]).toBe(graph.nodes.get("0"));
+        expect(layer0[2]).toBe(graph.nodes.get("2"));
+        expect(layer0[3]).toBe(graph.nodes.get("3"));
+        expect(layer0[4]).toBe(graph.nodes.get("4"));
+        //test layer 1
+        const layer1 = LayeredGraphInterface.nodesOnLayer(graph, 1);
+        expect(layer1.length).toBe(5);
+        expect(layer1[0]).toBe(graph.nodes.get("6"));
+        expect(layer1[1]).toBe(graph.nodes.get("5"));
+        expect(layer1[2]).toBe(graph.nodes.get("9"));
+        expect(layer1[3]).toBe(graph.nodes.get("8"));
+        expect(layer1[4]).toBe(graph.nodes.get("7"));
+        //test layer 2
+        const layer2 = LayeredGraphInterface.nodesOnLayer(graph, 2);
+        expect(layer2.length).toBe(5);
+        expect(layer2[0]).toBe(graph.nodes.get("13"));
+        expect(layer2[1]).toBe(graph.nodes.get("10"));
+        expect(layer2[2]).toBe(graph.nodes.get("12"));
+        expect(layer2[3]).toBe(graph.nodes.get("14"));
+        expect(layer2[4]).toBe(graph.nodes.get("11"));
+        //test layer 3
+        const layer3 = LayeredGraphInterface.nodesOnLayer(graph, 3);
+        expect(layer3.length).toBe(5);
+        expect(layer3[0]).toBe(graph.nodes.get("17"));
+        expect(layer3[1]).toBe(graph.nodes.get("15"));
+        expect(layer3[2]).toBe(graph.nodes.get("18"));
+        expect(layer3[3]).toBe(graph.nodes.get("16"));
+        expect(layer3[4]).toBe(graph.nodes.get("19"));
+    });
+
+    test("Swaps two nodes", () => {
+        // Graph is loaded as layered graph
+        expect(graph).toBeInstanceOf(LayeredGraph);
+        // Test function doesnt work on standard graphs
+        expect(() => { LayeredGraphInterface.swap(standardGraph, node2, node8) }).toThrow(Error);
+        // try swap nodes on same layer
+        const node0 = graph.nodes.get("0");
+        const node1 = graph.nodes.get("1");
+        expect(node0.index).toBe(1);
+        expect(node0.position.x).toBe(1);
+        expect(node1.index).toBe(0);
+        expect(node1.position.x).toBe(0);
+        LayeredGraphInterface.swap(graph, node0, node1);
+        expect(node0.index).toBe(0);
+        expect(node0.position.x).toBe(0);
+        expect(node1.index).toBe(1);
+        expect(node1.position.x).toBe(1);
+        // try swap nodes on different layer? behavior may change
+        const node2 = graph.nodes.get("2");
+        const node8 = graph.nodes.get("8");
+        expect(() => { LayeredGraphInterface.swap(graph, node2, node8) }).toThrow(Error);
+    });
+
+    test("set weights up by index", () => {
+        // Graph is loaded in
+        expect(graph).toBeInstanceOf(LayeredGraph);
+        expect(() => { LayeredGraphInterface.setWeightsUp(standardGraph, 1, "index") }).toThrow(Error);
+        const node6 = graph.nodes.get("6");
+        const node5 = graph.nodes.get("5");
+        const node9 = graph.nodes.get("9");
+        const node8 = graph.nodes.get("8");
+        const node7 = graph.nodes.get("7");
+        // test by index
+        LayeredGraphInterface.setWeightsUp(graph, 1, "index");
+        expect(node6.attributes.get("weight")).toBe(1 / 2);
+        expect(node5.attributes.get("weight")).toBe(4 / 3);
+        expect(node9.attributes.get("weight")).toBe(1);
+        expect(node8.attributes.get("weight")).toBe(3);
+        expect(node7.attributes.get("weight")).toBe(8 / 3);
+        // test invalid type
+        expect(() => { LayeredGraphInterface.setWeightsUp(graph, 1, "invalid") }).toThrow(Error);
+    });
+
+    test("set weights up by position", () => {
+        // Graph is loaded in
+        expect(graph).toBeInstanceOf(LayeredGraph);
+        expect(() => { LayeredGraphInterface.setWeightsUp(standardGraph, 1, "position") }).toThrow(Error);
+        const node6 = graph.nodes.get("6");
+        const node5 = graph.nodes.get("5");
+        const node9 = graph.nodes.get("9");
+        const node8 = graph.nodes.get("8");
+        const node7 = graph.nodes.get("7");
+        // test by position
+        LayeredGraphInterface.setWeightsUp(graph, 1, "position");
+        expect(node6.attributes.get("weight")).toBe(1 / 2);
+        expect(node5.attributes.get("weight")).toBe(4 / 3);
+        expect(node9.attributes.get("weight")).toBe(1);
+        expect(node8.attributes.get("weight")).toBe(3);
+        expect(node7.attributes.get("weight")).toBe(8 / 3);
+        // test invalid type
+        expect(() => { LayeredGraphInterface.setWeightsUp(graph, 1, "invalid") }).toThrow(Error);
+    });
+
+    test("set weights down by position", () => {
+        // Graph is loaded in
+        expect(graph).toBeInstanceOf(LayeredGraph);
+        expect(() => { LayeredGraphInterface.setWeightsDown(standardGraph, 1, "position") }).toThrow(Error);
+        const node6 = graph.nodes.get("6");
+        const node5 = graph.nodes.get("5");
+        const node9 = graph.nodes.get("9");
+        const node8 = graph.nodes.get("8");
+        const node7 = graph.nodes.get("7");
+        // test by position
+        LayeredGraphInterface.setWeightsDown(graph, 1, "position");
+        expect(node6.attributes.get("weight")).toBe(1);
+        expect(node5.attributes.get("weight")).toBe(5 / 3);
+        expect(node9.attributes.get("weight")).toBe(5 / 2);
+        expect(node8.attributes.get("weight")).toBe(8 / 3);
+        expect(node7.attributes.get("weight")).toBe(4);
+        // test invalid type
+        expect(() => { LayeredGraphInterface.setWeightsDown(graph, 1, "invalid") }).toThrow(Error);
+    });
+
+    test("set weights down by index", () => {
+        // Graph is loaded in
+        expect(graph).toBeInstanceOf(LayeredGraph);
+        expect(() => { LayeredGraphInterface.setWeightsDown(standardGraph, 1, "index") }).toThrow(Error);
+        const node6 = graph.nodes.get("6");
+        const node5 = graph.nodes.get("5");
+        const node9 = graph.nodes.get("9");
+        const node8 = graph.nodes.get("8");
+        const node7 = graph.nodes.get("7");
+        // test by position
+        LayeredGraphInterface.setWeightsDown(graph, 1, "position");
+        expect(node6.attributes.get("weight")).toBe(1);
+        expect(node5.attributes.get("weight")).toBe(5 / 3);
+        expect(node9.attributes.get("weight")).toBe(5 / 2);
+        expect(node8.attributes.get("weight")).toBe(8 / 3);
+        expect(node7.attributes.get("weight")).toBe(4);
+        // test invalid type
+        expect(() => { LayeredGraphInterface.setWeightsDown(graph, 1, "invalid") }).toThrow(Error);
+    });
+
+    test("set weights both by position", () => {
+        // Graph is loaded in
+        expect(graph).toBeInstanceOf(LayeredGraph);
+        expect(() => { LayeredGraphInterface.setWeightsBoth(standardGraph, 1, "position") }).toThrow(Error);
+        const node6 = graph.nodes.get("6");
+        const node5 = graph.nodes.get("5");
+        const node9 = graph.nodes.get("9");
+        const node8 = graph.nodes.get("8");
+        const node7 = graph.nodes.get("7");
+        // test by position
+        LayeredGraphInterface.setWeightsBoth(graph, 1, "position");
+        expect(node6.attributes.get("weight")).toBe(2 / 3);
+        expect(node5.attributes.get("weight")).toBe(9 / 6);
+        expect(node9.attributes.get("weight")).toBe(2);
+        expect(node8.attributes.get("weight")).toBe(17 / 6);
+        expect(node7.attributes.get("weight")).toBe(3);
+        // test invalid type
+        expect(() => { LayeredGraphInterface.setWeightBoth(graph, 1, "invalid") }).toThrow(Error);
+    });
+
+    test("set weights both by index", () => {
+        // Graph is loaded in
+        expect(graph).toBeInstanceOf(LayeredGraph);
+        expect(() => { LayeredGraphInterface.setWeightsBoth(standardGraph, 1, "index") }).toThrow(Error);
+        const node6 = graph.nodes.get("6");
+        const node5 = graph.nodes.get("5");
+        const node9 = graph.nodes.get("9");
+        const node8 = graph.nodes.get("8");
+        const node7 = graph.nodes.get("7");
+        // test by position
+        LayeredGraphInterface.setWeightsBoth(graph, 1, "index");
+        expect(node6.attributes.get("weight")).toBe(2 / 3);
+        expect(node5.attributes.get("weight")).toBe(9 / 6);
+        expect(node9.attributes.get("weight")).toBe(2);
+        expect(node8.attributes.get("weight")).toBe(17 / 6);
+        expect(node7.attributes.get("weight")).toBe(3);
+        // test invalid type
+        expect(() => { LayeredGraphInterface.setWeightBoth(graph, 1, "invalid") }).toThrow(Error);
+    });
+
+    test("Sorts by weight", () => {
+        // Graph is loaded in
+        expect(graph).toBeInstanceOf(LayeredGraph);
+        expect(() => { LayeredGraphInterface.sortByWeight(standardGraph, 1) }).toThrow(Error);
+        //get nodes for reference
+        const node6 = graph.nodes.get("6");
+        const node5 = graph.nodes.get("5");
+        const node9 = graph.nodes.get("9");
+        const node8 = graph.nodes.get("8");
+        const node7 = graph.nodes.get("7");
+        // assign weights and sort
+        LayeredGraphInterface.setWeightsUp(graph, 1, "index");
+        LayeredGraphInterface.sortByWeight(graph, 1);
+        // get nodes in order now and see if in right order
+        const nodesUp = LayeredGraphInterface.nodesOnLayer(graph, 1);
+        expect(nodesUp[0]).toBe(node6);
+        expect(nodesUp[1]).toBe(node9);
+        expect(nodesUp[2]).toBe(node5);
+        expect(nodesUp[3]).toBe(node7);
+        expect(nodesUp[4]).toBe(node8);
+        // assign weights and sort
+        LayeredGraphInterface.setWeightsDown(graph, 1, "index");
+        LayeredGraphInterface.sortByWeight(graph, 1);
+        // get nodes in order now and see if in right order
+        const nodesDown = LayeredGraphInterface.nodesOnLayer(graph, 1);
+        expect(nodesDown[0]).toBe(node6);
+        expect(nodesDown[1]).toBe(node5);
+        expect(nodesDown[2]).toBe(node9);
+        expect(nodesDown[3]).toBe(node8);
+        expect(nodesDown[4]).toBe(node7);
+        // assign weights and sort
+        LayeredGraphInterface.setWeightsBoth(graph, 1, "index");
+        LayeredGraphInterface.sortByWeight(graph, 1);
+        // get nodes in order now and see if in right order
+        const nodesBoth = LayeredGraphInterface.nodesOnLayer(graph, 1);
+        expect(nodesBoth[0]).toBe(node6);
+        expect(nodesBoth[1]).toBe(node5);
+        expect(nodesBoth[2]).toBe(node9);
+        expect(nodesBoth[3]).toBe(node8);
+        expect(nodesBoth[4]).toBe(node7);
+
+    });
+
+    test("Sets layer property", () => {
+        // Graph is loaded in
+        expect(graph).toBeInstanceOf(LayeredGraph);
+        expect(() => { LayeredGraphInterface.setLayerProperty(standardGraph, 0, "weight", 2) }).toThrow(Error);
+        LayeredGraphInterface.setLayerProperty(graph, 0, "someAttribute", "someValue");
+        const node0 = graph.nodes.get("0");
+        const node1 = graph.nodes.get("1");
+        const node2 = graph.nodes.get("2");
+        const node3 = graph.nodes.get("3");
+        const node4 = graph.nodes.get("4");
+        const node5 = graph.nodes.get("5");
+        const node6 = graph.nodes.get("5");
+        const node7 = graph.nodes.get("7");
+        const node8 = graph.nodes.get("8");
+        const node9 = graph.nodes.get("9");
+        const node10 = graph.nodes.get("10");
+
+        //verify values are updated
+        expect(node0.attributes.get("someAttribute")).toBe("someValue");
+        expect(node1.attributes.get("someAttribute")).toBe("someValue");
+        expect(node2.attributes.get("someAttribute")).toBe("someValue");
+        expect(node3.attributes.get("someAttribute")).toBe("someValue");
+        expect(node4.attributes.get("someAttribute")).toBe("someValue");
+        // test some other nodes arent affected
+        expect(node5.attributes.get("someAttribute")).toBeUndefined();
+        expect(node6.attributes.get("someAttribute")).toBeUndefined();
+        expect(node7.attributes.get("someAttribute")).toBeUndefined();
+        expect(node8.attributes.get("someAttribute")).toBeUndefined();
+        expect(node9.attributes.get("someAttribute")).toBeUndefined();
+        expect(node10.attributes.get("someAttribute")).toBeUndefined();
+
+    });
+
+    test("Sets channel property", () => {
+        // Graph is loaded in
+        expect(graph).toBeInstanceOf(LayeredGraph);
+        expect(() => { LayeredGraphInterface.setChannelProperty(standardGraph, 1, "weight", 2) }).toThrow(Error);
+        LayeredGraphInterface.setChannelProperty(graph, 0, "someAttribute", "someValue");
+        //test all edges in channel have attribute
+        expect(A.attributes.get("someAttribute")).toBe("someValue");
+        expect(B.attributes.get("someAttribute")).toBe("someValue");
+        expect(C.attributes.get("someAttribute")).toBe("someValue");
+        expect(D.attributes.get("someAttribute")).toBe("someValue");
+        expect(E.attributes.get("someAttribute")).toBe("someValue");
+        expect(F.attributes.get("someAttribute")).toBe("someValue");
+        expect(G.attributes.get("someAttribute")).toBe("someValue");
+        expect(H.attributes.get("someAttribute")).toBe("someValue");
+        expect(I.attributes.get("someAttribute")).toBe("someValue");
+        expect(J.attributes.get("someAttribute")).toBe("someValue");
+        expect(K.attributes.get("someAttribute")).toBe("someValue");
+        expect(L.attributes.get("someAttribute")).toBe("someValue");
+        //TEST other edges not modified
+        expect(M.attributes.get("someAttribute")).toBeUndefined();
+        expect(N.attributes.get("someAttribute")).toBeUndefined();
+        expect(O.attributes.get("someAttribute")).toBeUndefined();
+        expect(P.attributes.get("someAttribute")).toBeUndefined();
+        expect(Q.attributes.get("someAttribute")).toBeUndefined();
+        expect(R.attributes.get("someAttribute")).toBeUndefined();
+        expect(S.attributes.get("someAttribute")).toBeUndefined();
+        expect(T.attributes.get("someAttribute")).toBeUndefined();
+        expect(U.attributes.get("someAttribute")).toBeUndefined();
+        expect(V.attributes.get("someAttribute")).toBeUndefined();
+        expect(W.attributes.get("someAttribute")).toBeUndefined();
+        expect(X.attributes.get("someAttribute")).toBeUndefined();
+        expect(Y.attributes.get("someAttribute")).toBeUndefined();
+        expect(Z.attributes.get("someAttribute")).toBeUndefined();
+        expect(AA.attributes.get("someAttribute")).toBeUndefined();
+        expect(BB.attributes.get("someAttribute")).toBeUndefined();
+        expect(CC.attributes.get("someAttribute")).toBeUndefined();
+        expect(DD.attributes.get("someAttribute")).toBeUndefined();
+        expect(EE.attributes.get("someAttribute")).toBeUndefined();
+        expect(FF.attributes.get("someAttribute")).toBeUndefined();
+        expect(GG.attributes.get("someAttribute")).toBeUndefined();
+        expect(HH.attributes.get("someAttribute")).toBeUndefined();
+        expect(II.attributes.get("someAttribute")).toBeUndefined();
+        expect(JJ.attributes.get("someAttribute")).toBeUndefined();
+        
+    });
 
 });

@@ -1,20 +1,45 @@
 import LayeredGraph from "states/Graph/LayeredGraph";
 import produce, { enableMapSet } from "immer";
 import GraphInterface from "./GraphInterface";
+import ChangeManager from "states/ChangeManager/ChangeManager";
+
+/**
+ * LayeredGraphInterface contains getters and setters used to interact with Graph objects,
+ * more specifically functions unique to Layered Graphs. When creating a new function make sure
+ * to check it is a l
+ * Graphs are passed in as arguments to the functions and a value is returned. If
+ * using a setter, both a Graph and ChangeManager are passed in and new objects for
+ * the Graph and ChangeManager are returned, which are used to update the state in
+ * React.
+ *
+ * @author Heath Dyer
+ * @author Michael Richardson
+ */
+
+/**
+ * Helper function to handle what to do when a graph
+ * is not a layered graph. Right now throws error if not.
+ * @param {Graph} graph Graph on which to operate
+ * @author Heath Dyer
+ */
+function isLayered(graph) {
+    if (!(graph instanceof LayeredGraph)) {
+        throw new Error("Function can only be performed on layered graphs.");
+    }
+}
 
 /**
  * Help function that checks if two nodes have an edge crossing
  * Edge crossings: two edges e = wy and f = xz cross if one of the following holds
  * index(w) < index(x) and index(y) > index(z)
  * index(w) > index(x) and index(y) < index(z)
- * @params e Edge 1 to check
- * @params f Edge 2 to check
+ * @param {Graph} graph Graph on which to operate
+ * @param {Edge} e Edge 1 to check
+ * @param {Edge} f Edge 2 to check
  * @author Heath Dyer
  */
-function isEdgeCrossed(graph, e, f) {
-    if (!(graph instanceof LayeredGraph)) {
-        throw new Error("Function can only be performed on layered graphs.");
-    }
+function isCrossed(graph, e, f) {
+    isLayered(graph);
     //get nodes
     let w = graph.nodes.get(e.source);
     let y = graph.nodes.get(e.target);
@@ -44,18 +69,17 @@ function isEdgeCrossed(graph, e, f) {
 /**
  * Number of edges that cross edge in graph
  * c(e) = the number of edges that cross edge e
- * @params e edge to check for crossings
+ * @param {Graph} graph Graph on which to operate
+ * @param {Edge} e edge to check for crossings
  * @author Heath Dyer
  */
-function getEdgeCrossings(graph, e) {
-    if (!(graph instanceof LayeredGraph)) {
-        throw new Error("Function can only be performed on layered graphs.");
-    }
+function crossings(graph, e) {
+    isLayered(graph);
     let crossings = 0;
     let visitedEdges = new Set();
     graph.nodes.forEach(node => {
         node.edges.forEach(f => {
-            if (e != f && !visitedEdges.has(f) && this.isEdgeCrossed(graph, e, f)) {
+            if (e != f && !visitedEdges.has(f) && isCrossed(graph, e, f)) {
                 // console.log(`${e.attributes.get("label")} crosses ${f.attributes.get("label")}`);
                 crossings += 1;
             }
@@ -70,18 +94,17 @@ function getEdgeCrossings(graph, e) {
  *  Get total crossings of the graph
  * Total crossings = (sum over e of c(e)) / 2
  * each crossing is counted twice
+ * @param {Graph} graph Graph on which to operate
  * @author Heath Dyer
  */
-function getTotalCrossings(graph) {
-    if (!(graph instanceof LayeredGraph)) {
-        throw new Error("Function can only be performed on layered graphs.");
-    }
+function totalCrossings(graph) {
+    isLayered(graph);
     let total = 0;
     let visitedEdges = new Set();
     graph.nodes.forEach(node => {
         node.edges.forEach(e => {
             if (!visitedEdges.has(e)) {
-                total += this.getEdgeCrossings(graph, e);
+                total += crossings(graph, e);
                 visitedEdges.add(e);
             }
         });
@@ -92,20 +115,19 @@ function getTotalCrossings(graph) {
 /**
  * Gets bottle neck crossings of the graph
  * Bottleneck crossings = max over e of c(e)
+ * @param {Graph} graph Graph on which to operate
  * @author Heath Dyer
  */
-function getBottleneckCrossings(graph) {
-    if (!(graph instanceof LayeredGraph)) {
-        throw new Error("Function can only be performed on layered graphs.");
-    }
+function bottleneckCrossings(graph) {
+    isLayered(graph);
     let max = 0;
     let visitedEdges = new Set();
     graph.nodes.forEach(node => {
         node.edges.forEach(e => {
             if (!visitedEdges.has(e)) {
-                const crossings = this.getEdgeCrossings(graph, e);
-                if (crossings > max) {
-                    max = crossings;
+                const c = crossings(graph, e);
+                if (c > max) {
+                    max = c;
                 }
                 visitedEdges.add(e);
             }
@@ -117,13 +139,12 @@ function getBottleneckCrossings(graph) {
 /**
  * Helper function to get non-verticality of edge
  * Non-verticality of edge e = xy is (position(x) – position()y)2
- * @params e Edge to get non-verticality of
+ * @param {Graph} graph Graph on which to operate
+ * @param {Edge} e Edge to get non-verticality of
  * @author Heath Dyer
  */
-function getNonVerticality(graph, e) {
-    if (!(graph instanceof LayeredGraph)) {
-        throw new Error("Function can only be performed on layered graphs.");
-    }
+function nonVerticality(graph, e) {
+    isLayered(graph);
     const source = graph.nodes.get(e.source);
     const target = graph.nodes.get(e.target);
     return (source.position.x - target.position.x) ** 2;
@@ -132,18 +153,17 @@ function getNonVerticality(graph, e) {
 /**
  * Gets total non-verticality of graph
  * Total non-verticality = sum over e of nv(e)
+ * @param {Graph} graph Graph on which to operate
  * @author Heath Dyer
  */
-function getTotalNonVerticality(graph) {
-    if (!(graph instanceof LayeredGraph)) {
-        throw new Error("Function can only be performed on layered graphs.");
-    }
+function totalNonVerticality(graph) {
+    isLayered(graph);
     let result = 0;
     let visitedEdges = new Set();
     graph.nodes.forEach(node => {
         node.edges.forEach(e => {
             if (!visitedEdges.has(e)) {
-                result += getNonVerticality(graph, e);
+                result += nonVerticality(graph, e);
                 visitedEdges.add(e);
             }
         });
@@ -154,20 +174,19 @@ function getTotalNonVerticality(graph) {
 /**
  * Gets bottleneck non-verticality of graph
  * Bottleneck non-verticality = max over e of nv(e)
+ * @param {Graph} graph Graph on which to operate
  * @author Heath Dyer
  */
-function getBottleneckNonVerticality(graph) {
-    if (!(graph instanceof LayeredGraph)) {
-        throw new Error("Function can only be performed on layered graphs.");
-    }
+function bottleneckVerticality(graph) {
+    isLayered(graph);
     let max = 0;
     let visitedEdges = new Set();
     graph.nodes.forEach(node => {
         node.edges.forEach(e => {
             if (!visitedEdges.has(e)) {
-                const nonVerticality = this.getNonVerticality(graph, e);
-                if (nonVerticality > max) {
-                    max = nonVerticality;
+                const nv = nonVerticality(graph, e);
+                if (nv > max) {
+                    max = nv;
                 }
                 visitedEdges.add(e);
             }
@@ -177,11 +196,253 @@ function getBottleneckNonVerticality(graph) {
 }
 
 /**
+ * sets some attribute of all nodes on layer i to the value
+ * @param {Graph} graph Graph on which to operate
+ * @param {Integer} layer Layer on graph
+ * @param {String} attribute Name of attribute to modify
+ * @param {*} value  Value of attribute to set
+ * @author Heath Dyer
+ */
+function setLayerProperty(graph, layer, attribute, value) {
+    isLayered(graph);
+    const layerNodes = nodesOnLayer(graph, layer);
+    if (layerNodes) {
+        layerNodes.forEach(node => {
+            node.attributes.set(attribute, value);
+        });
+    }
+}
+
+
+/**
+ * Sets some attribute of all edges in channel to the value
+ * @param {Graph} graph Graph on which to operate
+ * @param {Integer} channel channel on graph
+ * @param {String} attribute Name of attribute to modify
+ * @param {*} value  Value of attribute to set
+ * @author Heath Dyer (hadyer)
+ */
+function setChannelProperty(graph, channel, attribute, value) {
+    isLayered(graph);
+    // get all nodes on layer i
+    const layerNodes = nodesOnLayer(graph, channel);
+    // get all edges in channel
+    const channelEdges = new Set();
+    layerNodes.forEach(node => {
+        node.edges.forEach(e => {
+            const source = graph.nodes.get(e.source);
+            const target = graph.nodes.get(e.target);
+            if (source.layer == channel && target.layer == channel + 1) {
+                channelEdges.add(e);
+            }
+            else if (source.layer == channel + 1 && target.layer == channel ) {
+                channelEdges.add(e);
+            }
+        })
+    });
+    //set attrtibute
+    channelEdges.forEach(edge => {
+        edge.attributes.set(attribute, value);
+    })
+}
+
+/**
+ * Assigns weights to all nodes on layer i based on average of positions or 
+ * indexes of adjacent nodes on layer above.
+ * @param {Graph} graph Graph on which to operate
+ * @param {Integer} layer Layer to operate on
+ * @param {String} type Specify "position" or "index"
+ * @author Heath Dyer (hadyer)
+ */
+function setWeightsUp(graph, layer, type) {
+    isLayered(graph);
+    if (type !== "index" && type !== "position") {
+        throw new Error('Invalid type. Type must be "index" or "position".');
+    }
+    // get nodes on layer
+    const layerNodes = nodesOnLayer(graph, layer);
+    // iterate through each node's edges on that layer
+    layerNodes.forEach(node => {
+        //keep track of all nodes for weight calculation
+        const adjacentNodes = new Set();
+        node.edges.forEach(edge => {
+            const source = graph.nodes.get(edge.source);
+            const target = graph.nodes.get(edge.target);
+            // the target is the adjacent node and on layer up?
+            if (source == node && target.layer == layer - 1) {
+                // then we keep track of this node
+                adjacentNodes.add(target);
+            } 
+             // the target is the adjacent node and on layer up?
+            else if (target == node && source.layer == layer - 1) {
+                // then we keep track of this node
+                adjacentNodes.add(source);
+            }
+        })
+        //calculate average weight based on index
+        let total = 0;
+        adjacentNodes.forEach(adjacentNode => {
+            if (type == "index") {
+                total += adjacentNode.index;
+            }
+            else {
+                total += adjacentNode.position.x;
+            }
+        })
+        node.attributes.set("weight", total / adjacentNodes.size);
+    });
+}
+
+/**
+ * Assigns weights to all nodes on layer i based on average of positions or 
+ * indexes of adjacent nodes on layer below.
+ * @param {Graph} graph Graph on which to operate
+ * @param {Integer} layer Layer to operate on
+ * @param {String} type Specify "position" or "index"
+ * @author Heath Dyer (hadyer)
+ */
+function setWeightsDown(graph, layer, type) {
+    isLayered(graph);
+    if (type !== "index" && type !== "position") {
+        throw new Error('Invalid type. Type must be "index" or "position".');
+    }
+    // get nodes on layer
+    const layerNodes = nodesOnLayer(graph, layer);
+    // iterate through each node's edges on that layer
+    layerNodes.forEach(node => {
+        //keep track of all nodes for weight calculation
+        const adjacentNodes = new Set();
+        node.edges.forEach(edge => {
+            const source = graph.nodes.get(edge.source);
+            const target = graph.nodes.get(edge.target);
+            // the target is the adjacent node and on layer down?
+            if (source == node && target.layer == layer + 1) {
+                // then we keep track of this node
+                adjacentNodes.add(target);
+            } 
+             // the target is the adjacent node and on layer down?
+            else if (target == node && source.layer == layer + 1) {
+                // then we keep track of this node
+                adjacentNodes.add(source);
+            }
+        })
+        //calculate average weight based on index
+        let total = 0;
+        adjacentNodes.forEach(adjacentNode => {
+            if (type == "index") {
+                total += adjacentNode.index;
+            }
+            else {
+                total += adjacentNode.position.x;
+            }
+        })
+        node.attributes.set("weight", total / adjacentNodes.size);
+    });
+}
+
+/**
+ * Assigns weights to all nodes on layer i based on average of positions or 
+ * indexes of adjacent nodes on both layers above and below.
+ * @param {Graph} graph Graph on which to operate
+ * @param {Integer} layer Layer to operate on
+ * @param {String} type Specify "position" or "index"
+ * @author Heath Dyer (hadyer)
+ */
+function setWeightsBoth(graph, layer, type) {
+    isLayered(graph);
+    if (type !== "index" && type !== "position") {
+        throw new Error('Invalid type. Type must be "index" or "position".');
+    }
+    // get nodes on layer
+    const layerNodes = nodesOnLayer(graph, layer);
+    // iterate through each node's edges on that layer
+    layerNodes.forEach(node => {
+        //keep track of all nodes for weight calculation
+        const adjacentNodes = new Set();
+        node.edges.forEach(edge => {
+            const source = graph.nodes.get(edge.source);
+            const target = graph.nodes.get(edge.target);
+            // the target is the adjacent node and on layer up?
+            if (source == node && (target.layer == layer + 1 || target.layer == layer - 1)) {
+                // then we keep track of this node
+                adjacentNodes.add(target);
+            } 
+             // the target is the adjacent node and on layer up?
+            else if (target == node && (source.layer == layer + 1 || source.layer == layer - 1)) {
+                // then we keep track of this node
+                adjacentNodes.add(source);
+            }
+        })
+        //calculate average weight based on index
+        let total = 0;
+        adjacentNodes.forEach(adjacentNode => {
+            if (type == "index") {
+                total += adjacentNode.index;
+            }
+            else {
+                total += adjacentNode.position.x;
+            }
+        })
+        node.attributes.set("weight", total / adjacentNodes.size);
+    });
+}
+
+/**
+ * Sorts layer by the weights of its nodes
+ * @param {Graph} graph Graph on which to operate
+ * @param {Integer} layer layer to sort
+ * @author Heath Dyer (hadyer)
+ */
+function sortByWeight(graph, layer) {
+    isLayered(graph);
+    const layerNodes = nodesOnLayer(graph, layer); // Nodes sorted by index
+    for (let j = 0; j < layerNodes.length - 1; j++) {
+        let minIndex = j;
+        // Find the node with the smallest weight in the remaining array
+        for (let k = j + 1; k < layerNodes.length; k++) {
+            if (layerNodes[k].attributes.get("weight") < layerNodes[minIndex].attributes.get("weight")) {
+                minIndex = k;
+            }
+        }
+        // Swap only if the smallest element is not already in place
+        if (minIndex !== j) {
+            swap(graph, layerNodes[j], layerNodes[minIndex]);
+            [layerNodes[j], layerNodes[minIndex]] = [layerNodes[minIndex], layerNodes[j]];
+        }
+    }
+}
+
+/**
+ * Swaps positions (and indexes) of two nodes x and y. Nodes
+ * must be on the same layer to swap.
+ * @param {Graph} graph Graph on which to operate
+ * @param {ChangeManager} changeManager record the swap operation
+ * @param {Node} x node to swap
+ * @param {Node} y  node to swap
+ * @author Heath Dyer (hadyer)
+ */
+function swap(graph, changeManager, x, y) {
+    isLayered(graph)
+    if (x.layer != y.layer) {
+        throw new Error("Nodes must be on the same layer to swap.");
+    }
+    GraphInterface.setNodePosition(graph, );
+    const tempX = x.position.x;
+    const tempIndex = x.index;
+    x.position.x = y.position.x;
+    x.index = y.index;
+    y.position.x = tempX;
+    y.index = tempIndex;
+}
+
+/**
  * Returns an array (list) of all the nodes in the provided layer, sorted by index.
  * @param {Graph} graph Graph on which to operate
  * @param {Number} layerIndex the layer to return
+ * @author Michael Richardson (maricha6)
  */
 function nodesOnLayer(graph, layerIndex) {
+    isLayered(graph);
     return Array.from(graph.nodes.values())
         // Filter the nodes to only those on the same layer
         .filter(n => n.layer == layerIndex)
@@ -193,6 +454,7 @@ function nodesOnLayer(graph, layerIndex) {
  * Runs the evenly-spaced layout on the provided layered graph
  * @param {Graph} graph Graph on which to operate
  * @param {ChangeManager} changeManager ChangeManager to use for storing changes
+ * @author Michael Richardson (maricha6)
  */
 function evenlySpacedLayout(graph, changeManager) {
 
@@ -240,13 +502,20 @@ function evenlySpacedLayout(graph, changeManager) {
 }
 
 const LayeredGraphInterface = {
-    isEdgeCrossed,
-    getEdgeCrossings,
-    getTotalCrossings,
-    getBottleneckCrossings,
-    getNonVerticality,
-    getTotalNonVerticality,
-    getBottleneckNonVerticality,
+    isCrossed,
+    crossings,
+    totalCrossings,
+    bottleneckCrossings,
+    nonVerticality,
+    totalNonVerticality,
+    bottleneckVerticality,
+    setLayerProperty,
+    setChannelProperty,
+    setWeightsUp,
+    setWeightsDown,
+    setWeightsBoth,
+    sortByWeight,
+    swap,
     nodesOnLayer,
     evenlySpacedLayout,
 };

@@ -730,33 +730,66 @@ function showEdgeLabel(edge) {
  * @author Heath Dyer
 */
 
-function isEdgeCrossed(e, f) {
-    return LayeredGraphInterface.isEdgeCrossed(graph, e, f);
+function isCrossed(e, f) {
+    return LayeredGraphInterface.isCrossed(graph, e, f);
 }
 
-function getEdgeCrossings(e) {
-    return LayeredGraphInterface.getEdgeCrossings(graph, e);
+function crossings(e) {
+    return LayeredGraphInterface.crossings(graph, e);
 } 
 
-function getTotalCrossings() {
-    return LayeredGraphInterface.getTotalCrossings(graph);
+function totalCrossings() {
+    return LayeredGraphInterface.totalCrossings(graph);
 } 
 
-function getBottleneckCrossings() {
-    return LayeredGraphInterface.getBottleneckCrossings(graph);
+function bottleneckCrossings() {
+    return LayeredGraphInterface.bottleneckCrossings(graph);
 } 
 
-function getNonVerticality(e) {
-    return LayeredGraphInterface.getNonVerticality(graph, e);
+function nonVerticality(e) {
+    return LayeredGraphInterface.nonVerticality(graph, e);
 } 
 
-function getTotalNonVerticality() {
-    return LayeredGraphInterface.getTotalNonVerticality(graph);
+function totalNonVerticality() {
+    return LayeredGraphInterface.totalNonVerticality(graph);
 } 
 
-function getBottleneckNonVerticality() {
-    return LayeredGraphInterface.getBottleneckNonVerticality(graph);
+function bottleneckVerticality() {
+    return LayeredGraphInterface.bottleneckVerticality(graph);
 } 
+
+function setLayerProperty(layer, attribute, value) {
+    return LayeredGraphInterface.setLayerProperty(graph, layer, attribute, value);
+} 
+
+function setChannelProperty(layer, attribute, value) {
+    return LayeredGraphInterface.setChannelProperty(graph, layer, attribute, value);
+} 
+
+function setWeightsUp(layer, type) {
+    return LayeredGraphInterface.setWeightsUp(graph, layer, type);
+} 
+
+function setWeightsDown(layer, type) {
+    return LayeredGraphInterface.setWeightsDown(graph, layer, type);
+} 
+
+function setWeightsBoth(layer, type) {
+    return LayeredGraphInterface.setWeightsBoth(graph, layer, type);
+} 
+
+function sortByWeight(layer) {
+    return LayeredGraphInterface.sortByWeight(graph, layer);
+} 
+
+function swap(x, y) {
+    return LayeredGraphInterface.swap(graph, x, y);
+} 
+
+function nodesOnLayer(layer) {
+    return LayeredGraphInterface.nodesOnLayer(graph, layer);
+} 
+
 
 /**************************************************************/
 /*************** End of algorithm methods *********************/
