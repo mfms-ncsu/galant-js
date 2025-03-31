@@ -23,7 +23,7 @@ import ChangeManager from "states/ChangeManager/ChangeManager";
  * @author Heath Dyer
  */
 function isLayered(graph) {
-    if (!(graph instanceof LayeredGraph)) {
+    if (!(graph.type == 'layered')) {
         throw new Error("Function can only be performed on layered graphs.");
     }
 }
