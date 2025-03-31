@@ -1274,8 +1274,7 @@ function startRecording(changeManager) {
  */
 function toString(graph) {
   // Start this file with the header comments
-  // TODO: Headers
-  let content = "";
+  let content = graph.headerComments;
 
   // Loop over each node
   graph.nodes.forEach((node) => {
@@ -1336,7 +1335,7 @@ function toString(graph) {
       }
     });
   });
-
+  
   // Return the string
   return content;
 }

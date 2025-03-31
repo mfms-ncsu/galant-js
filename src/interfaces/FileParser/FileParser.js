@@ -12,6 +12,61 @@ import StandardGraph from "../../states/Graph/StandardGraph";
  */
 
 /**
+ *********
+ * REGEX *
+ *********
+ */
+
+    /*
+        Please don't remove the regex documentation! Regex is nearly
+        impossible to read, and if these ever need to be changed
+        or updated by future teams, anyone in the future will
+        probably have trouble understanding them without documentation.
+     */
+
+    // Regex to match comments
+    const commentRegex = /^([gct].*)?$/;
+    /*
+        commentRegex documentation:
+
+        A comment is either:
+            - the letter g or c, followed by any amount of any characters
+            - An empty line
+
+    */
+
+
+    // Regexes to match simple node and edge lines
+    const nodeRegex = /^n \S+ -?\d+.?\d* -?\d+.?\d*( -?\d+)?( [^ \n\t:]+:[^ \n\t:]+)*$/;
+    /*
+        nodeRegex documentation:
+        
+        A line representing a node must have each of the following, separated by a space:
+            - The letter 'n' as the first letter
+            - An id (any amount of non-whitespace characters)
+            - An integer x coordinate
+            - An integer y coordinate
+            - Optionally, an integer weight
+            - Any amount of attributes. Attributes are specified as follows:
+                any amount of non-whitespace, non-colon characters, followed by a colon (no space),
+                followed by any amount of non-whitespace, non-colon characters.
+    */
+
+    const edgeRegex = /^e \S+ \S+( -?\d+)?( [^ \n\t:]+:[^ \n\t:]+)*$/;
+    /*
+        edgeRegex documentation:
+        
+        A line representing an edge must have each of the following, separated by a space:
+            - The letter 'e' as the first letter
+            - A source node id (any amount of non-whitespace characters)
+            - A target node id (any amount of non-whitespace characters)
+            - Optionally, an integer weight
+            - Any amount of attributes. Attributes are specified as follows:
+                any amount of non-whitespace, non-colon characters, followed by a colon (no space),
+                followed by any amount of non-whitespace, non-colon characters.
+    */
+
+/**
  ***********
  * HELPERS *
  ***********
@@ -78,6 +133,19 @@ function loadGraph(name, file) {
     const graph = isLayeredGraph(name, file)
         ? new LayeredGraph(name)
         : new StandardGraph(name);
+
+    // Get header comments
+    for (let line of lines) {
+        
+        // If the header comments are finished, break out of this
+        // loop
+        if (!commentRegex.test(line)) {
+            break;
+        }
+
+        // Save this line to the header of the graph
+        graph.headerComments = graph.headerComments + line + "\n"
+    }
     
     // Parse each line
     lines.forEach(line => { parseLine(graph, line) });
@@ -99,17 +167,11 @@ function parseLine(graph, line) {
     line = line.trim();
     const values = line.split(" ");
 
-    // Regex to match comments
-    const commentRegex = /^([gct].*)?$/;
-
-    // Regexes to match simple node and edge lines
-    const nodeRegex = /^n \S+ -?\d+.?\d* -?\d+.?\d*( -?\d+)?( [^ \n\t:]+:[^ \n\t:]+)*$/;
-    const edgeRegex = /^e \S+ \S+( -?\d+)?( [^ \n\t:]+:[^ \n\t:]+)*$/;
-
     // Check which regex matches and send the values to be parsed as either a node or edge
     switch (true) {
         case commentRegex.test(line):
-            // Ignore comments
+            // Ignore comments (header comments have already been
+            // recorded)
             return;
         case nodeRegex.test(line):
             parseNode(graph, values);

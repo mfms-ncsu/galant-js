@@ -49,6 +49,14 @@ export default function AlgorithmControls() {
      */
     async function exportGraphFallback() {
         // Prompt user for the desired file name, defaulting to "graph.gph"
+        // TODO: Fix this
+        // For some reason, the graph in this method is just a
+        // default graph. It has no nodes, no header comments, it's
+        // just what gets returned when you call new Graph(). Even when
+        // there is an actual graph loaded.
+        //
+        // No idea why. If you start running an algorithm, though, it
+        // then loads the correct graph, and will save it as expected.
         const fileName = window.prompt("Enter the filename to save:", "graph.gph");
 
         // Check if the user cancelled the prompt

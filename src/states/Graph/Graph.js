@@ -25,6 +25,8 @@ export default class Graph {
   showNodeWeights = true;
   /** Graph type */
   type;
+  /** Header comments, used to store meta information in the save file */
+  headerComments = "";
 
   /**
    * Creates a new graph with nodes.
