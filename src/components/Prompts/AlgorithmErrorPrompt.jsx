@@ -10,7 +10,6 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
     const errorObject = prompt.errorObject;
     let errorName = errorObject.stack.split("\n")[0].split(":")[0]
     
-
     let title, code;
 
     // This next code is from a previous team, but no author reference was found. 
@@ -26,7 +25,9 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
         if (title === "SyntaxError") {
             code = "There is an error with the algorithm code in the Algorithm Editor that we cannot identify."
         }
-        code = errorObject.stack
+        else {
+            code = errorObject.stack
+        }
     }
 
     return (
