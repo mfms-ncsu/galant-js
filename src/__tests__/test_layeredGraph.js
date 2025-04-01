@@ -232,23 +232,27 @@ describe("LayeredGraph", () => {
         // Graph is loaded as layered graph
         expect(graph).toBeInstanceOf(LayeredGraph);
         // Test function doesnt work on standard graphs
-        expect(() => { LayeredGraphInterface.swap(standardGraph, node2, node8) }).toThrow(Error);
+        let newGraph;
+        expect(() => { newGraph = LayeredGraphInterface.swap(graph, node2, node8) }).toThrow(Error);
         // try swap nodes on same layer
-        const node0 = graph.nodes.get("0");
-        const node1 = graph.nodes.get("1");
+        let node0 = graph.nodes.get("0");
+        let node1 = graph.nodes.get("1");
         expect(node0.index).toBe(1);
         expect(node0.position.x).toBe(1);
         expect(node1.index).toBe(0);
         expect(node1.position.x).toBe(0);
-        LayeredGraphInterface.swap(graph, node0, node1);
+
+        newGraph = LayeredGraphInterface.swap(graph, node0, node1);
+        node0 = newGraph.nodes.get("0");
+        node1 = newGraph.nodes.get("1");
         expect(node0.index).toBe(0);
         expect(node0.position.x).toBe(0);
         expect(node1.index).toBe(1);
         expect(node1.position.x).toBe(1);
         // try swap nodes on different layer? behavior may change
-        const node2 = graph.nodes.get("2");
-        const node8 = graph.nodes.get("8");
-        expect(() => { LayeredGraphInterface.swap(graph, node2, node8) }).toThrow(Error);
+        const node2 = newGraph.nodes.get("2");
+        const node8 = newGraph.nodes.get("8");
+        expect(() => { newGraph = LayeredGraphInterface.swap(graph, node2, node8) }).toThrow(Error);
     });
 
     test("set weights up by index", () => {
@@ -374,7 +378,8 @@ describe("LayeredGraph", () => {
     test("Sorts by weight", () => {
         // Graph is loaded in
         expect(graph).toBeInstanceOf(LayeredGraph);
-        expect(() => { LayeredGraphInterface.sortByWeight(standardGraph, 1) }).toThrow(Error);
+        let newGraph;
+        expect(() => { newGraph = LayeredGraphInterface.sortByWeight(standardGraph, 1) }).toThrow(Error);
         //get nodes for reference
         const node6 = graph.nodes.get("6");
         const node5 = graph.nodes.get("5");
@@ -383,29 +388,29 @@ describe("LayeredGraph", () => {
         const node7 = graph.nodes.get("7");
         // assign weights and sort
         LayeredGraphInterface.setWeightsUp(graph, 1, "index");
-        LayeredGraphInterface.sortByWeight(graph, 1);
+        newGraph = LayeredGraphInterface.sortByWeight(graph, 1);
         // get nodes in order now and see if in right order
-        const nodesUp = LayeredGraphInterface.nodesOnLayer(graph, 1);
+        const nodesUp = LayeredGraphInterface.nodesOnLayer(newGraph, 1);
         expect(nodesUp[0]).toBe(node6);
         expect(nodesUp[1]).toBe(node9);
         expect(nodesUp[2]).toBe(node5);
         expect(nodesUp[3]).toBe(node7);
         expect(nodesUp[4]).toBe(node8);
         // assign weights and sort
-        LayeredGraphInterface.setWeightsDown(graph, 1, "index");
-        LayeredGraphInterface.sortByWeight(graph, 1);
+        LayeredGraphInterface.setWeightsDown(newGraph, 1, "index");
+        newGraph = LayeredGraphInterface.sortByWeight(newGraph, 1);
         // get nodes in order now and see if in right order
-        const nodesDown = LayeredGraphInterface.nodesOnLayer(graph, 1);
+        const nodesDown = LayeredGraphInterface.nodesOnLayer(newGraph, 1);
         expect(nodesDown[0]).toBe(node6);
         expect(nodesDown[1]).toBe(node5);
         expect(nodesDown[2]).toBe(node9);
         expect(nodesDown[3]).toBe(node8);
         expect(nodesDown[4]).toBe(node7);
         // assign weights and sort
-        LayeredGraphInterface.setWeightsBoth(graph, 1, "index");
-        LayeredGraphInterface.sortByWeight(graph, 1);
+        LayeredGraphInterface.setWeightsBoth(newGraph, 1, "index");
+        newGraph = LayeredGraphInterface.sortByWeight(newGraph, 1);
         // get nodes in order now and see if in right order
-        const nodesBoth = LayeredGraphInterface.nodesOnLayer(graph, 1);
+        const nodesBoth = LayeredGraphInterface.nodesOnLayer(newGraph, 1);
         expect(nodesBoth[0]).toBe(node6);
         expect(nodesBoth[1]).toBe(node5);
         expect(nodesBoth[2]).toBe(node9);

@@ -417,22 +417,46 @@ function sortByWeight(graph, layer) {
  * must be on the same layer to swap.
  * @param {Graph} graph Graph on which to operate
  * @param {ChangeManager} changeManager record the swap operation
- * @param {Node} x node to swap
- * @param {Node} y  node to swap
+ * @param {String} x id node to swap
+ * @param {String} y  id node to swap
  * @author Heath Dyer (hadyer)
  */
-function swap(graph, changeManager, x, y) {
-    isLayered(graph)
-    if (x.layer != y.layer) {
+function swap(graph, x, y) {
+    isLayered(graph);
+    console.log(graph);
+    const a = graph.nodes.get(x);
+    const b = graph.nodes.get(y);
+    console.log(a);
+    if (a.layer != b.layer) {
         throw new Error("Nodes must be on the same layer to swap.");
     }
-    GraphInterface.setNodePosition(graph, );
-    const tempX = x.position.x;
-    const tempIndex = x.index;
-    x.position.x = y.position.x;
-    x.index = y.index;
-    y.position.x = tempX;
-    y.index = tempIndex;
+
+    const newAPosition = {
+        x: b.position.x,
+        y: a.position.y
+    }
+    const newBPosition = {
+        x: a.position.x,
+        y: b.position.y
+    }
+
+    // Update the node's position
+    let newGraph = produce(graph, (draft) => {
+        draft.nodes.get(a.id).position = newAPosition;
+        const tempIndex = a.index;
+        draft.nodes.get(a.id).index = b.index;
+        draft.nodes.get(b.id).position = newBPosition;
+        draft.nodes.get(b.id).index = tempIndex;
+    });
+
+    return newGraph;
+
+    // const tempX = a.position.a;
+    // const tempIndex = x.index;
+    // x.position.x = b.position.x;
+    // x.index = y.index;
+    // y.position.x = tempX;
+    // y.index = tempIndex;
 }
 
 /**
