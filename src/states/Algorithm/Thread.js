@@ -790,6 +790,13 @@ function nodesOnLayer(layer) {
     return LayeredGraphInterface.nodesOnLayer(graph, layer);
 } 
 
+function evenlySpacedLayout() {
+    if (!isInStep) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, changeManager);
+    postMessage({ action: "evenlySpacedLayout" });
+    waitIfNeeded();
+}
+
 
 /**************************************************************/
 /*************** End of algorithm methods *********************/

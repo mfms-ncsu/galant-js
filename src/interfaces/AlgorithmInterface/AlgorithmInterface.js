@@ -2,6 +2,7 @@ import { getDefaultStore } from "jotai";
 import { algorithmChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_atoms/atoms";
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import PromptInterface from "interfaces/PromptInterface/PromptInterface";
+import LayeredGraphInterface from "interfaces/GraphInterface/LayeredGraphInterface";
 
 /**
  * AlgorithmInterface contains functions to check and augment the algorithm.
@@ -271,6 +272,10 @@ function onMessage(algorithm, message) {
             break;
         case "setEdgeAttributeAll":
             [newGraph, newChangeManager] = GraphInterface.setEdgeAttributeAll(graphToUse, changeManagerToUse, message.name, message.value);
+            updateState(newGraph, newChangeManager);
+            break;
+        case "evenlySpacedLayout":
+            [newGraph, newChangeManager] = LayeredGraphInterface.evenlySpacedLayout(graphToUse, changeManagerToUse);
             updateState(newGraph, newChangeManager);
             break;
         case "startRecording":

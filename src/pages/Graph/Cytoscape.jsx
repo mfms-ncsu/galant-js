@@ -77,7 +77,7 @@ export default function CytoscapeComponent() {
         Cytoscape.style().resetToDefault(); // Reset style
         Cytoscape.style(CytoscapeInterface.getStyle(graph)).update(); // Update style
 
-        // Define a function to handle resize events
+        // Define a function to handle window resize events
         const handleResize = () => {
             let newScalar = GraphInterface.getScalar(graph);
             setGraph((prevGraph) => ({
@@ -85,15 +85,12 @@ export default function CytoscapeComponent() {
                 scalar: newScalar,
             }));
         };
-
-        // Ensure we do not add duplicate listeners
-        Cytoscape.off("resize", handleResize);
-        Cytoscape.on("resize", handleResize);
-
+        window.onresize = handleResize;
+        
         return () => {
-            Cytoscape.off("resize", handleResize); // Cleanup listener on unmount or dependency change
+            // Cleanup listener on unmount or dependency change
+            window.onresize = null;
         };
-
     }, [graph]);
 
     /**
