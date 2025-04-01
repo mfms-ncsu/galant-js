@@ -127,7 +127,7 @@ export default function AlgorithmControls() {
 
         document.addEventListener('keydown', handleKeyPress, true)
         return () => document.removeEventListener('keydown', handleKeyPress, true);
-    }, [algorithm]);
+    }, [graph, algorithm]);
 
     // Return if no algorithm is available
     if (!algorithm) return null;
