@@ -765,17 +765,19 @@ function setLayerProperty(layer, attribute, value) {
         action: "setLayerProperty",
         layer: layer,
         attribute: attribute,
+        value: value,
     });
     waitIfNeeded();
 } 
 
-function setChannelProperty(layer, attribute, value) {
+function setChannelProperty(channel, attribute, value) {
     if (!isInStep) { postMessage({ action: "step" }) }
-    [graph, changeManager] = LayeredGraphInterface.setChannelProperty(graph, changeManager, layer, attribute, value);
+    [graph, changeManager] = LayeredGraphInterface.setChannelProperty(graph, changeManager, channel, attribute, value);
     postMessage({ 
         action: "setChannelProperty",
-        layer: layer,
+        channel: channel,
         attribute: attribute,
+        value: value,
     });
     waitIfNeeded();
 } 

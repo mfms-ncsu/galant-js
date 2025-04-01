@@ -229,24 +229,18 @@ function setChannelProperty(graph, changeManager, channel, attribute, value) {
     // get all nodes on layer
     const layerNodes = nodesOnLayer(graph, channel);
     let newGraph = produce(graph, (draft) => {
-        // get all edges in channel
-        const channelEdges = new Set();
         layerNodes.forEach(node => {
-            node.edges.forEach(e => {
+            node.edges.forEach((e, index) => {
                 const source = draft.nodes.get(e.source);
                 const target = draft.nodes.get(e.target);
-                if (source.layer == channel && target.layer == channel + 1) {
-                    channelEdges.add(e);
-                }
-                else if (source.layer == channel + 1 && target.layer == channel ) {
-                    channelEdges.add(e);
+                if ((source.layer == channel && target.layer == channel + 1) || (source.layer == channel + 1 && target.layer == channel )) {
+                    draft.nodes.get(node.id).edges.get(`${e.source},${e.target}`).attributes.set(attribute, value);
                 }
             })
         });
-        channelEdges.forEach(edge => {
-            edge.attributes.set(attribute, value);
-        });
     });
+
+    
     return [newGraph, changeManager];   
 }
 
