@@ -759,31 +759,79 @@ function bottleneckVerticality() {
 } 
 
 function setLayerProperty(layer, attribute, value) {
-    return LayeredGraphInterface.setLayerProperty(graph, layer, attribute, value);
+    if (!isInStep) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.setLayerProperty(graph, changeManager, layer, attribute, value);
+    postMessage({ 
+        action: "setLayerProperty",
+        layer: layer,
+        attribute: attribute,
+    });
+    waitIfNeeded();
 } 
 
 function setChannelProperty(layer, attribute, value) {
-    return LayeredGraphInterface.setChannelProperty(graph, layer, attribute, value);
+    if (!isInStep) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.setChannelProperty(graph, changeManager, layer, attribute, value);
+    postMessage({ 
+        action: "setChannelProperty",
+        layer: layer,
+        attribute: attribute,
+    });
+    waitIfNeeded();
 } 
 
 function setWeightsUp(layer, type) {
-    return LayeredGraphInterface.setWeightsUp(graph, layer, type);
+    if (!isInStep) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.setWeightsUp(graph, changeManager, layer, type);
+    postMessage({ 
+        action: "setWeightsUp",
+        layer: layer,
+        type: type,
+    });
+    waitIfNeeded();
 } 
 
 function setWeightsDown(layer, type) {
-    return LayeredGraphInterface.setWeightsDown(graph, layer, type);
+    if (!isInStep) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.setWeightsDown(graph, changeManager, layer, type);
+    postMessage({ 
+        action: "setWeightsDown",
+        layer: layer,
+        type: type,
+    });
+    waitIfNeeded();
 } 
 
 function setWeightsBoth(layer, type) {
-    return LayeredGraphInterface.setWeightsBoth(graph, layer, type);
+    if (!isInStep) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.setWeightsBoth(graph, changeManager, layer, type);
+    postMessage({ 
+        action: "setWeightsBoth",
+        layer: layer,
+        type: type,
+    });
+    waitIfNeeded();
 } 
 
 function sortByWeight(layer) {
-    return LayeredGraphInterface.sortByWeight(graph, layer);
+    if (!isInStep) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.sortByWeight(graph, changeManager, layer);
+    postMessage({ 
+        action: "sortByWeight",
+        layer: layer,
+    });
+    waitIfNeeded();
 } 
 
 function swap(x, y) {
-    return LayeredGraphInterface.swap(graph, x, y);
+    if (!isInStep) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.swap(graph, changeManager, x, y);
+    postMessage({ 
+        action: "swap",
+        x: x,
+        y: y
+    });
+    waitIfNeeded();
 } 
 
 function nodesOnLayer(layer) {
@@ -793,7 +841,7 @@ function nodesOnLayer(layer) {
 function evenlySpacedLayout() {
     if (!isInStep) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, changeManager);
-    postMessage({ action: "evenlySpacedLayout" });
+    postMessage({ action: "evenlySpacedLayout",  });
     waitIfNeeded();
 }
 

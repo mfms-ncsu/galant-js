@@ -1485,7 +1485,7 @@ function toString(graph) {
         : "";
     
     // Add the node line
-    if (graph instanceof LayeredGraph) {
+    if (graph.type == "layered") {
         // Add the node line
             content += `n ${node.id} ${node.layer
             .toFixed(4)

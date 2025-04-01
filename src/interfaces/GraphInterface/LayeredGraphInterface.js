@@ -203,14 +203,15 @@ function bottleneckVerticality(graph) {
  * @param {*} value  Value of attribute to set
  * @author Heath Dyer
  */
-function setLayerProperty(graph, layer, attribute, value) {
+function setLayerProperty(graph, changeManager, layer, attribute, value) {
     isLayered(graph);
     const layerNodes = nodesOnLayer(graph, layer);
-    if (layerNodes) {
+    let newGraph = produce(graph, (draft) => {
         layerNodes.forEach(node => {
-            node.attributes.set(attribute, value);
+            draft.nodes.get(node.id).attributes.set(attribute, value);
         });
-    }
+    });
+    return [newGraph, changeManager];   
 }
 
 
@@ -221,29 +222,32 @@ function setLayerProperty(graph, layer, attribute, value) {
  * @param {String} attribute Name of attribute to modify
  * @param {*} value  Value of attribute to set
  * @author Heath Dyer (hadyer)
+ * TODO: update to return graph and use produce
  */
-function setChannelProperty(graph, channel, attribute, value) {
+function setChannelProperty(graph, changeManager, channel, attribute, value) {
     isLayered(graph);
-    // get all nodes on layer i
+    // get all nodes on layer
     const layerNodes = nodesOnLayer(graph, channel);
-    // get all edges in channel
-    const channelEdges = new Set();
-    layerNodes.forEach(node => {
-        node.edges.forEach(e => {
-            const source = graph.nodes.get(e.source);
-            const target = graph.nodes.get(e.target);
-            if (source.layer == channel && target.layer == channel + 1) {
-                channelEdges.add(e);
-            }
-            else if (source.layer == channel + 1 && target.layer == channel ) {
-                channelEdges.add(e);
-            }
-        })
+    let newGraph = produce(graph, (draft) => {
+        // get all edges in channel
+        const channelEdges = new Set();
+        layerNodes.forEach(node => {
+            node.edges.forEach(e => {
+                const source = draft.nodes.get(e.source);
+                const target = draft.nodes.get(e.target);
+                if (source.layer == channel && target.layer == channel + 1) {
+                    channelEdges.add(e);
+                }
+                else if (source.layer == channel + 1 && target.layer == channel ) {
+                    channelEdges.add(e);
+                }
+            })
+        });
+        channelEdges.forEach(edge => {
+            edge.attributes.set(attribute, value);
+        });
     });
-    //set attrtibute
-    channelEdges.forEach(edge => {
-        edge.attributes.set(attribute, value);
-    })
+    return [newGraph, changeManager];   
 }
 
 /**
@@ -254,43 +258,48 @@ function setChannelProperty(graph, channel, attribute, value) {
  * @param {String} type Specify "position" or "index"
  * @author Heath Dyer (hadyer)
  */
-function setWeightsUp(graph, layer, type) {
+function setWeightsUp(graph, changeManager, layer, type) {
     isLayered(graph);
+    //check validity of type
     if (type !== "index" && type !== "position") {
         throw new Error('Invalid type. Type must be "index" or "position".');
     }
-    // get nodes on layer
-    const layerNodes = nodesOnLayer(graph, layer);
-    // iterate through each node's edges on that layer
-    layerNodes.forEach(node => {
-        //keep track of all nodes for weight calculation
-        const adjacentNodes = new Set();
-        node.edges.forEach(edge => {
-            const source = graph.nodes.get(edge.source);
-            const target = graph.nodes.get(edge.target);
-            // the target is the adjacent node and on layer up?
-            if (source == node && target.layer == layer - 1) {
-                // then we keep track of this node
-                adjacentNodes.add(target);
-            } 
-             // the target is the adjacent node and on layer up?
-            else if (target == node && source.layer == layer - 1) {
-                // then we keep track of this node
-                adjacentNodes.add(source);
-            }
-        })
-        //calculate average weight based on index
-        let total = 0;
-        adjacentNodes.forEach(adjacentNode => {
-            if (type == "index") {
-                total += adjacentNode.index;
-            }
-            else {
-                total += adjacentNode.position.x;
-            }
-        })
-        node.attributes.set("weight", total / adjacentNodes.size);
+    //immer new graph
+    let newGraph = produce(graph, (draft) => {
+        // get nodes on layer
+        const layerNodes = nodesOnLayer(graph, layer);
+        // iterate through each node's edges on that layer
+        layerNodes.forEach(node => {
+            //keep track of all nodes for weight calculation
+            const adjacentNodes = new Set();
+            node.edges.forEach(edge => {
+                const source = graph.nodes.get(edge.source);
+                const target = graph.nodes.get(edge.target);
+                // the target is the adjacent node and on layer up?
+                if (source == node && target.layer == layer - 1) {
+                    // then we keep track of this node
+                    adjacentNodes.add(target);
+                } 
+                // the target is the adjacent node and on layer up?
+                else if (target == node && source.layer == layer - 1) {
+                    // then we keep track of this node
+                    adjacentNodes.add(source);
+                }
+            })
+            //calculate average weight based on index
+            let total = 0;
+            adjacentNodes.forEach(adjacentNode => {
+                if (type == "index") {
+                    total += adjacentNode.index;
+                }
+                else {
+                    total += adjacentNode.position.x;
+                }
+            })
+            draft.nodes.get(node.id).attributes.set("weight", total / adjacentNodes.size);
+        });
     });
+    return [newGraph, changeManager];
 }
 
 /**
@@ -301,43 +310,47 @@ function setWeightsUp(graph, layer, type) {
  * @param {String} type Specify "position" or "index"
  * @author Heath Dyer (hadyer)
  */
-function setWeightsDown(graph, layer, type) {
+function setWeightsDown(graph, changeManager, layer, type) {
     isLayered(graph);
     if (type !== "index" && type !== "position") {
         throw new Error('Invalid type. Type must be "index" or "position".');
     }
-    // get nodes on layer
-    const layerNodes = nodesOnLayer(graph, layer);
-    // iterate through each node's edges on that layer
-    layerNodes.forEach(node => {
-        //keep track of all nodes for weight calculation
-        const adjacentNodes = new Set();
-        node.edges.forEach(edge => {
-            const source = graph.nodes.get(edge.source);
-            const target = graph.nodes.get(edge.target);
-            // the target is the adjacent node and on layer down?
-            if (source == node && target.layer == layer + 1) {
-                // then we keep track of this node
-                adjacentNodes.add(target);
-            } 
-             // the target is the adjacent node and on layer down?
-            else if (target == node && source.layer == layer + 1) {
-                // then we keep track of this node
-                adjacentNodes.add(source);
-            }
-        })
-        //calculate average weight based on index
-        let total = 0;
-        adjacentNodes.forEach(adjacentNode => {
-            if (type == "index") {
-                total += adjacentNode.index;
-            }
-            else {
-                total += adjacentNode.position.x;
-            }
-        })
-        node.attributes.set("weight", total / adjacentNodes.size);
+    //immer new graph
+    let newGraph = produce(graph, (draft) => {
+        // get nodes on layer
+        const layerNodes = nodesOnLayer(graph, layer);
+        // iterate through each node's edges on that layer
+        layerNodes.forEach(node => {
+            //keep track of all nodes for weight calculation
+            const adjacentNodes = new Set();
+            node.edges.forEach(edge => {
+                const source = graph.nodes.get(edge.source);
+                const target = graph.nodes.get(edge.target);
+                // the target is the adjacent node and on layer down?
+                if (source == node && target.layer == layer + 1) {
+                    // then we keep track of this node
+                    adjacentNodes.add(target);
+                } 
+                // the target is the adjacent node and on layer down?
+                else if (target == node && source.layer == layer + 1) {
+                    // then we keep track of this node
+                    adjacentNodes.add(source);
+                }
+            })
+            //calculate average weight based on index
+            let total = 0;
+            adjacentNodes.forEach(adjacentNode => {
+                if (type == "index") {
+                    total += adjacentNode.index;
+                }
+                else {
+                    total += adjacentNode.position.x;
+                }
+            })
+            draft.nodes.get(node.id).attributes.set("weight", total / adjacentNodes.size);
+        });
     });
+    return [newGraph, changeManager];
 }
 
 /**
@@ -348,43 +361,47 @@ function setWeightsDown(graph, layer, type) {
  * @param {String} type Specify "position" or "index"
  * @author Heath Dyer (hadyer)
  */
-function setWeightsBoth(graph, layer, type) {
+function setWeightsBoth(graph, changeManager, layer, type) {
     isLayered(graph);
     if (type !== "index" && type !== "position") {
         throw new Error('Invalid type. Type must be "index" or "position".');
     }
-    // get nodes on layer
-    const layerNodes = nodesOnLayer(graph, layer);
-    // iterate through each node's edges on that layer
-    layerNodes.forEach(node => {
-        //keep track of all nodes for weight calculation
-        const adjacentNodes = new Set();
-        node.edges.forEach(edge => {
-            const source = graph.nodes.get(edge.source);
-            const target = graph.nodes.get(edge.target);
-            // the target is the adjacent node and on layer up?
-            if (source == node && (target.layer == layer + 1 || target.layer == layer - 1)) {
-                // then we keep track of this node
-                adjacentNodes.add(target);
-            } 
-             // the target is the adjacent node and on layer up?
-            else if (target == node && (source.layer == layer + 1 || source.layer == layer - 1)) {
-                // then we keep track of this node
-                adjacentNodes.add(source);
-            }
-        })
-        //calculate average weight based on index
-        let total = 0;
-        adjacentNodes.forEach(adjacentNode => {
-            if (type == "index") {
-                total += adjacentNode.index;
-            }
-            else {
-                total += adjacentNode.position.x;
-            }
-        })
-        node.attributes.set("weight", total / adjacentNodes.size);
+    //immer new graph
+    let newGraph = produce(graph, (draft) => {
+        // get nodes on layer
+        const layerNodes = nodesOnLayer(graph, layer);
+        // iterate through each node's edges on that layer
+        layerNodes.forEach(node => {
+            //keep track of all nodes for weight calculation
+            const adjacentNodes = new Set();
+            node.edges.forEach(edge => {
+                const source = graph.nodes.get(edge.source);
+                const target = graph.nodes.get(edge.target);
+                // the target is the adjacent node and on layers up and down?
+                if (source == node && (target.layer == layer + 1 || target.layer == layer - 1)) {
+                    // then we keep track of this node
+                    adjacentNodes.add(target);
+                } 
+                // the target is the adjacent node and on layers up and down?
+                else if (target == node && (source.layer == layer + 1 || source.layer == layer - 1)) {
+                    // then we keep track of this node
+                    adjacentNodes.add(source);
+                }
+            })
+            //calculate average weight based on index
+            let total = 0;
+            adjacentNodes.forEach(adjacentNode => {
+                if (type == "index") {
+                    total += adjacentNode.index;
+                }
+                else {
+                    total += adjacentNode.position.x;
+                }
+            })
+            draft.nodes.get(node.id).attributes.set("weight", total / adjacentNodes.size);
+        });
     });
+    return [newGraph, changeManager];
 }
 
 /**
@@ -393,8 +410,9 @@ function setWeightsBoth(graph, layer, type) {
  * @param {Integer} layer layer to sort
  * @author Heath Dyer (hadyer)
  */
-function sortByWeight(graph, layer) {
+function sortByWeight(graph, changeManager, layer) {
     isLayered(graph);
+    let newGraph = graph;
     const layerNodes = nodesOnLayer(graph, layer); // Nodes sorted by index
     for (let j = 0; j < layerNodes.length - 1; j++) {
         let minIndex = j;
@@ -406,10 +424,11 @@ function sortByWeight(graph, layer) {
         }
         // Swap only if the smallest element is not already in place
         if (minIndex !== j) {
-            swap(graph, layerNodes[j], layerNodes[minIndex]);
+            [newGraph, changeManager] = swap(newGraph, changeManager, layerNodes[j].id, layerNodes[minIndex].id);
             [layerNodes[j], layerNodes[minIndex]] = [layerNodes[minIndex], layerNodes[j]];
         }
     }
+    return [newGraph, changeManager];
 }
 
 /**
@@ -421,12 +440,10 @@ function sortByWeight(graph, layer) {
  * @param {String} y  id node to swap
  * @author Heath Dyer (hadyer)
  */
-function swap(graph, x, y) {
+function swap(graph, changeManager, x, y) {
     isLayered(graph);
-    console.log(graph);
     const a = graph.nodes.get(x);
     const b = graph.nodes.get(y);
-    console.log(a);
     if (a.layer != b.layer) {
         throw new Error("Nodes must be on the same layer to swap.");
     }
@@ -448,15 +465,9 @@ function swap(graph, x, y) {
         draft.nodes.get(b.id).position = newBPosition;
         draft.nodes.get(b.id).index = tempIndex;
     });
+    //TODO update change records
 
-    return newGraph;
-
-    // const tempX = a.position.a;
-    // const tempIndex = x.index;
-    // x.position.x = b.position.x;
-    // x.index = y.index;
-    // y.position.x = tempX;
-    // y.index = tempIndex;
+    return [newGraph, changeManager];
 }
 
 /**
@@ -487,8 +498,6 @@ function evenlySpacedLayout(graph, changeManager) {
             `Cannot run evenly-spaced layout because this is not a layered graph`
         );
     }
-
-    console.log(graph);
 
     // Find the "widest" layer (most nodes) and the total number of layers
     let minIndex = 0;

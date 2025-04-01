@@ -12,7 +12,7 @@ import Node from "states/Graph/GraphElement/Node";
 import FileParser from "interfaces/FileParser/FileParser";
 
 describe("LayeredGraph", () => {
-    let graph, standardGraph;
+    let graph, standardGraph, changeManager;
     let A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U , V, W, X, Y ,Z, AA, BB, CC, DD, EE, FF, GG, HH, II, JJ;
 
     // Load in graph
@@ -20,6 +20,8 @@ describe("LayeredGraph", () => {
         // this graph can be found in __tests__/test_files/layered-graph.sgf
         graph = FileParser.loadGraph("example 20", "c created by dot+ord2sgf, date/time = Sat Dec 19 21:09:50 UTC 2020\nc $Id: dot+ord2sgf 66 2014-03-29 16:58:11Z mfms $\nc ./minimization -h vertical_bary -i 10 -w _ ../testing/TestData/ex_20.sgf\nt ex_20 20 36 4\nn 0 0 1\nn 1 0 0\nn 2 0 2\nn 3 0 3\nn 4 0 4\nn 5 1 1\nn 6 1 0\nn 7 1 4\nn 8 1 3\nn 9 1 2\nn 10 2 1\nn 11 2 4\nn 12 2 2\nn 13 2 0\nn 14 2 3\nn 15 3 1\nn 16 3 3\nn 17 3 0\nn 18 3 2\nn 19 3 4\ne 0 5 label:A\ne 1 5 label:B\ne 3 5 label:C\ne 0 6 label:D\ne 1 6 label:E\ne 0 7 label:F\ne 3 7 label:G\ne 4 7 label:H\ne 2 8 label:I\ne 3 8 label:J\ne 4 8 label:K\ne 0 9 label:L\ne 6 10 label:M\ne 8 10 label:N\ne 7 11 label:O\ne 8 11 label:P\ne 5 12 label:Q\ne 9 12 label:R\ne 5 13 label:S\ne 5 14 label:T\ne 8 14 label:U\ne 9 14 label:V\ne 11 15 label:W\ne 12 15 label:X\ne 13 15 label:Y\ne 14 15 label:Z\ne 10 16 label:AA\ne 11 16 label:BB\ne 14 16 label:CC\ne 13 17 label:DD\ne 10 18 label:EE\ne 11 18 label:FF\ne 12 18 label:GG\ne 14 18 label:HH\ne 11 19 label:II\ne 12 19 label:JJ");
         standardGraph = FileParser.loadGraph("example 20", "c created by dot+ord2sgf, date/time = Sat Dec 19 21:09:50 UTC 2020\nc $Id: dot+ord2sgf 66 2014-03-29 16:58:11Z mfms $\nc ./minimization -h vertical_bary -i 10 -w _ ../testing/TestData/ex_20.txt\nn 0 0 1\nn 1 0 0\nn 2 0 2\nn 3 0 3\nn 4 0 4\nn 5 1 1\nn 6 1 0\nn 7 1 4\nn 8 1 3\nn 9 1 2\nn 10 2 1\nn 11 2 4\nn 12 2 2\nn 13 2 0\nn 14 2 3\nn 15 3 1\nn 16 3 3\nn 17 3 0\nn 18 3 2\nn 19 3 4\ne 0 5 label:A\ne 1 5 label:B\ne 3 5 label:C\ne 0 6 label:D\ne 1 6 label:E\ne 0 7 label:F\ne 3 7 label:G\ne 4 7 label:H\ne 2 8 label:I\ne 3 8 label:J\ne 4 8 label:K\ne 0 9 label:L\ne 6 10 label:M\ne 8 10 label:N\ne 7 11 label:O\ne 8 11 label:P\ne 5 12 label:Q\ne 9 12 label:R\ne 5 13 label:S\ne 5 14 label:T\ne 8 14 label:U\ne 9 14 label:V\ne 11 15 label:W\ne 12 15 label:X\ne 13 15 label:Y\ne 14 15 label:Z\ne 10 16 label:AA\ne 11 16 label:BB\ne 14 16 label:CC\ne 13 17 label:DD\ne 10 18 label:EE\ne 11 18 label:FF\ne 12 18 label:GG\ne 14 18 label:HH\ne 11 19 label:II\ne 12 19 label:JJ");
+        //update this later
+        changeManager = null;
         // get edges for easy reference
         A = GraphInterface.getEdge(graph, "0", "5");
         B = GraphInterface.getEdge(graph, "1", "5");
@@ -233,7 +235,7 @@ describe("LayeredGraph", () => {
         expect(graph).toBeInstanceOf(LayeredGraph);
         // Test function doesnt work on standard graphs
         let newGraph;
-        expect(() => { newGraph = LayeredGraphInterface.swap(graph, node2, node8) }).toThrow(Error);
+        expect(() => { [newGraph, changeManager] = LayeredGraphInterface.swap(graph, changeManager, "2", "8") }).toThrow(Error);
         // try swap nodes on same layer
         let node0 = graph.nodes.get("0");
         let node1 = graph.nodes.get("1");
@@ -242,7 +244,7 @@ describe("LayeredGraph", () => {
         expect(node1.index).toBe(0);
         expect(node1.position.x).toBe(0);
 
-        newGraph = LayeredGraphInterface.swap(graph, node0, node1);
+        [newGraph, changeManager] = LayeredGraphInterface.swap(graph, changeManager, "0", "1");
         node0 = newGraph.nodes.get("0");
         node1 = newGraph.nodes.get("1");
         expect(node0.index).toBe(0);
@@ -258,128 +260,137 @@ describe("LayeredGraph", () => {
     test("set weights up by index", () => {
         // Graph is loaded in
         expect(graph).toBeInstanceOf(LayeredGraph);
-        expect(() => { LayeredGraphInterface.setWeightsUp(standardGraph, 1, "index") }).toThrow(Error);
-        const node6 = graph.nodes.get("6");
-        const node5 = graph.nodes.get("5");
-        const node9 = graph.nodes.get("9");
-        const node8 = graph.nodes.get("8");
-        const node7 = graph.nodes.get("7");
+        let newGraph;
+        expect(() => { [newGraph, changeManager] = LayeredGraphInterface.setWeightsUp(standardGraph, changeManager, 1, "index") }).toThrow(Error);
         // test by index
-        LayeredGraphInterface.setWeightsUp(graph, 1, "index");
+        [newGraph, changeManager] = LayeredGraphInterface.setWeightsUp(graph, changeManager, 1, "index");
+        // test by position
+        const node6 = newGraph.nodes.get("6");
+        const node5 = newGraph.nodes.get("5");
+        const node9 = newGraph.nodes.get("9");
+        const node8 = newGraph.nodes.get("8");
+        const node7 = newGraph.nodes.get("7");
         expect(node6.attributes.get("weight")).toBe(1 / 2);
         expect(node5.attributes.get("weight")).toBe(4 / 3);
         expect(node9.attributes.get("weight")).toBe(1);
         expect(node8.attributes.get("weight")).toBe(3);
         expect(node7.attributes.get("weight")).toBe(8 / 3);
         // test invalid type
-        expect(() => { LayeredGraphInterface.setWeightsUp(graph, 1, "invalid") }).toThrow(Error);
+        expect(() => { LayeredGraphInterface.setWeightsUp(graph, changeManager, 1, "invalid") }).toThrow(Error);
     });
 
     test("set weights up by position", () => {
         // Graph is loaded in
         expect(graph).toBeInstanceOf(LayeredGraph);
-        expect(() => { LayeredGraphInterface.setWeightsUp(standardGraph, 1, "position") }).toThrow(Error);
-        const node6 = graph.nodes.get("6");
-        const node5 = graph.nodes.get("5");
-        const node9 = graph.nodes.get("9");
-        const node8 = graph.nodes.get("8");
-        const node7 = graph.nodes.get("7");
+        let newGraph;
+        expect(() => { [newGraph, changeManager] = LayeredGraphInterface.setWeightsUp(standardGraph, changeManager, 1, "position") }).toThrow(Error);
         // test by position
-        LayeredGraphInterface.setWeightsUp(graph, 1, "position");
+        [newGraph, changeManager] = LayeredGraphInterface.setWeightsUp(graph, changeManager, 1, "position");
+        const node6 = newGraph.nodes.get("6");
+        const node5 = newGraph.nodes.get("5");
+        const node9 = newGraph.nodes.get("9");
+        const node8 = newGraph.nodes.get("8");
+        const node7 = newGraph.nodes.get("7");
         expect(node6.attributes.get("weight")).toBe(1 / 2);
         expect(node5.attributes.get("weight")).toBe(4 / 3);
         expect(node9.attributes.get("weight")).toBe(1);
         expect(node8.attributes.get("weight")).toBe(3);
         expect(node7.attributes.get("weight")).toBe(8 / 3);
         // test invalid type
-        expect(() => { LayeredGraphInterface.setWeightsUp(graph, 1, "invalid") }).toThrow(Error);
+        expect(() => { LayeredGraphInterface.setWeightsUp(graph, changeManager, 1, "invalid") }).toThrow(Error);
     });
 
     test("set weights down by position", () => {
         // Graph is loaded in
         expect(graph).toBeInstanceOf(LayeredGraph);
-        expect(() => { LayeredGraphInterface.setWeightsDown(standardGraph, 1, "position") }).toThrow(Error);
-        const node6 = graph.nodes.get("6");
-        const node5 = graph.nodes.get("5");
-        const node9 = graph.nodes.get("9");
-        const node8 = graph.nodes.get("8");
-        const node7 = graph.nodes.get("7");
+        let newGraph;
+        expect(() => { [newGraph, changeManager] = LayeredGraphInterface.setWeightsDown(standardGraph, changeManager, 1, "position") }).toThrow(Error);
         // test by position
-        LayeredGraphInterface.setWeightsDown(graph, 1, "position");
+        [newGraph, changeManager] = LayeredGraphInterface.setWeightsDown(graph, changeManager, 1, "position");
+        // test by position
+        const node6 = newGraph.nodes.get("6");
+        const node5 = newGraph.nodes.get("5");
+        const node9 = newGraph.nodes.get("9");
+        const node8 = newGraph.nodes.get("8");
+        const node7 = newGraph.nodes.get("7");
         expect(node6.attributes.get("weight")).toBe(1);
         expect(node5.attributes.get("weight")).toBe(5 / 3);
         expect(node9.attributes.get("weight")).toBe(5 / 2);
         expect(node8.attributes.get("weight")).toBe(8 / 3);
         expect(node7.attributes.get("weight")).toBe(4);
         // test invalid type
-        expect(() => { LayeredGraphInterface.setWeightsDown(graph, 1, "invalid") }).toThrow(Error);
+        expect(() => { [newGraph, changeManager] = LayeredGraphInterface.setWeightsDown(graph, changeManager, 1, "invalid") }).toThrow(Error);
     });
 
     test("set weights down by index", () => {
         // Graph is loaded in
         expect(graph).toBeInstanceOf(LayeredGraph);
-        expect(() => { LayeredGraphInterface.setWeightsDown(standardGraph, 1, "index") }).toThrow(Error);
-        const node6 = graph.nodes.get("6");
-        const node5 = graph.nodes.get("5");
-        const node9 = graph.nodes.get("9");
-        const node8 = graph.nodes.get("8");
-        const node7 = graph.nodes.get("7");
+        let newGraph;
+        expect(() => { [newGraph, changeManager] = LayeredGraphInterface.setWeightsDown(standardGraph, changeManager, 1, "index") }).toThrow(Error);
         // test by position
-        LayeredGraphInterface.setWeightsDown(graph, 1, "position");
+        [newGraph, changeManager] = LayeredGraphInterface.setWeightsDown(graph, changeManager, 1, "position");
+        // test by position
+        const node6 = newGraph.nodes.get("6");
+        const node5 = newGraph.nodes.get("5");
+        const node9 = newGraph.nodes.get("9");
+        const node8 = newGraph.nodes.get("8");
+        const node7 = newGraph.nodes.get("7");
         expect(node6.attributes.get("weight")).toBe(1);
         expect(node5.attributes.get("weight")).toBe(5 / 3);
         expect(node9.attributes.get("weight")).toBe(5 / 2);
         expect(node8.attributes.get("weight")).toBe(8 / 3);
         expect(node7.attributes.get("weight")).toBe(4);
         // test invalid type
-        expect(() => { LayeredGraphInterface.setWeightsDown(graph, 1, "invalid") }).toThrow(Error);
+        expect(() => { [newGraph, changeManager] = LayeredGraphInterface.setWeightsDown(graph, changeManager, 1, "invalid") }).toThrow(Error);
     });
 
     test("set weights both by position", () => {
         // Graph is loaded in
         expect(graph).toBeInstanceOf(LayeredGraph);
-        expect(() => { LayeredGraphInterface.setWeightsBoth(standardGraph, 1, "position") }).toThrow(Error);
-        const node6 = graph.nodes.get("6");
-        const node5 = graph.nodes.get("5");
-        const node9 = graph.nodes.get("9");
-        const node8 = graph.nodes.get("8");
-        const node7 = graph.nodes.get("7");
+        let newGraph;
+        expect(() => { [newGraph, changeManager] = LayeredGraphInterface.setWeightsBoth(standardGraph, changeManager, 1, "position") }).toThrow(Error);
+        [newGraph, changeManager] = LayeredGraphInterface.setWeightsBoth(graph, changeManager, 1, "position");
         // test by position
-        LayeredGraphInterface.setWeightsBoth(graph, 1, "position");
+        const node6 = newGraph.nodes.get("6");
+        const node5 = newGraph.nodes.get("5");
+        const node9 = newGraph.nodes.get("9");
+        const node8 = newGraph.nodes.get("8");
+        const node7 = newGraph.nodes.get("7");
         expect(node6.attributes.get("weight")).toBe(2 / 3);
         expect(node5.attributes.get("weight")).toBe(9 / 6);
         expect(node9.attributes.get("weight")).toBe(2);
         expect(node8.attributes.get("weight")).toBe(17 / 6);
         expect(node7.attributes.get("weight")).toBe(3);
         // test invalid type
-        expect(() => { LayeredGraphInterface.setWeightBoth(graph, 1, "invalid") }).toThrow(Error);
+        expect(() => { [newGraph, changeManager] = LayeredGraphInterface.setWeightBoth(graph, changeManager, 1, "invalid") }).toThrow(Error);
     });
 
     test("set weights both by index", () => {
         // Graph is loaded in
         expect(graph).toBeInstanceOf(LayeredGraph);
-        expect(() => { LayeredGraphInterface.setWeightsBoth(standardGraph, 1, "index") }).toThrow(Error);
-        const node6 = graph.nodes.get("6");
-        const node5 = graph.nodes.get("5");
-        const node9 = graph.nodes.get("9");
-        const node8 = graph.nodes.get("8");
-        const node7 = graph.nodes.get("7");
+        let newGraph;
+        expect(() => { [newGraph, changeManager] = LayeredGraphInterface.setWeightsBoth(standardGraph, changeManager, 1, "index") }).toThrow(Error);
+        [newGraph, changeManager] = LayeredGraphInterface.setWeightsBoth(graph, changeManager, 1, "index");
         // test by position
-        LayeredGraphInterface.setWeightsBoth(graph, 1, "index");
+        const node6 = newGraph.nodes.get("6");
+        const node5 = newGraph.nodes.get("5");
+        const node9 = newGraph.nodes.get("9");
+        const node8 = newGraph.nodes.get("8");
+        const node7 = newGraph.nodes.get("7");
         expect(node6.attributes.get("weight")).toBe(2 / 3);
         expect(node5.attributes.get("weight")).toBe(9 / 6);
         expect(node9.attributes.get("weight")).toBe(2);
         expect(node8.attributes.get("weight")).toBe(17 / 6);
         expect(node7.attributes.get("weight")).toBe(3);
         // test invalid type
-        expect(() => { LayeredGraphInterface.setWeightBoth(graph, 1, "invalid") }).toThrow(Error);
+        expect(() => { [newGraph, changeManager] = LayeredGraphInterface.setWeightBoth(graph, changeManager, 1, "invalid") }).toThrow(Error);
     });
 
     test("Sorts by weight", () => {
         // Graph is loaded in
         expect(graph).toBeInstanceOf(LayeredGraph);
         let newGraph;
-        expect(() => { newGraph = LayeredGraphInterface.sortByWeight(standardGraph, 1) }).toThrow(Error);
+        expect(() => { [newGraph, changeManager] = LayeredGraphInterface.sortByWeight(standardGraph, changeManager, 1) }).toThrow(Error);
         //get nodes for reference
         const node6 = graph.nodes.get("6");
         const node5 = graph.nodes.get("5");
@@ -387,54 +398,55 @@ describe("LayeredGraph", () => {
         const node8 = graph.nodes.get("8");
         const node7 = graph.nodes.get("7");
         // assign weights and sort
-        LayeredGraphInterface.setWeightsUp(graph, 1, "index");
-        newGraph = LayeredGraphInterface.sortByWeight(graph, 1);
+        [newGraph, changeManager] = LayeredGraphInterface.setWeightsUp(graph, changeManager, 1, "index");
+        [newGraph, changeManager] = LayeredGraphInterface.sortByWeight(newGraph, changeManager, 1);
         // get nodes in order now and see if in right order
         const nodesUp = LayeredGraphInterface.nodesOnLayer(newGraph, 1);
-        expect(nodesUp[0]).toBe(node6);
-        expect(nodesUp[1]).toBe(node9);
-        expect(nodesUp[2]).toBe(node5);
-        expect(nodesUp[3]).toBe(node7);
-        expect(nodesUp[4]).toBe(node8);
+        expect(nodesUp[0].id).toBe(node6.id);
+        expect(nodesUp[1].id).toBe(node9.id);
+        expect(nodesUp[2].id).toBe(node5.id);
+        expect(nodesUp[3].id).toBe(node7.id);
+        expect(nodesUp[4].id).toBe(node8.id);
         // assign weights and sort
-        LayeredGraphInterface.setWeightsDown(newGraph, 1, "index");
-        newGraph = LayeredGraphInterface.sortByWeight(newGraph, 1);
+        [newGraph, changeManager] = LayeredGraphInterface.setWeightsDown(newGraph, changeManager, 1, "index");
+        [newGraph, changeManager] = LayeredGraphInterface.sortByWeight(newGraph, changeManager, 1);
         // get nodes in order now and see if in right order
         const nodesDown = LayeredGraphInterface.nodesOnLayer(newGraph, 1);
-        expect(nodesDown[0]).toBe(node6);
-        expect(nodesDown[1]).toBe(node5);
-        expect(nodesDown[2]).toBe(node9);
-        expect(nodesDown[3]).toBe(node8);
-        expect(nodesDown[4]).toBe(node7);
+        expect(nodesDown[0].id).toBe(node6.id);
+        expect(nodesDown[1].id).toBe(node5.id);
+        expect(nodesDown[2].id).toBe(node9.id);
+        expect(nodesDown[3].id).toBe(node8.id);
+        expect(nodesDown[4].id).toBe(node7.id);
         // assign weights and sort
-        LayeredGraphInterface.setWeightsBoth(newGraph, 1, "index");
-        newGraph = LayeredGraphInterface.sortByWeight(newGraph, 1);
+        [newGraph, changeManager] = LayeredGraphInterface.setWeightsBoth(newGraph, changeManager, 1, "index");
+        [newGraph, changeManager] = LayeredGraphInterface.sortByWeight(newGraph, changeManager, 1);
         // get nodes in order now and see if in right order
         const nodesBoth = LayeredGraphInterface.nodesOnLayer(newGraph, 1);
-        expect(nodesBoth[0]).toBe(node6);
-        expect(nodesBoth[1]).toBe(node5);
-        expect(nodesBoth[2]).toBe(node9);
-        expect(nodesBoth[3]).toBe(node8);
-        expect(nodesBoth[4]).toBe(node7);
+        expect(nodesBoth[0].id).toBe(node6.id);
+        expect(nodesBoth[1].id).toBe(node5.id);
+        expect(nodesBoth[2].id).toBe(node9.id);
+        expect(nodesBoth[3].id).toBe(node8.id);
+        expect(nodesBoth[4].id).toBe(node7.id);
 
     });
 
     test("Sets layer property", () => {
         // Graph is loaded in
         expect(graph).toBeInstanceOf(LayeredGraph);
-        expect(() => { LayeredGraphInterface.setLayerProperty(standardGraph, 0, "weight", 2) }).toThrow(Error);
-        LayeredGraphInterface.setLayerProperty(graph, 0, "someAttribute", "someValue");
-        const node0 = graph.nodes.get("0");
-        const node1 = graph.nodes.get("1");
-        const node2 = graph.nodes.get("2");
-        const node3 = graph.nodes.get("3");
-        const node4 = graph.nodes.get("4");
-        const node5 = graph.nodes.get("5");
-        const node6 = graph.nodes.get("5");
-        const node7 = graph.nodes.get("7");
-        const node8 = graph.nodes.get("8");
-        const node9 = graph.nodes.get("9");
-        const node10 = graph.nodes.get("10");
+        let newGraph;
+        expect(() => { [newGraph, changeManager] = LayeredGraphInterface.setLayerProperty(standardGraph, changeManager, 0, "weight", 2) }).toThrow(Error);
+        [newGraph, changeManager] = LayeredGraphInterface.setLayerProperty(graph, changeManager, 0, "someAttribute", "someValue");
+        const node0 = newGraph.nodes.get("0");
+        const node1 = newGraph.nodes.get("1");
+        const node2 = newGraph.nodes.get("2");
+        const node3 = newGraph.nodes.get("3");
+        const node4 = newGraph.nodes.get("4");
+        const node5 = newGraph.nodes.get("5");
+        const node6 = newGraph.nodes.get("5");
+        const node7 = newGraph.nodes.get("7");
+        const node8 = newGraph.nodes.get("8");
+        const node9 = newGraph.nodes.get("9");
+        const node10 = newGraph.nodes.get("10");
 
         //verify values are updated
         expect(node0.attributes.get("someAttribute")).toBe("someValue");
@@ -455,8 +467,46 @@ describe("LayeredGraph", () => {
     test("Sets channel property", () => {
         // Graph is loaded in
         expect(graph).toBeInstanceOf(LayeredGraph);
-        expect(() => { LayeredGraphInterface.setChannelProperty(standardGraph, 1, "weight", 2) }).toThrow(Error);
-        LayeredGraphInterface.setChannelProperty(graph, 0, "someAttribute", "someValue");
+        let newGraph;
+        expect(() => { [newGraph, changeManager] = LayeredGraphInterface.setChannelProperty(standardGraph, 1, "weight", 2) }).toThrow(Error);
+        [newGraph, changeManager] = LayeredGraphInterface.setChannelProperty(graph, changeManager, 0, "someAttribute", "someValue");
+
+        A = GraphInterface.getEdge(newGraph, "0", "5");
+        B = GraphInterface.getEdge(newGraph, "1", "5");
+        C = GraphInterface.getEdge(newGraph, "3", "5");
+        D = GraphInterface.getEdge(newGraph, "0", "6");
+        E = GraphInterface.getEdge(newGraph, "1", "6");
+        F = GraphInterface.getEdge(newGraph, "0", "7");
+        G = GraphInterface.getEdge(newGraph, "3", "7");
+        H = GraphInterface.getEdge(newGraph, "4", "7");
+        I = GraphInterface.getEdge(newGraph, "2", "8");
+        J = GraphInterface.getEdge(newGraph, "3", "8");
+        K = GraphInterface.getEdge(newGraph, "4", "8");
+        L = GraphInterface.getEdge(newGraph, "0", "9");
+        M = GraphInterface.getEdge(newGraph, "6", "10");
+        N = GraphInterface.getEdge(newGraph, "8", "10");
+        O = GraphInterface.getEdge(newGraph, "7", "11");
+        P = GraphInterface.getEdge(newGraph, "8", "11");
+        Q = GraphInterface.getEdge(newGraph, "5", "12");
+        R = GraphInterface.getEdge(newGraph, "9", "12");
+        S = GraphInterface.getEdge(newGraph, "5", "13");
+        T = GraphInterface.getEdge(newGraph, "5", "14");
+        U = GraphInterface.getEdge(newGraph, "8", "14");
+        V = GraphInterface.getEdge(newGraph, "9", "14");
+        W = GraphInterface.getEdge(newGraph, "11", "15");
+        X = GraphInterface.getEdge(newGraph, "12", "15");
+        Y = GraphInterface.getEdge(newGraph, "13", "15");
+        Z = GraphInterface.getEdge(newGraph, "14", "15");
+        AA = GraphInterface.getEdge(newGraph, "10", "16");
+        BB = GraphInterface.getEdge(newGraph, "11", "16");
+        CC = GraphInterface.getEdge(newGraph, "14", "16");
+        DD = GraphInterface.getEdge(newGraph, "13", "17");
+        EE = GraphInterface.getEdge(newGraph, "10", "18");
+        FF = GraphInterface.getEdge(newGraph, "11", "18");
+        GG = GraphInterface.getEdge(newGraph, "12", "18");
+        HH = GraphInterface.getEdge(newGraph, "14", "18");
+        II = GraphInterface.getEdge(newGraph, "11", "19");
+        JJ = GraphInterface.getEdge(newGraph, "12", "19");
         //test all edges in channel have attribute
         expect(A.attributes.get("someAttribute")).toBe("someValue");
         expect(B.attributes.get("someAttribute")).toBe("someValue");
