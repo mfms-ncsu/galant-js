@@ -1,1 +1,0 @@
-n a 100 200 color:red color:blue

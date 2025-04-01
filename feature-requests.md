@@ -1,5 +1,25 @@
 # The following are desired in future versions of `galant-js`
 
+## Notes for Spring 2025 Senior Design
+If there are two teams, they could work independently on the following two aspects of the project.
+
+### More direct interaction with Cytoscape
+* write some smaller standalone apps that feed graphs directly into Cytoscape, modify the graphs, and respond to user interactions with the graph display
+* see if the existing code base can be made to interact with Cytoscape directly, starting with minimal functionality
+* depending on how the previous steps go, work on a cleaner graph representation
+* gradually add features of original implementation
+* **Possible deliverable:** a standalone graph editor that handles both gph and sgf files
+
+### Fix various aspects of the user interface, correct bugs, etc.
+* going back to original state, except for node movements, when an algorithm is completed: see `animation_and_edit_states.pptx`
+* keyboard shortcuts
+* saving graph and algorithm files with a file browser instead of downloading them: StackOverflow has some examples of code
+* positioning of query popups
+* display of messages and using change records for these
+* fixing various annoyances of the display
+
+Both teams can move in the direction of handling layered graphs with sorting graphs as a special case.
+
 ## High priority
 
 * Maintaining a mapping between physical screen positions of nodes and logical positions recorded in a text file. This will facilitate the following
@@ -12,10 +32,11 @@ A mapping, scale factor, is apparently maintained to save positions of nodes mov
 ```
  const transformedPositions = transformPositions(positions, 1 / graphSnapshot.scalar);
 ```
-for a potential clue. part of the code may explain why a workaround for saving an auto-layout is to start an algorithm and exit.
-Note: If user moves an individual node, a new edit state is created, see
-pages/GraphView/GraphEditOverlay/ContextMenus/ContextMenu.jsx
-This should also happen when an auto-layout is performed.
+for a potential clue.
+
+* The text produced by the `display` function does not appear in this version. Furthermore a `display` call during algorithm execution should generate a change record so that the text is always in sync with the animation. The Java version handled this by making the text display a graph object on par with a node or edge.
+
+* Edits to node/edge labels/weights do not work; nor does adding an edge or deleting a node that has incident edges; these are probably simple oversights.
 
 * More detailed documentation for animators and developers, in the form of Google docs for ease of modification. For the developer, pointers to locations in the code for important functionalities are essential; some of these already exist.
 I anticipate being closely involved in the development and will produce some of this documentation as we go, as well as making suggestions about code style and commenting.
@@ -24,16 +45,30 @@ Also desirable is a log of design and implementation decisions and the reasoning
 * Better handling of errors. Currently, you have to open "developer tools" in the browser to see the console and get information such as detailed error messages. And the developer messages don't give line numbers for the source code or the input files. Makes debugging difficult (actually, the browser will pop up a window that highlights the location of the error). Syntax errors in graph text simply result in the graph not being loaded - no explanation is given.
 On the other hand, runtime errors during algorithm execution are handled well - the graph window gives a line number with a description of the error and marks the offending line; the only quibble I have with it is that the window may need to be expanded and the message window replaces the graph window rather than being a separate popup (as in the Java version)
 
+## Code organization and refactoring
+
+There are many places in the code (and comments) that are awkward and/or hard to understand. Some common issues.
+* each file should have an overview comment describing its purpose, how it fits into the overall functionality
+* functions should have comments describing not only their parameters, return values, and side effects, but also how they are used (from where they are called)
+* `Graph.js` should be written in such a way that outside access is via methods and does not rely on the particulars of the graph data structure
+* the interface with Cytoscape is still somewhat mysterious; it appears to require that the nodes are in the form of a list
+* there are lots of places where the same functionality is implemented using different mechanisms, e.g., looping through nodes and edges
+
 ## Secondary but important
 
 * Most (if not all) of the keyboard shortcuts based on Cmd or Ctrl keys (Mac/Windows) are hijacked by the browser when focus is on a **text edit window** (as opposed to the graph window); these should work as Galant commands, e.g., Cmd-S should save the file, Cmd-O should open one, and Cmd-Q should exit Galant.
+- Cmd-S now saves the text file to Downloads, but there is still a popup the prompts the user to save the html file. There are ways to write a JavaScript function that saves a file, as opposed to downloading it.
+- Cmd-L for loading a graph or algorithm does not work in Safari but does work in other browsers (Ctrl-L does work, however): probably an easy fix; we had the same issue with Cmd-S
+- Cmd-O loads a text file, but the buttons in the graph/algorithm editor go away
+- Cmd-Q exits the browser
 
-* Many of the styles for buttons and menus are ad-hoc rather than being standardized and the buttons are not in the most desirable locations; some of this has been taken care of in the this `dev` branch.
+* Many of the styles for buttons and menus are ad-hoc rather than being standardized and the buttons are not in the most desirable locations; most of this has been taken care of in the current branch.
 
-* Some problems with drop downs and popups have serious impact on usability
+* Some problems with drop downs and popups have impact on usability
 - drop down menus are not always in expected locations and the way their locations are specified is mysterious
 - popups during algorithm execution obscure the middle of the graph
-- menus that show up when you right click on a node, edge, or on the canvas may go partially off screen.
+- menus that show up when you right click on a node, edge, or on the canvas may go partially off screen
+- some of this has been fixed
 
 See the two `.jpg` files for desired locations of buttons.
 Location of popups during and at the end of algorithm execution is difficult to control, probably because of the nested contexts in `pages/GraphView/index.jxs`

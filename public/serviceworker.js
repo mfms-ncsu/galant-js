@@ -113,7 +113,7 @@ function log(...data) {
           '../src/utils/Algorithm/AlgorithmHandler.js',
           '../src/utils/Algorithm/StepHandler.js',
           '../src/utils/Algorithm/Thread/Thread.js',
-          '../src/utils/Algorithm/Thread/ThreadHandler.js',
+          '../src/utils/Algorithm/Thread/ThreadHandler.mjs',
           '../src/utils/Algorithm/Thread/ThreadHandlerDemo.js',
 
           '../src/index.js',
