@@ -488,6 +488,8 @@ function evenlySpacedLayout(graph, changeManager) {
         );
     }
 
+    console.log(graph);
+
     // Find the "widest" layer (most nodes) and the total number of layers
     let minIndex = 0;
     let maxIndex = 0;
@@ -506,7 +508,7 @@ function evenlySpacedLayout(graph, changeManager) {
     for (let i = 0; i <= maxLayer; i++) {
         const layer = nodesOnLayer(graph, i);
         const layerWidth = layer.length;
-        const stepSize = widestLayer / (layerWidth - 1);
+        const stepSize = widestLayer / Math.max((layerWidth - 1), 1);
         for (let j = 0; j < layerWidth; j++) {
             const node = layer[j];
 
