@@ -120,8 +120,8 @@ export default function AlgorithmControls() {
             if (event.target.tagName.toLowerCase() === 'input') return;
             if (event.key === 'ArrowLeft') backButtonPress();
             else if (!event.metaKey && event.key === 'ArrowRight') frontButtonPress();
-            else if (event.key === 'x') terminateAlgorithm();
-            else if (event.key === 's') exportGraph();
+            else if (event.key === 'Escape') terminateAlgorithm();
+            else if (event.key === 'x') exportGraph();
             else if (event.key === '1') debugMode();
         }
 
@@ -153,8 +153,8 @@ export default function AlgorithmControls() {
             </div>
 
             <div className="space-y-1">
-                <PrimaryButton onClick={exportGraph}>Export Graph (s)</PrimaryButton>
-                <ExitButton onClick={terminateAlgorithm}>Exit (x)</ExitButton>
+                <PrimaryButton onClick={exportGraph}>Export Graph (x)</PrimaryButton>
+                <ExitButton onClick={terminateAlgorithm}>Exit (esc)</ExitButton>
             </div>
         </div>
     );
