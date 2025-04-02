@@ -533,6 +533,14 @@ function weight(id) {
     return getAttribute(id, "weight");
 }
 
+function hideWeight(id) {
+    setAttribute(id, "weightHidden", true);
+}
+
+function showWeight(id) {
+    setAttribute(id, "weightHidden", false);
+}
+
 function hasWeight(id) {
     let weight = getAttribute(id, "weight")
     return weight !== undefined;

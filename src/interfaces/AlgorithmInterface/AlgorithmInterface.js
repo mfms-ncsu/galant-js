@@ -321,6 +321,7 @@ function onMessage(algorithm, message) {
                 () => {}
             );
             store.set(promptQueueAtom, newQueue);
+            break;
         // eslint-disable-next-line no-fallthrough
         default:
             // If the message was not a type we define here, then we probably just made a mistake 
