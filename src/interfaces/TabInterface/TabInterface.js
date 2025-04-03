@@ -46,10 +46,10 @@ function downloadTab(tab, type) {
     //Update the file extension if it is missing or incorrect
     let name = tab.name;
     if (isAlgorithm && !tab.name.match(/\.js$/)) {
-        name = name.replace(/[a-z]+$/).concat(".js")
+        name = name.replace(/\.[a-z]+$/).concat(".js")
     }
     if (!isAlgorithm && !tab.name.match(/\.(?:gph|sgf)$/)) {
-        name = name.replace(/[a-z]+$/).concat(".gph")
+        name = name.replace(/\.[a-z]+$/).concat(".gph")
     }
     const ext = name.match(/\.[a-zA-Z0-9]+$/);
 

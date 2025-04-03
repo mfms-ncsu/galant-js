@@ -384,6 +384,10 @@ function getEdges() {
     return GraphInterface.getEdgeIds(graph);
 }
 
+function getEdgeBetween(source, target) {
+    return GraphInterface.getEdgeBetween(graph, source, target);
+}
+
 function getNumberOfEdges() {
     return GraphInterface.getNumberOfEdges(graph);
 }
@@ -531,6 +535,14 @@ function clearWeight(id) {
 
 function weight(id) {
     return getAttribute(id, "weight");
+}
+
+function hideWeight(id) {
+    setAttribute(id, "weightHidden", true);
+}
+
+function showWeight(id) {
+    setAttribute(id, "weightHidden", false);
 }
 
 function hasWeight(id) {
