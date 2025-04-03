@@ -22,7 +22,10 @@ function LoadButton({ tab, editorType }) {
             // Only if user enters designated keyboard shortcut
             //  cmd-l or ctrl-l the graph/algorithm in text area is loaded
             // @todo function modifier(event) that returns true if it's a meta or ctrl
-            if (event.code === "KeyL" && (event.metaKey || event.ctrlKey)) load();
+            if (event.code === "KeyL" && (event.metaKey || event.ctrlKey)) {
+                event.preventDefault();
+                load();
+            }
         }
         document.addEventListener("keydown", onKeyPress);
         return () => document.removeEventListener("keydown", onKeyPress);
