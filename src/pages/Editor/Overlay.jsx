@@ -16,10 +16,13 @@ function LoadButton({ tab, editorType }) {
     useEffect(() => {
         function onKeyPress(event) {
             // If user is typing into the editor text area, ignore.
-            if (event.target.tagName.toLowerCase() === "textarea") return;
+            // !!! this defeats the purpose of a kbd shortcut !!!
+            // if (event.target.tagName.toLowerCase() === "textarea") return;
 
-            // Only if user enters designated keyboard shortcut - l - the graph/algorithm in loaded in
-            if (event.code === "KeyL") load();
+            // Only if user enters designated keyboard shortcut
+            //  cmd-l or ctrl-l the graph/algorithm in text area is loaded
+            // @todo function modifier(event) that returns true if it's a meta or ctrl
+            if (event.code === "KeyL" && (event.metaKey || event.ctrlKey)) load();
         }
         document.addEventListener("keydown", onKeyPress);
         return () => document.removeEventListener("keydown", onKeyPress);
