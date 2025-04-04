@@ -387,7 +387,7 @@ function getEdges() {
 }
 
 function getEdgeBetween(source, target) {
-    return GraphInterface.getEdgeBetween(graph, source, target);
+    return GraphInterface.getEdgeIDBetween(graph, source, target);
 }
 
 function getNumberOfEdges() {

@@ -250,6 +250,37 @@ function getEdgeBetween(graph, source, target) {
 }
 
 /**
+ * Gets the id of the edge between the given source and target.
+ * If undirected, it will check in both directions.
+ * @param {Graph} graph Graph on which to operate
+ * @param {String} source Source node
+ * @param {String} target Target node
+ * @returns Edge between source and target nodes
+ */
+function getEdgeIDBetween(graph, source, target) {
+  let edge = getEdge(graph, source, target);
+  if (edge === undefined && !graph.isDirected) {
+    // If undirected, check the opposite as well
+    edge = getEdge(graph, target, source);
+  }
+  return getEdgeID(graph, edge);
+}
+
+
+/**
+ * Returns the ID of an edge
+ * @param {Graph} graph the graph that contains the edge
+ * @param {Edge} edge the edge to return the id of
+ * @return {String} the Id of the given edge
+ */
+function getEdgeID(graph, edge) {
+    if (edge === undefined) {
+        return undefined;
+    }
+    return edge.source + "," + edge.target;
+}
+
+/**
  * Gets an array of all edges in the given graph.
  * @param {Graph} graph Graph on which to operate
  * @returns Array of edges in the graph
@@ -1643,7 +1674,7 @@ const GraphInterface = {
   getAdjacentNodes,
   getEdge,
   getEdgeAttribute,
-  getEdgeBetween,
+  getEdgeIDBetween,
   getEdgeIds,
   getFileName,
   getIncidentEdges,
