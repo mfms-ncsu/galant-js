@@ -170,8 +170,8 @@ function parseLine(graph, line) {
     // Check which regex matches and send the values to be parsed as either a node or edge
     switch (true) {
         case commentRegex.test(line):
-            // Ignore comments (header comments have already been
-            // recorded)
+            // Ignore comments
+            parseComment(graph, line);
             return;
         case nodeRegex.test(line):
             parseNode(graph, values);
@@ -183,6 +183,16 @@ function parseLine(graph, line) {
             // If the line was not a node or an edge, throw an exception
             throw new Error("input line from file: \"" + line + "\" is not a valid node or edge.");
     }
+}
+
+/**
+ * @author Heath Dyer (hadyer)
+ * TODO: add better comment & header handling system
+ * @param {*} graph Graph to update
+ * @param {*} line 
+ */
+function parseComment(graph, line) {
+    graph.comments.add(line);
 }
 
 /**
@@ -234,7 +244,7 @@ function addNode(graph, x, y, nodeId, attributes) {
     //TODO take a look at this
     // Create the node
     let node = graph.type === 'layered' 
-        ? new Node(nodeId, y, x, y, x)
+        ? new Node(nodeId, y, x, x, y)
         : new Node(nodeId, x, y);
 
     graph.nodes.set(nodeId, node);

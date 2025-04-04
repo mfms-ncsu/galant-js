@@ -35,5 +35,6 @@ export default class Graph {
     this.type = type;
     this.name = name;
     this.nodes = new Map();
+    this.comments = new Set();
   }
 }

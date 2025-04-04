@@ -3,6 +3,7 @@ import ChangeObject from "states/ChangeManager/ChangeObject";
 import Graph from "states/Graph/Graph";
 import Edge from "states/Graph/GraphElement/Edge";
 import Node from "states/Graph/GraphElement/Node";
+import LayeredGraph from "states/Graph/LayeredGraph";
 
 /** Enable maps in immer */
 enableMapSet();
@@ -17,6 +18,7 @@ enableMapSet();
  * @author Henry Morris
  * @author Krisjian Smith
  * @author Ziyu Wang
+ * @author Michael Richardson
  */
 
 /**
@@ -89,6 +91,76 @@ function verifyNodes(graph, source, target, action) {
     throw new Error(
       `Cannot ${action} because the target node (${target}) does not exist in the graph`
     );
+}
+
+/**
+ * Recursive function to shift nodes on a layer to the right or left to resolve overlap
+ * @param {Graph} graph Graph on which to operate
+ * @param {ChangeManager} changeManager ChangeManager to which to push the change
+ * @param {Node[]} sortedLayer Array of Nodes for this layer in the desired order (sorted by index)
+ * @param {Number} nodeIndex Number pointing to the current node in sortedLayer to evaluate (check for overlap)
+ * @param {Boolean} shiftRight Boolean used to determine if the nodes need to shift right or left (based on the direction the node was moved initially)
+ * @returns Updated graph and change manager
+ */
+function shiftNodes(graph, changeManager, sortedLayer, nodeIndex, shiftRight) {
+        
+    // Determine the shift "offset" (move one to the right or one to the left)
+    let offset;
+    if (shiftRight && nodeIndex + 1 < sortedLayer.length) {
+        // We need to shift to the right and we haven't reached the end of the layer
+        offset = 1;
+    } else if (!shiftRight && nodeIndex > 0) {
+         // We need to shift to the left and we haven't reached the beginning of the layer
+        offset = -1;
+    } else {
+        // There are no remaining nodes to shift
+        return [graph, changeManager];
+    }
+
+    // Get a reference to the current node and its immediate neighbor (right or left)
+    const currentNode = sortedLayer[nodeIndex];
+    const nextNode = sortedLayer[nodeIndex + offset];
+    
+    // If there is overlap, move the neighbor over by one (right or left) and continue the recursive check
+    if (currentNode.position.x == nextNode.position.x) {
+        // Update the neighbor (nextNode)'s position
+        const oldPosition = nextNode.position;
+        const newPosition = {
+            x: oldPosition.x + offset,
+            y: oldPosition.y,
+        };
+
+        const newGraph = produce(graph, (draft) => {
+            draft.nodes.get(nextNode.id).position = newPosition;
+        });
+
+        // Make sure to update the sortedLayer parameter as well
+        const newSortedLayer = produce(sortedLayer, (draft) => {
+            draft[nodeIndex + offset].position = newPosition;
+        });
+
+
+        // Add the change object to the changeManager (one per node moved)
+        const newChangeManager = recordChange(changeManager, [
+            new ChangeObject(
+            "setNodePosition",
+            {
+                id: nextNode.id,
+                position: oldPosition,
+            },
+            {
+                id: nextNode.id,
+                position: newPosition,
+            }
+            ),
+        ]);
+
+        // Continue the recursive check to handle node overlap
+        return shiftNodes(newGraph, newChangeManager, newSortedLayer, nodeIndex + offset, shiftRight);
+    }
+    
+    // No more node overlap, return mutated graph and change manager to trigger re-render
+    return [graph, changeManager]; 
 }
 
 /**
@@ -1143,9 +1215,16 @@ function setNodePosition(graph, changeManager, nodeId, x, y) {
     );
   }
 
+  // Defer to the "setNodePositionLayered" function for layered graphs
+  if (graph.type == "layered") {
+    return setNodePositionLayered(graph, changeManager, nodeId, x);
+  } 
+
   // Store old and new values for the position
   let oldPosition = node.position;
-  let newPosition = {
+  let newPosition = node.position;
+
+  newPosition = {
     x: Math.round(x),
     y: Math.round(y),
   };
@@ -1154,6 +1233,11 @@ function setNodePosition(graph, changeManager, nodeId, x, y) {
   const newGraph = produce(graph, (draft) => {
     draft.nodes.get(nodeId).position = newPosition;
   });
+
+  // If the node did not move, no need to add a new ChangeRecord
+  if (newPosition.x == oldPosition.x && newPosition.y == oldPosition.y) {
+    return [newGraph, changeManager];
+  }
 
   // Add the change object to the changeManager
   const newChangeManager = recordChange(changeManager, [
@@ -1172,6 +1256,103 @@ function setNodePosition(graph, changeManager, nodeId, x, y) {
 
   // Return mutated graph and change manager to trigger re-render
   return [newGraph, newChangeManager];
+}
+
+/**
+ * Sets a new position for the given node along the same Layer.
+ * @param {Graph} graph Graph on which to operate
+ * @param {ChangeManager} changeManager ChangeManager to which to push the change
+ * @param {String} nodeId Node to move
+ * @param {Number} x New x position
+ * @returns Updated graph and change manager
+ */
+function setNodePositionLayered(graph, changeManager, nodeId, x) {
+
+    // Get a reference to the node
+    const node = graph.nodes.get(nodeId);
+
+    // Error checking
+    if (!node) {
+        throw new Error(
+        `Cannot set position of node ${nodeId} because it does not exist in the graph`
+        );
+    }
+    if (graph.type != "layered") {
+        throw new Error(
+            `Cannot set position of node ${nodeId} because this is not a layered graph`
+        );
+    }
+
+    // Store old and new values for the position
+    let oldPosition = node.position;
+    let newPosition = node.position;
+
+    newPosition = {
+        x: Math.round(x),
+        y: oldPosition.y,
+    };
+
+    // Update the node's position
+    let newGraph = produce(graph, (draft) => {
+        draft.nodes.get(nodeId).position = newPosition;
+    });
+
+    // If the node did not move, no need to add a new ChangeRecord
+    if (newPosition.x == oldPosition.x) {
+        return [newGraph, changeManager];
+    }
+
+    // Add the change object to the changeManager
+    const newChangeManager = recordChange(changeManager, [
+        new ChangeObject(
+        "setNodePosition",
+        {
+            id: nodeId,
+            position: oldPosition,
+        },
+        {
+            id: nodeId,
+            position: newPosition,
+        }
+        ),
+    ]);
+
+    /** Algorithm to update node indices and address any node overlap by shifting nodes recursively */
+    // Determine wether the node is moving to the right or left (important for node ordering and shift direction)
+    let movedRight = newPosition.x > oldPosition.x;
+
+    // Assemble a list of node references for this layer, sorted by X coordinate. 
+    // If the moved node overlaps an existing node on this layer, it will be positioned
+    // to the right of the existing node if movedRight and to the left of the existing node
+    // if !movedRight.
+    const sortedLayer = Array.from(newGraph.nodes.values())
+        // Filter the nodes to only those on the same layer
+        .filter(n => n.layer == node.layer)
+        // Sort the nodes by X coordinate (ascending order)
+        .sort((a, b) => {
+            const difference = a.position.x - b.position.x;
+            // If two nodes overlap, one must be the node that just moved
+            if (difference == 0) {
+                // Place the moved node to the right if movedRight and to the left if !movedRight
+                if (a.id == node.id)
+                    return movedRight ? 1 : -1;
+                else
+                    return movedRight ? -1 : 1;
+            }
+            // In the case of no overlap, sort by X coordinate
+            return difference;
+        });
+    
+    // Now that sortedLayer is in the proper order (after movement), we can update the node indices for this layer
+    newGraph = produce(newGraph, (draft) => {
+        sortedLayer.forEach((node, index) => draft.nodes.get(node.id).index = index);
+    });
+
+    // Now we need to know the index of the moved node (the starting point to shift from)
+    const nodeIndex = sortedLayer.findIndex(node => node.id === nodeId)
+
+    // Recursively shift the other nodes on this layer (if needed to resolve overlap)
+    return shiftNodes(newGraph, newChangeManager, sortedLayer, nodeIndex, !movedRight);
 }
 
 /**
@@ -1276,6 +1457,10 @@ function toString(graph) {
   // Start this file with the header comments
   let content = graph.headerComments;
 
+  graph.comments.forEach((comment) => {
+    content += `${comment}\n`;
+  })
+
   // Loop over each node
   graph.nodes.forEach((node) => {
     // Get the attributes string
@@ -1297,13 +1482,24 @@ function toString(graph) {
       node.attributes.get("weight") !== undefined
         ? ` ${node.attributes.get("weight")}`
         : "";
-
+    
     // Add the node line
-    content += `n ${node.id} ${node.position.x
-      .toFixed(4)
-      .replace(/[.,]0000$/, "")} ${node.position.y
-      .toFixed(4)
-      .replace(/[.,]0000$/, "")}${weightString}${attributesString}\n`;
+    if (graph.type == "layered") {
+        // Add the node line
+            content += `n ${node.id} ${node.layer
+            .toFixed(4)
+            .replace(/[.,]0000$/, "")} ${node.index
+            .toFixed(4)
+            .replace(/[.,]0000$/, "")}${weightString}${attributesString}\n`;
+    }
+    else {
+        // Add the node line
+        content += `n ${node.id} ${node.position.x
+            .toFixed(4)
+            .replace(/[.,]0000$/, "")} ${node.position.y
+            .toFixed(4)
+            .replace(/[.,]0000$/, "")}${weightString}${attributesString}\n`;
+    }
   });
 
   // Loop over each edge
@@ -1480,6 +1676,7 @@ const GraphInterface = {
   setNodeAttribute,
   setNodeAttributeAll,
   setNodePosition,
+  setNodePositionLayered,
   setNodeSize,
   setShowEdgeLabels,
   setShowEdgeWeights,
