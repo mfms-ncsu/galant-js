@@ -21,15 +21,18 @@ let component_color = ['brown', 'blue', 'red', 'violet', 'green']
  * sets the component of the element (node or edge) and colors it;
  *  the component is used as a label and displayed
  */
-function set_component(element, component) {
+function color_component(element, component) {
     step(() => {
         display(`component for ${element} is ${component}`)
-        element_component[element] = component
         let color_index = component % component_color.length
         color(element, component_color[color_index])
         highlight(element)
         label(element, component)
     })
+}
+
+function set_component(element, component) {
+    element_component[element] = component
 }
 
 function get_component(element) {
@@ -129,18 +132,29 @@ function visit(node) {
  * here, we no longer care about discovery/finish times or types of edges
  */
 function reverse_visit(node, component) {
+    // do animation first, logic later
     display(`reverse visiting node ${node}`)
+    step(() => {
+        color_component(node, component)
+        for ( let in_edge of incoming(node) ) {
+            display(`incoming edge is ${in_edge}`)
+            let neighbor = other(node, in_edge)
+            if ( ! has_component(neighbor) ) {
+                color_component(neighbor, component)
+                color_component(in_edge, component)
+            }
+            else if ( component == get_component(neighbor) ) {
+                color_component(in_edge, component)
+            }
+        }
+    })
+    // separating logic from animation
     set_component(node, component)
     for ( let in_edge of incoming(node) ) {
-        display(`incoming edge is ${in_edge}`)
         let neighbor = other(node, in_edge)
         if ( ! has_component(neighbor) ) {
             set_component(neighbor, component)
-            set_component(in_edge, component)
             reverse_visit(neighbor, component)
-        }
-        else if ( component == get_component(neighbor) ) {
-            set_component(in_edge, component)
         }
     }
 }
