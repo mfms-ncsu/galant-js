@@ -306,6 +306,14 @@ function onMessage(algorithm, message) {
             [newGraph, newChangeManager] = LayeredGraphInterface.swap(graphToUse, changeManager, message.x, message.y);
             updateState(newGraph, newChangeManager);
             break;
+        case "showIndexes":
+            [newGraph, newChangeManager] = LayeredGraphInterface.showIndexes(graphToUse, changeManager, message.layer);
+            updateState(newGraph, newChangeManager);
+            break;
+        case "showPositions":
+            [newGraph, newChangeManager] = LayeredGraphInterface.showPositions(graphToUse, changeManager, message.layer);
+            updateState(newGraph, newChangeManager);
+            break;
         case "startRecording":
             newChangeManager = GraphInterface.startRecording(changeManagerToUse);
 

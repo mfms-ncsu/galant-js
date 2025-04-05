@@ -1685,5 +1685,6 @@ const GraphInterface = {
   startRecording,
   toString,
   undo,
+  recordChange,
 };
 export default GraphInterface;

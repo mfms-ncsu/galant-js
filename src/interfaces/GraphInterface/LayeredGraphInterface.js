@@ -2,6 +2,8 @@ import LayeredGraph from "states/Graph/LayeredGraph";
 import produce, { enableMapSet } from "immer";
 import GraphInterface from "./GraphInterface";
 import ChangeManager from "states/ChangeManager/ChangeManager";
+import ChangeObject from "states/ChangeManager/ChangeObject";
+
 
 /**
  * LayeredGraphInterface contains getters and setters used to interact with Graph objects,
@@ -206,12 +208,35 @@ function bottleneckVerticality(graph) {
 function setLayerProperty(graph, changeManager, layer, attribute, value) {
     isLayered(graph);
     const layerNodes = nodesOnLayer(graph, layer);
+    const changeObjects = [];
+    // update graph
     let newGraph = produce(graph, (draft) => {
         layerNodes.forEach(node => {
+            //create change object
+            changeObjects.push(new ChangeObject("setNodeAttribute",
+                {
+                    id: node.id,
+                    attribute: {
+                        name: attribute,
+                        value: draft.nodes.get(node.id).attributes.get(attribute),
+                    },
+                },
+                {
+                    id: node.id,
+                    attribute: {
+                        name: attribute,
+                        value: value,
+                    },
+                },
+            ));
+            //update attribute
             draft.nodes.get(node.id).attributes.set(attribute, value);
         });
     });
-    return [newGraph, changeManager];   
+    //update change record
+    const newChangeManager = GraphInterface.recordChange(changeManager, changeObjects);
+    //update change record
+    return [newGraph, newChangeManager];   
 }
 
 
@@ -222,26 +247,46 @@ function setLayerProperty(graph, changeManager, layer, attribute, value) {
  * @param {String} attribute Name of attribute to modify
  * @param {*} value  Value of attribute to set
  * @author Heath Dyer (hadyer)
- * TODO: update to return graph and use produce
  */
 function setChannelProperty(graph, changeManager, channel, attribute, value) {
     isLayered(graph);
     // get all nodes on layer
     const layerNodes = nodesOnLayer(graph, channel);
+    const changeObjects = [];
     let newGraph = produce(graph, (draft) => {
         layerNodes.forEach(node => {
             node.edges.forEach((e, index) => {
                 const source = draft.nodes.get(e.source);
                 const target = draft.nodes.get(e.target);
                 if ((source.layer == channel && target.layer == channel + 1) || (source.layer == channel + 1 && target.layer == channel )) {
+                    //create change object
+                    changeObjects.push(new ChangeObject("setEdgeAttribute",
+                        {
+                            source: e.source,
+                            target: e.target,
+                            attribute: {
+                                name: attribute,
+                                value: draft.nodes.get(node.id).edges.get(`${e.source},${e.target}`).attributes.get(attribute),
+                            },
+                        },
+                        {
+                            source: e.source,
+                            target: e.target,
+                            attribute: {
+                                name: attribute,
+                                value: value,
+                            },
+                        },
+                    ));
+                    // update attribute
                     draft.nodes.get(node.id).edges.get(`${e.source},${e.target}`).attributes.set(attribute, value);
                 }
             })
         });
     });
-
-    
-    return [newGraph, changeManager];   
+    //update change record
+    const newChangeManager = GraphInterface.recordChange(changeManager, changeObjects);
+    return [newGraph, newChangeManager];   
 }
 
 /**
@@ -258,6 +303,7 @@ function setWeightsUp(graph, changeManager, layer, type) {
     if (type !== "index" && type !== "position") {
         throw new Error('Invalid type. Type must be "index" or "position".');
     }
+    const changeObjects = [];
     //immer new graph
     let newGraph = produce(graph, (draft) => {
         // get nodes on layer
@@ -290,10 +336,30 @@ function setWeightsUp(graph, changeManager, layer, type) {
                     total += adjacentNode.position.x;
                 }
             })
-            draft.nodes.get(node.id).attributes.set("weight", total / adjacentNodes.size);
+            const newWeight = total / adjacentNodes.size;
+            //create change object
+            changeObjects.push(new ChangeObject("setNodeAttribute",
+                {
+                    id: node.id,
+                    attribute: {
+                        name: "weight",
+                        value: draft.nodes.get(node.id).attributes.get("weight"),
+                    },
+                },
+                {
+                    id: node.id,
+                    attribute: {
+                        name: "weight",
+                        value: newWeight,
+                    },
+                },
+            ));
+            draft.nodes.get(node.id).attributes.set("weight", newWeight);
         });
     });
-    return [newGraph, changeManager];
+    //update change record
+    const newChangeManager = GraphInterface.recordChange(changeManager, changeObjects);
+    return [newGraph, newChangeManager];
 }
 
 /**
@@ -309,6 +375,7 @@ function setWeightsDown(graph, changeManager, layer, type) {
     if (type !== "index" && type !== "position") {
         throw new Error('Invalid type. Type must be "index" or "position".');
     }
+    const changeObjects = [];
     //immer new graph
     let newGraph = produce(graph, (draft) => {
         // get nodes on layer
@@ -341,9 +408,29 @@ function setWeightsDown(graph, changeManager, layer, type) {
                     total += adjacentNode.position.x;
                 }
             })
-            draft.nodes.get(node.id).attributes.set("weight", total / adjacentNodes.size);
+            const newWeight = total / adjacentNodes.size;
+            //create change object
+            changeObjects.push(new ChangeObject("setNodeAttribute",
+                {
+                    id: node.id,
+                    attribute: {
+                        name: "weight",
+                        value: draft.nodes.get(node.id).attributes.get("weight"),
+                    },
+                },
+                {
+                    id: node.id,
+                    attribute: {
+                        name: "weight",
+                        value: newWeight,
+                    },
+                },
+            ));
+            draft.nodes.get(node.id).attributes.set("weight", newWeight);
         });
     });
+    //update change record
+    const newChangeManager = GraphInterface.recordChange(changeManager, changeObjects);
     return [newGraph, changeManager];
 }
 
@@ -360,6 +447,7 @@ function setWeightsBoth(graph, changeManager, layer, type) {
     if (type !== "index" && type !== "position") {
         throw new Error('Invalid type. Type must be "index" or "position".');
     }
+    const changeObjects = [];
     //immer new graph
     let newGraph = produce(graph, (draft) => {
         // get nodes on layer
@@ -392,9 +480,29 @@ function setWeightsBoth(graph, changeManager, layer, type) {
                     total += adjacentNode.position.x;
                 }
             })
-            draft.nodes.get(node.id).attributes.set("weight", total / adjacentNodes.size);
+            const newWeight = total / adjacentNodes.size;
+            //create change object
+            changeObjects.push(new ChangeObject("setNodeAttribute",
+                {
+                    id: node.id,
+                    attribute: {
+                        name: "weight",
+                        value: draft.nodes.get(node.id).attributes.get("weight"),
+                    },
+                },
+                {
+                    id: node.id,
+                    attribute: {
+                        name: "weight",
+                        value: newWeight,
+                    },
+                },
+            ));
+            draft.nodes.get(node.id).attributes.set("weight", newWeight);
         });
     });
+    //update change record
+    const newChangeManager = GraphInterface.recordChange(changeManager, changeObjects);
     return [newGraph, changeManager];
 }
 
@@ -422,6 +530,9 @@ function sortByWeight(graph, changeManager, layer) {
             [layerNodes[j], layerNodes[minIndex]] = [layerNodes[minIndex], layerNodes[j]];
         }
     }
+    //update change record
+
+
     return [newGraph, changeManager];
 }
 
@@ -441,27 +552,61 @@ function swap(graph, changeManager, x, y) {
     if (a.layer != b.layer) {
         throw new Error("Nodes must be on the same layer to swap.");
     }
+    //get old position and index
+    const oldAPosition = {
+        x: a.position.x,
+        y: a.position.y
+    }
+    const oldAIndex = a.index;
 
+    const oldBPosition = {
+        x: b.position.x,
+        y: b.position.y
+    }
+    const oldBIndex = b.index;
+    //get new position and index
     const newAPosition = {
         x: b.position.x,
         y: a.position.y
     }
+    const newAIndex = b.index
     const newBPosition = {
         x: a.position.x,
         y: b.position.y
     }
+    const newBIndex = a.index;
 
     // Update the node's position
     let newGraph = produce(graph, (draft) => {
         draft.nodes.get(a.id).position = newAPosition;
-        const tempIndex = a.index;
-        draft.nodes.get(a.id).index = b.index;
+        draft.nodes.get(a.id).index = newAIndex;
         draft.nodes.get(b.id).position = newBPosition;
-        draft.nodes.get(b.id).index = tempIndex;
+        draft.nodes.get(b.id).index = newBIndex;
     });
-    //TODO update change records
-
-    return [newGraph, changeManager];
+    //update change record
+    const newChangeManager = GraphInterface.recordChange(changeManager, [
+        new ChangeObject("setNodePosition", {
+            id: a.id,
+            position: oldAPosition,
+            index: oldAIndex,
+        },
+        {
+            id: a.id,
+            position: newAPosition,
+            index: newAIndex,
+        }),
+        new ChangeObject("setNodePosition", {
+            id: b.id,
+            position: oldBPosition,
+            index: oldBIndex,
+        },
+        {
+            id: b.id,
+            position: newBPosition,
+            index: newBIndex,
+        }),
+    ]);
+    return [newGraph, newChangeManager];
 }
 
 /**
@@ -530,6 +675,86 @@ function evenlySpacedLayout(graph, changeManager) {
     return [newGraph, newChangeManager];
 }
 
+/**
+ * make all node weights = x-coordinates
+ * @param  {Graph} graph Graph on which to operate
+ * @param {ChangeManager} changeManager Change manger to record with 
+ * @param {Integer} layer Layer to operate on 
+ */
+function showPositions(graph, changeManager, layer) {
+    isLayered(graph);
+    const layerNodes = nodesOnLayer(graph, layer);
+    const changeObjects = [];
+    // update graph
+    let newGraph = produce(graph, (draft) => {
+        layerNodes.forEach(node => {
+            //create change object
+            changeObjects.push(new ChangeObject("setNodeAttribute",
+                {
+                    id: node.id,
+                    attribute: {
+                        name: "weight",
+                        value: draft.nodes.get(node.id).attributes.get("weight"),
+                    },
+                },
+                {
+                    id: node.id,
+                    attribute: {
+                        name: "weight",
+                        value: draft.nodes.get(node.id).position.x,
+                    },
+                },
+            ));
+            //update attribute
+            draft.nodes.get(node.id).attributes.set("weight", draft.nodes.get(node.id).position.x);
+        });
+    });
+    //update change record
+    const newChangeManager = GraphInterface.recordChange(changeManager, changeObjects);
+    //update change record
+    return [newGraph, newChangeManager]; 
+}
+
+/**
+ * make all node weights = indexes
+ * @param  {Graph} graph Graph on which to operate
+ * @param {ChangeManager} changeManager Change manger to record with
+ * @param {Integer} layer Layer to operate on
+ */
+function showIndexes(graph, changeManager, layer) {
+    isLayered(graph);
+    const layerNodes = nodesOnLayer(graph, layer);
+    const changeObjects = [];
+    // update graph
+    let newGraph = produce(graph, (draft) => {
+        layerNodes.forEach(node => {
+            //create change object
+            changeObjects.push(new ChangeObject("setNodeAttribute",
+                {
+                    id: node.id,
+                    attribute: {
+                        name: "weight",
+                        value: draft.nodes.get(node.id).attributes.get("weight"),
+                    },
+                },
+                {
+                    id: node.id,
+                    attribute: {
+                        name: "weight",
+                        value: draft.nodes.get(node.id).index,
+                    },
+                },
+            ));
+            //update attribute
+            draft.nodes.get(node.id).attributes.set("weight", draft.nodes.get(node.id).index);
+        });
+    });
+    //update change record
+    const newChangeManager = GraphInterface.recordChange(changeManager, changeObjects);
+    //update change record
+    return [newGraph, newChangeManager]; 
+}
+
 const LayeredGraphInterface = {
     isCrossed,
     crossings,
@@ -547,5 +772,7 @@ const LayeredGraphInterface = {
     swap,
     nodesOnLayer,
     evenlySpacedLayout,
+    showPositions,
+    showIndexes,
 };
 export default LayeredGraphInterface;

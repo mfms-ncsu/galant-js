@@ -847,6 +847,20 @@ function evenlySpacedLayout() {
     waitIfNeeded();
 }
 
+function showPositions(layer) {
+    if (!isInStep) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.showPositions(graph, changeManager, layer);
+    postMessage({ action: "showPositions",  layer: layer,});
+    waitIfNeeded();
+}
+
+function showIndexes(layer) {
+    if (!isInStep) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.showIndexes(graph, changeManager, layer);
+    postMessage({ action: "showIndexes",  layer: layer,});
+    waitIfNeeded();
+}
+
 
 /**************************************************************/
 /*************** End of algorithm methods *********************/
