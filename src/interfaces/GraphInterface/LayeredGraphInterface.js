@@ -653,6 +653,8 @@ function evenlySpacedLayout(graph, changeManager) {
     // Iterate over each layer and space the nodes evenly to fit the "widest" layer
     let newGraph = graph;
     let newChangeManager = changeManager;
+    newChangeManager = GraphInterface.startRecording(changeManager);
+
     for (let i = 0; i <= maxLayer; i++) {
         const layer = nodesOnLayer(graph, i);
         const layerWidth = layer.length;
@@ -660,17 +662,38 @@ function evenlySpacedLayout(graph, changeManager) {
         for (let j = 0; j < layerWidth; j++) {
             const node = layer[j];
 
+            const oldPosition = node.position;
+
             const newPosition = {
                 x: Math.round(j * stepSize),
                 y: node.position.y,
             };
+
+            // Add the change object to the changeManager
+            newChangeManager = GraphInterface.recordChange(newChangeManager, [
+                new ChangeObject(
+                "setNodePosition",
+                {
+                    id: node.id,
+                    position: oldPosition,
+                },
+                {
+                    id: node.id,
+                    position: newPosition,
+                }
+                ),
+            ]);
         
             // Update the node's position
             newGraph = produce(newGraph, (draft) => {
                 draft.nodes.get(node.id).position = newPosition;
             });
+
+
         }
     }
+
+    newChangeManager = GraphInterface.endRecording(newChangeManager);
 
     return [newGraph, newChangeManager];
 }

@@ -113,8 +113,9 @@ function shiftNodes(graph, changeManager, sortedLayer, nodeIndex, shiftRight) {
          // We need to shift to the left and we haven't reached the beginning of the layer
         offset = -1;
     } else {
-        // There are no remaining nodes to shift
-        return [graph, changeManager];
+        // There are no remaining nodes to shift, stop recording changes and return
+        let newChangeManager = GraphInterface.endRecording(changeManager);
+        return [graph, newChangeManager];
     }
 
     // Get a reference to the current node and its immediate neighbor (right or left)
@@ -159,8 +160,9 @@ function shiftNodes(graph, changeManager, sortedLayer, nodeIndex, shiftRight) {
         return shiftNodes(newGraph, newChangeManager, newSortedLayer, nodeIndex + offset, shiftRight);
     }
     
-    // No more node overlap, return mutated graph and change manager to trigger re-render
-    return [graph, changeManager]; 
+    // No more node overlap, stop recording changes and return
+    let newChangeManager = GraphInterface.endRecording(changeManager);
+    return [graph, newChangeManager];
 }
 
 /**
@@ -1302,8 +1304,10 @@ function setNodePositionLayered(graph, changeManager, nodeId, x) {
         return [newGraph, changeManager];
     }
 
+    let newChangeManager = GraphInterface.startRecording(changeManager);
+
     // Add the change object to the changeManager
-    const newChangeManager = recordChange(changeManager, [
+    newChangeManager = recordChange(newChangeManager, [
         new ChangeObject(
         "setNodePosition",
         {
