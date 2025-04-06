@@ -1,0 +1,30 @@
+c gm-10_16
+c random geometric graph: 10 vertices, 21 (desired) edges, seed = 1
+c 16 actual edges
+g 10 16
+n 1 84 100 
+n 2 45 87 
+n 3 1 26 
+n 4 61 100 
+n 5 30 48 
+n 6 19 80 
+n 7 38 78 
+n 8 70 35 
+n 9 80 88 
+n 10 8 70 
+e 3 5 37
+e 5 6 34
+e 5 10 31
+e 5 7 32
+e 6 10 15
+e 2 6 27
+e 6 7 19
+e 7 10 31
+e 2 7 12
+e 2 4 22
+e 4 7 33
+e 4 9 23
+e 1 4 23
+e 1 9 14
+e 2 9 36
+e 8 9 55
