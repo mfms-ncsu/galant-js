@@ -92,6 +92,31 @@ function verifyNodes(graph, source, target, action) {
 }
 
 /**
+ * Throws an error if the given graph is undefined
+ * @param {Graph} graph the graph to check
+ */
+function verifyGraph(graph) {
+    if (graph === undefined) {
+        throw new Error("Graph cannot be undefined");
+    }
+}
+
+/**
+ * Throws an error if the given graph and/or changeManager are undefined
+ * @param {Graph} graph the graph to check
+ * @param {ChangeManager} changeManager the ChangeManager to check
+ */
+function verifyGraphChangeManager(graph, changeManager) {
+    if (graph === undefined && changeManager === undefined) {
+        throw new Error("Both the given Graph and ChangeManager are undefined");
+    }
+    if (changeManager === undefined) {
+        throw new Error("ChangeManager cannot be undefined");
+    }
+    verifyGraph(graph);
+}
+
+/**
  ***********
  * GETTERS *
  ***********
@@ -131,6 +156,8 @@ function getAdjacentNodes(graph, nodeId) {
  * @returns Edge between source and target
  */
 function getEdge(graph, source, target) {
+  verifyNodes(graph, source, target, `get edge ${source},${target}`);
+  verifyGraph(graph);
   const node = graph.nodes.get(source);
   if (!node) return undefined;
 
@@ -243,14 +270,15 @@ function getFileName(graph) {
  * @returns Array of all edges incident to nodeId, undefined if nodeId doesn't exist
  */
 function getIncidentEdges(graph, nodeId) {
+  verifyGraph(graph);
   // Check if the node exists
   if (graph.nodes.has(nodeId)) {
     // If it does, return an array of all of its edges
     return [...graph.nodes.get(nodeId).edges.keys()];
-  } else {
-    // If the node doesn't exist, return undefined
-    return undefined;
   }
+
+  // If the node doesn't exist, throw an error
+  throw new Error("Cannot get incident edges of node " + nodeId + " because no node with this id exists in the graph");
 }
 
 /**
@@ -259,10 +287,12 @@ function getIncidentEdges(graph, nodeId) {
  * @param {String} target Target node id
  * @returns Array of edges incoming to target, undefined if the target doesn't exist
  */
-function getIncomingEdges(graph, target) {
-  // Return undefined if the node doesn't exist
+function getIncomingEdges(graph, target) { 
+  verifyGraph(graph);
+
+  // Throw an error if the node doesn't exist
   if (!graph.nodes.has(target)) {
-    return undefined;
+    throw new Error("Cannot get incoming edges of node " + nodeId + " because no node with this id exists in the graph");
   }
 
   // Get all edges if undirected
@@ -355,6 +385,7 @@ function getNodeAttribute(graph, nodeId, name) {
  * @returns Array of node ids
  */
 function getNodeIds(graph) {
+  verifyGraph(graph);
   return [...graph.nodes.keys()];
 }
 
@@ -382,6 +413,7 @@ function getNodePosition(graph, nodeId) {
  * @returns Array of nodes
  */
 function getNodes(graph) {
+  verifyGraph(graph);
   return [...graph.nodes.values()];
 }
 
@@ -413,21 +445,21 @@ function getNumberOfNodes(graph) {
  */
 function getOppositeNode(graph, nodeId, edgeId) {
   // Error checking
-  // Note that for getters, we usually just return undefined if the node or edge doesn't exist. I am adding
-  // detailed error messages in an attempt to debug some Algorithm functions. Feel free to change these to just
-  // return undefined to make it consistent with the rest of the graph functions
   if (!graph.nodes.has(nodeId))
     throw new Error(
-      `Cannot get opposite node of node "${nodeId}" because it does not exist in the graph`
+      `Cannot get opposite node of node ${nodeId} because this node does not exist in the graph`
     );
   if (!graph.nodes.get(nodeId).edges.has(edgeId))
     throw new Error(
-      `Cannot get the opposite of edge "${edgeId}" because it does not exist in the graph`
+      `Cannot get the opposite of edge ${edgeId} because this edge does not exist in the graph`
     );
 
   // Get the edge
   let edge = graph.nodes.get(nodeId).edges.get(edgeId);
-  if (!edge) return undefined;
+
+  if (edge.source !== nodeId && edge.target !== nodeId) {
+    throw new Error(`Cannot get the opposite node of ${nodeId} along edge ${edgeId} because ${nodeId} is not a node on edge ${edgeId}`);
+  }
 
   // Return the id of the opposite node
   return edge.source === nodeId ? edge.target : edge.source;
@@ -442,7 +474,7 @@ function getOppositeNode(graph, nodeId, edgeId) {
 function getOutgoingEdges(graph, source) {
   // Return undefined if the node doesn't exist
   if (!graph.nodes.has(source)) {
-    return undefined;
+    throw new Error("Cannot get outgoing edges of node " + nodeId + " because no node with this id exists in the graph");
   }
 
   // Get all edges if undirected
@@ -642,6 +674,7 @@ function addMessage(changeManager, message) {
  */
 function addNode(graph, changeManager, x, y, nodeId, attributes) {
   // Throw an error if the id is a duplicate
+  verifyGraphChangeManager(graph, changeManager);
   if (nodeId && graph.nodes.has(nodeId)) {
     throw new Error("Cannot add node with duplicate ID");
   }
@@ -668,7 +701,8 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
         x: x,
         y: y,
       },
-    }),
+      attributes: attributes
+    })
   ]);
 
   // Return mutated graph and change manager to trigger re-render
@@ -1047,6 +1081,7 @@ function setEdgeAttributeAll(graph, changeManager, name, value) {
  * @returns Updated graph object
  */
 function setDirected(graph, isDirected) {
+  verifyGraph(graph);
   const newGraph = produce(graph, (draft) => {
     draft.isDirected = isDirected;
   });

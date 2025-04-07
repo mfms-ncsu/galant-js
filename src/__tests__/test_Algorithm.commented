@@ -1,0 +1,28 @@
+/*
+
+import { AlgorithmContext } from 'utils/algorithm/AlgorithmContext';
+import graph from 'utils/graph/Graph';
+
+
+
+
+Currently commented out as I work on other test cases
+
+
+/**
+ * Skeleton for future Algorithm tests
+ *
+ * @author Krisjian Smith
+ *
+
+describe('Algorithm', () => {
+    
+    /**
+     * Test cases for the Algorithm should go in here
+     *
+    test("name", () => {
+        
+        expect(0).toBe(1);
+    });
+});
+*/
