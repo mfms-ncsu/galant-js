@@ -33,8 +33,8 @@ export default function ControlSettingsPopover() {
         const idealEdgeLength = Math.min(window.innerWidth / graphScalar.x, window.innerHeight / graphScalar.y);
         var layout = Cytoscape.layout({ name: 'cose-bilkent', fit: false, animate: false, idealEdgeLength: idealEdgeLength,
             stop: function () {
-                let newGraph = graph;
-                let newChangeManager = userChangeManager;
+                let [newGraph, newChangeManager] = [graph, userChangeManager];
+                newChangeManager = GraphInterface.startRecording(userChangeManager);
 
                 Cytoscape.nodes().forEach(node => {
                     const nodePosition = node.position();
@@ -52,6 +52,8 @@ export default function ControlSettingsPopover() {
                       y: logicalY * graphScalar.y,
                     });
                 });
+
+                newChangeManager = GraphInterface.endRecording(newChangeManager);
 
                 setGraph(newGraph);
                 setUserChangeManager(newChangeManager);
