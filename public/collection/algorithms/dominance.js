@@ -44,6 +44,32 @@ function queueAllNodes() {
     })
 }
 
+/**
+ * Animation steps to take place if neighbor dominates next_node
+ * Also puts neighbor into the cover and updates cover size
+ */
+function addToCover(next_node, neighbor) {
+    step(() => {
+        display(`node ${neighbor} dominates ${next_node}`)
+        for ( let edge_to_remove of incident(neighbor) ) {
+            let to_decrease = other(neighbor, edge_to_remove)
+            setWeight(to_decrease, weight(to_decrease) - 1)
+            nodePQ[to_decrease] -= 1
+            // hideEdge does not exist in the API
+            // setAttribute(edge_to_remove, "hidden", true)
+        }
+        // put neighbor into cover
+        cover.add(neighbor)
+        cover_size += 1
+        console.log("cover size", cover_size)
+        delete nodePQ[neighbor]
+        hideNode(neighbor)
+    })
+    // it looks like two display calls in the same step don't work
+    // also, display("cover size =", cover_size) appears not to work
+    display(`cover size = ${cover_size}`)
+}
+
 step(() => {
     setDirected(false);
     clearNodeMarks();
@@ -58,9 +84,14 @@ queueAllNodes()
 
 let cover_size = 0
 
+/**
+ * nodes are considered by increasing degree since a low degree node
+ * can only be dominated by a node of equal or higher degree and ...
+ * traversing neighbors is more efficient for a low degree node than a high degree one 
+ */
 while ( ! PQisEmpty() ) {
     let next_node = removeMin()
-    if ( ! next_node ) break   // apparently need this
+    if ( ! next_node ) break   // apparently need this, not clear why
 
     step(() => {
         highlight(next_node)
@@ -68,7 +99,6 @@ while ( ! PQisEmpty() ) {
         color(next_node, "yellow")
         setShape(next_node, "star")
     })
-    // @todo use foreach constructs here
     for ( let neighbor of visibleNeighbors(next_node) ) {
         if ( ! nodePQ[neighbor] ) continue
         display(`Does ${neighbor} dominate ${next_node}?`)
@@ -116,26 +146,11 @@ while ( ! PQisEmpty() ) {
             }
         })
         if ( next_adjacent.isSubsetOf(neighbor_adjacent) ) {
-            step(() => {
-                display(`node ${neighbor} dominates ${next_node}`)
-                for ( let edge_to_remove of incident(neighbor) ) {
-                    let to_decrease = other(neighbor, edge_to_remove)
-                    setWeight(to_decrease, weight(to_decrease) - 1)
-                    nodePQ[to_decrease] -= 1
-                    // hideEdge does not exist in the API
-                    // setAttribute(edge_to_remove, "hidden", true)
-                }
-                // put neighbor into cover
-                cover.add(neighbor)
-                cover_size += 1
-                console.log("cover size", cover_size)
-                delete nodePQ[neighbor]
-                hideNode(neighbor)
-            })
-            // it looks like two display calls in the same step don't work
-            // also, display("cover size =", cover_size) appears not to work
-            display(`cover size = ${cover_size}`)
+            addToCover(next_node, neighbor)
         } // if neighbor dominates
+        else {
+            display(`${neighbor} does not dominate ${next_node}`)
+        }
         // clear all animations from this dominance check and blacken node removed from queue
         step(() => {
             for ( let incident_edge of all_incident ) {
