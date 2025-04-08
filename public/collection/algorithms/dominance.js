@@ -45,11 +45,12 @@ function queueAllNodes() {
 }
 
 step(() => {
+    setDirected(false);
     clearNodeMarks();
     clearNodeWeights();
     clearEdgeColors();
     hideAllEdgeWeights();
-    //hideAllEdgeLabels(); needs to be added in Thread.js
+    hideAllEdgeLabels();
 })
 display("queueing nodes")
 

@@ -1,0 +1,9 @@
+n 0 0 0 1 color:red shape:star highlighted:yes
+n 1 1 0 color:black
+n abc 1 1
+n n 0 1 -1
+n 2 -1 -1 -5
+n -1 100 -1000 -754
+e 0 1 2 bold:true
+e 1 abc squiggly:true
+e n -1 -4
