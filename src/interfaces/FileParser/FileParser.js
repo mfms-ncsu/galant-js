@@ -134,19 +134,6 @@ function loadGraph(name, file) {
         ? new LayeredGraph(name)
         : new StandardGraph(name);
 
-    // Get header comments
-    for (let line of lines) {
-        
-        // If the header comments are finished, break out of this
-        // loop
-        if (!commentRegex.test(line)) {
-            break;
-        }
-
-        // Save this line to the header of the graph
-        graph.headerComments = graph.headerComments + line + "\n"
-    }
-    
     // Parse each line
     lines.forEach(line => { parseLine(graph, line) });
 
