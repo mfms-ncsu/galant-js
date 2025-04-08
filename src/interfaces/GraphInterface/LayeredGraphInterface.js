@@ -200,6 +200,7 @@ function bottleneckVerticality(graph) {
 /**
  * sets some attribute of all nodes on layer i to the value
  * @param {Graph} graph Graph on which to operate
+ * @param {ChangeManager} changeManager ChangeManager to use for storing changes
  * @param {Integer} layer Layer on graph
  * @param {String} attribute Name of attribute to modify
  * @param {*} value  Value of attribute to set
@@ -243,6 +244,7 @@ function setLayerProperty(graph, changeManager, layer, attribute, value) {
 /**
  * Sets some attribute of all edges in channel to the value
  * @param {Graph} graph Graph on which to operate
+ * @param {ChangeManager} changeManager ChangeManager to use for storing changes
  * @param {Integer} channel channel on graph
  * @param {String} attribute Name of attribute to modify
  * @param {*} value  Value of attribute to set
@@ -293,6 +295,7 @@ function setChannelProperty(graph, changeManager, channel, attribute, value) {
  * Assigns weights to all nodes on layer i based on average of positions or 
  * indexes of adjacent nodes on layer above.
  * @param {Graph} graph Graph on which to operate
+ * @param {ChangeManager} changeManager ChangeManager to use for storing changes
  * @param {Integer} layer Layer to operate on
  * @param {String} type Specify "position" or "index"
  * @author Heath Dyer (hadyer)
@@ -366,6 +369,7 @@ function setWeightsUp(graph, changeManager, layer, type) {
  * Assigns weights to all nodes on layer i based on average of positions or 
  * indexes of adjacent nodes on layer below.
  * @param {Graph} graph Graph on which to operate
+ * @param {ChangeManager} changeManager ChangeManager to use for storing changes
  * @param {Integer} layer Layer to operate on
  * @param {String} type Specify "position" or "index"
  * @author Heath Dyer (hadyer)
@@ -438,6 +442,7 @@ function setWeightsDown(graph, changeManager, layer, type) {
  * Assigns weights to all nodes on layer i based on average of positions or 
  * indexes of adjacent nodes on both layers above and below.
  * @param {Graph} graph Graph on which to operate
+ * @param {ChangeManager} changeManager ChangeManager to use for storing changes
  * @param {Integer} layer Layer to operate on
  * @param {String} type Specify "position" or "index"
  * @author Heath Dyer (hadyer)
@@ -509,12 +514,14 @@ function setWeightsBoth(graph, changeManager, layer, type) {
 /**
  * Sorts layer by the weights of its nodes
  * @param {Graph} graph Graph on which to operate
+ * @param {ChangeManager} changeManager ChangeManager to use for storing changes
  * @param {Integer} layer layer to sort
  * @author Heath Dyer (hadyer)
  */
 function sortByWeight(graph, changeManager, layer) {
     isLayered(graph);
     let newGraph = graph;
+    let newChangeManager = changeManager;
     const layerNodes = nodesOnLayer(graph, layer); // Nodes sorted by index
     for (let j = 0; j < layerNodes.length - 1; j++) {
         let minIndex = j;
@@ -526,15 +533,14 @@ function sortByWeight(graph, changeManager, layer) {
         }
         // Swap only if the smallest element is not already in place
         if (minIndex !== j) {
-            [newGraph, changeManager] = swap(newGraph, changeManager, layerNodes[j].id, layerNodes[minIndex].id);
+            [newGraph, newChangeManager] = swap(newGraph, newChangeManager, layerNodes[j].id, layerNodes[minIndex].id);
             [layerNodes[j], layerNodes[minIndex]] = [layerNodes[minIndex], layerNodes[j]];
         }
     }
     //update change record
-
-
     return [newGraph, changeManager];
 }
+
 
 /**
  * Swaps positions (and indexes) of two nodes x and y. Nodes
@@ -775,4 +781,5 @@ const LayeredGraphInterface = {
     showPositions,
     showIndexes,
 };
+
 export default LayeredGraphInterface;
