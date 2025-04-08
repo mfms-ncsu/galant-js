@@ -4,6 +4,7 @@ import { algorithmAtom, algorithmChangeManagerAtom, graphAtom, promptQueueAtom }
 import Cytoscape from "globals/Cytoscape";
 import SharedWorker from "globals/SharedWorker";
 import Algorithm from "states/Algorithm/Algorithm";
+import ChangeManager from "states/ChangeManager/ChangeManager";
 import FileParser from "interfaces/FileParser/FileParser";
 import Header from "./Header";
 import CytoscapeComponent from "./Cytoscape"
@@ -13,6 +14,7 @@ import NodeContextMenu from "components/ContextMenus/NodeContextMenu";
 import EdgeContextMenu from "components/ContextMenus/EdgeContextMenu";
 import EditControls from "./Overlays/EditControls";
 import AlgorithmControls from "./Overlays/AlgorithmControls";
+import AlgorithmInterface from "interfaces/AlgorithmInterface/AlgorithmInterface"
 
 /**
  * Graph component is responsible for rendering and managing the main view of the application.
@@ -54,8 +56,16 @@ export default function Graph() {
 
         // Load a new algorithm
         function onAlgorithmLoad(data) {
-            // Load the algorithm
+            
+            // Undo any changes the old algorithm made
+            AlgorithmInterface.revert();
+
+            // Clear the PromptQueue if one exists
+            setPromptQueue([]);
+            
+            // Load the algorithm and reset the ChangeManager
             setAlgorithm(new Algorithm(data.name, data.payload));
+            setAlgorithmChangeManager(new ChangeManager());
         }
 
         // Register the functions in shared worker

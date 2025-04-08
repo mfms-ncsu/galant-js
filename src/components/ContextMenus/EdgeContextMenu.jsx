@@ -58,13 +58,24 @@ export default function EdgeContextMenu() {
 
     // This function runs whenever update is called, and updates the values in the graph.
     function update() {
+
         // Get the new label and weight
         const label = values.label.trim();
         const weight = parseInt(String(values.weight).trim()) || undefined;
+        
+        // Start recording, so changing the label and weight happen
+        // in one step
+        let [newGraph, newChangeManager] = [];
+        newChangeManager = GraphInterface.startRecording(userChangeManager);
 
         // Set the changes
-        let [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(graph, userChangeManager, edge.source, edge.target, "label", label);
+        [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(graph, newChangeManager, edge.source, edge.target, "label", label);
         [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(newGraph, newChangeManager, edge.source, edge.target, "weight", weight);
+        
+        // Stop recording
+        newChangeManager = GraphInterface.endRecording(newChangeManager);
+        
+        // Set the new Graph and ChangeManager
         setGraph(newGraph);
         setUserChangeManager(newChangeManager);
     }

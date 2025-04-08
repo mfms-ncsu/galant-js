@@ -28,16 +28,10 @@ let sharedArray;
 let flags;
 
 /** 
- * Flag that is set to true when the algorithm is in a step. When
- * false, the algorithm should wait after every change to the graph. When
- * true, the algorithm should only wait when the step is finished.
+ * A counter to record how many steps deep we are. This is necessary to
+ * allow for recursive steps.
  */
-let isInStep;
-
-/**
- * The number of steps to take before waiting again.
- */
-let stepsToTake;
+let stepDepth = 0;
 
 /**
  * This thread's copy of the graph and its change manager.
@@ -49,18 +43,12 @@ let changeManager = new ChangeManager();
  * This function uses Atomics to cause the algorithm to wait for user input before continuing
  */
 function wait() {
-    // If we are waiting, then the algorithm step is complete. It is
-    // safe for the main thread to redraw the window
-    postMessage({action: "redraw"});
 
     // Store a 0 in the sharedArray buffer
     Atomics.store(sharedArray, 0, 0);
 
     // Wait until the sharedArray buffer's first element is not 0.
     Atomics.wait(sharedArray, 0, 0);
-
-    // Set stepsToTake to 1 (default behavior)
-    stepsToTake = 1;
 }
 
 /**
@@ -68,14 +56,9 @@ function wait() {
  * 0.
  */
 function waitIfNeeded() {
-    // If we are not in a step (implying we just finished a step),
-    // then decrement the stepsToTake counter
-    if (!isInStep) {
-        stepsToTake--;
-    }
     
-    // Wait if we are finished taking all our steps
-    if (stepsToTake == 0) {
+    // Wait if we are not in a step
+    if (stepDepth == 0) {
         wait();
     }
 }
@@ -84,31 +67,42 @@ function waitIfNeeded() {
  * Tells the thread to wait after running a step.
  */
 function step(code=null) {
-    // If we are already in a step, something probably went wrong,
-    // since it doesn't make sense to have a step within a step.
-    if (isInStep) {
-        throw new Error("Step started when already in a step. Recursive steps are not allowed.");
-    }
 
     // If there is no code in this step, an error must have happened
-    if (code == null || code == undefined) {
+    if (code === null || code === undefined) {
         throw new Error("Invalid code in step. Code cannot be null or undefined.");
     }
 
     // Tell the ChangeManager to start recording our changes, but only
     // if we are not in debug mode
     if (flags[0] == 0) {
-        postMessage({action: "startRecording"});
-        isInStep = true;
+        
+        // Are we the lowest level of step? If so, start and end the
+        // recording. If not, we shouldn't start a recording, because
+        // only the lowest level should be recording.
+        let lowestLayer = stepDepth == 0;
+
+        // Start recording, so that a single change record is made
+        if (lowestLayer) {
+            postMessage({action: "startRecording"});
+        }
+
+        // Increment the stepDepth counter so that we know when to end
+        // our step
+        stepDepth++;
 
         // Execute the code in this step
         code();
         
         // End the recording of the steps
-        postMessage({action: "endRecording"});
-        isInStep = false;
+        if (lowestLayer) {
+            postMessage({action: "endRecording"});
+        }
 
-        // Wait until we should start the next step
+        // Decrement the stepDepth counter and wait if the
+        // step is finished
+        
+        stepDepth--;
         waitIfNeeded();
     }
     else {
@@ -172,7 +166,7 @@ function promptFrom(message, list, error) {
  * @param {Object} value Value of the attribute
  */
 function setAttribute(id, name, value) {
-    if (!isInStep) { postMessage({ action: "step" }) }
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
 
     if (id == null) {
         console.error("id is null! name: " + name + ", value: " + value);
@@ -199,7 +193,7 @@ function setAttribute(id, name, value) {
  * @param {Object} value Attribute value
  */
 function setAttributeAll(type, name, value) {
-    if (!isInStep) { postMessage({ action: "step" }) }
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
 
     if (type === "nodes") {
         [graph, changeManager] = GraphInterface.setNodeAttributeAll(graph, changeManager, name, value);
@@ -241,13 +235,13 @@ function getAttribute(id, name) {
 /**************************************************************/
 
 function display(message) {
-    if (!isInStep) { postMessage({ action: "step" }) }
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
     postMessage({ action: "message", message: message });
     waitIfNeeded();
 }
 
 function print(message) {
-    if (!isInStep) { postMessage({ action: "step" }) }
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
     postMessage({ action: "print", message: message });
 }
 
@@ -330,14 +324,14 @@ function promptEdge(message) {
 }
 
 function setDirected(isDirected) {
-    if (!isInStep) { postMessage({ action: "step" }) }
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
     graph.isDirected = isDirected;
     postMessage({ action: "setDirected", isDirected: isDirected });
     waitIfNeeded();
 }
 
 function addNode(x, y) {
-    if (!isInStep) { postMessage({ action: "step" }) }
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
     let newNode;
     [graph, changeManager, newNode] = GraphInterface.addNode(graph, changeManager, x, y);
     postMessage({ action: "addNode", x: x, y: y });
@@ -346,14 +340,14 @@ function addNode(x, y) {
 }
 
 function addEdge(source, target) {
-    if (!isInStep) { postMessage({ action: "step" }) }
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, source, target);
     postMessage({ action: "addEdge", source: source, target: target });
     waitIfNeeded();
 }
 
 function setPosition(nodeId, x, y) {
-    if (!isInStep) { postMessage({ action: "step" }) }
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = GraphInterface.setNodePosition(graph, changeManager, nodeId, x, y);
     postMessage({ action: "setNodePosition", nodeId: nodeId, x: x, y: y });
     waitIfNeeded();
@@ -365,14 +359,14 @@ function incrementPosition(nodeId, x, y) {
 }
 
 function deleteNode(nodeId) {
-    if (!isInStep) { postMessage({ action: "step" }) }
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = GraphInterface.deleteNode(graph, changeManager, nodeId);
     postMessage({ action: "deleteNode", nodeId: nodeId });
     waitIfNeeded();
 }
 
 function deleteEdge(edgeId) {
-    if (!isInStep) { postMessage({ action: "step" }) }
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
     let split = edgeId.split(",");
     let source = split[0], target = split[1];
     [graph, changeManager] = GraphInterface.deleteEdge(graph, changeManager, source, target);
@@ -390,6 +384,10 @@ function getNumberOfNodes() {
 
 function getEdges() {
     return GraphInterface.getEdgeIds(graph);
+}
+
+function getEdgeBetween(source, target) {
+    return GraphInterface.getEdgeIDBetween(graph, source, target);
 }
 
 function getNumberOfEdges() {
@@ -541,6 +539,14 @@ function weight(id) {
     return getAttribute(id, "weight");
 }
 
+function hideWeight(id) {
+    setAttribute(id, "weightHidden", true);
+}
+
+function showWeight(id) {
+    setAttribute(id, "weightHidden", false);
+}
+
 function hasWeight(id) {
     let weight = getAttribute(id, "weight")
     return weight !== undefined;
@@ -684,6 +690,14 @@ function showAllEdgeLabels() {
 
 function showAllNodeLabels() {
     setAttributeAll("nodes", "labelHidden", false);
+}
+
+function isHidden(id) {
+    return getAttribute(id, "hidden") == true;
+}
+
+function visibleNeighbors(node) {
+    return GraphInterface.getAdjacentNodes(graph, node).filter((node) => GraphInterface.getNodeAttribute(graph, node, "hidden") !== true);
 }
 
 function hideNode(node) {
@@ -887,8 +901,8 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         graph = FileParser.loadGraph("", message[1]);
         graph.isDirected = message[2];
 
-        // Make sure that the isInStep variable is initialized
-        isInStep = false;
+        // Make sure that the stepDepth variable is initialized
+        stepDepth = 0;
 
         // Wait for the user to resume the algorithm
         wait();

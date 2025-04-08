@@ -355,8 +355,6 @@ function onMessage(algorithm, message) {
             if (algorithm.onStepAdded) algorithm.onStepAdded();
             algorithm.completed = true;
             break;
-        case "redraw":
-            break;
         case "error":
             newQueue = PromptInterface.queuePrompt(
                 promptQueue,
@@ -364,7 +362,7 @@ function onMessage(algorithm, message) {
                 () => {}
             );
             store.set(promptQueueAtom, newQueue);
-        // eslint-disable-next-line no-fallthrough
+            break;
         default:
             // If the message was not a type we define here, then we probably just made a mistake 
             // or typo when sending this message. Throw an error to let us know about it

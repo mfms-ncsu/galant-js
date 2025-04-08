@@ -1,0 +1,8 @@
+// nodes
+n A 0 0
+n B 0 100
+n C 0 200
+
+# edges
+e A B
+e B C
