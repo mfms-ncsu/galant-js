@@ -4,7 +4,6 @@
  */
 
 import Graph from "states/Graph/Graph";
-import ChangeManager from "states/ChangeManager/ChangeManager";
 import LayeredGraph from "states/Graph/LayeredGraph";
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import LayeredGraphInterface from "interfaces/GraphInterface/LayeredGraphInterface";
@@ -22,7 +21,7 @@ describe("LayeredGraph", () => {
         graph = FileParser.loadGraph("example 20", "c created by dot+ord2sgf, date/time = Sat Dec 19 21:09:50 UTC 2020\nc $Id: dot+ord2sgf 66 2014-03-29 16:58:11Z mfms $\nc ./minimization -h vertical_bary -i 10 -w _ ../testing/TestData/ex_20.sgf\nt ex_20 20 36 4\nn 0 0 1\nn 1 0 0\nn 2 0 2\nn 3 0 3\nn 4 0 4\nn 5 1 1\nn 6 1 0\nn 7 1 4\nn 8 1 3\nn 9 1 2\nn 10 2 1\nn 11 2 4\nn 12 2 2\nn 13 2 0\nn 14 2 3\nn 15 3 1\nn 16 3 3\nn 17 3 0\nn 18 3 2\nn 19 3 4\ne 0 5 label:A\ne 1 5 label:B\ne 3 5 label:C\ne 0 6 label:D\ne 1 6 label:E\ne 0 7 label:F\ne 3 7 label:G\ne 4 7 label:H\ne 2 8 label:I\ne 3 8 label:J\ne 4 8 label:K\ne 0 9 label:L\ne 6 10 label:M\ne 8 10 label:N\ne 7 11 label:O\ne 8 11 label:P\ne 5 12 label:Q\ne 9 12 label:R\ne 5 13 label:S\ne 5 14 label:T\ne 8 14 label:U\ne 9 14 label:V\ne 11 15 label:W\ne 12 15 label:X\ne 13 15 label:Y\ne 14 15 label:Z\ne 10 16 label:AA\ne 11 16 label:BB\ne 14 16 label:CC\ne 13 17 label:DD\ne 10 18 label:EE\ne 11 18 label:FF\ne 12 18 label:GG\ne 14 18 label:HH\ne 11 19 label:II\ne 12 19 label:JJ");
         standardGraph = FileParser.loadGraph("example 20", "c created by dot+ord2sgf, date/time = Sat Dec 19 21:09:50 UTC 2020\nc $Id: dot+ord2sgf 66 2014-03-29 16:58:11Z mfms $\nc ./minimization -h vertical_bary -i 10 -w _ ../testing/TestData/ex_20.txt\nn 0 0 1\nn 1 0 0\nn 2 0 2\nn 3 0 3\nn 4 0 4\nn 5 1 1\nn 6 1 0\nn 7 1 4\nn 8 1 3\nn 9 1 2\nn 10 2 1\nn 11 2 4\nn 12 2 2\nn 13 2 0\nn 14 2 3\nn 15 3 1\nn 16 3 3\nn 17 3 0\nn 18 3 2\nn 19 3 4\ne 0 5 label:A\ne 1 5 label:B\ne 3 5 label:C\ne 0 6 label:D\ne 1 6 label:E\ne 0 7 label:F\ne 3 7 label:G\ne 4 7 label:H\ne 2 8 label:I\ne 3 8 label:J\ne 4 8 label:K\ne 0 9 label:L\ne 6 10 label:M\ne 8 10 label:N\ne 7 11 label:O\ne 8 11 label:P\ne 5 12 label:Q\ne 9 12 label:R\ne 5 13 label:S\ne 5 14 label:T\ne 8 14 label:U\ne 9 14 label:V\ne 11 15 label:W\ne 12 15 label:X\ne 13 15 label:Y\ne 14 15 label:Z\ne 10 16 label:AA\ne 11 16 label:BB\ne 14 16 label:CC\ne 13 17 label:DD\ne 10 18 label:EE\ne 11 18 label:FF\ne 12 18 label:GG\ne 14 18 label:HH\ne 11 19 label:II\ne 12 19 label:JJ");
         //update this later
-        changeManager = new ChangeManager();
+        changeManager = null;
         // get edges for easy reference
         A = GraphInterface.getEdge(graph, "0", "5");
         B = GraphInterface.getEdge(graph, "1", "5");
