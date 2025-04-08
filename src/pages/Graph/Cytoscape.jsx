@@ -10,7 +10,7 @@ import { renderToString } from "react-dom/server";
  * A React component that renders the cytoscape instance.
  */
 export default function CytoscapeComponent() {
-    const [graph] = useAtom(graphAtom);
+    const [graph, setGraph] = useAtom(graphAtom);
     const [algorithmChangeManager] = useAtom(algorithmChangeManagerAtom)
     const cytoscapeElement = useRef();
     const backgroundCanvas = useRef();
@@ -82,6 +82,21 @@ export default function CytoscapeComponent() {
         Cytoscape.add(CytoscapeInterface.getElements(graph)); // Get new elements
         Cytoscape.style().resetToDefault(); // Reset style
         Cytoscape.style(CytoscapeInterface.getStyle(graph)).update(); // Update style
+
+        // Define a function to handle window resize events
+        const handleResize = () => {
+            let newScalar = GraphInterface.getScalar(graph);
+            setGraph((prevGraph) => ({
+                ...prevGraph,
+                scalar: newScalar,
+            }));
+        };
+        window.onresize = handleResize;
+        
+        return () => {
+            // Cleanup listener on unmount or dependency change
+            window.onresize = null;
+        };
     }, [graph]);
 
     /**
@@ -96,14 +111,24 @@ export default function CytoscapeComponent() {
         // Draw the background grid once and add an event listener to re-draw it when the viewport changes
         const graphScalar = GraphInterface.getScalar(graph);
         drawGrid(graphScalar.x, graphScalar.y);
-        Cytoscape.on('viewport', (event) => {
+    
+        // Define the event handler separately
+        const handleViewportChange = () => {
             drawGrid(graphScalar.x, graphScalar.y);
-        });
+        };
+    
+        // Add event listener once
+        Cytoscape.off('viewport', handleViewportChange); // Ensure no duplicate listeners
+        Cytoscape.on('viewport', handleViewportChange);
+    
+        return () => {
+            Cytoscape.off('viewport', handleViewportChange); // Cleanup when effect runs again or unmounts
+        };
     }, [graph?.scalar]);
 
     // Helper function to draw a background grid aligned with the graph's scaling
     const drawGrid = (scaleX, scaleY) => {
-        if (!backgroundCanvas.current) return;
+        if (!backgroundCanvas.current || !window.cytoscape) return;
 
         const canvas = backgroundCanvas.current;
         const ctx = canvas.getContext('2d');

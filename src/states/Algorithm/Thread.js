@@ -1,6 +1,8 @@
 import GraphInterface from 'interfaces/GraphInterface/GraphInterface';
 import FileParser from 'interfaces/FileParser/FileParser';
 import ChangeManager from 'states/ChangeManager/ChangeManager';
+import LayeredGraphInterface from 'interfaces/GraphInterface/LayeredGraphInterface';
+import { RampRightOutlined } from '@mui/icons-material';
 
 /**
  * Execution environment for algorithms. This file provides all necessary functions
@@ -737,6 +739,142 @@ function showNodeLabel(node) {
 function showEdgeLabel(edge) {
     setAttribute(edge, "labelHidden", false);
 }
+
+/** Layered graph functions 
+ * @author Heath Dyer
+*/
+
+function isCrossed(e, f) {
+    return LayeredGraphInterface.isCrossed(graph, e, f);
+}
+
+function crossings(e) {
+    return LayeredGraphInterface.crossings(graph, e);
+} 
+
+function totalCrossings() {
+    return LayeredGraphInterface.totalCrossings(graph);
+} 
+
+function bottleneckCrossings() {
+    return LayeredGraphInterface.bottleneckCrossings(graph);
+} 
+
+function nonVerticality(e) {
+    return LayeredGraphInterface.nonVerticality(graph, e);
+} 
+
+function totalNonVerticality() {
+    return LayeredGraphInterface.totalNonVerticality(graph);
+} 
+
+function bottleneckVerticality() {
+    return LayeredGraphInterface.bottleneckVerticality(graph);
+} 
+
+function setLayerProperty(layer, attribute, value) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.setLayerProperty(graph, changeManager, layer, attribute, value);
+    postMessage({ 
+        action: "setLayerProperty",
+        layer: layer,
+        attribute: attribute,
+        value: value,
+    });
+    waitIfNeeded();
+} 
+
+function setChannelProperty(channel, attribute, value) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.setChannelProperty(graph, changeManager, channel, attribute, value);
+    postMessage({ 
+        action: "setChannelProperty",
+        channel: channel,
+        attribute: attribute,
+        value: value,
+    });
+    waitIfNeeded();
+} 
+
+function setWeightsUp(layer, type) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.setWeightsUp(graph, changeManager, layer, type);
+    postMessage({ 
+        action: "setWeightsUp",
+        layer: layer,
+        type: type,
+    });
+    waitIfNeeded();
+} 
+
+function setWeightsDown(layer, type) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.setWeightsDown(graph, changeManager, layer, type);
+    postMessage({ 
+        action: "setWeightsDown",
+        layer: layer,
+        type: type,
+    });
+    waitIfNeeded();
+} 
+
+function setWeightsBoth(layer, type) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.setWeightsBoth(graph, changeManager, layer, type);
+    postMessage({ 
+        action: "setWeightsBoth",
+        layer: layer,
+        type: type,
+    });
+    waitIfNeeded();
+} 
+
+function sortByWeight(layer) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.sortByWeight(graph, changeManager, layer);
+    postMessage({ 
+        action: "sortByWeight",
+        layer: layer,
+    });
+    waitIfNeeded();
+} 
+
+function swap(x, y) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.swap(graph, changeManager, x, y);
+    postMessage({ 
+        action: "swap",
+        x: x,
+        y: y
+    });
+    waitIfNeeded();
+} 
+
+function nodesOnLayer(layer) {
+    return LayeredGraphInterface.nodesOnLayer(graph, layer);
+} 
+
+function evenlySpacedLayout() {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, changeManager);
+    postMessage({ action: "evenlySpacedLayout",  });
+    waitIfNeeded();
+}
+
+function showPositions(layer) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.showPositions(graph, changeManager, layer);
+    postMessage({ action: "showPositions",  layer: layer,});
+    waitIfNeeded();
+}
+
+function showIndexes(layer) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.showIndexes(graph, changeManager, layer);
+    postMessage({ action: "showIndexes",  layer: layer,});
+    waitIfNeeded();
+}
+
 
 /**************************************************************/
 /*************** End of algorithm methods *********************/

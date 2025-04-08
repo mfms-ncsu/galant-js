@@ -2,6 +2,7 @@ import { getDefaultStore } from "jotai";
 import { algorithmChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_atoms/atoms";
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import PromptInterface from "interfaces/PromptInterface/PromptInterface";
+import LayeredGraphInterface from "interfaces/GraphInterface/LayeredGraphInterface";
 
 /**
  * AlgorithmInterface contains functions to check and augment the algorithm.
@@ -271,6 +272,46 @@ function onMessage(algorithm, message) {
             break;
         case "setEdgeAttributeAll":
             [newGraph, newChangeManager] = GraphInterface.setEdgeAttributeAll(graphToUse, changeManagerToUse, message.name, message.value);
+            updateState(newGraph, newChangeManager);
+            break;
+        case "evenlySpacedLayout":
+            [newGraph, newChangeManager] = LayeredGraphInterface.evenlySpacedLayout(graphToUse, changeManagerToUse);
+            updateState(newGraph, newChangeManager);
+            break;
+        case "setLayerProperty":
+            [newGraph, newChangeManager] = LayeredGraphInterface.setLayerProperty(graphToUse, changeManagerToUse, message.layer, message.attribute, message.value);
+            updateState(newGraph, newChangeManager);
+            break;
+        case "setChannelProperty":
+            [newGraph, newChangeManager] = LayeredGraphInterface.setChannelProperty(graphToUse, changeManagerToUse, message.channel, message.attribute, message.value);
+            updateState(newGraph, newChangeManager);
+            break;
+        case "setWeightsUp":
+            [newGraph, newChangeManager] = LayeredGraphInterface.setWeightsUp(graphToUse, changeManagerToUse, message.layer, message.type);
+            updateState(newGraph, newChangeManager);
+            break;
+        case "setWeightsDown":
+            [newGraph, newChangeManager] = LayeredGraphInterface.setWeightsDown(graphToUse, changeManagerToUse, message.layer, message.type);
+            updateState(newGraph, newChangeManager);
+            break;
+        case "setWeightsBoth":
+            [newGraph, newChangeManager] = LayeredGraphInterface.setWeightsBoth(graphToUse, changeManagerToUse, message.layer, message.type);
+            updateState(newGraph, newChangeManager);
+            break;
+        case "sortByWeight":
+            [newGraph, newChangeManager] = LayeredGraphInterface.sortByWeight(graphToUse, changeManagerToUse, message.layer);
+            updateState(newGraph, newChangeManager);
+            break;
+        case "swap":
+            [newGraph, newChangeManager] = LayeredGraphInterface.swap(graphToUse, changeManager, message.x, message.y);
+            updateState(newGraph, newChangeManager);
+            break;
+        case "showIndexes":
+            [newGraph, newChangeManager] = LayeredGraphInterface.showIndexes(graphToUse, changeManager, message.layer);
+            updateState(newGraph, newChangeManager);
+            break;
+        case "showPositions":
+            [newGraph, newChangeManager] = LayeredGraphInterface.showPositions(graphToUse, changeManager, message.layer);
             updateState(newGraph, newChangeManager);
             break;
         case "startRecording":

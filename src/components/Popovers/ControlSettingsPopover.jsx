@@ -1,4 +1,8 @@
 import Cytoscape from 'globals/Cytoscape';
+import { useAtom } from "jotai";
+import { graphAtom, userChangeManagerAtom } from 'states/_atoms/atoms';
+import GraphInterface from "interfaces/GraphInterface/GraphInterface.js";
+import LayeredGraphInterface from "interfaces/GraphInterface/LayeredGraphInterface.js";
 import { Popover } from '@headlessui/react'
 import PreferenceButton from 'components/Buttons/PreferenceButton';
 import SecondaryButton from 'components/Buttons/SecondaryButton';
@@ -11,6 +15,9 @@ export default function ControlSettingsPopover() {
     // Ref for popover button
     const button = useRef(null);
 
+    const [graph, setGraph] = useAtom(graphAtom);
+    const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
+
     // Function to handle auto camera action
     function autoCamera() {
         Cytoscape.fit(Cytoscape.elements(), 100);
@@ -18,7 +25,48 @@ export default function ControlSettingsPopover() {
 
     // Function to handle auto layout action
     function autoLayout() {
-        Cytoscape.layout({ name: "cose-bilkent" }).run();
+        // Disable for Layered Graphs
+        if (graph.type == "layered")
+            return;
+
+        const graphScalar = graph.scalar;
+        const idealEdgeLength = Math.min(window.innerWidth / graphScalar.x, window.innerHeight / graphScalar.y);
+        var layout = Cytoscape.layout({ name: 'cose-bilkent', fit: false, animate: false, idealEdgeLength: idealEdgeLength,
+            stop: function () {
+                let [newGraph, newChangeManager] = [graph, userChangeManager];
+                newChangeManager = GraphInterface.startRecording(userChangeManager);
+
+                Cytoscape.nodes().forEach(node => {
+                    const nodePosition = node.position();
+
+                    // Compute the logical coordinate (nearest integer) after scaling down the physical coordinate
+                    let logicalX = Math.floor(nodePosition.x / graphScalar.x + 0.5);
+                    let logicalY = Math.floor(nodePosition.y / graphScalar.y + 0.5);
+                  
+                    // Update the node's position in the graph (logical)
+                    [newGraph, newChangeManager] = GraphInterface.setNodePosition(newGraph, newChangeManager, node.id(), logicalX, logicalY);
+
+                    // Update the node's position in Cytoscape (physical)
+                    node.position({
+                      x: logicalX * graphScalar.x,
+                      y: logicalY * graphScalar.y,
+                    });
+                });
+
+                newChangeManager = GraphInterface.endRecording(newChangeManager);
+
+                setGraph(newGraph);
+                setUserChangeManager(newChangeManager);
+            }
+        });
+
+        layout.run();
+    }
+
+    function evenlySpacedLayout() {
+        const [newGraph, newChangeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, userChangeManager);
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
     }
 
     // Function to toggle the popover menu
@@ -34,8 +82,9 @@ export default function ControlSettingsPopover() {
 
             <Popover.Panel className="absolute right-0 z-10 w-64 p-4 pt-2 rounded-xl bg-white shadow-lg pointer-events-auto">
                 <p className='text-lg font-semibold text-center'>Controls</p>
-                <SecondaryButton onClick={autoCamera} className="my-2">Auto Camera</SecondaryButton>
-                <SecondaryButton onClick={autoLayout}>Auto Layout</SecondaryButton>
+                <SecondaryButton onClick={(e) => autoCamera()} className="mb-2">Auto Camera</SecondaryButton>
+                <SecondaryButton onClick={(e) => autoLayout()} className="mb-2">Auto Layout</SecondaryButton>
+                <SecondaryButton onClick={(e) => evenlySpacedLayout()}>Evenly-Spaced Layout</SecondaryButton>
             </Popover.Panel>
         </Popover>
     );
