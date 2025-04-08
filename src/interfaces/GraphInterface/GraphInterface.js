@@ -1524,7 +1524,7 @@ function startRecording(changeManager) {
  */
 function toString(graph) {
   // Start this file with the header comments
-  let content = graph.headerComments;
+  let content = "";
 
   graph.comments.forEach((comment) => {
     content += `${comment}\n`;
