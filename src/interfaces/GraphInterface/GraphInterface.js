@@ -292,7 +292,7 @@ function getIncomingEdges(graph, target) {
 
   // Throw an error if the node doesn't exist
   if (!graph.nodes.has(target)) {
-    throw new Error("Cannot get incoming edges of node " + nodeId + " because no node with this id exists in the graph");
+    throw new Error("Cannot get incoming edges of node " + target + " because no node with this id exists in the graph");
   }
 
   // Get all edges if undirected
@@ -474,7 +474,7 @@ function getOppositeNode(graph, nodeId, edgeId) {
 function getOutgoingEdges(graph, source) {
   // Return undefined if the node doesn't exist
   if (!graph.nodes.has(source)) {
-    throw new Error("Cannot get outgoing edges of node " + nodeId + " because no node with this id exists in the graph");
+    throw new Error("Cannot get outgoing edges of node " + source + " because no node with this id exists in the graph");
   }
 
   // Get all edges if undirected
