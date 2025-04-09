@@ -61,7 +61,6 @@ function addToCover(next_node, neighbor) {
         // put neighbor into cover
         cover.add(neighbor)
         cover_size += 1
-        console.log("cover size", cover_size)
         delete nodePQ[neighbor]
         hideNode(neighbor)
     })
@@ -100,6 +99,8 @@ while ( ! PQisEmpty() ) {
         setShape(next_node, "star")
     })
     for ( let neighbor of visibleNeighbors(next_node) ) {
+        // ignore neighbor if dominance with it has already been checked
+        // in that case it's degree is at most that of next_node
         if ( ! nodePQ[neighbor] ) continue
         display(`Does ${neighbor} dominate ${next_node}?`)
         let next_incident = new Set(incident(next_node))
@@ -117,7 +118,6 @@ while ( ! PQisEmpty() ) {
                 if ( next_node == both_adjacent_node ) continue
                 // nodes adjacent to both
                 let edge_between = getEdgeBetween(next_node, both_adjacent_node)
-                console.log("both, node", both_adjacent_node, "edge", edge_between)
                 color(both_adjacent_node, "cyan")
                 highlight(both_adjacent_node)
                 setShape(both_adjacent_node, "star")
@@ -130,7 +130,6 @@ while ( ! PQisEmpty() ) {
             }
             for ( let neighbor_only_adjacent_node of neighbor_adjacent.difference(next_adjacent) ) {
                 let edge_between = getEdgeBetween(neighbor, neighbor_only_adjacent_node)
-                console.log("neighbor only, node", neighbor_only_adjacent_node, "edge", edge_between)
                 color(neighbor_only_adjacent_node, "yellow")
                 setShape(neighbor_only_adjacent_node, "star")
                 color(edge_between, "green")
@@ -138,7 +137,6 @@ while ( ! PQisEmpty() ) {
             }
             for ( let next_only_adjacent_node of next_adjacent.difference(neighbor_adjacent) ) {
                 let edge_between = getEdgeBetween(next_node, next_only_adjacent_node)
-                console.log("next only, node", next_only_adjacent_node, "edge", edge_between)
                 color(next_only_adjacent_node, "red")
                 setShape(next_only_adjacent_node, "triangle")
                 color(edge_between, "red")
@@ -151,7 +149,7 @@ while ( ! PQisEmpty() ) {
         else {
             display(`${neighbor} does not dominate ${next_node}`)
         }
-        // clear all animations from this dominance check and blacken node removed from queue
+        // clear all animations from this dominance check and blacken nodes removed from queue
         step(() => {
             for ( let incident_edge of all_incident ) {
                 unhighlight(incident_edge)
@@ -164,8 +162,15 @@ while ( ! PQisEmpty() ) {
             }
         })
     } // for each neighbor
-    color(next_node, "black")
-    hideWeight(next_node)
+    // color all nodes not in the priority queue black
+    step(() => {
+            for ( let node of getNodes() ) {
+            if ( ! nodePQ[node] ) {
+                hideWeight(node)
+                color(node, "black")
+            }
+        }
+    })
 } // while nodePQ not empty
 step(() => {
     for ( let in_cover of cover ) {
