@@ -1,6 +1,7 @@
 import produce, { enableMapSet } from "immer";
 import ChangeObject from "states/ChangeManager/ChangeObject";
 import Graph from "states/Graph/Graph";
+import ChangeManager from "states/ChangeManager/ChangeManager";
 import Edge from "states/Graph/GraphElement/Edge";
 import Node from "states/Graph/GraphElement/Node";
 import LayeredGraph from "states/Graph/LayeredGraph";
@@ -94,7 +95,7 @@ function verifyNodes(graph, source, target, action) {
 }
 
 /**
- * Throws an error if the given graph is undefined
+ * Throws an error if the given graph is undefined or not a Graph object
  * @param {Graph} graph the graph to check
  */
 function verifyGraph(graph) {
@@ -104,18 +105,23 @@ function verifyGraph(graph) {
 }
 
 /**
+ * Throws an error if the given changeManager is undefined or not a ChangeManager object
+ * @param {Graph} graph the graph to check
+ */
+function verifyChangeManager(changeManager) {
+    if (changeManager === undefined) {
+        throw new Error("changeManager cannot be undefined");
+    }
+}
+
+/**
  * Throws an error if the given graph and/or changeManager are undefined
  * @param {Graph} graph the graph to check
  * @param {ChangeManager} changeManager the ChangeManager to check
  */
 function verifyGraphChangeManager(graph, changeManager) {
-    if (graph === undefined && changeManager === undefined) {
-        throw new Error("Both the given Graph and ChangeManager are undefined");
-    }
-    if (changeManager === undefined) {
-        throw new Error("ChangeManager cannot be undefined");
-    }
     verifyGraph(graph);
+    verifyChangeManager(changeManager);
 }
 
  /** Recursive function to shift nodes on a layer to the right or left to resolve overlap
@@ -202,6 +208,7 @@ function shiftNodes(graph, changeManager, sortedLayer, nodeIndex, shiftRight) {
  * @returns Array of adjacent nodes
  */
 function getAdjacentNodes(graph, nodeId) {
+  verifyGraph(graph);
   let nodes = [];
 
   // Check if the node exists
@@ -216,8 +223,8 @@ function getAdjacentNodes(graph, nodeId) {
 
     return nodes;
   } else {
-    // If the node doesn't exist, return undefined
-    return undefined;
+    // If the node doesn't exist, throw an error
+    throw new Error("Cannot get adjacent nodes of node " + nodeId + " because the node does not exist");
   }
 }
 
@@ -232,8 +239,6 @@ function getEdge(graph, source, target) {
   verifyNodes(graph, source, target, `get edge ${source},${target}`);
   verifyGraph(graph);
   const node = graph.nodes.get(source);
-  if (!node) return undefined;
-
   return node.edges.get(`${source},${target}`);
 }
 
@@ -246,18 +251,14 @@ function getEdge(graph, source, target) {
  * @returns Attribute value
  */
 function getEdgeAttribute(graph, source, target, name) {
-  // Verify the edge exists and get it
-  let sourceNode = graph.nodes.get(source);
-  let targetNode = graph.nodes.get(target);
-  let edge =
-    sourceNode && targetNode && sourceNode.edges.get(`${source},${target}`);
+  
+  let edge = getEdge(graph, source, target);
 
-  if (edge) {
-    return edge.attributes.get(name);
-  } else {
-    // If the edge doesn't exist, return undefined
-    return undefined;
+  // If the edge doesn't exist, throw an error
+  if (!edge) {
+    throw new Error("Cannot get attribute of edge " + edge + " because no such edge exists in the graph");
   }
+  return edge.attributes.get(name);
 }
 
 /**
@@ -266,7 +267,7 @@ function getEdgeAttribute(graph, source, target, name) {
  * @param {Graph} graph Graph on which to operate
  * @param {String} source Source node
  * @param {String} target Target node
- * @returns Edge between source and target nodes
+ * @returns Edge between source and target nodes, or undefined if no such edge exists
  */
 function getEdgeBetween(graph, source, target) {
   let edge = getEdge(graph, source, target);
@@ -286,11 +287,7 @@ function getEdgeBetween(graph, source, target) {
  * @returns Edge between source and target nodes
  */
 function getEdgeIDBetween(graph, source, target) {
-  let edge = getEdge(graph, source, target);
-  if (edge === undefined && !graph.isDirected) {
-    // If undirected, check the opposite as well
-    edge = getEdge(graph, target, source);
-  }
+  let edge = getEdgeBetween(graph, source, target);
   return getEdgeID(graph, edge);
 }
 
@@ -314,6 +311,7 @@ function getEdgeID(graph, edge) {
  * @returns Array of edges in the graph
  */
 function getEdgeIds(graph) {
+  verifyGraph(graph);
   const edges = [];
 
   graph.nodes.forEach((node) => {
@@ -333,6 +331,7 @@ function getEdgeIds(graph) {
  * @returns String file name for graph.
  */
 function getFileName(graph) {
+  verifyGraph(graph);
   return graph.name;
 }
 
@@ -394,6 +393,13 @@ function getIncomingEdges(graph, target) {
  * @returns Array of incoming nodes
  */
 function getIncomingNodes(graph, target) {
+  verifyGraph(graph);
+  
+  // Throw an error if the node doesn't exist
+  if (!graph.nodes.has(target)) {
+    throw new Error("Cannot get incoming nodes of node " + target + " because no node with this id exists in the graph");
+  }
+  
   // Get all nodes if undirected
   if (!graph.isDirected) {
     return getAdjacentNodes(graph, target);
@@ -402,18 +408,13 @@ function getIncomingNodes(graph, target) {
   let nodes = [];
 
   // Check if the node exists
-  if (graph.nodes.has(target)) {
-    graph.nodes.get(target).edges.forEach((edge) => {
-      if (edge.target === target) {
-        nodes.push(edge.source);
-      }
-    });
+  graph.nodes.get(target).edges.forEach((edge) => {
+    if (edge.target === target) {
+      nodes.push(edge.source);
+    }
+  });
 
-    return nodes;
-  } else {
-    // If the node doesn't exist, return undefined
-    return undefined;
-  }
+  return nodes;
 }
 
 /**
@@ -441,14 +442,16 @@ function getMessage(changeManager) {
  * @returns Attribute value
  */
 function getNodeAttribute(graph, nodeId, name) {
+  verifyGraph(graph);
+
   // Get the node
   let node = graph.nodes.get(nodeId);
 
   if (node) {
     return node.attributes.get(name);
   } else {
-    // If the node doesn't exist, return undefined
-    return undefined;
+    // If the node doesn't exist, throw an error
+    throw new Error("Cannot get the attribute of node " + nodeId + " because no such node exists in the graph");
   }
 }
 
@@ -469,14 +472,16 @@ function getNodeIds(graph) {
  * @returns Node position
  */
 function getNodePosition(graph, nodeId) {
+  verifyGraph(graph);
+
   // Get the node
   let node = graph.nodes.get(nodeId);
 
   if (node) {
     return node.position;
   } else {
-    // If the node doesn't exist, return undefined
-    return undefined;
+    // If the node doesn't exist, throw an error
+    throw new Error("Cannot get the position of node " + nodeId + " because it does not exist in the Graph");
   }
 }
 
@@ -496,6 +501,7 @@ function getNodes(graph) {
  * @return the total number of edges in the graph
  */
 function getNumberOfEdges(graph) {
+  verifyGraph(graph);
   return getEdgeIds(graph).length;
 }
 
@@ -505,6 +511,7 @@ function getNumberOfEdges(graph) {
  * @return the total number of nodes in the graph
  */
 function getNumberOfNodes(graph) {
+  verifyGraph(graph);
   return graph.nodes.size;
 }
 
@@ -517,6 +524,7 @@ function getNumberOfNodes(graph) {
  * @returns Id of the node opposite the given
  */
 function getOppositeNode(graph, nodeId, edgeId) {
+  verifyGraph(graph);
   // Error checking
   if (!graph.nodes.has(nodeId))
     throw new Error(
@@ -545,6 +553,7 @@ function getOppositeNode(graph, nodeId, edgeId) {
  * @returns Array of edges outgoing from source, undefined if source doesn't exist
  */
 function getOutgoingEdges(graph, source) {
+  verifyGraph(graph);
   // Return undefined if the node doesn't exist
   if (!graph.nodes.has(source)) {
     throw new Error("Cannot get outgoing edges of node " + source + " because no node with this id exists in the graph");
@@ -576,6 +585,7 @@ function getOutgoingEdges(graph, source) {
  * @returns Array of outgoing nodes
  */
 function getOutgoingNodes(graph, source) {
+  verifyGraph(graph);
   // Get all nodes if undirected
   if (!graph.isDirected) {
     return getAdjacentNodes(graph, source);
@@ -593,8 +603,8 @@ function getOutgoingNodes(graph, source) {
 
     return nodes;
   } else {
-    // If the node doesn't exist, return undefined
-    return undefined;
+    // If the node doesn't exist, throw an error
+    throw new Error("Cannot get the outgoing nodes of node " + source + " because no such node exists in the graph");
   }
 }
 
@@ -605,6 +615,7 @@ function getOutgoingNodes(graph, source) {
  * @returns Object of Scalars for the x and y scales
  */
 function getScalar(graph) {
+  verifyGraph(graph);
   
   // If there is no window, then this graph is being loaded into
   // the thread to run an algorithm. The scalar does not matter
@@ -651,8 +662,9 @@ function getScalar(graph) {
  * @throws if the edge does not exist
  */
 function getTarget(graph, edge) {
+  verifyGraph(graph);
   const nodes = edge.split(",");
-  if (nodes.length !== 2 || !graph.nodes.has(nodes[1])) {
+  if (nodes.length !== 2 || !graph.nodes.has(nodes[1]) || !graph.nodes.get(nodes[1]).edges.has(edge)) {
     throw new Error("Given edge is not valid: " + edge);
   }
   return nodes[1];
@@ -666,8 +678,9 @@ function getTarget(graph, edge) {
  * @throws if the edge does not exist
  */
 function getSource(graph, edge) {
+  verifyGraph(graph);
   const nodes = edge.split(",");
-  if (nodes.length !== 2 || !graph.nodes.has(nodes[0])) {
+  if (nodes.length !== 2 || !graph.nodes.has(nodes[0]) || !graph.nodes.get(nodes[0]).edges.has(edge)) {
     throw new Error("Given edge is not valid: " + edge);
   }
   return nodes[0];
@@ -793,7 +806,11 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
  */
 function deleteEdge(graph, changeManager, source, target) {
   // Error checking
+  verifyGraphChangeManager(graph, changeManager);
   verifyNodes(graph, source, target, "delete edge");
+  if (!graph.nodes.get(source).edges.has(`${source},${target}`)) {
+    throw new Error(`Cannot delete edge ${source},${target} because the edge does not exist`);
+  }
 
   // Get a copy of the attributes
   const attributes = graph.nodes
@@ -1172,6 +1189,7 @@ function setDirected(graph, isDirected) {
  * @returns Updated graph and change manager
  */
 function setNodeAttribute(graph, changeManager, nodeId, name, value) {
+  verifyGraphChangeManager(graph, changeManager);
   if (!graph.nodes.has(nodeId)) {
     throw new Error(
       "Cannot set attribute of node " +

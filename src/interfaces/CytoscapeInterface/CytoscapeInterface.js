@@ -1,4 +1,5 @@
 import GraphInterface from "../GraphInterface/GraphInterface"
+import Graph from "../../states/Graph/Graph"
 
 /**
  * CytoscapeInterface returns the graph represented in cytoscape 

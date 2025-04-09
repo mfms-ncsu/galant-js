@@ -166,28 +166,311 @@ describe("Graph tests", () => {
     });
 
     /**
-     * Test method for Graph.getNodePosition
-     *
-    test("Testing the Graph.getNodePosition method", () => {
-        expect(graph.getNodePosition(node1)).toEqual({ x: 0, y: 0 });
-        expect(graph.getNodePosition("nonexistent")).toBeUndefined();
+     * Test method for GraphInterface.getNodePosition
+     */
+    test("Testing the GraphInterface.getNodePosition method", () => {
+        expect(GraphInterface.getNodePosition(graph, node1)).toEqual({ x: 0, y: 0 });
+        expect(() => { GraphInterface.getNodePosition(graph, "nonexistent") } ).toThrow();
     });
 
     /**
-     * Test method for Graph.getNodeAttribute
-     *
-    test("Testing the Graph.getNodeAttribute method", () => {
-        expect(graph.getNodeAttribute(node1, "attribute")).toBeUndefined();
-        expect(graph.getNodeAttribute("nonexistent", "attribute")).toBeUndefined();
+     * Test method for GraphInterface.getNodeAttribute
+     */
+    test("Testing the GraphInterface.getNodeAttribute method", () => {
+        expect(GraphInterface.getNodeAttribute(graph, node1, "attribute")).toBeUndefined();
+        expect(() => { GraphInterface.getNodeAttribute(graph, "nonexistent", "attribute") } ).toThrow();
     });
 
     /**
-     * Test method for Graph.getEdgeAttribute
-     *
-    test("Testing the Graph.getEdgeAttribute method", () => {
-        expect(graph.getEdgeAttribute(node1, node2, "attribute")).toBeUndefined();
-        expect(graph.getEdgeAttribute("nonexistent", node2, "attribute")).toBeUndefined();
+     * Test method for GraphInterface.getEdgeAttribute
+     */
+    test("Testing the GraphInterface.getEdgeAttribute method", () => {
+        expect(GraphInterface.getEdgeAttribute(graph, node1, node2, "attribute")).toBeUndefined();
+        expect(() => { GraphInterface.getEdgeAttribute(graph, "nonexistent", node2, "attribute") } ).toThrow();
     });
-    */
     
+    /** 
+     * Test the addNode and addEdge methods. These two methods are tested
+     * together since there's no way to add an Edge without first adding
+     * Nodes, and there's no way to test if a Node exists without 
+     * retrieving an Edge it belongs to.
+     *
+     * It's a little strange to have Edge objects but not Node
+     * objects, but we don't allow the user to retrieve a Node
+     * object itself because they could add their own edges to the
+     * Node's internal Edge map, which would bypass the ChangeManager.
+     */
+    test("Testing GraphInterface.addNode and GraphInterface.addEdge", 
+            () => {
+        
+        graph = new Graph();
+
+        // Add a node to the graph
+        let node1, node2;
+        [graph, changeManager, node1] = GraphInterface.addNode(graph, changeManager, 0, 0);
+        
+        // Add a new node to the graph
+        [graph, changeManager, node2] = GraphInterface.addNode(graph, changeManager, 1, 1);
+
+        // Add an edge between the two nodes
+        [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node1, node2);
+
+        // Make sure the edge between the two nodes exists
+        let edge = GraphInterface.getEdge(graph, node1, node2);
+
+        // Make sure that the edge exists, and that its
+        // nodes are node1 and node2, respectively
+        expect(edge).toBeInstanceOf(Edge);
+        expect(edge.source).toBe(node1);
+        expect(edge.target).toBe(node2);
+
+        // Make sure that we cannot add edges between nodes that do not exist
+        expect( () => {
+            GraphInterface.addEdge(graph, changeManager, node1, "bad input");
+        }).toThrow();
+        expect( () => {
+            GraphInterface.addEdge(graph, changeManager, "bad input", node1);
+        }).toThrow();
+        expect( () => {
+            GraphInterface.addEdge(graph, changeManager, "bad input", "bad input");
+        }).toThrow();
+    }); 
+    
+    /** 
+     * Test the deleteNode method
+     */
+    test("Testing GraphInterface.deleteNode", () => {
+        
+        // Remove node1
+        [graph, changeManager] = GraphInterface.deleteNode(graph, changeManager, node2);
+
+        // Test that the associated edges of the node are removed
+        expect(() => { GraphInterface.getEdge(graph, node1, node2) } ).toThrow();
+        expect(() => { GraphInterface.getEdge(graph, node2, node3) } ).toThrow();
+        expect(() => { GraphInterface.getEdge(graph, node2, node4) } ).toThrow();
+ 
+        // We should no longer allow the node to be used in making edges
+        expect( () => {
+            GraphInterface.addEdge(graph, changeManager, node1, node2);
+        }).toThrow();
+        expect( () => {
+            GraphInterface.addEdge(graph, changeManager, node2, node1);
+        }).toThrow();
+
+        // Any adjacency lists containing the edge should be updated
+        graph = GraphInterface.setDirected(graph, true);
+
+        let incoming = GraphInterface.getIncomingEdges(graph, node3);
+        expect(incoming.length).toBe(1);
+
+        let outgoing = GraphInterface.getOutgoingEdges(graph, node1);
+        expect(outgoing.length).toBe(2);
+    });
+    
+    /** 
+     * Test the deleteEdge method
+     */
+    test("Testing ChangeManager.deleteEdge", () => {
+        
+        // Delete one of the edges, then make sure it does not exist anymore
+        [graph, changeManager] = GraphInterface.deleteEdge(graph, changeManager, node1, node2);
+
+        expect(GraphInterface.getEdge(graph, node1, node2)).toBeUndefined();
+        expect(() => {GraphInterface.deleteEdge(graph, changeManager, node1, "bad")} ).toThrow();
+        expect(() => {GraphInterface.deleteEdge(graph, changeManager, "bad", node1)} ).toThrow();
+        expect(() => {GraphInterface.deleteEdge(graph, changeManager, node1, node2)} ).toThrow();
+
+    });
+    
+    /** 
+     * Test the setNodeAttribute method
+     */
+    test("Testing ChangeManager.setNodeAttribute", () => {
+        
+        // Set an attribute
+        [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, node1, "marked", true);
+
+        // Test that the attribute exists
+        expect(GraphInterface.getNodeAttribute(graph, node1, "marked")).toBe(true);
+        expect(GraphInterface.getNodeAttribute(graph, node1, "unusedAttribute")).toBeUndefined();
+
+        // Test that invalid inputs return undefined
+        expect(() => { GraphInterface.getNodeAttribute("bad input", "marked") } ).toThrow();
+    });
+    
+    /** 
+     * Test the setEdgeAttribute method
+     */
+    test("Testing ChangeManager.setEdgeAttribute", () => {
+        
+        // Set an attribute
+        [graph, changeManager] = GraphInterface.setEdgeAttribute(graph, changeManager, node1, node2, "color", "red");
+
+        // Make sure that the edge's attribute was properly saved
+        expect(GraphInterface.getEdgeAttribute(graph, node1, node2, "color")).toBe("red");
+        expect(GraphInterface.getEdgeAttribute(graph, node1, node2, "newAttribute")).toBeUndefined;
+        
+        // Make sure that invalid inputs throw an error
+        expect(() => { GraphInterface.getEdgeAttribute(graph, node1, "bad input", "abc") } ).toThrow();
+        expect(() => { GraphInterface.getEdgeAttribute(graph, "no", "bad input", "abc") } ).toThrow();
+        expect(() => { GraphInterface.getEdgeAttribute(graph, "no", node2, "abc") } ).toThrow();
+        expect(() => { GraphInterface.getEdgeAttribute(undefined, "no", node2, "abc") } ).toThrow();
+        expect(() => { GraphInterface.getEdgeAttribute("graph", "no", node2, "abc") } ).toThrow();
+    });
+    
+    /** 
+     * Test the undo and redo methods. These are tested together
+     * because you cannot redo without first calling undo, so it
+     * makes more sense to test redo while you are testing undo.
+     */
+    test("Testing ChangeManager.undo and ChangeManager.redo", () => {
+        
+        // Make a simple graph
+        graph = new Graph();
+        changeManager = new ChangeManager();
+    
+        // Make nodes
+        let node1, node2;
+        [graph, changeManager, node1] = GraphInterface.addNode(graph, changeManager, 0, 0);
+        [graph, changeManager, node2] = GraphInterface.addNode(graph, changeManager, 1, 1);
+
+        // Add an attribute to node1
+        [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, node1, "color", "black");
+
+        // Add an edge to the graph
+        [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node1, node2);
+        
+        // Add an attribute to the edge
+        [graph, changeManager] = GraphInterface.setEdgeAttribute(graph, changeManager, node1, node2, "color", "red");
+        
+        // Make sure that the edge has the attribute (which implies the
+        // nodes and edges were created successfully as well);
+        expect(GraphInterface.getEdgeAttribute(graph, node1, node2, "color")).toBe("red");
+
+        // Call the Undo method. The Edge should still be there, but
+        // it should have no attribute
+        [graph, changeManager] = GraphInterface.undo(graph, changeManager);
+        expect(GraphInterface.getEdgeAttribute(graph, node1, node2, "color")).toBeUndefined();
+
+        // Call undo again, the edge should be removed
+        [graph, changeManager] = GraphInterface.undo(graph, changeManager);
+        
+        // Make sure the edge is no longer there
+        expect(GraphInterface.getEdge(graph, node1, node2)).toBeUndefined(); 
+
+        // Undo the node's attribute. It should exist before the undo, but not after
+        expect(GraphInterface.getNodeAttribute(graph, node1, "color")).toBe("black");
+        [graph, changeManager] = GraphInterface.undo(graph, changeManager);
+        expect(GraphInterface.getNodeAttribute(graph, node1, "color")).toBeUndefined();
+
+        // Undo the last two nodes
+        expect(graph.nodes.size).toBe(2); 
+        [graph, changeManager] = GraphInterface.undo(graph, changeManager);
+        expect(graph.nodes.size).toBe(1); 
+        [graph, changeManager] = GraphInterface.undo(graph, changeManager);
+
+        // The graph should have no nodes
+        expect(graph.nodes.size).toBe(0);
+
+        // Now that the graph is empty, calling undo() again should have no effect
+        [graph, changeManager] = GraphInterface.undo(graph, changeManager);
+
+        // Redo both nodes
+        expect(graph.nodes.size).toBe(0);
+        [graph, changeManager] = GraphInterface.redo(graph, changeManager);
+        expect(graph.nodes.size).toBe(1);
+        [graph, changeManager] = GraphInterface.redo(graph, changeManager);
+        expect(graph.nodes.size).toBe(2);
+
+        // Redo the attribute
+        [graph, changeManager] = GraphInterface.redo(graph, changeManager);
+        expect(GraphInterface.getNodeAttribute(graph, node1, "color")).toBe("black");
+            
+        // Redo the edge
+        [graph, changeManager] = GraphInterface.redo(graph, changeManager);
+
+        // The edge should be back, but with no attribute
+        expect(GraphInterface.getEdge(graph, node1, node2)).toBeInstanceOf(Edge);
+        expect(GraphInterface.getEdgeAttribute(graph, node1, node2, "color")).toBeUndefined();
+
+        // Redo the attribute
+        [graph, changeManager] = GraphInterface.redo(graph, changeManager);
+
+        // Make sure that the edge has it's attribute back
+        expect(GraphInterface.getEdgeAttribute(graph, node1, node2, "color")).toBe("red");
+
+        // Calling redo now should have no effect, but should not throw any error
+        [graph, changeManager] = GraphInterface.redo(graph, changeManager);
+
+    });
+
+    /** 
+     * Test the startRecording and endRecording methods
+     * @author Ziyu Wang
+     */
+    test("Testing ChangeManager.startRecording and ChangeManager.endRecording", () => {
+        
+        let graph = new Graph();
+        let changeManager = new ChangeManager();
+        
+        // Start recording
+        changeManager = GraphInterface.startRecording(changeManager);
+        expect(changeManager.isRecording).toBe(true);
+        
+        // Make some changes
+        let node1, node2;
+        [graph, changeManager, node1] = GraphInterface.addNode(graph, changeManager, 0, 0);
+        [graph, changeManager, node2] = GraphInterface.addNode(graph, changeManager, 1, 1);
+        [graph, changeManager] =  GraphInterface.addEdge(graph, changeManager, node1, node2);
+        
+        // End the recording
+        changeManager = GraphInterface.endRecording(changeManager);
+        expect(changeManager.isRecording).toBe(false);
+
+        // Undo should remove both nodes and the edge at once
+        [graph, changeManager] = GraphInterface.undo(graph, changeManager);
+        expect(GraphInterface.getNumberOfNodes(graph)).toBe(0);
+        expect(GraphInterface.getNumberOfEdges(graph)).toBe(0);
+    });
+
+    /** 
+     * Test the revert method
+     * @author Ziyu Wang
+     */
+    test("Testing ChangeManager.revert", () => {
+        
+        graph = new Graph();
+        changeManager = new ChangeManager();
+        
+        let node1, node2;
+        [graph, changeManager, node1] = GraphInterface.addNode(graph, changeManager, 0, 0);
+        [graph, changeManager, node2] = GraphInterface.addNode(graph, changeManager, 1, 1);
+        [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node1, node2);
+
+        [graph, changeManager] = GraphInterface.revert(graph, changeManager);
+        expect(GraphInterface.getNumberOfNodes(graph)).toBe(0);
+        expect(GraphInterface.getNumberOfEdges(graph)).toBe(0);
+    });
+
+    /** 
+     * Test the getLength and getIndex methods
+     * @author Ziyu Wang
+     */
+    test("Testing ChangeManager.getLength and ChangeManager.getIndex", () => {
+        
+        graph  = new Graph();
+        changeManager = new ChangeManager();
+        
+        let node1, node2;
+        [graph, changeManager, node1] = GraphInterface.addNode(graph, changeManager, 0, 0);
+        [graph, changeManager, node2] = GraphInterface.addNode(graph, changeManager, 1, 1);
+        [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node1, node2);
+
+        expect(changeManager.changes.length).toBe(3);
+        expect(changeManager.index).toBe(3);
+
+        [graph, changeManager] = GraphInterface.undo(graph, changeManager);
+        expect(changeManager.changes.length).toBe(3);
+        expect(changeManager.index).toBe(2);
+    });
 });
