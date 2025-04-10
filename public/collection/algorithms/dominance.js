@@ -54,9 +54,9 @@ function addToCover(next_node, neighbor) {
         for ( let edge_to_remove of incident(neighbor) ) {
             let to_decrease = other(neighbor, edge_to_remove)
             setWeight(to_decrease, weight(to_decrease) - 1)
-            nodePQ[to_decrease] -= 1
-            // hideEdge does not exist in the API
-            // setAttribute(edge_to_remove, "hidden", true)
+            if ( weight(to_decrease) > 0 ) {
+                nodePQ[to_decrease] = weight(to_decrease)
+            }
         }
         // put neighbor into cover
         cover.add(neighbor)
@@ -66,7 +66,6 @@ function addToCover(next_node, neighbor) {
     })
     // it looks like two display calls in the same step don't work
     // also, display("cover size =", cover_size) appears not to work
-    display(`cover size = ${cover_size}`)
 }
 
 step(() => {
@@ -91,7 +90,8 @@ let cover_size = 0
 while ( ! PQisEmpty() ) {
     let next_node = removeMin()
     if ( ! next_node ) break   // apparently need this, not clear why
-
+    // skip nodes that are already in the cover
+    if ( isHidden(next_node) ) continue
     step(() => {
         highlight(next_node)
         display("checking node " + next_node)
@@ -99,9 +99,6 @@ while ( ! PQisEmpty() ) {
         setShape(next_node, "star")
     })
     for ( let neighbor of visibleNeighbors(next_node) ) {
-        // ignore neighbor if dominance with it has already been checked
-        // in that case it's degree is at most that of next_node
-        if ( ! nodePQ[neighbor] ) continue
         display(`Does ${neighbor} dominate ${next_node}?`)
         let next_incident = new Set(incident(next_node))
         let neighbor_incident = new Set(incident(neighbor))              
@@ -166,17 +163,25 @@ while ( ! PQisEmpty() ) {
     step(() => {
             for ( let node of getNodes() ) {
             if ( ! nodePQ[node] ) {
-                hideWeight(node)
                 color(node, "black")
             }
         }
     })
 } // while nodePQ not empty
 step(() => {
-    for ( let in_cover of cover ) {
-        showNode(in_cover)
-        color(in_cover, "yellow")
-        setShape(in_cover, "star")
-        hideWeight(in_cover)
+    for ( let node of getNodes() ) {
+        showNode(node)
+        hideWeight(node)
+        uncolor(node)
+        if ( cover.has(node) ) {
+            color(node, "yellow")
+            setShape(node, "square")
+        }
+    }
+    for ( let edge of getEdges() ) {
+        if ( ! (cover.has(source(edge)) || cover.has(target(edge))) ) {
+            highlight(edge)
+            color(edge, "red")
+        }
     }
 })
