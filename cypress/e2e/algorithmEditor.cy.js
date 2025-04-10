@@ -8,7 +8,16 @@ describe('Test Algorithm Editor', () => {
     })
   
     it('Monaco Editor exists', () => {
-        cy.get('.monaco-editor').should('exist');
+        // Old test
+        // cy.get('.monaco-editor').should('exist');
+
+        // New test
+        // Open a blank editor tab
+        cy.get('[data-cy="NewTabButton"]').click();
+        cy.get('[data-cy="BlankTab"]').click();
+
+        // Monaco editor should render
+        cy.get('[data-cy="MonacoEditor"]').should('exist');
     });
 
     it('Examples dropdown appears', () => {
