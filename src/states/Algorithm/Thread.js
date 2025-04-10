@@ -875,6 +875,10 @@ function showIndexes(layer) {
     waitIfNeeded();
 }
 
+function numberOfLayers() {
+    return LayeredGraphInterface.numberOfLayers(graph);
+} 
+
 
 /**************************************************************/
 /*************** End of algorithm methods *********************/

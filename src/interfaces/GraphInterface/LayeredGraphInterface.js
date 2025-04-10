@@ -784,6 +784,16 @@ function showIndexes(graph, changeManager, layer) {
     return [newGraph, newChangeManager]; 
 }
 
+function numberOfLayers(graph) {
+    let maxLayer = 0;
+    graph.nodes.forEach(node => {
+        if (node.layer > maxLayer) {
+            maxLayer = node.layer;
+        }
+    });
+    return maxLayer + 1;
+}
+
 const LayeredGraphInterface = {
     isCrossed,
     crossings,
@@ -803,6 +813,7 @@ const LayeredGraphInterface = {
     evenlySpacedLayout,
     showPositions,
     showIndexes,
+    numberOfLayers,
 };
 
 export default LayeredGraphInterface;
