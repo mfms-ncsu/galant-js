@@ -837,7 +837,10 @@ function applyNodePositions(graph, changeManager, savedPositions) {
             changeObjects.push(new ChangeObject("setNodePosition",
                 {
                     id: node.id,
-                    position: draft.nodes.get(node.id).position,
+                    position: {
+                        x: draft.nodes.get(node.id).position.x,
+                        y: draft.nodes.get(node.id).position.y,
+                    },
                     index: draft.nodes.get(node.id).index,
                 },
                 {
