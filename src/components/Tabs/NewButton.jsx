@@ -60,7 +60,7 @@ export default function NewButton({ addTab, examples }) {
                         </Menu.Item>
 
                         <div className="mt-2 flex flex-col items-start">
-                            <span className="font-bold">Examples</span>
+                            <span className="font-bold" data-cy="ExamplesHeader">Examples</span>
                             {examples.map(data => (
                                 <Menu.Item key={data.name}>
                                     <button

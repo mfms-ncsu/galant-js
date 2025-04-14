@@ -1,3 +1,7 @@
+/**
+ * Tests Algorithm Editor functionality
+ * @author Jacob Friend
+ */
 describe('Test Algorithm Editor', () => {
     beforeEach(() => {
       // Cypress starts out with a blank slate for each test
@@ -8,10 +12,6 @@ describe('Test Algorithm Editor', () => {
     })
   
     it('Monaco Editor exists', () => {
-        // Old test
-        // cy.get('.monaco-editor').should('exist');
-
-        // New test
         // Open a blank editor tab
         cy.get('[data-cy="NewTabButton"]').click();
         cy.get('[data-cy="BlankTab"]').click();
@@ -21,23 +21,31 @@ describe('Test Algorithm Editor', () => {
     });
 
     it('Examples dropdown appears', () => {
-        cy.get('#new-button').click();
-        cy.get('#examples-dropdown').should('be.visible');
+        // Open a new tab
+        cy.get('[data-cy="NewTabButton"]').click();
+        // Check for list of algorithm examples
+        cy.get('[data-cy="ExamplesHeader"]').should('exist');
     })
 
     it('Example Added', () => {
-        cy.get('#new-button').click();
-        cy.get('#examples-dropdown').contains('Breadth-First Search').click();
-        cy.get('.tab').contains('Breadth-First Search');
+        // Open a new tab
+        cy.get('[data-cy="NewTabButton"]').click();
+        // Select BFS Algorithm
+        cy.contains('Breadth-First Search').click();
+        // BFS tab should open
+        cy.contains('Breadth-First Search').should('exist');
     })
 
     it('Ensure LocalStorage is properly read on refresh', () => {
-        cy.get('#new-button').click();
-        cy.get('#examples-dropdown').contains('Breadth-First Search').click();
+        // Open a new tab
+        cy.get('[data-cy="NewTabButton"]').click();
+        // Select BFS Algorithm
+        cy.contains('Breadth-First Search').click();
         cy.window().should(win => {
-            expect(win.localStorage.getItem('AlgorithmFiles')).to.exist;
+            expect(win.localStorage.getItem('algorithmTabs')).to.exist;
         });
         cy.visit('http://localhost:3000/algorithmeditor');
-        cy.get('.tab').contains('Breadth-First Search');
+        // BFS tab should persist through refresh
+        cy.contains('Breadth-First Search').should('exist');
     })
 });

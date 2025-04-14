@@ -61,6 +61,8 @@ export default function ContextMenu() {
 
     // Add a new node to the graph
     function addNode() {
+        console.log("position.x: " + position.x);
+        console.log("graph.scalar.x: " + graph.scalar.x);
         let [newGraph, newChangeManager] = GraphInterface.addNode(graph, userChangeManager, position.x / graph.scalar.x, position.y / graph.scalar.y);
         setGraph(newGraph);
         setUserChangeManager(newChangeManager);
@@ -89,13 +91,13 @@ export default function ContextMenu() {
 
 
     return(!algorithm && visible &&
-        <div id="edit-context-menu" className="p-4 rounded-xl bg-white shadow-lg" style={{ position: 'fixed', top: renderedPosition.y + 'px', left: renderedPosition.x + 'px' }} onMouseDown={(event) => event.stopPropagation()}>
+        <div id="edit-context-menu" data-cy="edit-context-menu" className="p-4 rounded-xl bg-white shadow-lg" style={{ position: 'fixed', top: renderedPosition.y + 'px', left: renderedPosition.x + 'px' }} onMouseDown={(event) => event.stopPropagation()}>
             <PrimaryButton onClick={addNode}>New Node</PrimaryButton>
             <div className="h-[1px] w-full my-4 bg-gray-300" />
             <div>
                 <div className="flex flex-row mb-2">
                     <input className="p-1 rounded bg-gray-200" size={12} placeholder="Source" value={values.source} onChange={(event) => changeValue('source', event.target.value)} />
-                    <input className="p-1 ml-2 rounded bg-gray-200" size={12} placeholder="Destionation" onChange={(event) => changeValue('destination', event.target.value)} />
+                    <input className="p-1 ml-2 rounded bg-gray-200" size={12} placeholder="Destination" onChange={(event) => changeValue('destination', event.target.value)} />
                 </div>
                 <PrimaryButton onClick={addEdge}>New Edge</PrimaryButton>
             </div>

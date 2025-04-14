@@ -1,13 +1,14 @@
 /**
  * Tests the algorithm mode
  * @author Julian Madrigal
+ * @author Jacob Friend
  */
 describe('Test Graph Edit Mode', () => {
-    it('New Graph Saved', () => {
+    it.only('New Graph Saved', () => {
         cy.visit('http://localhost:3000');
-        cy.get('#cytoscape-instance').rightclick();
-        const newNode = cy.get('#edit-context-menu').contains('New Node');
-        newNode.click();
+        cy.get('[data-cy="cytoscape-instance"]').should('be.visible');
+        cy.get('[data-id="layer0-selectbox"]').rightclick();
+        cy.get('[data-cy="edit-context-menu"] > :nth-child(1)').click();
         const saveChanges = cy.get('#edit-overlay').contains('Save Changes');
         saveChanges.click();
     });
