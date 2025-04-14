@@ -757,7 +757,7 @@ function showIndexes(graph, changeManager, layer) {
     // update graph
     let newGraph = produce(graph, (draft) => {
         layerNodes.forEach(node => {
-            //create change object
+            //create change object\
             changeObjects.push(new ChangeObject("setNodeAttribute",
                 {
                     id: node.id,
@@ -784,6 +784,11 @@ function showIndexes(graph, changeManager, layer) {
     return [newGraph, newChangeManager]; 
 }
 
+/**
+ * Returns the number of layers in the graph as an integer
+ * @param {Graph} graph graph to use
+ * @returns number of layers in graph
+ */
 function numberOfLayers(graph) {
     let maxLayer = 0;
     graph.nodes.forEach(node => {
@@ -792,6 +797,65 @@ function numberOfLayers(graph) {
         }
     });
     return maxLayer + 1;
+}
+
+/**
+ * Given a graph, copys all node position data to an array
+ * @param {Graph} graph Graph to copy nodes from
+ * @returns Retursn array of objects contianing node id, position, and index
+ */
+function copyNodePositions(graph) {
+    const savedPositions = [];
+    graph.nodes.forEach(node => {
+        savedPositions.push({
+            id: node.id,
+            position: {
+                x: node.position.x,
+                y: node.position.y,
+            },
+            index: node.index,
+            layer: node.layer,
+        });
+    });
+    return savedPositions;
+}
+
+/**
+ * Given an array of saved node positions, applys those positions to the graph
+ * @param {Graph} graph Graph to make changes to
+ * @param {ChangeManager} changeManager Change manager to record changes with
+ * @param {Array} savedPositions Array of objects containg position, id, index of nodes to apply
+ * @returns Retursn the new graph and change mangager
+ */
+function applyNodePositions(graph, changeManager, savedPositions) {
+    const changeObjects = [];
+    //create new graph
+    let newGraph = produce(graph, (draft) => {
+        savedPositions.forEach(node => {
+            console.log("Old node index:", node.index);
+            console.log("new node index:", draft.nodes.get(node.id).index);
+            changeObjects.push(new ChangeObject("setNodePosition",
+                {
+                    id: node.id,
+                    position: {
+                        x: draft.nodes.get(node.id).position.x,
+                        y: draft.nodes.get(node.id).position.y,
+                    },
+                    index: draft.nodes.get(node.id).index,
+                },
+                {
+                    id: node.id,
+                    position: node.position,
+                    index: node.index,
+                },
+            ));
+            draft.nodes.get(node.id).position = node.position;
+            draft.nodes.get(node.id).index = node.index;
+        })
+    });
+    //update change record
+    const newChangeManager = GraphInterface.recordChange(changeManager, changeObjects);
+    return [newGraph, newChangeManager]; 
 }
 
 const LayeredGraphInterface = {
@@ -814,6 +878,8 @@ const LayeredGraphInterface = {
     showPositions,
     showIndexes,
     numberOfLayers,
+    copyNodePositions,
+    applyNodePositions,
 };
 
 export default LayeredGraphInterface;
