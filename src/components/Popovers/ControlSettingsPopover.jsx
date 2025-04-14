@@ -61,6 +61,8 @@ export default function ControlSettingsPopover() {
         });
 
         layout.run();
+
+        autoCamera();
     }
 
     function evenlySpacedLayout() {

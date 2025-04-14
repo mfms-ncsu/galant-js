@@ -17,7 +17,7 @@ export default class Graph {
   /** Node render size */
   nodeSize = 35;
   /** Object of x and y scales */
-  scalar;
+  scalar = {x: 50, y: 50};
   /** Show weights and labels flags */
   showEdgeLabels = true;
   showEdgeWeights = true;
