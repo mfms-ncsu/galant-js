@@ -287,6 +287,11 @@ function onMessage(algorithm, message) {
             [newGraph, newChangeManager] = LayeredGraphInterface.showPositions(graph, changeManager, message.layer);
             updateState(newGraph, newChangeManager);
             break;
+        case "applyNodePositions":
+            [newGraph, newChangeManager] = LayeredGraphInterface.applyNodePositions(graph, changeManager, message.savedPositions);
+            console.log("algorithm thread", message.savedPositions);
+            updateState(newGraph, newChangeManager);
+            break;
         case "startRecording":
             newChangeManager = GraphInterface.startRecording(changeManager);
             store.set(algorithmChangeManagerAtom, newChangeManager);
