@@ -129,6 +129,10 @@ export default function AlgorithmControls() {
         return () => document.removeEventListener('keydown', handleKeyPress, true);
     }, [graph, algorithm]);
 
+    useEffect(() => {
+        console.log(algorithmChangeManager);
+    }, [algorithmChangeManager]);
+
     // Return if no algorithm is available
     if (!algorithm) return null;
 
