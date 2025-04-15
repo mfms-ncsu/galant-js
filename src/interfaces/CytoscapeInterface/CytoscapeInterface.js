@@ -15,6 +15,22 @@ import Graph from "../../states/Graph/Graph"
  ***********
  */
 
+ function parseAndRound(input) {
+    const num = Number(input);
+    
+    if (isNaN(num)) {
+        return null;
+    }
+  
+    // Check if it needs to be rounded
+    const parts = num.toString().split(".");
+    if (parts.length === 2 && parts[1].length > 2) {
+      return Math.round(num * 100) / 100;
+    }
+  
+    return num;
+  }
+
 /**
  * Returns true if the given attribute in the ege is not undefined, not 
  * an empty string, and is not hidden.
@@ -50,6 +66,9 @@ function parseEdge(graph, edge) {
 
     if (edgeHasAttribute(edge, "weight") && graph.showEdgeWeights) {
         addedWeight = true;
+        if (parseAndRound(edge.attributes.get("weight"))) {
+            text += parseAndRound(edge.attributes.get("weight"));
+        }
         text += edge.attributes.get("weight");
     }
     
@@ -79,6 +98,7 @@ function parseEdge(graph, edge) {
  * @returns Cytoscape node element
  */
 function parseNode(graph, node) {
+    //TODO: round node weight
     let scalar = graph.scalar;
 
     // Identifying data
@@ -93,7 +113,13 @@ function parseNode(graph, node) {
 
     // Add attributes
     node.attributes.forEach((value, name) => {
-        element.data[name] = value;
+
+        if (name === "weight" && parseAndRound(value)) {
+            element.data[name] = parseAndRound(value);
+        }
+        else {
+            element.data[name] = value;
+        }
     });
 
     return element;
