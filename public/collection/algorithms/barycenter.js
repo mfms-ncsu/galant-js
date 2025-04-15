@@ -9,8 +9,6 @@ const numLayers = numberOfLayers();
 let savedPositions = copyNodePositions();
 // saveGraphState();
 
-let scope = "down";
-
 /**
  * writes a message about current number of crossings, along with context information
  */
@@ -27,10 +25,15 @@ function displayMessage( layer, sweepDirection ) {
  * @param weightDirection direction of layer on which the current weight
  * assignment is based 
  */
-function displayAfterWeightAssignment( layer, weightDirection ) {
-    setLayerProperty(layer, "highlighted", true);
+function displayAfterWeightAssignment( layer, sweepDirection ) {
+    setLayerProperty(layer, "color", "cyan");
     setLayerProperty(layer, "weightHidden", false);
-    const sweepDirection = ( weightDirection == scope ? "up" : "down");
+    if (sweepDirection == "up") {
+        setChannelProperty(layer - 1, "color", "blue");
+    }
+    else if (sweepDirection == "down") {
+        setChannelProperty(layer, "color", "blue");
+    }
     displayMessage( layer, sweepDirection );
 }
 
@@ -39,10 +42,15 @@ function displayAfterWeightAssignment( layer, weightDirection ) {
  * resets weights and highlighting; nodes whose position is changed by the
  * sorting are marked
  */
-function displayAfterSort( layer, weightDirection ) {
-    setLayerProperty(layer, "highlighted", true);
+function displayAfterSort( layer, sweepDirection ) {
+    setLayerProperty(layer, "color", "cyan");
     setLayerProperty(layer, "weightHidden", false);
-    let sweepDirection = ( weightDirection == scope  ? "up" : "down");
+    if (sweepDirection == "up") {
+        setChannelProperty(layer - 1, "color", "blue");
+    }
+    else if (sweepDirection == "down") {
+        setChannelProperty(layer, "color", "blue");
+    }
     displayMessage( layer, sweepDirection );
 }
 
@@ -51,10 +59,16 @@ function displayAfterSort( layer, weightDirection ) {
  * the nodes that have been marked for position changes; the beginStep
  * matched an endStep after weights are assigned to a new layer
  */
-function reset( layer ) {
-    setLayerProperty(layer, "highlighted", false);
+function reset( layer, sweepDirection ) {
+    setLayerProperty(layer, "color", "white");
     setLayerProperty(layer, "weightHidden", false);
     setLayerProperty(layer, "marked", false);
+    if (sweepDirection == "up") {
+        setChannelProperty(layer - 1, "color", "black");
+    }
+    else if (sweepDirection == "down") {
+        setChannelProperty(layer, "color", "black");
+    }
 }
 
 /**
@@ -77,26 +91,40 @@ function checkCrossings() {
 }
 
 function upSweep( numLayers ) {
+    const sweepDirection = "down";
     for (let layer = 0; layer < numLayers - 1; layer++) {
-        setWeightsDown(layer, "position");
-        displayAfterWeightAssignment(layer, "down");
-        sortByWeight(layer);
-        iteration++;
-        checkCrossings();
-        displayAfterSort(layer, "down");
-        reset(layer);
+        step(() => {
+            setWeightsDown(layer, "position");
+            displayAfterWeightAssignment(layer, sweepDirection);
+        })
+        step(() => {
+            sortByWeight(layer);
+            iteration++;
+            checkCrossings();
+            displayAfterSort(layer, sweepDirection);
+        })
+        step(() => {
+            reset(layer, sweepDirection);
+        })
     }
 }
 
 function downSweep( numLayers ) {
-    for (let layer = numLayers - 2; layer >= 1; layer--) {
-        setWeightsUp(layer, "position");
-        displayAfterWeightAssignment(layer, "up");
-        sortByWeight(layer);
-        iteration++;
-        checkCrossings();
-        displayAfterSort(layer, "up");
-        reset(layer);
+    const sweepDirection = "up";
+    for (let layer = numLayers - 1; layer >= 1; layer--) {
+        step(() => {
+            setWeightsUp(layer, "position");
+            displayAfterWeightAssignment(layer, sweepDirection);
+        })
+        step(() => {
+            sortByWeight(layer);
+            iteration++;
+            checkCrossings();
+            displayAfterSort(layer, sweepDirection);
+        })
+        step(() => {
+            reset(layer, sweepDirection);
+        })
     }
 }
 

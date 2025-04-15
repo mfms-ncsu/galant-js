@@ -80,12 +80,12 @@ function crossings(graph, e) {
     let crossings = 0;
     let visitedEdges = new Set();
     graph.nodes.forEach(node => {
-        node.edges.forEach(f => {
-            if (e != f && !visitedEdges.has(f) && isCrossed(graph, e, f)) {
+        node.edges.forEach((f, index) => {
+            if (e != f && !visitedEdges.has(index) && isCrossed(graph, e, f)) {
                 // console.log(`${e.attributes.get("label")} crosses ${f.attributes.get("label")}`);
                 crossings += 1;
             }
-            visitedEdges.add(f);
+            visitedEdges.add(index);
         });
     });
     // console.log(`crossings: ${crossings}`);
@@ -104,10 +104,10 @@ function totalCrossings(graph) {
     let total = 0;
     let visitedEdges = new Set();
     graph.nodes.forEach(node => {
-        node.edges.forEach(e => {
-            if (!visitedEdges.has(e)) {
+        node.edges.forEach((e, index) => {
+            if (!visitedEdges.has(index)) {
                 total += crossings(graph, e);
-                visitedEdges.add(e);
+                visitedEdges.add(index, e);
             }
         });
     });
@@ -268,7 +268,7 @@ function setChannelProperty(graph, changeManager, channel, attribute, value) {
                             target: e.target,
                             attribute: {
                                 name: attribute,
-                                value: draft.nodes.get(node.id).edges.get(`${e.source},${e.target}`).attributes.get(attribute),
+                                value: draft.nodes.get(node.id).edges.get(index).attributes.get(attribute),
                             },
                         },
                         {
@@ -281,7 +281,7 @@ function setChannelProperty(graph, changeManager, channel, attribute, value) {
                         },
                     ));
                     // update attribute
-                    draft.nodes.get(node.id).edges.get(`${e.source},${e.target}`).attributes.set(attribute, value);
+                    draft.nodes.get(node.id).edges.get(index).attributes.set(attribute, value);
                 }
             })
         });
