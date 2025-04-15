@@ -164,5 +164,5 @@ step(() => {
 //display minimum bottlneck graph
 step(() => {
     applyNodePositions(savedBottleneckPositions);
-    display( `min pass = ${minBottleneckPass}, min iteration = ${minBottleneckIteration}, min bottlneck = ${minCrossings} `);
+    display( `min pass = ${minBottleneckPass}, min iteration = ${minBottleneckIteration}, min bottlneck = ${minEdgeCrossings} `);
 })

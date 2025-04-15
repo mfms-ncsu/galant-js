@@ -583,28 +583,6 @@ function sortByWeight(graph, changeManager, layer) {
     const newChangeManager = GraphInterface.recordChange(changeManager, changes);
 
     return [newGraph, newChangeManager];
-
-
-
-    // let newGraph = graph;
-    // let newChangeManager = changeManager;
-    // const layerNodes = nodesOnLayer(graph, layer); // Nodes sorted by index
-    // for (let j = 0; j < layerNodes.length - 1; j++) {
-    //     let minIndex = j;
-    //     // Find the node with the smallest weight in the remaining array
-    //     for (let k = j + 1; k < layerNodes.length; k++) {
-    //         if (layerNodes[k].attributes.get("weight") < layerNodes[minIndex].attributes.get("weight")) {
-    //             minIndex = k;
-    //         }
-    //     }
-    //     // Swap only if the smallest element is not already in place
-    //     if (minIndex !== j) {
-    //         [newGraph, newChangeManager] = swap(newGraph, newChangeManager, layerNodes[j].id, layerNodes[minIndex].id);
-    //         [layerNodes[j], layerNodes[minIndex]] = [layerNodes[minIndex], layerNodes[j]];
-    //     }
-    // }
-    // //update change record
-    // return [newGraph, changeManager];
 }
 
 
