@@ -520,25 +520,91 @@ function setWeightsBoth(graph, changeManager, layer, type) {
  */
 function sortByWeight(graph, changeManager, layer) {
     isLayered(graph);
-    let newGraph = graph;
-    let newChangeManager = changeManager;
-    const layerNodes = nodesOnLayer(graph, layer); // Nodes sorted by index
-    for (let j = 0; j < layerNodes.length - 1; j++) {
-        let minIndex = j;
-        // Find the node with the smallest weight in the remaining array
-        for (let k = j + 1; k < layerNodes.length; k++) {
-            if (layerNodes[k].attributes.get("weight") < layerNodes[minIndex].attributes.get("weight")) {
-                minIndex = k;
-            }
+
+    const layerNodes = nodesOnLayer(graph, layer); // Sorted by index
+
+    // Record original positions and indices
+    const originalPositions = new Map();
+    for (const node of layerNodes) {
+        originalPositions.set(node.id, {
+            position: { 
+                x: node.position.x,
+                y: node.position.y,
+             },
+            index: node.index
+        });
+    }
+
+    // Create a shallow copy of the layer nodes and sort by weight
+    const sortedNodes = [...layerNodes].sort((a, b) => {
+        return a.attributes.get("weight") - b.attributes.get("weight");
+    });
+
+    // Apply new positions and indices based on sorted order
+    let newGraph = produce(graph, (draft) => {
+        for (let i = 0; i < sortedNodes.length; i++) {
+            const nodeId = sortedNodes[i].id;
+            const node = draft.nodes.get(nodeId);
+
+            node.index = i;
+            node.position = {
+                x: i, // Assuming horizontal layout; adjust if vertical
+                y: node.position.y
+            };
         }
-        // Swap only if the smallest element is not already in place
-        if (minIndex !== j) {
-            [newGraph, newChangeManager] = swap(newGraph, newChangeManager, layerNodes[j].id, layerNodes[minIndex].id);
-            [layerNodes[j], layerNodes[minIndex]] = [layerNodes[minIndex], layerNodes[j]];
+    });
+
+    // Generate change records
+    const changes = [];
+
+    for (let i = 0; i < sortedNodes.length; i++) {
+        const nodeId = sortedNodes[i].id;
+        const old = originalPositions.get(nodeId);
+        const node = newGraph.nodes.get(nodeId);
+
+        const positionChanged = node.position.x !== old.position.x || node.position.y !== old.position.y;
+        const indexChanged = node.index !== old.index;
+
+        if (positionChanged || indexChanged) {
+            changes.push(
+                new ChangeObject("setNodePosition", {
+                    id: nodeId,
+                    position: old.position,
+                    index: old.index
+                }, {
+                    id: nodeId,
+                    position: node.position,
+                    index: node.index
+                })
+            );
         }
     }
-    //update change record
-    return [newGraph, changeManager];
+
+    const newChangeManager = GraphInterface.recordChange(changeManager, changes);
+
+    return [newGraph, newChangeManager];
+
+
+
+    // let newGraph = graph;
+    // let newChangeManager = changeManager;
+    // const layerNodes = nodesOnLayer(graph, layer); // Nodes sorted by index
+    // for (let j = 0; j < layerNodes.length - 1; j++) {
+    //     let minIndex = j;
+    //     // Find the node with the smallest weight in the remaining array
+    //     for (let k = j + 1; k < layerNodes.length; k++) {
+    //         if (layerNodes[k].attributes.get("weight") < layerNodes[minIndex].attributes.get("weight")) {
+    //             minIndex = k;
+    //         }
+    //     }
+    //     // Swap only if the smallest element is not already in place
+    //     if (minIndex !== j) {
+    //         [newGraph, newChangeManager] = swap(newGraph, newChangeManager, layerNodes[j].id, layerNodes[minIndex].id);
+    //         [layerNodes[j], layerNodes[minIndex]] = [layerNodes[minIndex], layerNodes[j]];
+    //     }
+    // }
+    // //update change record
+    // return [newGraph, changeManager];
 }
 
 
