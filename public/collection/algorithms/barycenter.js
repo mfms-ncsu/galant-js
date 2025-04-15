@@ -5,8 +5,11 @@ let iteration = 0;
 let pass = 0;
 let minIteration = 0;
 let minPass = 0;
+let minBottleneckIteration = 0;
+let minBottleneckPass = 0;
 const numLayers = numberOfLayers();
 let savedPositions = copyNodePositions();
+let savedBottleneckPositions = copyNodePositions();
 // saveGraphState();
 
 /**
@@ -86,6 +89,10 @@ function checkCrossings() {
     edgeCrossings = bottleneckCrossings();
     if (edgeCrossings < minEdgeCrossings) {
         minEdgeCrossings = edgeCrossings;
+        minBottleneckIteration = iteration;
+        minBottleneckPass = pass;
+        //save graph state
+        savedBottleneckPositions = copyNodePositions();
     }
     
 }
@@ -141,13 +148,21 @@ while(true) {
     pass++;
     upSweep(numLayers);
     downSweep(numLayers);
-    display("Total crossings: " + totalCrossings());
     let quit = promptBoolean("quit?");
     if (quit) {
         break;
     };
 }
 
-//load graph state
-applyNodePositions(savedPositions);
-display( `min pass = ${minPass}, min iteration = ${minIteration}, min crossings = ${minCrossings} `);
+
+//display minimum crossing graph
+step(() => {
+    applyNodePositions(savedPositions);
+    display( `min pass = ${minPass}, min iteration = ${minIteration}, min crossings = ${minCrossings} `);
+})
+
+//display minimum bottlneck graph
+step(() => {
+    applyNodePositions(savedBottleneckPositions);
+    display( `min pass = ${minBottleneckPass}, min iteration = ${minBottleneckIteration}, min bottlneck = ${minCrossings} `);
+})
