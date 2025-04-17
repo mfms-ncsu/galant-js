@@ -3,29 +3,47 @@
  * @author Julian Madrigal
  * @author Jacob Friend
  */
-describe('Test Graph Edit Mode', () => {
-    it.only('New Graph Saved', () => {
-        cy.visit('http://localhost:3000');
-        cy.get('[data-cy="cytoscape-instance"]').should('be.visible');
-        cy.get('[data-id="layer0-selectbox"]').rightclick();
-        cy.get('[data-cy="edit-context-menu"] > :nth-child(1)').click();
-        const saveChanges = cy.get('#edit-overlay').contains('Save Changes');
-        saveChanges.click();
-    });
+describe.skip('Tests Algorithm Execution Mode', () => {
 
-
+    /** 
+     * Currently unable to load a graph and algorithm into Galant
+     * in a Cypress test. Cypress does not support testing across
+     * multiple windows, which makes it difficult to interact with
+     * the algorithm and graph editors. Find a work around or consider
+     * a different testing framework.
+     * 
+     * Skipping all tests in this file for now.
+    */
+    
     it('Test Graph Saved With No Existing Tab', () => {
         cy.intercept('GET', '/worker.js', (req) => {
             const url = new URL(req.url);
-            url.pathname = url.pathname.replace('worker.js', 'testing/mockWorkerGraphAlgorithm.js');
+            url.pathname = url.pathname.replace('worker.js', 'testing/mockWorker.js');
             req.url = url.href;
         }).as('modifiedRequest');
 
-        cy.visit('http://localhost:3000');
-        cy.get("#algorithm-controls").should('be.visible');
-        cy.get("#algorithm-name").should('have.text', 'Mock Algorithm');
-        cy.get("#terminate-algorithm").click();
-        cy.get("#confirmation-prompt-confirm").click();
+        cy.visit('http://localhost:3000/grapheditor');
 
-    })
+        cy.get('.tab').contains('New Graph1');
+        cy.contains('n a 0 0 label:From_Testing');
+        cy.contains('n a 0 0 label:Updated_From_Testing');
+    });
+
+    it('Load a standard graph and execute Breadth First Search', () => {      
+        // Load a standard graph
+
+        // Load BFS algorithm
+
+        // Step through the algorithm
+    });
+
+    it('Load a layered graph and execute Bary Center Algorithm', () => {
+        // Load a layered graph
+        
+        cy.visit('http://localhost:3000/algorithmeditor');
+        // Open a new tab
+        cy.get('[data-cy="NewTabButton"]').click();
+        // Load Bary Center Algorithm
+    });
+
 });

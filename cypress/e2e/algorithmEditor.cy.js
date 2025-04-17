@@ -2,14 +2,11 @@
  * Tests Algorithm Editor functionality
  * @author Jacob Friend
  */
-describe('Test Algorithm Editor', () => {
+describe('Tests Algorithm Editor', () => {
+    
     beforeEach(() => {
-      // Cypress starts out with a blank slate for each test
-      // so we must tell it to visit our website with the `cy.visit()` command.
-      // Since we want to visit the same URL at the start of all our tests,
-      // we include it in our beforeEach function so that it runs before each test
       cy.visit('http://localhost:3000/algorithmeditor')
-    })
+    });
   
     it('Monaco Editor exists', () => {
         // Open a blank editor tab
@@ -25,7 +22,7 @@ describe('Test Algorithm Editor', () => {
         cy.get('[data-cy="NewTabButton"]').click();
         // Check for list of algorithm examples
         cy.get('[data-cy="ExamplesHeader"]').should('exist');
-    })
+    });
 
     it('Example Added', () => {
         // Open a new tab
@@ -34,7 +31,7 @@ describe('Test Algorithm Editor', () => {
         cy.contains('Breadth-First Search').click();
         // BFS tab should open
         cy.contains('Breadth-First Search').should('exist');
-    })
+    });
 
     it('Ensure LocalStorage is properly read on refresh', () => {
         // Open a new tab
@@ -47,5 +44,6 @@ describe('Test Algorithm Editor', () => {
         cy.visit('http://localhost:3000/algorithmeditor');
         // BFS tab should persist through refresh
         cy.contains('Breadth-First Search').should('exist');
-    })
+    });
+
 });
