@@ -1,9 +1,11 @@
 import { React, useEffect } from "react";
 import { useAtom } from "jotai";
-import { graphAtom, userChangeManagerAtom } from "states/_atoms/atoms";
+import { graphAtom, graphTabsAtom, userChangeManagerAtom } from "states/_atoms/atoms";
+import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from "@heroicons/react/24/solid";
+
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import PrimaryButton from "components/Buttons/PrimaryButton";
-import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from "@heroicons/react/24/solid";
+import TabInterface from "interfaces/TabInterface/TabInterface";
 
 /**
  * GraphEditOverlay component represents an overlay for editing graph with 
@@ -11,33 +13,19 @@ import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from "@heroicons/react/24/sol
  */
 export default function EditControls() {
     const [graph, setGraph] = useAtom(graphAtom);
+    const [tabs, setTabs] = useAtom(graphTabsAtom);
     const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
 
     // Function to save the graph state
-    // TODO: IMPROVE THIS!!
     function save() {
-        // // Get the graph as a JSON object
-        // const graphData = {
-        //     name: GraphInterface.getFileName(graph) ?? 'New Graph',
-        //     content: GraphInterface.toString(graph),
-        // };
+        // Get the graph as a JSON object
+        const graphData = {
+            name: GraphInterface.getFileName(graph) ?? 'New Graph',
+            content: GraphInterface.toString(graph),
+        };
 
-        // const storageItem = localStorage.getItem(`GraphFiles`); // Get the existing local storage
-        // const dataList = (storageItem) ? JSON.parse(storageItem) : []; // Parse it
-        
-        // // Attempt to overwrite the existing graph
-        // let added = false;
-        // dataList.forEach((graph, i) => {
-        //     if (graph.name === graphData.name) {
-        //         dataList[i] = graphData;
-        //         added = true;
-        //     }
-        // });
-
-        // // If there isn't one, save it
-        // !added && dataList.push(graphData);
-
-        // localStorage.setItem(`GraphFiles`, JSON.stringify(dataList)); // Set the local storage
+        //Update the EditorTabs
+        setTabs(TabInterface.updateTab(tabs, graphData));
     }
 
     // Function to revert graph edits (node movements, etc.)
