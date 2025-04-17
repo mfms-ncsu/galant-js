@@ -137,8 +137,10 @@ function addTab(tabs, data) {
  * @returns Updated tab list
  */
 function updateTab(tabs, data) {
+    // Get the tab
     const tab = getTabByName(tabs, data.name);
 
+    // Update the content if the tab exists or create a new tab
     if (tab) {
         tab.content = data.content;
     } else {

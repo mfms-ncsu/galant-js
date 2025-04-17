@@ -1,9 +1,10 @@
 import { React, useEffect } from "react";
 import { useAtom } from "jotai";
 import { graphAtom, graphTabsAtom, userChangeManagerAtom } from "states/_atoms/atoms";
+import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from "@heroicons/react/24/solid";
+
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import PrimaryButton from "components/Buttons/PrimaryButton";
-import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from "@heroicons/react/24/solid";
 import TabInterface from "interfaces/TabInterface/TabInterface";
 
 /**
