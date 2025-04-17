@@ -2,6 +2,7 @@ import Graph from "states/Graph/Graph";
 import ChangeManager from "states/ChangeManager/ChangeManager";
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import Edge from "states/Graph/GraphElement/Edge";
+import LayeredGraph from "states/Graph/LayeredGraph";
 
 /**
  * Mock window functions for testing environment
@@ -17,6 +18,7 @@ window.updateMessage = jest.fn();
  *
  * @author Krisjian Smith
  * @author Ziyu Wang
+ * @author Ethan Haske
  */
 describe("Graph tests", () => {
     
@@ -473,4 +475,176 @@ describe("Graph tests", () => {
         expect(changeManager.changes.length).toBe(3);
         expect(changeManager.index).toBe(2);
     });
+
+     /** 
+     * Test setNodePosition method
+     */
+     test("Testing GraphInterface.setNodePosition method", () => {
+        
+        [graph, changeManager] = GraphInterface.setNodePosition(graph, changeManager, node1, 10, 15);
+
+        expect(GraphInterface.getNodePosition(graph,node1)).toEqual({ x: 10, y: 15 });
+        expect(() => { GraphInterface.setNodePosition(graph, changeManager, "", 10, 15) } ).toThrow();
+
+        let layGraph = new Graph("", "layered");
+        changeManager = new ChangeManager();
+        let node5;
+        [layGraph, changeManager, node5] = GraphInterface.addNode(layGraph, changeManager, 0, 0);
+        [layGraph, changeManager] = GraphInterface.setNodePosition(layGraph, changeManager, node5, 5, 10);
+        expect(GraphInterface.getNodePosition(layGraph,node5)).toEqual({ x: 5, y: 0 });
+
+    });
+
+     /** 
+     * Test setNodeSize method
+     */
+     test("Testing GraphInterface.setNodeSize method", () => {
+        graph = GraphInterface.setNodeSize(graph, 10);
+        expect((graph.nodeSize)).toEqual(10);
+       
+
+    });
+
+    /** 
+     * Test setShowEdgeLabels method
+     */
+    test("Testing GraphInterface.setShowEdgeLabels method", () => {
+        graph = GraphInterface.setShowEdgeLabels(graph, true);
+        expect((graph.showEdgeLabels)).toBe(true);
+        graph = GraphInterface.setShowEdgeLabels(graph, false);
+        expect((graph.showEdgeLabels)).toBe(false);
+
+    });
+
+     /** 
+     * Test setShowEdgeWeights method
+     */
+     test("Testing GraphInterface.setShowEdgeWeights method", () => {
+        graph = GraphInterface.setShowEdgeWeights(graph, true);
+        expect((graph.showEdgeWeights)).toBe(true);
+        graph = GraphInterface.setShowEdgeWeights(graph, false);
+        expect((graph.showEdgeWeights)).toBe(false);
+       
+
+    });
+
+     /** 
+     * Test setShowNodeLabels method
+     */
+     test("Testing GraphInterface.setShowNodeLabels method", () => {
+        graph = GraphInterface.setShowNodeLabels(graph, true);
+        expect((graph.showNodeLabels)).toBe(true);
+        graph = GraphInterface.setShowNodeLabels(graph, false);
+        expect((graph.showNodeLabels)).toBe(false);
+       
+
+    });
+
+     /** 
+     * Test setShowNodeWeights method
+     */
+     test("Testing GraphInterface.setShowNodeWeights method", () => {
+        graph = GraphInterface.setShowNodeWeights(graph, true);
+        expect((graph.showNodeWeights)).toBe(true);
+        graph = GraphInterface.setShowNodeWeights(graph, false);
+        expect((graph.showNodeWeights)).toBe(false);
+       
+
+    });
+    
+     /** 
+     * Test toString method
+     */
+     test("Testing GraphInterface.toString method", () => {
+       const content = GraphInterface.toString(graph);
+       const expected = "n 0 0 0 \nn 1 1 0 \nn 2 1 1 \nn 3 0 1 \ne 0 1 \ne 0 2 \ne 0 3 \ne 1 2 \ne 1 3 \ne 2 3 \n"
+       expect((content)).toEqual(expected);
+       
+
+    });
+
+    /** 
+     * Test undo method
+     */
+    test("Testing GraphInterface.undo method", () => {
+        [graph, changeManager] = GraphInterface.deleteNode(graph, changeManager, node4);
+        expect(GraphInterface.getNumberOfNodes(graph)).toBe(3);
+        [graph, changeManager] = GraphInterface.undo(graph, changeManager);
+        expect(GraphInterface.getNumberOfNodes(graph)).toBe(4);
+     });
+
+      /** 
+     * Test addEdge method
+     */
+    test("Testing GraphInterface.addEdge method", () => {
+        let node5;
+        [graph, changeManager, node5] = GraphInterface.addNode(graph, changeManager, 10, 10);
+        [graph, changeManager ] = GraphInterface.addEdge(graph, changeManager, node1, node5);
+        expect(GraphInterface.getNumberOfEdges(graph)).toEqual(7);
+        expect(GraphInterface.getEdge(graph, node1, node5)).toBeDefined;
+     });
+
+     /** 
+     * Test setNodeAttributeAll method
+     */
+    test("Testing GraphInterface.setNodeAttributeAll method", () => {
+        [graph, changeManager ] = GraphInterface.setNodeAttributeAll(graph,changeManager, "weight", 10);
+        expect(GraphInterface.getNodeAttribute(graph, node1, "weight")).toEqual(10);
+        expect(GraphInterface.getNodeAttribute(graph, node2, "weight")).toEqual(10);
+        expect(GraphInterface.getNodeAttribute(graph, node3, "weight")).toEqual(10);
+        expect(GraphInterface.getNodeAttribute(graph, node4, "weight")).toEqual(10);
+     });
+
+      /** 
+     * Test setEdgeAttributeAll method
+     */
+    test("Testing GraphInterface.setEdgeAttributeAll method", () => {
+        [graph, changeManager ] = GraphInterface.setEdgeAttributeAll(graph, changeManager, "weight", 10);
+        expect(GraphInterface.getEdgeAttribute(graph, node1, node2, "weight")).toEqual(10);
+        expect(GraphInterface.getEdgeAttribute(graph, node1, node3, "weight")).toEqual(10);
+        expect(GraphInterface.getEdgeAttribute(graph, node1, node4, "weight")).toEqual(10);
+        expect(GraphInterface.getEdgeAttribute(graph, node2, node3, "weight")).toEqual(10);
+        expect(GraphInterface.getEdgeAttribute(graph, node2, node4, "weight")).toEqual(10);
+        expect(GraphInterface.getEdgeAttribute(graph, node3, node4, "weight")).toEqual(10);
+     });
+
+    
+      /** 
+     * Test getOutgoingNodes method
+     */
+    test("Testing GraphInterface.getOutgoingNodes method", () => {
+        expect(GraphInterface.getOutgoingNodes(graph, node1)).toEqual([node2, node3, node4]);
+     });
+
+       /** 
+     * Test getIncomingNodes method
+     */
+    test("Testing GraphInterface.getIncomingNodes method", () => {
+        expect(GraphInterface.getIncomingNodes(graph, node1)).toEqual([node2, node3, node4]);
+     });
+
+       /** 
+     * Test getEdgeIds method
+     */
+    test("Testing GraphInterface.getEdgeIds method", () => {
+        graph  = new Graph();
+        changeManager = new ChangeManager();
+        
+        let node1, node2;
+        [graph, changeManager, node1] = GraphInterface.addNode(graph, changeManager, 0, 0);
+        [graph, changeManager, node2] = GraphInterface.addNode(graph, changeManager, 1, 1);
+        [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node1, node2);
+        expect(GraphInterface.getEdgeIds(graph)).toEqual(["0,1"])
+     });
+
+       /** 
+     * Test addMessage method
+     */
+    test("Testing GraphInterface.addMessage method", () => {
+        changeManager = GraphInterface.addMessage(changeManager, "hello");
+        expect(GraphInterface.getMessage(changeManager)).toEqual("hello");
+     });
+
+
+
 });

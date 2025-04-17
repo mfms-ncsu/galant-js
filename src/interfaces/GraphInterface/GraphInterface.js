@@ -624,6 +624,11 @@ function getScalar(graph) {
     return { x: 1, y: 1 };
   }
 
+  // If there is 0 or 1 nodes in the graph, return the default value specified in Graph.js (50, 50)
+  if (graph.nodes.size <= 1) {
+    return graph.scalar;
+  }
+
   const boundingBox = {
     minX: 0,
     minY: 0,
@@ -649,8 +654,8 @@ function getScalar(graph) {
   }
 
   return {
-    x: Math.round(scaleX),
-    y: Math.round(scaleY),
+    x: Math.max(1, Math.round(scaleX)),
+    y: Math.max(1, Math.round(scaleY)),
   };
 }
 
@@ -770,7 +775,7 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
 
   const newGraph = produce(graph, (draft) => {
     // Create the node
-    let node = new Node(nodeId, x, y);
+    let node = new Node(nodeId, Math.round(x), Math.round(y));
     draft.nodes.set(nodeId, node);
 
     // Set the attributes

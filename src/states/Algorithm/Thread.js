@@ -879,6 +879,17 @@ function numberOfLayers() {
     return LayeredGraphInterface.numberOfLayers(graph);
 } 
 
+function copyNodePositions() {
+    return LayeredGraphInterface.copyNodePositions(graph);
+}
+
+function applyNodePositions(savedPositions){
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.applyNodePositions(graph, changeManager, savedPositions);
+    postMessage({ action: "applyNodePositions",  savedPositions: savedPositions,});
+    waitIfNeeded();
+}
+
 
 /**************************************************************/
 /*************** End of algorithm methods *********************/

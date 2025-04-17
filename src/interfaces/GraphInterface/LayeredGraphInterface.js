@@ -80,12 +80,12 @@ function crossings(graph, e) {
     let crossings = 0;
     let visitedEdges = new Set();
     graph.nodes.forEach(node => {
-        node.edges.forEach(f => {
-            if (e != f && !visitedEdges.has(f) && isCrossed(graph, e, f)) {
+        node.edges.forEach((f, index) => {
+            if (e != f && !visitedEdges.has(index) && isCrossed(graph, e, f)) {
                 // console.log(`${e.attributes.get("label")} crosses ${f.attributes.get("label")}`);
                 crossings += 1;
             }
-            visitedEdges.add(f);
+            visitedEdges.add(index);
         });
     });
     // console.log(`crossings: ${crossings}`);
@@ -104,10 +104,10 @@ function totalCrossings(graph) {
     let total = 0;
     let visitedEdges = new Set();
     graph.nodes.forEach(node => {
-        node.edges.forEach(e => {
-            if (!visitedEdges.has(e)) {
+        node.edges.forEach((e, index) => {
+            if (!visitedEdges.has(index)) {
                 total += crossings(graph, e);
-                visitedEdges.add(e);
+                visitedEdges.add(index, e);
             }
         });
     });
@@ -268,7 +268,7 @@ function setChannelProperty(graph, changeManager, channel, attribute, value) {
                             target: e.target,
                             attribute: {
                                 name: attribute,
-                                value: draft.nodes.get(node.id).edges.get(`${e.source},${e.target}`).attributes.get(attribute),
+                                value: draft.nodes.get(node.id).edges.get(index).attributes.get(attribute),
                             },
                         },
                         {
@@ -281,7 +281,7 @@ function setChannelProperty(graph, changeManager, channel, attribute, value) {
                         },
                     ));
                     // update attribute
-                    draft.nodes.get(node.id).edges.get(`${e.source},${e.target}`).attributes.set(attribute, value);
+                    draft.nodes.get(node.id).edges.get(index).attributes.set(attribute, value);
                 }
             })
         });
@@ -520,25 +520,69 @@ function setWeightsBoth(graph, changeManager, layer, type) {
  */
 function sortByWeight(graph, changeManager, layer) {
     isLayered(graph);
-    let newGraph = graph;
-    let newChangeManager = changeManager;
-    const layerNodes = nodesOnLayer(graph, layer); // Nodes sorted by index
-    for (let j = 0; j < layerNodes.length - 1; j++) {
-        let minIndex = j;
-        // Find the node with the smallest weight in the remaining array
-        for (let k = j + 1; k < layerNodes.length; k++) {
-            if (layerNodes[k].attributes.get("weight") < layerNodes[minIndex].attributes.get("weight")) {
-                minIndex = k;
-            }
+
+    const layerNodes = nodesOnLayer(graph, layer); // Sorted by index
+
+    // Record original positions and indices
+    const originalPositions = new Map();
+    for (const node of layerNodes) {
+        originalPositions.set(node.id, {
+            position: { 
+                x: node.position.x,
+                y: node.position.y,
+             },
+            index: node.index
+        });
+    }
+
+    // Create a shallow copy of the layer nodes and sort by weight
+    const sortedNodes = [...layerNodes].sort((a, b) => {
+        return a.attributes.get("weight") - b.attributes.get("weight");
+    });
+
+    // Apply new positions and indices based on sorted order
+    let newGraph = produce(graph, (draft) => {
+        for (let i = 0; i < sortedNodes.length; i++) {
+            const nodeId = sortedNodes[i].id;
+            const node = draft.nodes.get(nodeId);
+
+            node.index = i;
+            node.position = {
+                x: i, // Assuming horizontal layout; adjust if vertical
+                y: node.position.y
+            };
         }
-        // Swap only if the smallest element is not already in place
-        if (minIndex !== j) {
-            [newGraph, newChangeManager] = swap(newGraph, newChangeManager, layerNodes[j].id, layerNodes[minIndex].id);
-            [layerNodes[j], layerNodes[minIndex]] = [layerNodes[minIndex], layerNodes[j]];
+    });
+
+    // Generate change records
+    const changes = [];
+
+    for (let i = 0; i < sortedNodes.length; i++) {
+        const nodeId = sortedNodes[i].id;
+        const old = originalPositions.get(nodeId);
+        const node = newGraph.nodes.get(nodeId);
+
+        const positionChanged = node.position.x !== old.position.x || node.position.y !== old.position.y;
+        const indexChanged = node.index !== old.index;
+
+        if (positionChanged || indexChanged) {
+            changes.push(
+                new ChangeObject("setNodePosition", {
+                    id: nodeId,
+                    position: old.position,
+                    index: old.index
+                }, {
+                    id: nodeId,
+                    position: node.position,
+                    index: node.index
+                })
+            );
         }
     }
-    //update change record
-    return [newGraph, changeManager];
+
+    const newChangeManager = GraphInterface.recordChange(changeManager, changes);
+
+    return [newGraph, newChangeManager];
 }
 
 
@@ -757,7 +801,7 @@ function showIndexes(graph, changeManager, layer) {
     // update graph
     let newGraph = produce(graph, (draft) => {
         layerNodes.forEach(node => {
-            //create change object
+            //create change object\
             changeObjects.push(new ChangeObject("setNodeAttribute",
                 {
                     id: node.id,
@@ -784,6 +828,11 @@ function showIndexes(graph, changeManager, layer) {
     return [newGraph, newChangeManager]; 
 }
 
+/**
+ * Returns the number of layers in the graph as an integer
+ * @param {Graph} graph graph to use
+ * @returns number of layers in graph
+ */
 function numberOfLayers(graph) {
     let maxLayer = 0;
     graph.nodes.forEach(node => {
@@ -792,6 +841,65 @@ function numberOfLayers(graph) {
         }
     });
     return maxLayer + 1;
+}
+
+/**
+ * Given a graph, copys all node position data to an array
+ * @param {Graph} graph Graph to copy nodes from
+ * @returns Retursn array of objects contianing node id, position, and index
+ */
+function copyNodePositions(graph) {
+    const savedPositions = [];
+    graph.nodes.forEach(node => {
+        savedPositions.push({
+            id: node.id,
+            position: {
+                x: node.position.x,
+                y: node.position.y,
+            },
+            index: node.index,
+            layer: node.layer,
+        });
+    });
+    return savedPositions;
+}
+
+/**
+ * Given an array of saved node positions, applys those positions to the graph
+ * @param {Graph} graph Graph to make changes to
+ * @param {ChangeManager} changeManager Change manager to record changes with
+ * @param {Array} savedPositions Array of objects containg position, id, index of nodes to apply
+ * @returns Retursn the new graph and change mangager
+ */
+function applyNodePositions(graph, changeManager, savedPositions) {
+    const changeObjects = [];
+    //create new graph
+    let newGraph = produce(graph, (draft) => {
+        savedPositions.forEach(node => {
+            console.log("Old node index:", node.index);
+            console.log("new node index:", draft.nodes.get(node.id).index);
+            changeObjects.push(new ChangeObject("setNodePosition",
+                {
+                    id: node.id,
+                    position: {
+                        x: draft.nodes.get(node.id).position.x,
+                        y: draft.nodes.get(node.id).position.y,
+                    },
+                    index: draft.nodes.get(node.id).index,
+                },
+                {
+                    id: node.id,
+                    position: node.position,
+                    index: node.index,
+                },
+            ));
+            draft.nodes.get(node.id).position = node.position;
+            draft.nodes.get(node.id).index = node.index;
+        })
+    });
+    //update change record
+    const newChangeManager = GraphInterface.recordChange(changeManager, changeObjects);
+    return [newGraph, newChangeManager]; 
 }
 
 const LayeredGraphInterface = {
@@ -814,6 +922,8 @@ const LayeredGraphInterface = {
     showPositions,
     showIndexes,
     numberOfLayers,
+    copyNodePositions,
+    applyNodePositions,
 };
 
 export default LayeredGraphInterface;

@@ -129,13 +129,38 @@ function loadGraph(name, file) {
     // Split the file on the new line character and parse each line
     const lines = file.split("\n");
 
-    //Initialize the proper graph type
+    // Initialize the proper graph type
     const graph = isLayeredGraph(name, file)
         ? new LayeredGraph(name)
         : new StandardGraph(name);
 
     // Parse each line
     lines.forEach(line => { parseLine(graph, line) });
+
+    // Reconcile the index and layer properties of each node if it's a LayeredGraph. This is necessary
+    // because each node uses its x and y coordinate as its layer and index initially which is not accurate.
+    if (graph.type === "layered") {
+        // Build a map of layers (layer (int) -> list of nodes)
+        const layers = new Map();
+        graph.nodes.forEach((node) => {
+            if (!layers.has(node.layer)) {
+                layers.set(node.layer, []);
+            }
+            layers.get(node.layer).push(node);
+        });
+
+        // Calculate the smallest layer value to use as our offset (this will be layer 0)
+        const minLayer = Math.min(...Array.from(layers.keys()));
+
+        // Iterate through each layer, sort its nodes by x position and update the node's layer and index properties accordingly
+        for (const [layer, nodes] of layers) {
+            const sortedNodes = nodes.sort((a, b) => a.position.x - b.position.x);
+            for (const [idx, node] of sortedNodes.entries()) {
+                node.layer = layer - minLayer;
+                node.index = idx;
+            }
+        }
+    }
 
     // Generate a scale for the graph based on the node positions
     graph.scalar = GraphInterface.getScalar(graph);
