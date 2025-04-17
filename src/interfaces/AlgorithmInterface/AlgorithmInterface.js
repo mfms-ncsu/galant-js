@@ -302,7 +302,7 @@ function onMessage(algorithm, message) {
             // means that the recording was never actually started
             if (changeManager.isRecording) {
                 newChangeManager = GraphInterface.endRecording(changeManager);
-                store.set(algorithmChangeManagerAtom, newChangeManager);
+                updateState(graph, newChangeManager);
             }
             if (algorithm.onStepAdded) algorithm.onStepAdded();
             break;

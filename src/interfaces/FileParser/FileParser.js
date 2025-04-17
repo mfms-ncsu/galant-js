@@ -37,7 +37,7 @@ import StandardGraph from "../../states/Graph/StandardGraph";
 
 
     // Regexes to match simple node and edge lines
-    const nodeRegex = /^n \S+ -?\d+.?\d* -?\d+.?\d*( -?\d+)?( [^ \n\t:]+:[^ \n\t:]+)*$/;
+    const nodeRegex = /^n[ \t]+\S+[ \t]+-?\d+.?\d*[ \t]+-?\d+.?\d*([ \t]+-?\d+)?([ \t]+[^ \n\t:]+:[^ \n\t:]+)*$/;
     /*
         nodeRegex documentation:
         
@@ -52,7 +52,7 @@ import StandardGraph from "../../states/Graph/StandardGraph";
                 followed by any amount of non-whitespace, non-colon characters.
     */
 
-    const edgeRegex = /^e \S+ \S+( -?\d+)?( [^ \n\t:]+:[^ \n\t:]+)*$/;
+    const edgeRegex = /^e[ \t]+\S+[ \t]+\S+([ \t]+-?\d+)?([ \t]+[^ \n\t:]+:[^ \n\t:]+)*$/;
     /*
         edgeRegex documentation:
         
@@ -177,7 +177,8 @@ function loadGraph(name, file) {
 function parseLine(graph, line) {
     // Trim the line string to remove leading/trailing whitespace and split along spacez
     line = line.trim();
-    const values = line.split(" ");
+    let whitespaceRegex = /[ \t]+/
+    const values = line.split(whitespaceRegex);
 
     // Check which regex matches and send the values to be parsed as either a node or edge
     switch (true) {
