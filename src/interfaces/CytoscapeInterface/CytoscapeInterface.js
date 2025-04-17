@@ -69,7 +69,6 @@ function parseEdge(graph, edge) {
         if (parseAndRound(edge.attributes.get("weight"))) {
             text += parseAndRound(edge.attributes.get("weight"));
         }
-        text += edge.attributes.get("weight");
     }
     
     if (edgeHasAttribute(edge, "label") && graph.showEdgeLabels) {

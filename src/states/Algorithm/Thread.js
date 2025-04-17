@@ -389,7 +389,7 @@ function visibleNeighbors(node) {
 
 
 /*
- * MARKS (left off here)
+ * MARKS
  */
 
 function mark(nodeId) {
