@@ -131,6 +131,24 @@ function addTab(tabs, data) {
 }
 
 /**
+ * Updates an existing or adds a new tab to the tabs list state.
+ * @param {Tab[]} tabs Existing tabs
+ * @param {Tab} data New tab data
+ * @returns Updated tab list
+ */
+function updateTab(tabs, data) {
+    const tab = getTabByName(tabs, data.name);
+
+    if (tab) {
+        tab.content = data.content;
+    } else {
+        return addTab(tabs, data);
+    }
+
+    return [...tabs];
+}
+
+/**
  * Deletes the given tab.
  * @param {Tab[]} tabs List of tabs
  * @param {Tab} tab Tab to delete
@@ -191,6 +209,7 @@ const TabInterface = {
     downloadTab,
     getSelectedTab,
     addTab,
+    updateTab,
     deleteTab,
     renameTab,
     setSelected
