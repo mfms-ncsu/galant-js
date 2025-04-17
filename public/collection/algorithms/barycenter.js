@@ -148,7 +148,7 @@ while(true) {
     pass++;
     upSweep(numLayers);
     downSweep(numLayers);
-    let quit = promptBoolean("quit?");
+    let quit = promptBoolean("Do you want to quit? ('true' to quit, 'false' to continue to next iteration)");
     if (quit) {
         break;
     };

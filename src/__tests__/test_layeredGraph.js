@@ -1,5 +1,6 @@
 /**
  * @author Heath Dyer
+ * @author Ethan Haske
  * Tests for Layered Graph functions related to crossings
  */
 
@@ -547,6 +548,97 @@ describe("LayeredGraph", () => {
         expect(II.attributes.get("someAttribute")).toBeUndefined();
         expect(JJ.attributes.get("someAttribute")).toBeUndefined();
         
+    });
+
+    test("Gets number of Layers", () => {
+        // Graph is loaded in
+        expect(graph).toBeInstanceOf(LayeredGraph);
+        expect(LayeredGraphInterface.numberOfLayers(graph)).toEqual(4);
+        
+    });
+
+    test("test evenly spaced layout", () => {
+        let regGraph = new Graph("", "");
+        let regChangeManager = new ChangeManager();
+        expect(() => { LayeredGraphInterface.evenlySpacedLayout(regGraph, regChangeManager) } ).toThrow();
+        graph = FileParser.loadGraph("example 20", "c created by dot+ord2sgf, date/time = Sat Dec 19 21:09:50 UTC 2020\nc $Id: dot+ord2sgf 66 2014-03-29 16:58:11Z mfms $\nc ./minimization -h vertical_bary -i 10 -w _ ../testing/TestData/ex_20.sgf\nt ex_20 20 36 4\nn 0 0 1\nn 1 0 0\nn 2 0 2\nn 3 0 3\nn 4 0 4\nn 20 0 5\nn 21 0 6\nn 22 0 7\nn 23 0 8\nn 5 1 1\nn 6 1 0\nn 7 1 4\nn 8 1 3\nn 9 1 2\nn 10 2 1\nn 11 2 4\nn 12 2 2\nn 13 2 0\nn 14 2 3\nn 15 3 1\nn 16 3 3\nn 17 3 0\nn 18 3 2\nn 19 3 4\ne 0 5 label:A\ne 1 5 label:B\ne 3 5 label:C\ne 0 6 label:D\ne 1 6 label:E\ne 0 7 label:F\ne 3 7 label:G\ne 4 7 label:H\ne 2 8 label:I\ne 3 8 label:J\ne 4 8 label:K\ne 0 9 label:L\ne 6 10 label:M\ne 8 10 label:N\ne 7 11 label:O\ne 8 11 label:P\ne 5 12 label:Q\ne 9 12 label:R\ne 5 13 label:S\ne 5 14 label:T\ne 8 14 label:U\ne 9 14 label:V\ne 11 15 label:W\ne 12 15 label:X\ne 13 15 label:Y\ne 14 15 label:Z\ne 10 16 label:AA\ne 11 16 label:BB\ne 14 16 label:CC\ne 13 17 label:DD\ne 10 18 label:EE\ne 11 18 label:FF\ne 12 18 label:GG\ne 14 18 label:HH\ne 11 19 label:II\ne 12 19 label:JJ");
+
+         // Graph is loaded in
+         expect(graph).toBeInstanceOf(LayeredGraph);
+         [graph, changeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, changeManager);
+         let nodes = LayeredGraphInterface.nodesOnLayer(graph, 0);
+         expect(nodes[0].position.x).toEqual(0);
+         expect(nodes[1].position.x).toEqual(1);
+         expect(nodes[2].position.x).toEqual(2);
+         expect(nodes[3].position.x).toEqual(3);
+         expect(nodes[4].position.x).toEqual(4);
+         expect(nodes[5].position.x).toEqual(5);
+         expect(nodes[6].position.x).toEqual(6);
+         expect(nodes[7].position.x).toEqual(7);
+         expect(nodes[8].position.x).toEqual(8);
+         nodes = LayeredGraphInterface.nodesOnLayer(graph, 1);
+         expect(nodes[0].position.x).toEqual(0);
+         expect(nodes[1].position.x).toEqual(2);
+         expect(nodes[2].position.x).toEqual(4);
+         expect(nodes[3].position.x).toEqual(6);
+         expect(nodes[4].position.x).toEqual(8);
+
+
+
+    });
+
+    test("test show positions", () => {
+        graph = FileParser.loadGraph("example 20", "c created by dot+ord2sgf, date/time = Sat Dec 19 21:09:50 UTC 2020\nc $Id: dot+ord2sgf 66 2014-03-29 16:58:11Z mfms $\nc ./minimization -h vertical_bary -i 10 -w _ ../testing/TestData/ex_20.sgf\nt ex_20 20 36 4\nn 0 0 1\nn 1 0 0\nn 2 0 2\nn 3 0 3\nn 4 0 8\nn 5 1 1\nn 6 1 0\nn 7 1 4\nn 8 1 3\nn 9 1 2\nn 10 2 1\nn 11 2 4\nn 12 2 2\nn 13 2 0\nn 14 2 3\nn 15 3 1\nn 16 3 3\nn 17 3 0\nn 18 3 2\nn 19 3 4\ne 0 5 label:A\ne 1 5 label:B\ne 3 5 label:C\ne 0 6 label:D\ne 1 6 label:E\ne 0 7 label:F\ne 3 7 label:G\ne 4 7 label:H\ne 2 8 label:I\ne 3 8 label:J\ne 4 8 label:K\ne 0 9 label:L\ne 6 10 label:M\ne 8 10 label:N\ne 7 11 label:O\ne 8 11 label:P\ne 5 12 label:Q\ne 9 12 label:R\ne 5 13 label:S\ne 5 14 label:T\ne 8 14 label:U\ne 9 14 label:V\ne 11 15 label:W\ne 12 15 label:X\ne 13 15 label:Y\ne 14 15 label:Z\ne 10 16 label:AA\ne 11 16 label:BB\ne 14 16 label:CC\ne 13 17 label:DD\ne 10 18 label:EE\ne 11 18 label:FF\ne 12 18 label:GG\ne 14 18 label:HH\ne 11 19 label:II\ne 12 19 label:JJ");
+        [graph, changeManager] = LayeredGraphInterface.showPositions(graph, changeManager, 0);
+        let nodes = GraphInterface.getNodeIds(graph);
+        expect(GraphInterface.getNodeAttribute(graph, nodes[0], "weight")).toEqual(1);
+        expect(GraphInterface.getNodeAttribute(graph, nodes[1], "weight")).toEqual(0);
+        expect(GraphInterface.getNodeAttribute(graph, nodes[2], "weight")).toEqual(2);
+        expect(GraphInterface.getNodeAttribute(graph, nodes[3], "weight")).toEqual(3);
+        expect(GraphInterface.getNodeAttribute(graph, nodes[4], "weight")).toEqual(8);
+
+    });
+
+    test("test show indexes", () => {
+        graph = FileParser.loadGraph("example 20", "c created by dot+ord2sgf, date/time = Sat Dec 19 21:09:50 UTC 2020\nc $Id: dot+ord2sgf 66 2014-03-29 16:58:11Z mfms $\nc ./minimization -h vertical_bary -i 10 -w _ ../testing/TestData/ex_20.sgf\nt ex_20 20 36 4\nn 0 0 1\nn 1 0 0\nn 2 0 2\nn 3 0 3\nn 4 0 8\nn 5 1 1\nn 6 1 0\nn 7 1 4\nn 8 1 3\nn 9 1 2\nn 10 2 1\nn 11 2 4\nn 12 2 2\nn 13 2 0\nn 14 2 3\nn 15 3 1\nn 16 3 3\nn 17 3 0\nn 18 3 2\nn 19 3 4\ne 0 5 label:A\ne 1 5 label:B\ne 3 5 label:C\ne 0 6 label:D\ne 1 6 label:E\ne 0 7 label:F\ne 3 7 label:G\ne 4 7 label:H\ne 2 8 label:I\ne 3 8 label:J\ne 4 8 label:K\ne 0 9 label:L\ne 6 10 label:M\ne 8 10 label:N\ne 7 11 label:O\ne 8 11 label:P\ne 5 12 label:Q\ne 9 12 label:R\ne 5 13 label:S\ne 5 14 label:T\ne 8 14 label:U\ne 9 14 label:V\ne 11 15 label:W\ne 12 15 label:X\ne 13 15 label:Y\ne 14 15 label:Z\ne 10 16 label:AA\ne 11 16 label:BB\ne 14 16 label:CC\ne 13 17 label:DD\ne 10 18 label:EE\ne 11 18 label:FF\ne 12 18 label:GG\ne 14 18 label:HH\ne 11 19 label:II\ne 12 19 label:JJ");
+        [graph, changeManager] = LayeredGraphInterface.showIndexes(graph, changeManager, 0);
+        let nodes = GraphInterface.getNodeIds(graph);
+        expect(GraphInterface.getNodeAttribute(graph, nodes[0], "weight")).toEqual(1);
+        expect(GraphInterface.getNodeAttribute(graph, nodes[1], "weight")).toEqual(0);
+        expect(GraphInterface.getNodeAttribute(graph, nodes[2], "weight")).toEqual(2);
+        expect(GraphInterface.getNodeAttribute(graph, nodes[3], "weight")).toEqual(3);
+        expect(GraphInterface.getNodeAttribute(graph, nodes[4], "weight")).toEqual(4);
+
+    });
+
+    test("test copy and apply node position", () => {
+        let position = LayeredGraphInterface.copyNodePositions(graph);
+        expect(position[0].id).toEqual("0");
+        expect(position[0].position.x).toEqual(1);
+        expect(position[0].index).toEqual(1);
+        expect(position[0].layer).toEqual(0);
+        
+        expect(position[6].id).toEqual("6");
+        expect(position[6].position.x).toEqual(0);
+        expect(position[6].index).toEqual(0);
+        expect(position[6].layer).toEqual(1);
+        
+        expect(position[12].id).toEqual("12");
+        expect(position[12].position.x).toEqual(2);
+        expect(position[12].index).toEqual(2);
+        expect(position[12].layer).toEqual(2);
+
+        expect(position[16].id).toEqual("16");
+        expect(position[16].position.x).toEqual(3);
+        expect(position[16].index).toEqual(3);
+        expect(position[16].layer).toEqual(3);
+
+        position[0].position.x = 10;
+        [graph, changeManager] = LayeredGraphInterface.applyNodePositions(graph, changeManager, position);
+        expect(GraphInterface.getNodePosition(graph, "0").x).toEqual(10);
+
+
+
     });
 
 });
