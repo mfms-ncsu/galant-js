@@ -71,12 +71,12 @@ export default function EditControls() {
         <div id="edit-overlay" className="absolute left-0 right-0 bottom-1 flex flex-col items-center pointer-events-none">
             <div className="flex flex-col items-center">
                 <div className="flex space-x-6">
-                    <button className="relative pointer-events-auto stroke-0 stroke-black hover:stroke-1 transition-all" onClick={undo}>
+                    <button className="relative pointer-events-auto stroke-0 stroke-black hover:stroke-1 transition-all" onClick={undo} data-cy="change-back">
                         <ArrowUturnLeftIcon className="w-6 h-6" />
                         <label className="absolute -bottom-2 left-0 text-sm">z</label>
                     </button>
                     <span>{userChangeManager.index} / {userChangeManager.changes.length}</span>
-                    <button className="relative pointer-events-auto stroke-0 stroke-black hover:stroke-1 transition-all" onClick={redo}>
+                    <button className="relative pointer-events-auto stroke-0 stroke-black hover:stroke-1 transition-all" onClick={redo} data-cy="change-forward">
                         <ArrowUturnRightIcon className="w-6 h-6" />
                         <label className="absolute -bottom-2 right-0 text-sm">y</label>
                     </button>

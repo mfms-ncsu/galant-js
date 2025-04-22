@@ -29,7 +29,7 @@ export default function NewButton({ addTab, examples }) {
         <div className="relative">
             <Menu>
                 <PrimaryButton className="m-1">
-                    <Menu.Button ref={button} className="flex items-center">
+                    <Menu.Button ref={button} className="flex items-center" data-cy="NewTabButton">
                         <PlusIcon className="h-4 me-2 fill-white stroke stroke-white" />
                         <span>New Tab</span>
                     </Menu.Button>
@@ -46,6 +46,7 @@ export default function NewButton({ addTab, examples }) {
                         <Menu.Item>
                             <button
                                 className="hover:underline"
+                                data-cy="BlankTab"
                                 onClick={() => {
                                     try {
                                         addTab({ 'name': 'Blank' });
@@ -59,7 +60,7 @@ export default function NewButton({ addTab, examples }) {
                         </Menu.Item>
 
                         <div className="mt-2 flex flex-col items-start">
-                            <span className="font-bold">Examples</span>
+                            <span className="font-bold" data-cy="ExamplesHeader">Examples</span>
                             {examples.map(data => (
                                 <Menu.Item key={data.name}>
                                     <button
