@@ -192,11 +192,11 @@ export default function CytoscapeComponent() {
 
     return (
         <div className="relative w-full h-full">
-            <canvas ref={backgroundCanvas} className="absolute top-0 left-0 pointer-events-none" />
+            <canvas ref={backgroundCanvas} className="absolute top-0 left-0 pointer-events-none"/>
             <div className="flex justify-center">
                 {message && <p className="absolute z-10 px-2 py-1 rounded-b-lg bg-black text-white text-lg font-semibold">{message}</p>}
             </div>
-            <div id="cytoscape-instance" ref={cytoscapeElement} className="w-full h-full bg-transparent" />
+            <div id="cytoscape-instance" data-cy="cytoscape-instance" ref={cytoscapeElement} className="w-full h-full bg-transparent" />
         </div>
     );
 }
