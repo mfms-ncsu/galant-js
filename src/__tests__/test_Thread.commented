@@ -1,0 +1,33 @@
+/*
+import Thread from 'utils/algorithm/Thread';
+
+
+Currently commented out while I work on other tests
+
+
+/**
+ * Skeleton for future tests of the Thread class. Right now, we cannot
+ * test an algorithm running in Thread, because each call in the Thread
+ * class is blocking. This means that the thread will not actually
+ * run until we make a call to unblock it, and that is usually
+ * done by a user on the frontend.
+ *
+ * @author Krisjian Smith
+ *
+describe('Test Thread.js', () => {
+    
+    /*
+     * It would be possible to test an algorithm running in the Thread class,
+     * but it would be difficult and cumbersome to do. We would need to wait
+     * for the Thread to post a redraw message, which signifies that it's done
+     * with it's step. When we get this message, we can use Atomics.notify to
+     * wake it up, and make sure that the correct messages are passed with each
+     * step. 
+     *
+     * This kind of testing has not yet been implemented, however.
+     *
+    test("name", () => {
+        expect(0).toBe(1);
+    });
+});
+*/

@@ -1,40 +1,36 @@
-/**
- * GraphView component is responsible for rendering and managing the main view of the application.
- * This component includes state management for the base graph, current algorithm, algorithm status,
- * graph edit history, and various context providers for child components.
- * @author Christina Albores
- */
-import { useState, useEffect, useRef } from "react";
-import HeaderComponent from "./Header";
+import { useEffect, useRef } from "react";
+import { useAtom } from "jotai";
+import { algorithmAtom, algorithmChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_atoms/atoms";
+import Cytoscape from "globals/Cytoscape";
+import SharedWorker from "globals/SharedWorker";
+import Algorithm from "states/Algorithm/Algorithm";
+import ChangeManager from "states/ChangeManager/ChangeManager";
+import FileParser from "interfaces/FileParser/FileParser";
+import Header from "./Header";
 import CytoscapeComponent from "./Cytoscape"
-import Algorithm from "utils/algorithm/Algorithm";
-import AlgorithmContext, { createAlgorithmContextObject } from "utils/algorithm/AlgorithmContext";
-import { PromptContext } from "utils/services/PromptService";
-import PromptServiceObject from "utils/services/PromptService";
 import PromptComponent from "components/Prompts/PromptComponent";
 import ContextMenu from "components/ContextMenus/ContextMenu"
 import NodeContextMenu from "components/ContextMenus/NodeContextMenu";
 import EdgeContextMenu from "components/ContextMenus/EdgeContextMenu";
 import EditControls from "./Overlays/EditControls";
-import SharedWorker from "utils/services/SharedWorker";
-import Graph from "utils/graph/Graph";
 import AlgorithmControls from "./Overlays/AlgorithmControls";
+import AlgorithmInterface from "interfaces/AlgorithmInterface/AlgorithmInterface"
 
-
-export default function GraphView() {
+/**
+ * Graph component is responsible for rendering and managing the main view of the application.
+ * This component handles loading new graph and algorithm objects into the state variables.
+ */
+export default function Graph() {
     // Define state variables using React hooks
-    const [PromptService] = useState(new PromptServiceObject(useState([])));
-    const [currentAlgorithm, setCurrentAlgorithm] = useState(null);
-    const [algorithmStatus, setAlgorithmStatus] = useState(null);
-    const [mode, setMode] = useState("normal") // "normal", "undo", "redo"
-
+    const [graph, setGraph] = useAtom(graphAtom);
+    const [algorithmChangeManager, setAlgorithmChangeManager] = useAtom(algorithmChangeManagerAtom);
+    const [_, setAlgorithm] = useAtom(algorithmAtom);
+    const [promptQueue, setPromptQueue] = useAtom(promptQueueAtom);
     const sentAliveMessage = useRef();
-
-    const algorithmContext = createAlgorithmContextObject(currentAlgorithm, setCurrentAlgorithm);
     
     /**
-     * Creates SharedWorker instance on mount.
-     * Whenever baseGraph or currentAlgorithm updates, onMessage is rewritten to allow reading of most current baseGraph/currentAlgorithm
+     * Creates SharedWorker instance on mount. Whenever graph updates, onMessage 
+     * is rewritten to allow reading of most current graph.
      */
     useEffect(() => {
         if (!sentAliveMessage.current) {
@@ -42,62 +38,56 @@ export default function GraphView() {
             SharedWorker.postMessage({ message: "alive" });
         }
 
-        /**
-         * Load a new graph.
-         */
+        // Load a new graph
         function onGraphLoad(data, isInit) {
             // Get the name and graph text from the data
-            const { name: graphName, graph: graphText } = data;
+            const { name: graphName, payload: graphText } = data;
             if (!graphText) return;
 
             // Remove any running algorithm
-            setCurrentAlgorithm(null);
+            setAlgorithm(null);
 
             // Load the graph
-            try {
-                Graph.fileParser.loadGraph(graphText);
-            } catch (e) {
-                alert(e);
-            }
+            setGraph(FileParser.loadGraph(graphName, graphText));
 
             // We have to wait for cytoscape to read graph changes, and add graph.
-            if (isInit && window.cytoscape) setTimeout(() => window.cytoscape.fit(), 75);
+            if (isInit) setTimeout(() => Cytoscape.fit(Cytoscape.elements(), 100), 25);
         }
 
-        /**
-         * Load a new algorithm.
-         */
+        // Load a new algorithm
         function onAlgorithmLoad(data) {
-            // Load the algorithm
-            Graph.algorithmChangeManager.clear(); // Clear any changes
-            let newAlgorithm = new Algorithm(data.name, data.algorithm, PromptService, [algorithmStatus, setAlgorithmStatus]); // Create a new algorithm object
-            setCurrentAlgorithm(newAlgorithm); // Set the state
+            
+            // Undo any changes the old algorithm made
+            AlgorithmInterface.revert();
+
+            // Clear the PromptQueue if one exists
+            setPromptQueue([]);
+            
+            // Load the algorithm and reset the ChangeManager
+            setAlgorithm(new Algorithm(data.name, data.payload));
+            setAlgorithmChangeManager(new ChangeManager());
         }
 
+        // Register the functions in shared worker
         SharedWorker.on("graph-init", data => onGraphLoad(data, true));
         SharedWorker.on("graph-rename", onGraphLoad);
         SharedWorker.on("algo-init", onAlgorithmLoad);
         return () => SharedWorker.remove(onGraphLoad, onAlgorithmLoad);
-        // eslint-disable-next-line
-    }, [window.cytoscape]);
-
+    }, [graph]);
 
     return (
         <>
             <link rel="manifest" id="manifest-placeholder" href="./manifest.webmanifest" />
-            <HeaderComponent />
+            <Header />
             <div className="relative w-full h-full">
-                <AlgorithmContext.Provider value={algorithmContext}>
-                    <PromptContext.Provider value={PromptService}>
-                        <PromptComponent />
-                        <CytoscapeComponent />
-                        <AlgorithmControls />
-                        <EditControls />
-                        <ContextMenu />
-                        <NodeContextMenu />
-                        <EdgeContextMenu />
-                    </PromptContext.Provider>
-                </AlgorithmContext.Provider>
+                <PromptComponent />
+                <CytoscapeComponent />
+                <AlgorithmControls />
+                <EditControls />
+                <ContextMenu />
+                <NodeContextMenu />
+                <EdgeContextMenu />
             </div>
-        </>);
+        </>
+    );
 }

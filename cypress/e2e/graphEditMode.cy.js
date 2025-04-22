@@ -1,5 +1,17 @@
-describe('Test Graph Editor', () => {  
+describe.skip('Test Graph Editor', () => {  
+    
+    /** 
+     * Currently unable to load a graph and algorithm into Galant
+     * in a Cypress test. Cypress does not support testing across
+     * multiple windows, which makes it difficult to interact with
+     * the algorithm and graph editors. Find a work around or consider
+     * a different testing framework.
+     * 
+     * Skipping all tests in this file for now.
+    */
+
     it('Graph Loaded', () => {
+        // Invalid work around to load a graph during a Cypress test
         cy.intercept('GET', '/worker.js', (req) => {
             const url = new URL(req.url);
             url.pathname = url.pathname.replace('worker.js', 'testing/mockWorkerGraph.js');
@@ -8,8 +20,6 @@ describe('Test Graph Editor', () => {
 
         cy.visit('http://localhost:3000');
         cy.window().should('have.property', 'cytoscape');
-
-
 
         const cytoscape = cy.window()
         .then((window) => {
@@ -50,5 +60,6 @@ describe('Test Graph Editor', () => {
             cy.wait(1000);
             cy.contains('Save Changes').click();
         });
-    })
+    });
+
 });

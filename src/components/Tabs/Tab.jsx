@@ -1,16 +1,9 @@
 import { useState, useRef } from "react";
 import { PencilIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
-
 /**
  * Returns a tab component, which displays its name and allows you to change its name.
  * In edit mode, tab shows intermediateName, and allows user to focus on input box to change name.
- * @param {Object} props props
- * @param {Tab} props.tab The tab data related to the tab
- * @param {function} props.onClick The callback function for when a user clicks a tab
- * @param {function} props.onRename The callback function for when a user renames a tab
- * @param {function} props.onRemove The callback function for when a user removes a tab
- * @returns {React.ReactElement}
  */
 export default function Tab({tab, onClick, onRename, onRemove}) {
     const [editMode, setEditMode] = useState(false);
@@ -45,15 +38,9 @@ export default function Tab({tab, onClick, onRename, onRemove}) {
         onClick(tab);
     }
 
-
     return(
-        <div tabIndex={0} className={`flex bg-transparent`} onClick={() => onClick(tab)} onKeyDown={onTabSelectByKey}>
-            <div className={`${(tab.selected) ? "bg-white" : ""}`}>
-                <div className={`h-full ${(tab.selected) ? "px-1 bg-neutral-300 rounded-br-lg" : ""}`}>
-                </div>
-            </div>
-
-            <div className={`flex items-center py-1 ps-2 pe-1 ${(tab.selected) ? "rounded-t-lg bg-white font-semibold" : ""}`}>
+        <div tabIndex={0} className="flex bg-transparent" onClick={() => onClick(tab)} onKeyDown={onTabSelectByKey}>
+            <div className={`flex items-center py-1 ps-2 pe-1 rounded-t-lg text-xl font-semibold ${tab.selected ? "bg-white" : "bg-neutral-300"}`}>
                 <div className="relative overflow-hidden cursor-default whitespace-nowrap">
                     <span className="opacity-0 pr-1">{editMode ? intermediateName : tab.name}</span>
                     <input className={`absolute inset-x-0 bg-transparent outline-none caret-blue-500 ${!editMode && 'pointer-events-none' }`} ref={inputField} value={editMode ? intermediateName : tab.name} size={intermediateName.length} disabled={!editMode} onChange={(event) => setIntermediateName(event.target.value.trim())} onKeyUp={onEnter} onBlur={() => setEditMode(false)} ></input>
@@ -67,11 +54,6 @@ export default function Tab({tab, onClick, onRename, onRemove}) {
                     <XMarkIcon className="h-4 stroke stroke-black"/>
                 </button>
             </div>
-            
-            <div className={`${(tab.selected) ? "bg-white" : ""}`}>
-                <div className={`h-full ${(tab.selected) ? "px-1 bg-neutral-300 rounded-bl-lg" : ""}`}>
-                </div>
-            </div>
         </div>
-    )
+    );
 }

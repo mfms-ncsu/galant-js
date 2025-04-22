@@ -1,27 +1,25 @@
 import { useEffect, useState } from "react";
+import { useAtom } from "jotai";
+import { algorithmAtom, graphAtom, userChangeManagerAtom } from "states/_atoms/atoms";
+import Cytoscape from "globals/Cytoscape";
+import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import ExitButton from "components/Buttons/ExitButton";
-import Graph from "utils/graph/Graph";
-import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
+
 /**
- * NodeContextMenu defines the React Component for the menu that should be opened to display and allow edits to a node's attributes.
- * Displayed attributes include id, label, and weight.
- * NodeContextMenu also defines the listeners for when the user right clicks on a node in cytoscape.
- * Changed attributes get saved to the graph object. 
- * 
- * @author Julian Madrigal
- * @param {Object} props
- * @returns {React.ReactElement} React component
+ * Opens when a user right-clicks on a node. Allows a user to set 
+ * weight or label, and ability to delete a node.
  */
 export default function NodeContextMenu() {
-    const { algorithm, setAlgorithm } = useAlgorithmContext();
+    const [graph, setGraph] = useAtom(graphAtom);
+    const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
+    const [algorithm] = useAtom(algorithmAtom);
     const [visible, setVisible] = useState(false);
     const [node, setNode] = useState(null);
     const [renderedPosition, setRenderedPosition] = useState({ x: 0, y: 0 });
     const [values, setValues] = useState({});
 
-
+    // Listen for clicks to open the menu
     useEffect(() => {
-        if (!window.cytoscape) return;
         function onContextClick(event) {
             // Initially hide the menu and prevent default functionality
             setVisible(false);
@@ -32,13 +30,13 @@ export default function NodeContextMenu() {
 
             // Set the values to display
             setValues({
-                id: node.id(),
-                label: node.data().label || "",
+                id: event.target.id(),
+                label: node.data().label,
                 weight: node.data().weight || "",
             });
 
             // Get the node as a state variable and set the visibility to true
-            setNode(event.target);
+            setNode(node);
             setVisible(true);
 
             // Set rendering position
@@ -48,12 +46,9 @@ export default function NodeContextMenu() {
             // Use a click to hide the menu
             document.addEventListener('click', () => setVisible(false), { once: true });
         }
-        window.cytoscape.on('cxttap', 'node', onContextClick);
-        return (() => window.cytoscape.removeListener('cxttap', onContextClick));
-    }, [window.cytoscape])
-
-    const data = node && node.data();
-    const nodeId = node && node.id();
+        Cytoscape.on('cxttap', 'node', onContextClick);
+        return (() => Cytoscape.removeListener('cxttap', onContextClick));
+    }, []);
 
     // Updates the values state whenever an input is changed
     function onChangeValue(value, newValue) {
@@ -66,19 +61,34 @@ export default function NodeContextMenu() {
     function update() {
         // Get the new label and weight
         const label = values.label.trim();
-        const weight = values.weight.trim();
+        const weight = parseInt(String(values.weight).trim()) || undefined;
+
+        // Start recording, so changing the label and weight happen
+        // in one step
+        let [newGraph, newChangeManager] = [];
+        newChangeManager = GraphInterface.startRecording(userChangeManager);
 
         // Set the changes
-        Graph.userChangeManager.setNodeAttribute(nodeId, "label", label);
-        Graph.userChangeManager.setNodeAttribute(nodeId, "weight", weight);
+        [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graph, newChangeManager, node.id(), "label", label);
+        [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(newGraph, newChangeManager, node.id(), "weight", weight);
+
+        // Stop recording
+        newChangeManager = GraphInterface.endRecording(newChangeManager);
+
+        // Set the new graph and change manager
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
     }
 
     // Deletes the node and closes the context menu
     function deleteNode() {
-        setVisible(false); // Hide the menu
-        Graph.userChangeManager.deleteNode(nodeId); // Delete the node
+        setVisible(false);
+        let [newGraph, newChangeManager] = GraphInterface.deleteNode(graph, userChangeManager, node.id());
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
     }
 
+    // Hide the context menu when enter is pressed
     function onEnterPressed(event) {
         if (event.key !== 'Enter') return;
         event.target.blur();

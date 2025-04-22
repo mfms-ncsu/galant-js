@@ -1,57 +1,40 @@
 import PrimaryButton from "components/Buttons/PrimaryButton";
 
 /**
- * Displays an AlgorithmError based on an Error Object, along with the algorithm code which failed
- * @param {Object} props The props passed to the component
- * @param {Object} props.prompt The prompt object and its data
- * @param {ReferenceError} props.prompt.errorObject The error that was returned
- * @param {string} props.prompt.algorithmCode The code which failed to execute
- * @param {Function} props.callback Callback when the modal is closed.
- * @returns {React.ReactElement} Returns modal displaying error information
+ * Displays an AlgorithmError based on an Error Object
+ * 
  * @author Julian Madrigal
  */
 export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
+    // Error object and name
     const errorObject = prompt.errorObject;
-    const algorithmCode = prompt.algorithmCode;
+    let errorName = errorObject.stack.split("\n")[0].split(":")[0]
+    
+    let title, code;
 
-    let title, error, code;
     // This next code is from a previous team, but no author reference was found. 
     // if its a timeout error, we've set the line number to -1. And we don't need to do put the line here.
     if (errorObject.lineNumber === -1) {
-        title = "Timeout Error. Likely an infine loop."
-        error = errorObject.toString();
-        code = "Your code took longer than 5 seconds to execute.\nFor technical reasons, we're not able to discern where in your code this occured.\nSorry!";
-    } else {
-        title = "Error on line " + errorObject.lineNumber;
-        error = errorObject.toString();
-        // its a regular error, so generate the data to go in the popup.
-
-        let splitAlg = algorithmCode.toString().split(/\r\n|\r|\n/);
-        let numLines = splitAlg.length;
-        // make sure we offset by enough characters
-        let offsetSize = ("" + numLines).length;
-        let adjustedAlgText = "";
-        splitAlg.forEach((line, i) =>{
-            // generate the line number and offset
-            // we star the line if it is the bad one
-            let starTags = ["  ", "   "]
-            // eslint-disable-next-line
-            if (i === errorObject.lineNumber-1) {
-                starTags = ["**", "** "];
-            }
-            let offset = starTags[0] + ("" + (i + 1)).padStart(offsetSize) + starTags[1]
-            adjustedAlgText = adjustedAlgText.concat("\n", offset, line)
-        })
-
-        code = adjustedAlgText;
+        title = "Timeout Error. Likely an infinite loop."
+        code = "Your code took longer than 5 seconds to execute.\nFor technical reasons, we're not able to discern where in your code this occurred.\nSorry!";
+    }
+    else {
+        // Other errors encountered
+        title = errorName
+        // Do not display stack trace if a syntax error has occurred
+        if (title === "SyntaxError") {
+            code = "There is an error with the algorithm code in the Algorithm Editor that we cannot identify."
+        }
+        else {
+            code = errorObject.stack
+        }
     }
 
     return (
-        <div className="flex flex-col max-h-full bg-white shadow-lg p-4 rounded-xl" ref={promptRef}>
-            <span className="block text-center text-red-500 font-semibold pointer-events-none select-none">{title}</span>
-            <span className="block text-center text-red-500 pointer-events-none select-none">{error}</span>
-            <pre className="overflow-auto my-4">{code}</pre>
-            <PrimaryButton onClick={callback}>Okay</PrimaryButton>
+        <div className="flex flex-col min-w-[550px] min-h-[270px] max-h-full bg-white shadow-lg p-4 rounded-xl" ref={promptRef}>
+            <span className="block text-center text-red-500 font-semibold pointer-events-none select-none text-xl">{title}</span>
+            <pre className="overflow-auto text-wrap my-4 text-xl flex-1">{code}</pre>
+            <PrimaryButton className="mt-auto" onClick={callback}>Okay</PrimaryButton>
         </div>
     )
 }

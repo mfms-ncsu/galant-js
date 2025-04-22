@@ -1,44 +1,41 @@
 import { useEffect, useState } from "react";
+import { useAtom } from "jotai";
+import { algorithmAtom, graphAtom, userChangeManagerAtom } from "states/_atoms/atoms";
+import GraphInterface from "interfaces/GraphInterface/GraphInterface";
+import Cytoscape from "globals/Cytoscape";
 import ExitButton from "components/Buttons/ExitButton";
-import Graph from "utils/graph/Graph";
-import { useAlgorithmContext } from 'utils/algorithm/AlgorithmContext';
 
 /**
- * EdgeContextMenu defines the React Component that should be displayed when a user right clicks an edge in cytoscape.
- * The displayed/editable attributes include: weight, label, and ability to delete node.
- * EdgeContextMenu also defines the event listeners for when the user right clicks on an edge. 
- * 
- * @author Julian Madrigal
- * @param {Object} props
- * @returns {React.ReactElement}
+ * Opens when a user right-clicks on an edge. Allows a user to set 
+ * weight or label, and ability to delete an edge.
  */
 export default function EdgeContextMenu() {
-    const { algorithm, setAlgorithm } = useAlgorithmContext();
+    const [graph, setGraph] = useAtom(graphAtom);
+    const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
+    const [algorithm] = useAtom(algorithmAtom);
     const [visible, setVisible] = useState(false);
     const [edge, setEdge] = useState(null);
     const [renderedPosition, setRenderedPosition] = useState({x: 0, y: 0});
     const [values, setValues] = useState({});
 
-
+    // Listen for clicks to open the menu
     useEffect(() => {
-        if (!window.cytoscape) return;
         function onContextClick(event) {
             // Initially hide the menu and prevent default functionality
             setVisible(false);
             event.preventDefault();
 
             // Get the edge from cytoscape
-            const edge = event.target;
+            const edge = event.target.data();
 
             // Set the values to display
-            const edgeObject = Graph.getEdge(edge.data().source, edge.data().target);
             setValues({
-                label: edgeObject.getAttribute("label") || "",
-                weight: edgeObject.getAttribute("weight") ? edgeObject.getAttribute("weight").toString() : "",
+                label: edge.label,
+                weight: edge.weight || "",
             });
 
             // Set the edge state and show the menu
-            setEdge(event.target);
+            setEdge(edge);
             setVisible(true);
 
             // Set the rendering position
@@ -48,11 +45,9 @@ export default function EdgeContextMenu() {
             // Use click to hide the menu
             document.addEventListener('click', () => setVisible(false), { once: true });
         }
-        window.cytoscape.on('cxttap', 'edge', onContextClick);
-        return (() => window.cytoscape.removeListener('cxttap', onContextClick));
-    }, [window.cytoscape])
-
-    const data = edge && edge.data();
+        Cytoscape.on('cxttap', 'edge', onContextClick);
+        return (() => Cytoscape.removeListener('cxttap', onContextClick));
+    }, []);
 
     // Updates the values state whenever an input is changed
     function onChangeValue(value, newValue) {
@@ -63,19 +58,34 @@ export default function EdgeContextMenu() {
 
     // This function runs whenever update is called, and updates the values in the graph.
     function update() {
+
         // Get the new label and weight
         const label = values.label.trim();
-        const weight = values.weight.trim();
+        const weight = parseInt(String(values.weight).trim()) || undefined;
+        
+        // Start recording, so changing the label and weight happen
+        // in one step
+        let [newGraph, newChangeManager] = [];
+        newChangeManager = GraphInterface.startRecording(userChangeManager);
 
         // Set the changes
-        Graph.userChangeManager.setEdgeAttribute(data.source, data.target, "label", label);
-        Graph.userChangeManager.setEdgeAttribute(data.source, data.target, "weight", weight);
+        [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(graph, newChangeManager, edge.source, edge.target, "label", label);
+        [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(newGraph, newChangeManager, edge.source, edge.target, "weight", weight);
+        
+        // Stop recording
+        newChangeManager = GraphInterface.endRecording(newChangeManager);
+        
+        // Set the new Graph and ChangeManager
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
     }
 
     // Deletes the edge and closes the context menu
     function deleteEdge() {
         setVisible(false);
-        Graph.userChangeManager.deleteEdge(data.source, data.target);
+        let [newGraph, newChangeManager] = GraphInterface.deleteEdge(graph, userChangeManager, edge.source, edge.target);
+        setGraph(newGraph);
+        setUserChangeManager(newChangeManager);
     }
 
     // Label/Weight is already updated on blur, so enter should just blur to apply changes.
@@ -98,7 +108,5 @@ export default function EdgeContextMenu() {
             
             <ExitButton onClick={deleteEdge}>Delete Edge</ExitButton>
         </div>
-
-
-    )
+    );
 }

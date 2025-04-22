@@ -1,3 +1,13 @@
+import * as React from "react";
+import * as ReactDOM from "react-dom/client";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { getDefaultStore, Provider } from "jotai";
+import { algorithmTabsAtom, graphTabsAtom } from "states/_atoms/atoms";
+import Graph from "pages/Graph/Graph";
+import Editor from "pages/Editor/Editor";
+import Instructions from "pages/Instructions/Instructions";
+import "./index.css";
+
 /**
  * This code sets up a React application with routing using react-router-dom. 
  * It registers a service worker if supported by the browser, then creates a 
@@ -6,15 +16,6 @@
  * to the application.
  * @author Christina Albores
  */
-
-import * as React from "react";
-import * as ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import "./index.css";
-
-import GraphView from "pages/Graph/Graph";
-import Editor from "pages/Editor/Editor"
-import InstructionsPage from "pages/Instructions/Instructions"
 
 // Check if service workers are supported by the browser
 if ('serviceWorker' in navigator) {
@@ -37,23 +38,27 @@ if ('serviceWorker' in navigator) {
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <GraphView />,
+        element: <Graph />,
     },
     {
         path: '/algorithmeditor',
-        element: <Editor editorType="Algorithm" />
+        element: <Editor editorType="Algorithm" tabsAtom={algorithmTabsAtom} />
     },
     {
         path: '/grapheditor',
-        element: <Editor editorType="Graph" />
+        element: <Editor editorType="Graph" tabsAtom={graphTabsAtom} />
     },
     {
         path: '/instructions',
-        element: <InstructionsPage />
+        element: <Instructions />
     }
 ]);
 
 // Render the router wrapped in RouterProvider to provide routing context
 ReactDOM.createRoot(document.getElementById("root")).render(
-    <RouterProvider router={router} />
+    <React.StrictMode>
+        <Provider store={getDefaultStore()}>
+            <RouterProvider router={router} />
+        </Provider>
+    </React.StrictMode>
 );

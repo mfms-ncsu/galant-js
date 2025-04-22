@@ -9,7 +9,7 @@ import EdgeSettingsPopover from "components/Popovers/EdgeSettingsPopover"
  * Preferred over a Link to ensure only one instance open at a time. 
  */
 function openGraphEditor() {
-    window.open('/grapheditor','Graph Editor',`width=${window.screen.width / 2}, height=${window.screen.height}`);
+    window.open('/grapheditor', 'Graph Editor', `width=${window.screen.width / 2}, height=${window.screen.height}`);
 }
 
 /**
@@ -17,20 +17,23 @@ function openGraphEditor() {
  * Preferred over a Link to ensure only one instance open at a time. 
  */
 function openAlgorithmEditor() {
-    window.open('/algorithmeditor','Algorithm Editor',`width=${window.screen.width / 2}, height=${window.screen.height}`);
-}
-
-function openInstructionsPage() {
-    window.open('/instructions', 'Getting started with Galant-JS', `width=${window.screen.width / 2}, height=${window.screen.height}`);
+    window.open('/algorithmeditor', 'Algorithm Editor', `width=${window.screen.width / 2}, height=${window.screen.height}`);
 }
 
 /**
- * Header component for Graph.
- * @returns {React.ReactElement}
+ * Opens the instructions page in a new window.
+ * Preferred over a Link to ensure only one instance open at a time. 
+ */
+function openInstructionsPage() {
+    window.open('/instructions', 'Getting started with GalantJS', `width=${window.screen.width / 2}, height=${window.screen.height}`);
+}
+
+/**
+ * Header component for Graph containing menu buttons and popovers.
  */
 export default function Header() {
     return (
-        <header className="absolute top-1 left-1 right-1 z-10 flex justify-between">
+        <header className="absolute top-1 left-1 right-1 z-10 flex justify-between pointer-events-none">
             <div className="flex-col space-y-1 whitespace-nowrap">
                 <p className="font-bold">Editors</p>
                 <EditorButton shortcut="a" callback={openAlgorithmEditor} onClick={openAlgorithmEditor}>
@@ -51,5 +54,5 @@ export default function Header() {
                 <EdgeSettingsPopover />
             </div>
         </header>
-    )
+    );
 }

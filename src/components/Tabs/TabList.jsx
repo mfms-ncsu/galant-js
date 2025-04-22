@@ -1,77 +1,69 @@
-import { addTab, getSelectedTab } from "./TabUtils";
+import TabInterface from "interfaces/TabInterface/TabInterface";
 import Tab from "./Tab";
 import NewButton from './NewButton';
 import UploadButton from './UploadButton';
 
 /**
+ * Header section containing the GalantJS logo
+ */
+function Header({ children }) {
+    return (
+        <div className="w-full h-16 p-1 flex items-start justify-between bg-neutral-400">
+            <img src="img/galant_full_logo_without_words.svg" alt="GalantJS" className="m-1 h-full w-auto"/>
+
+            <div className="flex">
+                {children}
+            </div>
+        </div>
+    );
+}
+
+/**
  * Given a list of tabs, create a tablist component that lists each tab component (@see {@link Tab}).
  * Also adds buttons "new" (@see {@link NewButton}) and "import" (@see {@link UploadButton}) to the end of component.
- * Contains function handlers for several functionalities such as when a tab is selected, renamed, or deleted. (These could possibly be moved to be closer to their components)
- * @param {Object} props Props 
- * @param {Array<Tab>} props.tabs - List of tab objects
- * @param {Function} props.setTabs Setter for the tabs
- * @param {string} props.acceptFileType The string of comma seperated file extensions to allow
- * @param {Example[]} props.examples The examples of text that the use can add via new dropdown
- * @returns {React.ReactElement} React Component
+ * Contains function handlers for several functionalities such as when a tab is selected, renamed, or deleted.
  */
 export default function TabList({tabs, setTabs, acceptFileType, examples}) {
-    /**
-     * Add list of data imported from file upload by user as tabs.
-     * Passed to {@link UploadButton} as a prop.
-     * NOTE: Skips setting tabs until last is added, in order to include all tabs. 
-     * @param {Array<{name, tab}>} dataList List of data that should be created and added as tabs.  
-     */
+    function onAddTab(data) {
+        setTabs(TabInterface.addTab(tabs, data));
+    }
+
     function onFileUpload(dataList) {
+        let newTabs;
         for (let data of dataList) {
-            addTab(data, tabs, setTabs, true);
-        }
-
-        setTabs([...tabs]);
-    }
-
-    function onTabClick(tab) {
-        const prev = getSelectedTab(tabs);
-        if (prev) prev.selected = false;
-
-        tab.selected = true;
-        setTabs([...tabs]);
-    }
-
-    function onTabRename(tab, name) {
-        if (name.length > 0 && !tabs.find(tab => tab.name === name)) {
-            tab.name = name;
-        };
-        setTabs([...tabs]);
-    }
-
-    function onTabRemove(tab) {
-        const newTabs = tabs.filter(aTab => aTab !== tab);
-        if (tab.selected && newTabs.length > 0) {
-            newTabs[0].selected = true;
+            newTabs = TabInterface.addTab(tabs, data);
         }
         setTabs(newTabs);
     }
 
+    function onTabClick(tab) {
+        setTabs(TabInterface.setSelected(tabs, tab));
+    }
+
+    function onTabRename(tab, name) {
+        setTabs(TabInterface.renameTab(tabs, tab, name));
+    }
+
+    function onTabRemove(tab) {
+        setTabs(TabInterface.deleteTab(tabs, tab));
+    }
+
     
     return (
-        <div className="flex justify-between bg-neutral-300">
-            <div className={`flex items-end w-full ${(tabs.length > 0 && !tabs[tabs.length-1].selected) && "space-x-1"}`}>
-                <div className="flex">
-                    {tabs.map((tab, i) => 
-                        <div key={i} className="relative">
-                            <Tab key={tab.name} tab={tab} onClick={onTabClick} onRename={onTabRename} onRemove={onTabRemove} />
-                            {!(tab.selected || (tabs[i+1] && tabs[i+1].selected)) && <span className="absolute bg-black w-px right-0 top-1 bottom-1"></span>}
-                        </div>
+        <>
+            <Header>
+                <NewButton addTab={onAddTab} examples={examples} />
+                <UploadButton onUpload={onFileUpload} acceptFileType={acceptFileType}/>
+            </Header>
+
+            <div className="flex bg-neutral-400">
+                <div className="min-w-full flex space-x-1 overflow-x-scroll">
+                    {tabs.map(tab => 
+                        <Tab key={tab.name} tab={tab} onClick={onTabClick} onRename={onTabRename} onRemove={onTabRemove} />
                     )}
                 </div>
-
-                <NewButton 
-                    addTab={(data) => {return addTab(data, tabs, setTabs)}}
-                    examples={examples}
-                />
             </div>
-            <UploadButton onUpload={onFileUpload} acceptFileType={acceptFileType}/>
-        </div>
-    )
+        </>
+    );
 }
 

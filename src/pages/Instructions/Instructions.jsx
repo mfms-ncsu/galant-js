@@ -1,14 +1,11 @@
+import React from "react";
+
 /**
- * HelpPage Component
- * 
  * This component represents the page that users will be directed to when they press the 'Help' button in the application.
  * It consists of a list of keyboard shortcuts and contents of the Galant-JS User Guide written by the Spring 2024 team.
  */
-import React from "react"
-
 export default function Instructions() {
     return (
-        <>
         <div>
             <h1 className="font-bold text-3xl">Quick Start Guide to using Galant-JS</h1>
             <div>
@@ -80,6 +77,5 @@ export default function Instructions() {
                 </ol>
             </div>
         </div>
-        </>
-    )
+    );
 }

@@ -1,16 +1,14 @@
-import { Popover, Switch } from '@headlessui/react'
+import { useRef } from 'react';
+import { useAtom } from 'jotai';
+import { graphAtom } from 'states/_atoms/atoms';
+import { Popover, Switch } from '@headlessui/react';
 import PreferenceButton from 'components/Buttons/PreferenceButton';
-import { useState, useRef, useEffect } from 'react'
-import Graph from "utils/graph/Graph";
+import GraphInterface from 'interfaces/GraphInterface/GraphInterface';
 
 /**
- * BinarySwitchComponent renders a binary switch component.
- * @param {Object} props - The props for the BinarySwitchComponent.
- * @param {boolean} props.enabled - Indicates whether the switch is enabled.
- * @param {Function} props.setEnabled - Function to toggle the switch.
- * @returns {JSX.Element} - Returns the JSX for BinarySwitchComponent.
+ * Binary switch component.
  */
-function BinarySwitchComponent({enabled, setEnabled}) {
+function BinarySwitchComponent({ enabled, setEnabled }) {
     return (
         <Switch
             checked={enabled}
@@ -26,38 +24,17 @@ function BinarySwitchComponent({enabled, setEnabled}) {
                 } inline-block h-4 w-4 transform rounded-full bg-white transition`}
             />
         </Switch>
-    )
+    );
 }
 
 /**
- * EdgeSettingsPopover component renders a popover for edge settings.
- * @returns {JSX.Element} - Returns the JSX for EdgeSettingsPopover component.
+ * Popover for edge settings.
  */
 export default function EdgeSettingsPopover() {
-    const [displayLabels, setDisplayLabels] = useState(true);
-    const [displayWeights, setDisplayWeights] = useState(true);
-    const [isDirected, setIsDirected] = useState(false);
+    const [graph, setGraph] = useAtom(graphAtom);
 
     // Ref for popover button
     const button = useRef(null);
-
-    // Set edgeLabels in graph
-    useEffect(() => {
-        Graph.cytoscapeManager.edgeLabels = displayLabels;
-        window.updateCytoscape();
-    }, [displayLabels]);
-
-    // Set edgeWeights in graph
-    useEffect(() => {
-        Graph.cytoscapeManager.edgeWeights = displayWeights;
-        window.updateCytoscape();
-    }, [displayWeights]);
-
-    // Set isDirected in graph
-    useEffect(() => {
-        Graph.isDirected = isDirected;
-        window.updateCytoscape();
-    }, [isDirected]);
 
     // Function to toggle the popover menu
     function toggle() {
@@ -76,21 +53,20 @@ export default function EdgeSettingsPopover() {
                 <div className="flex flex-col space-y-2 mt-2">
                     <div className='flex justify-between align-middle'>
                         <span className='text-gray-700 font-medium'>Display Labels</span>
-                        <BinarySwitchComponent enabled={displayLabels} setEnabled={setDisplayLabels} />
+                        <BinarySwitchComponent enabled={graph.showEdgeLabels} setEnabled={val => setGraph(GraphInterface.setShowEdgeLabels(graph, val))} />
                     </div>
 
                     <div className='flex justify-between align-middle'>
                         <span className='text-gray-700 font-medium'>Display Weights</span>
-                        <BinarySwitchComponent enabled={displayWeights} setEnabled={setDisplayWeights} />
+                        <BinarySwitchComponent enabled={graph.showEdgeWeights} setEnabled={val => setGraph(GraphInterface.setShowEdgeWeights(graph, val))} />
                     </div>
 
                     <div className='flex justify-between align-middle'>
                         <span className='text-gray-700 font-medium'>Directed</span>
-                        <BinarySwitchComponent enabled={isDirected} setEnabled={setIsDirected} />
+                        <BinarySwitchComponent enabled={graph.isDirected} setEnabled={val => setGraph(GraphInterface.setDirected(graph, val))} />
                     </div>
                 </div>
-
             </Popover.Panel>
         </Popover>
-    )
+    );
 }

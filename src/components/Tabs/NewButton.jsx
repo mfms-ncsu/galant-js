@@ -1,13 +1,10 @@
-import { Fragment } from "react";
-import { PlusIcon } from '@heroicons/react/24/solid';
+import { Fragment, useRef, useEffect } from "react";
 import { Menu, Transition } from '@headlessui/react';
-import { useRef, useEffect } from "react";
+import PrimaryButton from 'components/Buttons/PrimaryButton';
+import { PlusIcon } from '@heroicons/react/24/solid';
 
 /**
  * Returns component for creating new tabs, including the button and dropdown.
- * @param {function({name, content})} addTab create tab given data object
- * @param {Example[]} examples Examples that will be shown in the dropdown
- * @returns {React.ReactElement}
  */
 export default function NewButton({ addTab, examples }) {
     const button = useRef(null);
@@ -22,7 +19,6 @@ export default function NewButton({ addTab, examples }) {
 
             // Only if the user enters the designated keyboard shortcut - n - the button is clicked
             if (event.key == 'n') button.current.click();
-
         }
 
         document.addEventListener('keypress', onKeyPress);
@@ -32,9 +28,13 @@ export default function NewButton({ addTab, examples }) {
     return (
         <div className="relative">
             <Menu>
-                <Menu.Button ref={button} className="flex items-center h-8">
-                    <PlusIcon className="h-6 p-1 fill-black stroke stroke-black hover:bg-black/10 transition-all rounded-full" />
-                </Menu.Button>
+                <PrimaryButton className="m-1">
+                    <Menu.Button ref={button} className="flex items-center" data-cy="NewTabButton">
+                        <PlusIcon className="h-4 me-2 fill-white stroke stroke-white" />
+                        <span>New Tab</span>
+                    </Menu.Button>
+                </PrimaryButton>
+                
                 <Transition
                     as={Fragment}
                     enter="transition ease-out duration-100"
@@ -46,14 +46,12 @@ export default function NewButton({ addTab, examples }) {
                         <Menu.Item>
                             <button
                                 className="hover:underline"
+                                data-cy="BlankTab"
                                 onClick={() => {
                                     try {
-                                        console.log('Adding a blank tab...');
                                         addTab({ 'name': 'Blank' });
-                                        console.log('Blank tab added successfully.');
                                     } catch (error) {
-                                        console.error('Error adding a blank tab:', error);
-                                        alert('An error occurred while adding the blank tab. Please try again.');
+                                        console.error('An error occurred while adding the blank tab. Please try again.', error);
                                     }
                                 }}
                             >
@@ -62,19 +60,16 @@ export default function NewButton({ addTab, examples }) {
                         </Menu.Item>
 
                         <div className="mt-2 flex flex-col items-start">
-                            <span className="font-bold">Examples</span>
+                            <span className="font-bold" data-cy="ExamplesHeader">Examples</span>
                             {examples.map(data => (
                                 <Menu.Item key={data.name}>
                                     <button
                                         className="text-nowrap hover:underline"
                                         onClick={() => {
                                             try {
-                                                console.log(`Adding tab for example: ${data.name}`);
                                                 addTab(data);
-                                                console.log(`Tab for example ${data.name} added successfully.`);
                                             } catch (error) {
                                                 console.error(`Error adding tab for example ${data.name}:`, error);
-                                                alert(`An error occurred while adding the tab for ${data.name}. Please try again.`);
                                             }
                                         }}
                                     >
@@ -87,6 +82,5 @@ export default function NewButton({ addTab, examples }) {
                 </Transition>
             </Menu>
         </div>
-
-    )
+    );
 }
