@@ -3,6 +3,7 @@ import TabInterface from "interfaces/TabInterface/TabInterface";
 import SharedWorker from "globals/SharedWorker";
 import PrimaryButton from "components/Buttons/PrimaryButton";
 import ExitButton from "components/Buttons/ExitButton";
+import FileParser from "interfaces/FileParser/FileParser";
 import { CheckIcon, ArrowDownTrayIcon, ArrowPathIcon, ArrowUpRightIcon } from "@heroicons/react/24/solid";
 
 /**
@@ -34,6 +35,25 @@ function LoadButton({ tab, editorType }) {
     // loads in a graph/algorithm into a shared worker by sending a message to its port and preparing the necessary data
     function load() {
         try {
+            
+            // Try to parse the file using the FileParser.
+            // It would be nice for us to not have to do this, but I
+            // don't know of any other way to do error checking here.
+            //
+            // Since the SharedWorker that loads the graph and this
+            // tab operate in different threads, there's no way to know
+            // if the SharedWorder runs into an error while parsing
+            // a Graph, meaning that we can't give a detailed error
+            // message if it does.
+            //
+            // So, we try to load the graph here, and if we're
+            // successful, we send the graph to the SharedWorker, who
+            // parses it again.
+
+            if (editorType === "Graph") {
+                let temp = FileParser.loadGraph(tab.name, tab.content);
+            }
+
             // Send the message using shared worker
             SharedWorker.postMessage({
                 "message": (editorType === "Algorithm") ? "algo-init" : "graph-init",
@@ -51,7 +71,7 @@ function LoadButton({ tab, editorType }) {
             }, 3000);
 
         } catch (e) {
-            setLoadError("Failed to load");
+            setLoadError("Failed to load " + editorType.toLowerCase() + ": " + e.message);
         }
     }
 

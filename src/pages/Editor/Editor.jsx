@@ -12,7 +12,7 @@ import graphs from 'data/graphs.json';
  */
 function InnerEditor({tab, editorType, onChange}) {
     return tab && (
-        <div className="w-full h-full mt-2">
+        <div className="w-full h-full mt-2" data-cy="MonacoEditor">
             <MonacoEditor
                 onChange={onChange}
                 path={tab.name}

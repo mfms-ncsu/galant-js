@@ -234,6 +234,9 @@ function getAttribute(id, name) {
 /************* Start of algorithm methods *********************/
 /**************************************************************/
 
+/*
+ * USER INTERFACE AND GRAPH SETTINGS
+ */
 function display(message) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     postMessage({ action: "message", message: message });
@@ -244,6 +247,501 @@ function print(message) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     postMessage({ action: "print", message: message });
 }
+
+function setDirected(isDirected) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    graph.isDirected = isDirected;
+    postMessage({ action: "setDirected", isDirected: isDirected });
+    waitIfNeeded();
+}
+
+/*
+ * LIST GETTERS
+ */
+
+function getNodes() {
+    return GraphInterface.getNodeIds(graph);
+}
+
+function getNumberOfNodes() {
+    return GraphInterface.getNumberOfNodes(graph);
+}
+
+function getEdges() {
+    return GraphInterface.getEdgeIds(graph);
+}
+
+function getNumberOfEdges() {
+    return GraphInterface.getNumberOfEdges(graph);
+}
+
+/*
+ * SOURCE AND TARGET
+ */
+
+function source(edge) {
+    return GraphInterface.getSource(graph, edge);
+}
+
+function target(edge) {
+    return GraphInterface.getTarget(graph, edge);
+}
+
+function getEdgeBetween(source, target) {
+    return GraphInterface.getEdgeIDBetween(graph, source, target);
+}
+
+function other(nodeId, edgeId) {
+    return GraphInterface.getOppositeNode(graph, nodeId, edgeId);
+}
+
+/*
+ * GRAPH EDITING
+ */
+
+function addNode(x, y) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    let newNode;
+    [graph, changeManager, newNode] = GraphInterface.addNode(graph, changeManager, x, y);
+    postMessage({ action: "addNode", x: x, y: y });
+    waitIfNeeded();
+    return newNode;
+}
+
+function setPosition(nodeId, x, y) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = GraphInterface.setNodePosition(graph, changeManager, nodeId, x, y);
+    postMessage({ action: "setNodePosition", nodeId: nodeId, x: x, y: y });
+    waitIfNeeded();
+}
+
+function addEdge(source, target) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, source, target);
+    postMessage({ action: "addEdge", source: source, target: target });
+    waitIfNeeded();
+}
+
+function incrementPosition(nodeId, x, y) {
+    let currPos = GraphInterface.getNodePosition(graph, nodeId);
+    currPos && setPosition(nodeId, currPos.x + x, currPos.y + y);
+}
+
+function deleteNode(nodeId) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = GraphInterface.deleteNode(graph, changeManager, nodeId);
+    postMessage({ action: "deleteNode", nodeId: nodeId });
+    waitIfNeeded();
+}
+
+function deleteEdge(edgeId) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    let split = edgeId.split(",");
+    let source = split[0], target = split[1];
+    [graph, changeManager] = GraphInterface.deleteEdge(graph, changeManager, source, target);
+    postMessage({ action: "deleteEdge", source: source, target: target });
+    waitIfNeeded();
+}
+
+/*
+ * ADJACENCIES
+ */
+
+function incident(nodeId) {
+    return GraphInterface.getIncidentEdges(graph, nodeId);
+}
+
+function incoming(nodeId) {
+    return GraphInterface.getIncomingEdges(graph, nodeId);
+}
+
+function outgoing(nodeId) {
+    return GraphInterface.getOutgoingEdges(graph, nodeId);
+}
+
+function adjacentNodes(nodeId) {
+    return GraphInterface.getAdjacentNodes(graph, nodeId);
+}
+
+function incomingNodes(nodeId) {
+    return GraphInterface.getIncomingNodes(graph, nodeId);
+}
+
+function outgoingNodes(nodeId) {
+    return GraphInterface.getOutgoingNodes(graph, nodeId);
+}
+
+function degree(nodeId) {
+    return GraphInterface.getIncidentEdges(graph, nodeId).length;
+}
+
+function inDegree(nodeId) {
+    return GraphInterface.getIncomingEdges(graph, nodeId).length;
+}
+
+function outDegree(nodeId) {
+    return GraphInterface.getOutgoingEdges(graph, nodeId).length;
+}
+
+function visibleNeighbors(node) {
+    return GraphInterface.getAdjacentNodes(graph, node).filter((node) => GraphInterface.getNodeAttribute(graph, node, "hidden") !== true);
+}
+
+
+/*
+ * MARKS
+ */
+
+function mark(nodeId) {
+    setAttribute(nodeId, "marked", true);
+}
+
+function unmark(nodeId) {
+    setAttribute(nodeId, "marked", false);
+}
+
+function marked(nodeId) {
+    return getAttribute(nodeId, "marked");
+}
+
+function clearNodeMarks() {
+    setAttributeAll("nodes", "marked", false);
+}
+
+/*
+ * HIGHLIGHTS
+ */
+
+function highlight(id) {
+    setAttribute(id, "highlighted", true);
+}
+
+function unhighlight(id) {
+    setAttribute(id, "highlighted", false);
+}
+
+function highlighted(id) {
+    return getAttribute(id, "highlighted");
+}
+
+function clearNodeHighlights() {
+    setAttributeAll("nodes", "highlighted", false);
+}
+
+function clearEdgeHighlights() {
+    setAttributeAll("edges", "highlighted", false);
+}
+
+/*
+ * COLORS
+ */
+
+function color(id, color) {
+    setAttribute(id, "color", color);
+}
+
+function uncolor(id) {
+    setAttribute(id, "color", undefined);
+}
+
+function getColor(id) {
+    return getAttribute(id, "color");
+}
+
+function hasColor(id) {
+    return getAttribute(id, "color") !== undefined;
+}
+
+function clearNodeColors() {
+    setAttributeAll("nodes", "color", undefined);
+}
+
+function clearEdgeColors() {
+    setAttributeAll("edges", "color", undefined);
+}
+
+/*
+ * LABELS
+ */
+
+function label(id, label) {
+    setAttribute(id, "label", label);
+}
+
+function unlabel(id) {
+    setAttribute(id, "label", "");
+}
+
+function getLabel(id) {
+    return getAttribute(id, "label");
+}
+
+function hasLabel(id) {
+    let label = getAttribute(id, "label");
+    return label !== undefined && label !== "";
+}
+
+function clearNodeLabels() {
+    setAttributeAll("nodes", "label", "");
+}
+
+function clearEdgeLabels() {
+    setAttributeAll("edges", "label", "");
+}
+
+/*
+ * WEIGHTS
+ */
+
+function setWeight(id, weight) {
+    setAttribute(id, "weight", weight);
+}
+
+function clearWeight(id) {
+    setAttribute(id, "weight", undefined);
+}
+
+function weight(id) {
+    return getAttribute(id, "weight");
+}
+
+function hideWeight(id) {
+    setAttribute(id, "weightHidden", true);
+}
+
+function showWeight(id) {
+    setAttribute(id, "weightHidden", false);
+}
+
+function hasWeight(id) {
+    let weight = getAttribute(id, "weight")
+    return weight !== undefined;
+}
+
+function clearNodeWeights() {
+    setAttributeAll("nodes", "weight", undefined);
+}
+
+function clearEdgeWeights() {
+    setAttributeAll("edges", "weight", undefined);
+}
+
+/*
+ * HIDE/SHOW NODE PROPERTIES
+ */
+
+function isHidden(id) {
+    return getAttribute(id, "hidden") == true;
+}
+
+function hideNode(node) {
+    setAttribute(node, "hidden", true); 
+}
+
+function showNode(node) {
+    setAttribute(node, "hidden", false);
+}
+
+function hideNodeWeight(node) {
+    setAttribute(node, "weightHidden", true);
+}
+
+function hideAllNodeWeights() {
+    setAttributeAll("nodes", "weightHidden", true);
+}
+
+function showNodeWeight(node) {
+    setAttribute(node, "weightHidden", false);
+}
+
+function showAllNodeWeights() {
+    setAttributeAll("nodes", "weightHidden", false);
+}
+
+function hideNodeLabel(node) {
+    setAttribute(node, "labelHidden", true);
+}
+
+function hideAllNodeLabels() {
+    setAttributeAll("nodes", "labelHidden", true);
+}
+
+function showNodeLabel(node) {
+    setAttribute(node, "labelHidden", false);
+}
+
+function showAllNodeLabels() {
+    setAttributeAll("nodes", "labelHidden", false);
+}
+
+/*
+ * HIDE/SHOW EDGE PROPERTIES
+ */
+
+function hideEdge(edge) {
+    setAttribute(edge, "hidden", true); 
+}
+
+function showEdge(edge) {
+    setAttribute(edge, "hidden", false);
+}
+
+function hideEdgeWeight(edge) {
+    setAttribute(edge, "weightHidden", true);
+}
+
+function hideAllEdgeWeights() {
+    setAttributeAll("edges", "weightHidden", true);
+}
+
+function showEdgeWeight(edge) {
+    setAttribute(edge, "weightHidden", false);
+}
+
+function showAllEdgeWeights() {
+    setAttributeAll("edges", "weightHidden", false);
+}
+
+function hideEdgeLabel(edge) {
+    setAttribute(edge, "labelHidden", true);
+}
+
+function hideAllEdgeLabels() {
+    setAttributeAll("edges", "labelHidden", true);
+}
+
+function showEdgeLabel(edge) {
+    setAttribute(edge, "labelHidden", false);
+}
+
+function showAllEdgeLabels() {
+    setAttributeAll("edges", "labelHidden", false);
+}
+
+
+/*
+ * NODE SHAPE
+ */
+
+function shape(id) {
+    return getAttribute(id, "shape");
+}
+
+function setShape(id, shape) {
+    setAttribute(id, "shape", shape);
+}
+
+function clearShape(id) {
+    setAttribute(id, "shape", undefined);
+}
+
+function hasShape(id) {
+    return getAttribute(id, "shape") !== undefined;
+}
+
+function clearNodeShapes() {
+    setAttributeAll("nodes", "shape", undefined);
+}
+
+/*
+ * NODE NORDER WIDTH
+ */
+
+function borderWidth(id){
+    return getAttribute(id, "borderWidth");
+}
+
+function setBorderWidth(id, borderWidth) {
+    setAttribute(id, "borderWidth", borderWidth);
+}
+
+function clearBorderWidth(id) {
+    setAttribute(id, "borderWidth", undefined);
+}
+
+function hasBorderWidth(id) {
+    return getAttribute(id, "borderWidth") !== undefined;
+}
+
+function clearNodeBorderWidths() {
+    setAttributeAll("nodes", "borderWidth", undefined);
+}
+
+/*
+ * NODE SHADING
+ */
+
+function backgroundOpacity(id) {
+    return getAttribute(id, "backgroundOpacity");
+}
+
+function setBackgroundOpacity(id, backgroundOpacity) {
+    setAttribute(id, "backgroundOpacity", backgroundOpacity);
+}
+
+function clearBackgroundOpacity(id) {
+    setAttribute(id, "backgroundOpacity", undefined);
+}
+
+function hasBackgroundOpacity(id) {
+    return getAttribute(id, "backgroundOpacity") !== undefined;
+}
+
+function clearNodeBackgroundOpacities() {
+    setAttributeAll("nodes", "backgroundOpacity", undefined);
+}
+
+/*
+ * NODE SIZE
+ */
+
+function size(id) {
+    return getAttribute(id, "size");
+}
+
+function setSize(id, size) {
+    setAttribute(id, "size", size)
+}
+
+function clearSize(id) {
+    setAttribute(id, "size", undefined)
+}
+
+function hasSize(id) {
+    return getAttribute(id, "size") !== undefined;
+}
+
+function clearNodeSizes() {
+    setAttributeAll("nodes", "size", undefined)
+}
+
+/*
+ * EDGE WIDTH
+ */
+
+function edgeWidth(id) {
+    return getAttribute(id, "width")
+}
+
+function setEdgeWidth(id, width) {
+    setAttribute(id, "width", width)
+}
+
+function clearEdgeWidth(id) {
+    setAttribute(id, "width", undefined)
+}
+
+function hasEdgeWidth(id) {
+    return getAttribute(id, "width") !== undefined
+}
+
+function clearEdgeWidths() {
+    setAttributeAll("edges", "width", undefined)
+}
+
+/*
+ * PROMPT FUNCTION
+ */
 
 function promptBoolean(message) {
     return promptFrom(message, ["true", "false"], "Error: Must enter a boolean value (true/false)") === "true";
@@ -286,18 +784,6 @@ function promptNodeFrom(message, nodes) {
     return promptFrom(message, nodes, "Must add node from: " + nodes.join(" "));
 }
 
-function promptEdgeFrom(message, edges) {
-    // If this is a set, make it an array
-    if (edges instanceof Set) {
-        edges = [...edges.values()];
-    }
-
-    if (edges.length === 0) {
-        throw new Error("Cannot prompt for a edge when no valid edges exist.");
-    }
-    return promptFrom(message, edges, "Must add edge from: " + edges.join(" "));
-}
-
 function promptEdge(message) {
     let edges = getEdges();
     if (edges.length === 0) {
@@ -323,426 +809,26 @@ function promptEdge(message) {
     return reversedEdges.get(promptResult) || promptResult; // Check if the edge is reversed or not
 }
 
-function setDirected(isDirected) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
-    graph.isDirected = isDirected;
-    postMessage({ action: "setDirected", isDirected: isDirected });
-    waitIfNeeded();
-}
-
-function addNode(x, y) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
-    let newNode;
-    [graph, changeManager, newNode] = GraphInterface.addNode(graph, changeManager, x, y);
-    postMessage({ action: "addNode", x: x, y: y });
-    waitIfNeeded();
-    return newNode;
-}
-
-function addEdge(source, target) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
-    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, source, target);
-    postMessage({ action: "addEdge", source: source, target: target });
-    waitIfNeeded();
-}
-
-function setPosition(nodeId, x, y) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
-    [graph, changeManager] = GraphInterface.setNodePosition(graph, changeManager, nodeId, x, y);
-    postMessage({ action: "setNodePosition", nodeId: nodeId, x: x, y: y });
-    waitIfNeeded();
-}
-
-function incrementPosition(nodeId, x, y) {
-    let currPos = GraphInterface.getNodePosition(graph, nodeId);
-    currPos && setPosition(nodeId, currPos.x + x, currPos.y + y);
-}
-
-function deleteNode(nodeId) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
-    [graph, changeManager] = GraphInterface.deleteNode(graph, changeManager, nodeId);
-    postMessage({ action: "deleteNode", nodeId: nodeId });
-    waitIfNeeded();
-}
-
-function deleteEdge(edgeId) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
-    let split = edgeId.split(",");
-    let source = split[0], target = split[1];
-    [graph, changeManager] = GraphInterface.deleteEdge(graph, changeManager, source, target);
-    postMessage({ action: "deleteEdge", source: source, target: target });
-    waitIfNeeded();
-}
-
-function getNodes() {
-    return GraphInterface.getNodeIds(graph);
-}
-
-function getNumberOfNodes() {
-    return GraphInterface.getNumberOfNodes(graph);
-}
-
-function getEdges() {
-    return GraphInterface.getEdgeIds(graph);
-}
-
-function getEdgeBetween(source, target) {
-    return GraphInterface.getEdgeIDBetween(graph, source, target);
-}
-
-function getNumberOfEdges() {
-    return GraphInterface.getNumberOfEdges(graph);
-}
-
-function source(edge) {
-    return GraphInterface.getSource(graph, edge);
-}
-
-function target(edge) {
-    return GraphInterface.getTarget(graph, edge);
-}
-
-function other(nodeId, edgeId) {
-    return GraphInterface.getOppositeNode(graph, nodeId, edgeId);
-}
-
-function incident(nodeId) {
-    return GraphInterface.getIncidentEdges(graph, nodeId);
-}
-
-function incoming(nodeId) {
-    return GraphInterface.getIncomingEdges(graph, nodeId);
-}
-
-function outgoing(nodeId) {
-    return GraphInterface.getOutgoingEdges(graph, nodeId);
-}
-
-function adjacentNodes(nodeId) {
-    return GraphInterface.getAdjacentNodes(graph, nodeId);
-}
-
-function incomingNodes(nodeId) {
-    return GraphInterface.getIncomingNodes(graph, nodeId);
-}
-
-function outgoingNodes(nodeId) {
-    return GraphInterface.getOutgoingNodes(graph, nodeId);
-}
-
-function degree(nodeId) {
-    return GraphInterface.getIncidentEdges(graph, nodeId).length;
-}
-
-function inDegree(nodeId) {
-    return GraphInterface.getIncomingEdges(graph, nodeId).length;
-}
-
-function outDegree(nodeId) {
-    return GraphInterface.getOutgoingEdges(graph, nodeId).length;
-}
-
-function mark(nodeId) {
-    setAttribute(nodeId, "marked", true);
-}
-
-function unmark(nodeId) {
-    setAttribute(nodeId, "marked", false);
-}
-
-function marked(nodeId) {
-    return getAttribute(nodeId, "marked");
-}
-
-function clearNodeMarks() {
-    setAttributeAll("nodes", "marked", false);
-}
-
-function highlight(id) {
-    setAttribute(id, "highlighted", true);
-}
-
-function unhighlight(id) {
-    setAttribute(id, "highlighted", false);
-}
-
-function highlighted(id) {
-    return getAttribute(id, "highlighted");
-}
-
-function clearEdgeHighlights() {
-    setAttributeAll("edges", "highlighted", false);
-}
-
-function clearNodeHighlights() {
-    setAttributeAll("nodes", "highlighted", false);
-}
-
-function color(id, color) {
-    setAttribute(id, "color", color);
-}
-
-function uncolor(id) {
-    setAttribute(id, "color", undefined);
-}
-
-function getColor(id) {
-    return getAttribute(id, "color");
-}
-
-function hasColor(id) {
-    return getAttribute(id, "color") !== undefined;
-}
-
-function clearNodeColors() {
-    setAttributeAll("nodes", "color", undefined);
-}
-
-function clearEdgeColors() {
-    setAttributeAll("edges", "color", undefined);
-}
-
-function label(id, label) {
-    setAttribute(id, "label", label);
-}
-
-function unlabel(id) {
-    setAttribute(id, "label", "");
-}
-
-function getLabel(id) {
-    return getAttribute(id, "label");
-}
-
-function hasLabel(id) {
-    let label = getAttribute(id, "label");
-    return label !== undefined && label !== "";
-}
-
-function clearNodeLabels() {
-    setAttributeAll("nodes", "label", "");
-}
-
-function clearEdgeLabels() {
-    setAttributeAll("edges", "label", "");
-}
-
-function setWeight(id, weight) {
-    setAttribute(id, "weight", weight);
-}
-
-function clearWeight(id) {
-    setAttribute(id, "weight", undefined);
-}
-
-function weight(id) {
-    return getAttribute(id, "weight");
-}
-
-function hideWeight(id) {
-    setAttribute(id, "weightHidden", true);
-}
-
-function showWeight(id) {
-    setAttribute(id, "weightHidden", false);
-}
-
-function hasWeight(id) {
-    let weight = getAttribute(id, "weight")
-    return weight !== undefined;
-}
-
-function clearNodeWeights() {
-    setAttributeAll("nodes", "weight", undefined);
-}
-
-function clearEdgeWeights() {
-    setAttributeAll("edges", "weight", undefined);
-}
-
-function shape(id) {
-    return getAttribute(id, "shape");
-}
-
-function setShape(id, shape) {
-    setAttribute(id, "shape", shape);
-}
-
-function clearShape(id) {
-    setAttribute(id, "shape", undefined);
-}
-
-function hasShape(id) {
-    return getAttribute(id, "shape") !== undefined;
-}
-
-function clearNodeShapes() {
-    setAttributeAll("nodes", "shape", undefined);
-}
-
-function borderWidth(id){
-    return getAttribute(id, "borderWidth");
-}
-
-function setBorderWidth(id, borderWidth) {
-    setAttribute(id, "borderWidth", borderWidth);
-}
-
-function clearBorderWidth(id) {
-    setAttribute(id, "borderWidth", undefined);
-}
-
-function hasBorderWidth(id) {
-    return getAttribute(id, "borderWidth") !== undefined;
-}
-
-function clearNodeBorderWidths() {
-    setAttributeAll("nodes", "borderWidth", undefined);
-}
-
-function backgroundOpacity(id) {
-    return getAttribute(id, "backgroundOpacity");
-}
-
-function setBackgroundOpacity(id, backgroundOpacity) {
-    setAttribute(id, "backgroundOpacity", backgroundOpacity);
-}
-
-function clearBackgroundOpacity(id) {
-    setAttribute(id, "backgroundOpacity", undefined);
-}
-
-function hasBackgroundOpacity(id) {
-    return getAttribute(id, "backgroundOpacity") !== undefined;
-}
-
-function clearNodeBackgroundOpacities() {
-    setAttributeAll("nodes", "backgroundOpacity", undefined);
-}
-
-function size(id) {
-    return getAttribute(id, "size");
-}
-
-function setSize(id, size) {
-    setAttribute(id, "size", size)
-}
-
-function clearSize(id) {
-    setAttribute(id, "size", undefined)
-}
-
-function hasSize(id) {
-    return getAttribute(id, "size") !== undefined;
-}
-
-function clearNodeSizes() {
-    setAttributeAll("nodes", "size", undefined)
-}
-
-function edgeWidth(id) {
-    return getAttribute(id, "width")
-}
-
-function setEdgeWidth(id, width) {
-    setAttribute(id, "width", width)
-}
-
-function clearEdgeWidth(id) {
-    setAttribute(id, "width", undefined)
-}
-
-function hasEdgeWidth(id) {
-    return getAttribute(id, "width") !== undefined
-}
-
-function clearEdgeWidths() {
-    setAttributeAll("edges", "width", undefined)
-}
-
-function hideAllEdgeWeights() {
-    setAttributeAll("edges", "weightHidden", true);
-}
-
-function hideAllNodeWeights() {
-    setAttributeAll("nodes", "weightHidden", true);
-}
-
-function showAllEdgeWeights() {
-    setAttributeAll("edges", "weightHidden", false);
-}
-
-function showAllNodeWeights() {
-    setAttributeAll("nodes", "weightHidden", false);
-}
-
-function hideAllEdgeLabels() {
-    setAttributeAll("edges", "labelHidden", true);
-}
-
-function hideAllNodeLabels() {
-    setAttributeAll("nodes", "labelHidden", true);
-}
-
-function showAllEdgeLabels() {
-    setAttributeAll("edges", "labelHidden", false);
-}
-
-function showAllNodeLabels() {
-    setAttributeAll("nodes", "labelHidden", false);
-}
-
-function isHidden(id) {
-    return getAttribute(id, "hidden") == true;
-}
-
-function visibleNeighbors(node) {
-    return GraphInterface.getAdjacentNodes(graph, node).filter((node) => GraphInterface.getNodeAttribute(graph, node, "hidden") !== true);
-}
-
-function hideNode(node) {
-    setAttribute(node, "hidden", true); 
-}
-
-function showNode(node) {
-    setAttribute(node, "hidden", false);
-}
-
-function hideNodeWeight(node) {
-    setAttribute(node, "weightHidden", true);
-}
-
-function hideEdgeWeight(edge) {
-    setAttribute(edge, "weightHidden", true);
-}
-
-function showNodeWeight(node) {
-    setAttribute(node, "weightHidden", false);
-}
-
-function showEdgeWeight(edge) {
-    setAttribute(edge, "weightHidden", false);
-}
-
-function hideNodeLabel(node) {
-    setAttribute(node, "labelHidden", true);
-}
-
-function hideEdgeLabel(edge) {
-    setAttribute(edge, "labelHidden", true);
-}
-
-function showNodeLabel(node) {
-    setAttribute(node, "labelHidden", false);
-}
-
-function showEdgeLabel(edge) {
-    setAttribute(edge, "labelHidden", false);
-}
-
-/** Layered graph functions 
+function promptEdgeFrom(message, edges) {
+    // If this is a set, make it an array
+    if (edges instanceof Set) {
+        edges = [...edges.values()];
+    }
+
+    if (edges.length === 0) {
+        throw new Error("Cannot prompt for a edge when no valid edges exist.");
+    }
+    return promptFrom(message, edges, "Must add edge from: " + edges.join(" "));
+}
+
+/*
+ * LAYERED GRAPH ALGORITHMS
+ */
+
+/**
+ * Layered graph functions 
  * @author Heath Dyer
-*/
+ */
 
 function isCrossed(e, f) {
     return LayeredGraphInterface.isCrossed(graph, e, f);
