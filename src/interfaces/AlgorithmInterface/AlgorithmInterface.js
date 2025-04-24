@@ -186,147 +186,165 @@ function onMessage(algorithm, message) {
     // Create new variables to set
     let [newGraph, newChangeManager] = [];
     let newQueue;
-
-    switch (message.action) {
-        case "setDirected":
-            newGraph = GraphInterface.setDirected(graph, message.isDirected);
-            store.set(graphAtom, newGraph);
-            break;
-        case "addNode":
-            [newGraph, newChangeManager] = GraphInterface.addNode(graph, changeManager, message.x, message.y);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "addEdge":
-            [newGraph, newChangeManager] = GraphInterface.addEdge(graph, changeManager, message.source, message.target);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "prompt":
-            clearTimeout(algorithm.timeoutId); // Cancel the timer while the prompt is up
-            newQueue = PromptInterface.queuePrompt(
-                promptQueue,
-                { type: 'input', label: message.content[1] || message.content[0] },
-                (value) => {
-                    setupTimeout(algorithm); // Start the timeout timer back up
-                    enterPromptResult(algorithm, value); // Send the enetered value to the thread
-                }
-            );
-            store.set(promptQueueAtom, newQueue);
-            break;
-        case "message":
-            newChangeManager = GraphInterface.addMessage(changeManager, message.message);
-            updateState(graph, newChangeManager);
-            break;
-        case "print":
-            console.log(message.message);
-            break;
-        case "deleteNode":
-            [newGraph, newChangeManager] = GraphInterface.deleteNode(graph, changeManager, message.nodeId);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "setNodePosition":
-            [newGraph, newChangeManager] = GraphInterface.setNodePosition(graph, changeManager, message.nodeId, message.x, message.y);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "deleteEdge":
-            [newGraph, newChangeManager] = GraphInterface.deleteEdge(graph, changeManager, message.source, message.target);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "setNodeAttribute":
-            [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graph, changeManager, message.nodeId, message.name, message.value);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "setNodeAttributeAll":
-            [newGraph, newChangeManager] = GraphInterface.setNodeAttributeAll(graph, changeManager, message.name, message.value);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "setEdgeAttribute":
-            [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(graph, changeManager, message.source, message.target, message.name, message.value);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "setEdgeAttributeAll":
-            [newGraph, newChangeManager] = GraphInterface.setEdgeAttributeAll(graph, changeManager, message.name, message.value);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "evenlySpacedLayout":
-            [newGraph, newChangeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, changeManager);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "setLayerProperty":
-            [newGraph, newChangeManager] = LayeredGraphInterface.setLayerProperty(graph, changeManager, message.layer, message.attribute, message.value);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "setChannelProperty":
-            [newGraph, newChangeManager] = LayeredGraphInterface.setChannelProperty(graph, changeManager, message.channel, message.attribute, message.value);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "setWeightsUp":
-            [newGraph, newChangeManager] = LayeredGraphInterface.setWeightsUp(graph, changeManager, message.layer, message.type);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "setWeightsDown":
-            [newGraph, newChangeManager] = LayeredGraphInterface.setWeightsDown(graph, changeManager, message.layer, message.type);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "setWeightsBoth":
-            [newGraph, newChangeManager] = LayeredGraphInterface.setWeightsBoth(graph, changeManager, message.layer, message.type);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "sortByWeight":
-            [newGraph, newChangeManager] = LayeredGraphInterface.sortByWeight(graph, changeManager, message.layer);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "swap":
-            [newGraph, newChangeManager] = LayeredGraphInterface.swap(graph, changeManager, message.x, message.y);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "showIndexes":
-            [newGraph, newChangeManager] = LayeredGraphInterface.showIndexes(graph, changeManager, message.layer);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "showPositions":
-            [newGraph, newChangeManager] = LayeredGraphInterface.showPositions(graph, changeManager, message.layer);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "applyNodePositions":
-            [newGraph, newChangeManager] = LayeredGraphInterface.applyNodePositions(graph, changeManager, message.savedPositions);
-            console.log("algorithm thread", message.savedPositions);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "startRecording":
-            newChangeManager = GraphInterface.startRecording(changeManager);
-            store.set(algorithmChangeManagerAtom, newChangeManager);
-            break;
-        case "endRecording":
-            clearTimeout(algorithm.timeoutId);
-            // End the recording, but only if it started. It is possible that the user was in debug mode, which
-            // means that the recording was never actually started
-            if (changeManager.isRecording) {
-                newChangeManager = GraphInterface.endRecording(changeManager);
+    
+    try {
+        switch (message.action) {
+            case "setDirected":
+                newGraph = GraphInterface.setDirected(graph, message.isDirected);
+                store.set(graphAtom, newGraph);
+                break;
+            case "addNode":
+                [newGraph, newChangeManager] = GraphInterface.addNode(graph, changeManager, message.x, message.y);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "addEdge":
+                [newGraph, newChangeManager] = GraphInterface.addEdge(graph, changeManager, message.source, message.target);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "prompt":
+                clearTimeout(algorithm.timeoutId); // Cancel the timer while the prompt is up
+                newQueue = PromptInterface.queuePrompt(
+                    promptQueue,
+                    { type: 'input', label: message.content[1] || message.content[0] },
+                    (value) => {
+                        setupTimeout(algorithm); // Start the timeout timer back up
+                        enterPromptResult(algorithm, value); // Send the enetered value to the thread
+                    }
+                );
+                store.set(promptQueueAtom, newQueue);
+                break;
+            case "message":
+                newChangeManager = GraphInterface.addMessage(changeManager, message.message);
                 updateState(graph, newChangeManager);
-            }
-            if (algorithm.onStepAdded) algorithm.onStepAdded();
-            break;
-        case "step":
-            clearTimeout(algorithm.timeoutId);
-            if (algorithm.onStepAdded) algorithm.onStepAdded();
-            break;
-        case "complete":
-            clearTimeout(algorithm.timeoutId);
-            if (algorithm.onStepAdded) algorithm.onStepAdded();
-            algorithm.completed = true;
-            break;
-        case "error":
-            newQueue = PromptInterface.queuePrompt(
-                promptQueue,
-                { type: "algorithmError", errorObject: message.error, algorithmCode: algorithm.code },
-                () => {}
-            );
-            store.set(promptQueueAtom, newQueue);
-            break;
-        default:
-            // If the message was not a type we define here, then we probably just made a mistake 
-            // or typo when sending this message. Throw an error to let us know about it
-            throw new Error("Unexpected message type: " + message.action);
+                break;
+            case "print":
+                console.log(message.message);
+                break;
+            case "deleteNode":
+                [newGraph, newChangeManager] = GraphInterface.deleteNode(graph, changeManager, message.nodeId);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "setNodePosition":
+                [newGraph, newChangeManager] = GraphInterface.setNodePosition(graph, changeManager, message.nodeId, message.x, message.y);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "deleteEdge":
+                [newGraph, newChangeManager] = GraphInterface.deleteEdge(graph, changeManager, message.source, message.target);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "setNodeAttribute":
+                [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graph, changeManager, message.nodeId, message.name, message.value);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "setNodeAttributeAll":
+                [newGraph, newChangeManager] = GraphInterface.setNodeAttributeAll(graph, changeManager, message.name, message.value);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "setEdgeAttribute":
+                [newGraph, newChangeManager] = GraphInterface.setEdgeAttribute(graph, changeManager, message.source, message.target, message.name, message.value);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "setEdgeAttributeAll":
+                [newGraph, newChangeManager] = GraphInterface.setEdgeAttributeAll(graph, changeManager, message.name, message.value);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "evenlySpacedLayout":
+                [newGraph, newChangeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, changeManager);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "setLayerProperty":
+                [newGraph, newChangeManager] = LayeredGraphInterface.setLayerProperty(graph, changeManager, message.layer, message.attribute, message.value);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "setChannelProperty":
+                [newGraph, newChangeManager] = LayeredGraphInterface.setChannelProperty(graph, changeManager, message.channel, message.attribute, message.value);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "setWeightsUp":
+                [newGraph, newChangeManager] = LayeredGraphInterface.setWeightsUp(graph, changeManager, message.layer, message.type);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "setWeightsDown":
+                [newGraph, newChangeManager] = LayeredGraphInterface.setWeightsDown(graph, changeManager, message.layer, message.type);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "setWeightsBoth":
+                [newGraph, newChangeManager] = LayeredGraphInterface.setWeightsBoth(graph, changeManager, message.layer, message.type);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "sortByWeight":
+                [newGraph, newChangeManager] = LayeredGraphInterface.sortByWeight(graph, changeManager, message.layer);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "swap":
+                [newGraph, newChangeManager] = LayeredGraphInterface.swap(graph, changeManager, message.x, message.y);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "showIndexes":
+                [newGraph, newChangeManager] = LayeredGraphInterface.showIndexes(graph, changeManager, message.layer);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "showPositions":
+                [newGraph, newChangeManager] = LayeredGraphInterface.showPositions(graph, changeManager, message.layer);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "applyNodePositions":
+                [newGraph, newChangeManager] = LayeredGraphInterface.applyNodePositions(graph, changeManager, message.savedPositions);
+                console.log("algorithm thread", message.savedPositions);
+                updateState(newGraph, newChangeManager);
+                break;
+            case "startRecording":
+                newChangeManager = GraphInterface.startRecording(changeManager);
+                store.set(algorithmChangeManagerAtom, newChangeManager);
+                break;
+            case "endRecording":
+                clearTimeout(algorithm.timeoutId);
+                // End the recording, but only if it started. It is possible that the user was in debug mode, which
+                // means that the recording was never actually started
+                if (changeManager.isRecording) {
+                    newChangeManager = GraphInterface.endRecording(changeManager);
+                    updateState(graph, newChangeManager);
+                }
+                if (algorithm.onStepAdded) algorithm.onStepAdded();
+                break;
+            case "step":
+                clearTimeout(algorithm.timeoutId);
+                if (algorithm.onStepAdded) {
+                    algorithm.onStepAdded();
+                    // Clear reference to callback
+                    algorithm.onStepAdded = null;
+                }
+                break;
+            case "complete":
+                clearTimeout(algorithm.timeoutId);
+                if (algorithm.onStepAdded) {
+                    algorithm.onStepAdded();
+                    algorithm.onStepAdded = null;
+                }
+                algorithm.completed = true;
+                // Clear any remaining references
+                algorithm.worker = null;
+                algorithm.array = null;
+                algorithm.flags = null;
+                break;
+            case "error":
+                newQueue = PromptInterface.queuePrompt(
+                    promptQueue,
+                    { type: "algorithmError", errorObject: message.error, algorithmCode: algorithm.code },
+                    () => {}
+                );
+                store.set(promptQueueAtom, newQueue);
+                break;
+            default:
+                // If the message was not a type we define here, then we probably just made a mistake 
+                // or typo when sending this message. Throw an error to let us know about it
+                throw new Error("Unexpected message type: " + message.action);
+        }
+    } finally {
+        // Clear temporary objects
+        newGraph = null;
+        newChangeManager = null;
+        newQueue = null;
     }
 }
 
