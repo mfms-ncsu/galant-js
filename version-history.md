@@ -10,11 +10,17 @@ Features in the original galant-js implemented by the Fall 2023 Senior Design Te
 
 ------------------------
 (1) (S25) Major refactoring of the code base.
-(2) (S25) Screen positions of nodes map consistently to coordinates in the text representation (logical positions), so that saving to the text representation maintains the scale
+
+(2) (S25) Screen positions of nodes map consistently to coordinates in the text representation (logical positions), so that saving to the text representation maintains the scale.
+
 (3) (S25) A snap to grid feature with visible grid when logical coordinates are small integers.
+
 (4) (S25) Support for layered graphs (See, e.g., DiBattista et al., Graph Drawing, Prentice Hall, 1999, chapter 9).
+
 (5) (S25) Better reporting of errors, both during graph loading and algorithm execution.
+
 (6) (S25) Improved keyboard shortcuts.
+
 (7) (S25) Automatic detection and assignment of file names during downloads.
 
 
