@@ -14,15 +14,16 @@ export default function NewButton({ addTab, examples }) {
         if (!button.current) return;
 
         function onKeyPress(event) {
-            // If user is typing into editor text area field, ignore.
-            if (event.target.tagName.toLowerCase() === 'textarea') return;
-
-            // Only if the user enters the designated keyboard shortcut - n - the button is clicked
-            if (event.key == 'n') button.current.click();
+            event.preventDefault();
+            // Keyboard shortcut for new tab is Ctrl-N or Cmd-N; only the former works, even on a Mac
+            console.log("keypress = ", event);
+            if (event.key === 'n' && (event.getModifierState("Control") || event.getModifierState("Meta"))) {
+                event.preventDefault();
+                button.current.click();
+            }
         }
-
-        document.addEventListener('keypress', onKeyPress);
-        return () => document.removeEventListener('keypress', onKeyPress);
+        document.addEventListener('keydown', onKeyPress);
+        return () => document.removeEventListener('keydown', onKeyPress);
     }, []);
 
     return (
