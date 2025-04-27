@@ -6,6 +6,9 @@ import { algorithmTabsAtom, graphTabsAtom } from "states/_atoms/atoms";
 import Graph from "pages/Graph/Graph";
 import Editor from "pages/Editor/Editor";
 import Instructions from "pages/Instructions/Instructions";
+// serves an index file for algorithm examples
+import Algorithms from "pages/Algorithms/Algorithms";
+import AlgorithmExamples from "pages/Algorithms/AlgorithmExamples";
 import "./index.css";
 
 /**
@@ -51,6 +54,14 @@ const router = createBrowserRouter([
     {
         path: '/instructions',
         element: <Instructions />
+    },
+    {
+        path: '/algorithms',
+        element: <Algorithms />
+    },
+    {
+        path: 'algorithmexamples',
+        element: <AlgorithmExamples />
     }
 ]);
 
