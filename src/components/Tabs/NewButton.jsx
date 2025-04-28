@@ -13,17 +13,23 @@ export default function NewButton({ addTab, examples }) {
     useEffect(() => {
         if (!button.current) return;
 
-        function onKeyPress(event) {
-            event.preventDefault();
-            // Keyboard shortcut for new tab is Ctrl-N or Cmd-N; only the former works, even on a Mac
-            console.log("keypress = ", event);
-            if (event.key === 'n' && (event.getModifierState("Control") || event.getModifierState("Meta"))) {
+        function onKeyDown(event) {
+            if (event.code === "KeyE" && (event.metaKey || event.ctrlKey)) {
                 event.preventDefault();
                 button.current.click();
             }
         }
-        document.addEventListener('keydown', onKeyPress);
-        return () => document.removeEventListener('keydown', onKeyPress);
+        // function onKeyPress(event) {
+        //     event.preventDefault();
+        //     // Keyboard shortcut for new tab is Ctrl-N or Cmd-N; only the former works, even on a Mac
+        //     console.log("keypress = ", event);
+        //     if (event.key === 'n' && (event.getModifierState("Control") || event.getModifierState("Meta"))) {
+        //         event.preventDefault();
+        //         button.current.click();
+        //     }
+        // }
+        document.addEventListener('keydown', onKeyDown);
+        return () => document.removeEventListener('keydown', onKeyDown);
     }, []);
 
     return (
