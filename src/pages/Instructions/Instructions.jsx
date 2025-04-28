@@ -76,6 +76,7 @@ export default function Instructions() {
                     </li>
                 </ol>
             </div>
+            For more information see the full <a href="https://docs.google.com/document/d/12raeCS_OfNbGwzBV74YuwBms6vQ5iN4d/edit#heading=h.rmp7levsyhum">User Manual</a> [currently unavailable]
         </div>
     );
 }
