@@ -19,24 +19,25 @@ export default function NewButton({ addTab, examples }) {
                 button.current.click();
             }
         }
-        // function onKeyPress(event) {
-        //     event.preventDefault();
-        //     // Keyboard shortcut for new tab is Ctrl-N or Cmd-N; only the former works, even on a Mac
-        //     console.log("keypress = ", event);
-        //     if (event.key === 'n' && (event.getModifierState("Control") || event.getModifierState("Meta"))) {
-        //         event.preventDefault();
-        //         button.current.click();
-        //     }
-        // }
         document.addEventListener('keydown', onKeyDown);
         return () => document.removeEventListener('keydown', onKeyDown);
     }, []);
 
     return (
-        <div className="relative">
-             <PrimaryButton className="m-1">
-                <a href="/algorithms">Examples</a>
-             </PrimaryButton>
-        </div>
+        <PrimaryButton className="m-1">
+            <button
+                className="hover:underline"
+                data-cy="BlankTab"
+                onClick={() => {
+                    try {
+                        addTab({ 'name': 'Blank' });
+                    } catch (error) {
+                        console.error('An error occurred while adding the blank tab Please try again.', error);
+                    }
+                }}
+            >
+            Examples
+            </button>
+        </PrimaryButton>
     );
 }
