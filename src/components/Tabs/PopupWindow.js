@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
-const PopupWindow = ({ options, onLinkClick }) => {
+const PopupWindow = ({ examples, onLinkClick }) => {
   useEffect(() => {
     const popup = window.open(
       '',
@@ -22,31 +22,31 @@ const PopupWindow = ({ options, onLinkClick }) => {
         popup.close(); // Optionally close the popup after clicking
       };
 
-      options.forEach(({ name, description, link }, index) => {
+      examples.map(option => {
         const optionElement = popupDocument.createElement('div');
         optionElement.style.marginBottom = '10px';
 
         const linkElement = popupDocument.createElement('a');
         linkElement.href = '#';
-        linkElement.textContent = name;
+        linkElement.textContent = option.name;
         linkElement.style.fontWeight = 'bold';
         linkElement.style.display = 'block';
         linkElement.onclick = (e) => {
           e.preventDefault();
-          handleClick({ name, description, link });
-        };
+          handleClick({ option });
+        }
 
         const descriptionElement = popupDocument.createElement('span');
-        descriptionElement.textContent = ` - ${description}`;
+//        descriptionElement.textContent = ` - ${description}`;
 
         optionElement.appendChild(linkElement);
         optionElement.appendChild(descriptionElement);
         root.appendChild(optionElement);
-      });
+      })
     }
 
     return () => popup && popup.close(); // Clean up the popup when the component unmounts
-  }, [options, onLinkClick]);
+  }, [examples, onLinkClick]);
 
   return null; // This component doesn't render anything itself
 };

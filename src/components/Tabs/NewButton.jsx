@@ -5,11 +5,11 @@ import App from "components/Tabs/App"
 /**
  * Returns component for creating new tabs, including the button and dropdown.
  */
-export default function NewButton({ addTab, examples }) {
+export default function NewButton({addTab, examples}) {
         return (
           <div>
             <PrimaryButton className="m-1">
-            <App>
+            <App addTab={addTab} examples={examples}>
                 <span>Examples</span>
             </App>
             </PrimaryButton>
