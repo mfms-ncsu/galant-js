@@ -25,6 +25,7 @@ function Header({ children }) {
  */
 export default function TabList({tabs, setTabs, acceptFileType, examples}) {
     function onAddTab(data) {
+        console.log("-> onAddTab, data =", data);
         setTabs(TabInterface.addTab(tabs, data));
     }
 
@@ -48,11 +49,11 @@ export default function TabList({tabs, setTabs, acceptFileType, examples}) {
         setTabs(TabInterface.deleteTab(tabs, tab));
     }
 
-    
+    console.log("In TabList: examples =", examples, "tabs =", tabs);    
     return (
         <>
             <Header>
-                <NewButton addTab={onAddTab} examples={examples} />
+                <NewButton addTab={onAddTab} tabs={tabs} examples={examples} />
                 <UploadButton onUpload={onFileUpload} acceptFileType={acceptFileType}/>
             </Header>
 

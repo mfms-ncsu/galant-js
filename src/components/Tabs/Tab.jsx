@@ -6,6 +6,7 @@ import { PencilIcon, XMarkIcon } from '@heroicons/react/24/solid';
  * In edit mode, tab shows intermediateName, and allows user to focus on input box to change name.
  */
 export default function Tab({tab, onClick, onRename, onRemove}) {
+    console.log("in Tab, tab =", tab);
     const [editMode, setEditMode] = useState(false);
     const [intermediateName, setIntermediateName] = useState(tab.name);
     const inputField = useRef(null);

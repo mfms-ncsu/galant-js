@@ -1,6 +1,9 @@
 import { useEffect } from 'react';
+import onAddTab from 'components/Tabs/TabList'
+import TabInterface from "interfaces/TabInterface/TabInterface";
+import Tab from "components/Tabs/Tab";
 
-const PopupWindow = ({ examples, onLinkClick }) => {
+const PopupWindow = ({ tabs, examples, onLinkClick }) => {
   useEffect(() => {
     const popup = window.open(
       '',
@@ -18,11 +21,15 @@ const PopupWindow = ({ examples, onLinkClick }) => {
 
       const handleClick = (option) => {
         // Call the function passed as a prop
-        onLinkClick(option);
+        console.log('PopupWindow, handleClick, option =', option);
+        TabInterface.addTab(tabs, option);
+        // onAddTab(option)
+//        onLinkClick(option);
         popup.close(); // Optionally close the popup after clicking
       };
 
       examples.map(option => {
+        console.log("in PopupWindow, option =", option);
         const optionElement = popupDocument.createElement('div');
         optionElement.style.marginBottom = '10px';
 

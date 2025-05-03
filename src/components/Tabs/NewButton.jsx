@@ -1,15 +1,16 @@
 import { useRef, useEffect, useState } from "react";
 import PrimaryButton from 'components/Buttons/PrimaryButton';
 import App from "components/Tabs/App"
+import TabList from "components/Tabs/TabList"
 
 /**
  * Returns component for creating new tabs, including the button and dropdown.
  */
-export default function NewButton({addTab, examples}) {
+export default function NewButton({tabs, examples}) {
         return (
           <div>
             <PrimaryButton className="m-1">
-            <App addTab={addTab} examples={examples}>
+            <App tabs={tabs} examples={examples}>
                 <span>Examples</span>
             </App>
             </PrimaryButton>

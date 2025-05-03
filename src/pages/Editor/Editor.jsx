@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 import TabInterface from "interfaces/TabInterface/TabInterface";
 import MonacoEditor from '@monaco-editor/react';
 import Overlay from "./Overlay"
-import TabList from "../../components/Tabs/TabList";
+import TabList from "components/Tabs/TabList";
 import algorithms from 'data/algorithms.json';
 import graphs from 'data/graphs.json';
 
