@@ -1,6 +1,7 @@
 import TabInterface from "interfaces/TabInterface/TabInterface";
 import Tab from "./Tab";
 import NewButton from './NewButton';
+import PopupWindow from './PopupWindow'
 import UploadButton from './UploadButton';
 
 /**
@@ -53,7 +54,7 @@ export default function TabList({tabs, setTabs, acceptFileType, examples}) {
     return (
         <>
             <Header>
-                <NewButton addTab={onAddTab} tabs={tabs} examples={examples} />
+                <PopupWindow onLinkClick={onAddTab} examples={examples} />
                 <UploadButton onUpload={onFileUpload} acceptFileType={acceptFileType}/>
             </Header>
 

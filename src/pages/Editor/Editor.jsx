@@ -30,6 +30,7 @@ export default function Editor({ editorType, tabsAtom }) {
     const [tabs, setTabs] = useAtom(tabsAtom); // State for managing tabs
     const selectedTab = TabInterface.getSelectedTab(tabs); // Get the currently selected tab
     const [saved, setSaved] = useState(true); // State for tracking whether changes are saved
+    console.log("-> Editor, tabs =", tabs);
 
     // Handler for editor content change
     function onEditorChange(value) {
@@ -45,6 +46,7 @@ export default function Editor({ editorType, tabsAtom }) {
 
     // Once tabs' value updates, set saved back to true
     useEffect(() => {
+        console.log("useEffect in Editor, tabs =", tabs);
         setSaved(true);
     }, [tabs]);
 

@@ -3,7 +3,8 @@ import onAddTab from 'components/Tabs/TabList'
 import TabInterface from "interfaces/TabInterface/TabInterface";
 import Tab from "components/Tabs/Tab";
 
-const PopupWindow = ({ tabs, examples, onLinkClick }) => {
+const PopupWindow = ({ examples }) => {
+
   useEffect(() => {
     const popup = window.open(
       '',
@@ -11,22 +12,22 @@ const PopupWindow = ({ tabs, examples, onLinkClick }) => {
       'width=400,height=400,scrollbars=yes,resizable=yes'
     );
 
-    if (popup) {
+    const handleClick = (option) => {
+      // Call the function passed as a prop
+      console.log('PopupWindow, handleClick, option =', option);
+      onAddTab(option);
+      // onAddTab(option)
+    //        onLinkClick(option);
+      popup.close(); // Optionally close the popup after clicking
+    };
+    
+      if (popup) {
       const popupDocument = popup.document;
       popupDocument.write('<!DOCTYPE html><html><head><title>Popup</title></head><body></body></html>');
       popupDocument.close();
 
       const root = popupDocument.createElement('div');
       popupDocument.body.appendChild(root);
-
-      const handleClick = (option) => {
-        // Call the function passed as a prop
-        console.log('PopupWindow, handleClick, option =', option);
-        TabInterface.addTab(tabs, option);
-        // onAddTab(option)
-//        onLinkClick(option);
-        popup.close(); // Optionally close the popup after clicking
-      };
 
       examples.map(option => {
         console.log("in PopupWindow, option =", option);
@@ -53,7 +54,7 @@ const PopupWindow = ({ tabs, examples, onLinkClick }) => {
     }
 
     return () => popup && popup.close(); // Clean up the popup when the component unmounts
-  }, [examples, onLinkClick]);
+  }, [examples, handleClick]);
 
   return null; // This component doesn't render anything itself
 };
