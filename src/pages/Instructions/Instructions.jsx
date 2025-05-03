@@ -78,7 +78,7 @@ export default function Instructions() {
             </div>
             For more information see the full (link below)
             <p>
-             <strong><em><a href="https://docs.google.com/document/d/1FEi-RJ97UxsDuxHQrGmyOUanNWrWdq84NKicSdswGDY">User Manual</a></em></strong>
+             <strong><em><a href="https://docs.google.com/document/d/1FEi-RJ97UxsDuxHQrGmyOUanNWrWdq84NKicSdswGDY/view">User Manual</a></em></strong>
             </p>
         </div>
     );
