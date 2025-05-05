@@ -1,41 +1,55 @@
-import React from 'react'
+import React, { useState } from 'react';
 
-const PopupWindow = ({examples, addNew}) => {
-
-  // useEffect(() => {
-  //   const popup = window.open(
-  //     '',
-  //     '_blank',
-  //     'width=400,height=400,scrollbars=yes,resizable=yes'
-  //   );
-
-    const handleClick = (option) => {
-      // Call the function passed as a prop
-      console.log('PopupWindow, handleClick, option =', option);
-      addNew(option);
-    };
-
-    return(
-      <div>
-      <h2>Options</h2>
-      <ul>
-        {examples.map((option, index) => (
-          <li key={index}>
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                handleClick(option);
-              }}
-            >
-              {option.name}
-            </a>{' '}
-            - add description
-          </li>
-        ))}
-      </ul>
-    </div>
+function PopupWindow({ options, onOptionSelect }) {
+  const openPopup = () => {
+    const popup = window.open(
+      '',
+      'popup',
+      'width=600,height=400,scrollbars=yes,resizable=yes'
     );
-};
+
+    if (popup) {
+      popup.document.body.innerHTML = `
+        <div id="popup-root"></div>
+      `;
+
+      const rootElement = popup.document.getElementById('popup-root');
+
+      const PopupContent = () => {
+        const handleClick = (option) => {
+          onOptionSelect(option);
+          popup.close();
+        };
+
+        return (
+          <div style={{ padding: '10px' }}>
+            <h1>Select an Option</h1>
+            <ul>
+              {options.map((option, index) => (
+                <li key={index}>
+                  <a
+                    href="#"
+                    onClick={() => handleClick(option.name)}
+                    style={{ color: 'blue', textDecoration: 'underline' }}
+                  >
+                    {option.name}
+                  </a>
+                  <p>{option.description}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      };
+
+      // Render the React component in the popup window
+      ReactDOM.createRoot(rootElement).render(<PopupContent />);
+    }
+  };
+
+  return (
+    <button onClick={openPopup}>Open Popup</button>
+  );
+}
 
 export default PopupWindow;

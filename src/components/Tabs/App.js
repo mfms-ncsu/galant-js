@@ -1,20 +1,23 @@
-import React, { useState } from 'react';
-import { useAtom } from "jotai";
+import React from 'react';
 import PopupWindow from './PopupWindow';
-//import onAddTab from 'components/Tabs/TabList'
 
-  const App = ({examples}) => {
-  const [showPopup, setShowPopup] = useState(false);
+function App() {
+  const options = [
+    { name: 'Option 1', description: 'This is the first option' },
+    { name: 'Option 2', description: 'This is the second option' },
+    { name: 'Option 3', description: 'This is the third option' },
+  ];
 
-  console.log("in App, examples =", examples);
-  // const [tabs, setTabs] = useAtom(tabsAtom);
-  // setTabs([...tabs]);
+  const handleOptionSelect = (selectedOption) => {
+    alert(`You selected: ${selectedOption}`);
+  };
+
   return (
     <div>
-      <button onClick={() => setShowPopup(true)}>Examples</button>
-      {showPopup && <PopupWindow examples={examples} />}
+      <h1>Popup Example</h1>
+      <PopupWindow options={options} onOptionSelect={handleOptionSelect} />
     </div>
   );
-};
+}
 
 export default App;

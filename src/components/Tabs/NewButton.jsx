@@ -5,6 +5,8 @@ import PopupWindow from 'components/Tabs/PopupWindow';
 
 /**
  * Returns component for creating new tabs, including the button and popup.
+ * @param addNew - this comes from TabList and is passed along;
+ *                 eventually should be handled more directly
  */
 export default function NewButton({examples, addNew}) {
   const openPopup = () => {
