@@ -1,21 +1,40 @@
-import { useRef, useEffect, useState } from "react";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 import PrimaryButton from 'components/Buttons/PrimaryButton';
-import App from "components/Tabs/App"
-import TabList from "components/Tabs/TabList"
+import PopupWindow from 'components/Tabs/PopupWindow';
 
 /**
- * Returns component for creating new tabs, including the button and dropdown.
+ * Returns component for creating new tabs, including the button and popup.
  */
-export default function NewButton({tabs, examples}) {
-        return (
-          <div>
-            <PrimaryButton className="m-1">
-            <App tabs={tabs} examples={examples}>
-                <span>Examples</span>
-            </App>
-            </PrimaryButton>
-          </div>
-        );
+export default function NewButton({examples, addNew}) {
+  const openPopup = () => {
+    const popupWindow = window.open(
+      '',
+      '_blank',
+      'width=400,height=400,scrollbars=yes,resizable=yes'
+    );
+
+    if (popupWindow) {
+      popupWindow.document.title = 'Popup Window';
+
+      // Render the React component in the new window
+      const container = popupWindow.document.createElement('div');
+      popupWindow.document.body.appendChild(container);
+
+      ReactDOM.createRoot(container).render(<PopupWindow examples={examples} addNew={addNew} />);
+    } else {
+      alert('Popup blocked! Please allow popups for this website.');
+    }
+  }
+
+  return (
+    <div>
+      <PrimaryButton className="m-1">
+        <button onClick={() => openPopup(true)}>Examples</button>
+      </PrimaryButton>
+    </div>
+  );
+}
     //           <div className="relative">
     //         <Menu>
     //             <PrimaryButton className="m-1">
@@ -73,4 +92,3 @@ export default function NewButton({tabs, examples}) {
     //         </Menu>
     //     </div>
     // );
-}

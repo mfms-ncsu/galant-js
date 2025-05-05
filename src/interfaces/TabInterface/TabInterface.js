@@ -111,7 +111,7 @@ function getSelectedTab(tabs) {
 function addTab(tabs, data) {
     console.log("-> addTab, tabs =", tabs, "data =", data);
     // Ensure the tab has a unique name
-    let updatedName = data.option.name;
+    let updatedName = data.name;
     console.log("updatedName = ", updatedName);
     let count = 1;
     while (getTabByName(tabs, updatedName)) {
@@ -119,7 +119,7 @@ function addTab(tabs, data) {
         count++;
     }
 
-    let myContent = data.option.content;
+    let myContent = data.content;
     console.log("data.content =", myContent);
     // Create the new tab and make it selected
     const tab = { name: updatedName, content: myContent || '', selected: true };

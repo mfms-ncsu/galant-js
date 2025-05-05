@@ -54,7 +54,7 @@ export default function TabList({tabs, setTabs, acceptFileType, examples}) {
     return (
         <>
             <Header>
-                <PopupWindow onLinkClick={onAddTab} examples={examples} />
+                <NewButton examples={examples} addNew={onAddTab} />
                 <UploadButton onUpload={onFileUpload} acceptFileType={acceptFileType}/>
             </Header>
 
