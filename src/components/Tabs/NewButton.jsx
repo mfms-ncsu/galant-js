@@ -5,8 +5,6 @@ import PopupWindow from 'components/Tabs/PopupWindow';
 
 /**
  * Returns component for creating new tabs, including the button and popup.
- * @param addNew - this comes from TabList and is passed along;
- *                 eventually should be handled more directly
  */
 export default function NewButton({examples, addNew}) {
   const openPopup = () => {
@@ -16,6 +14,11 @@ export default function NewButton({examples, addNew}) {
       'width=400,height=400,scrollbars=yes,resizable=yes'
     );
 
+    const handleSelection = (selection) => {
+      addNew(selection);
+      popupWindow.close();
+    }
+
     if (popupWindow) {
       popupWindow.document.title = 'Popup Window';
 
@@ -23,7 +26,7 @@ export default function NewButton({examples, addNew}) {
       const container = popupWindow.document.createElement('div');
       popupWindow.document.body.appendChild(container);
 
-      ReactDOM.createRoot(container).render(<PopupWindow examples={examples} addNew={addNew} />);
+      ReactDOM.createRoot(container).render(<PopupWindow examples={examples} handleSelection={handleSelection} />);
     } else {
       alert('Popup blocked! Please allow popups for this website.');
     }
