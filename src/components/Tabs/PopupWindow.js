@@ -20,9 +20,11 @@ const PopupWindow = ({examples, handleSelection}) => {
 
     return(
       <div>
-      <h2>Options</h2>
+      <h1>Examples</h1>
       <ul>
         {examples.map((option, index) => (
+          <div>
+            <p>
           <li key={index}>
             <a
               href="#"
@@ -32,10 +34,15 @@ const PopupWindow = ({examples, handleSelection}) => {
               }}
             >
               {option.name}
-            </a>{' '}
-            - add description
+            </a>
+              {' - '}
+            {option.description ? option.description : ""}
           </li>
-        ))}
+          </p>
+          </div>
+        )
+        )
+      }
       </ul>
     </div>
     );
