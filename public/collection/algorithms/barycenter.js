@@ -1,3 +1,6 @@
+/**
+ * The barycenter heuristic attempts to minimize edge crossings in layered graphs
+ */
 let minCrossings = 100000000;
 let edgeCrossings = 0;
 let minEdgeCrossings = 100000000;

@@ -1,9 +1,14 @@
+/**
+ * Insertion sort; works for "sorting graphs", graphs without edges and vertices in a horizontal line, only
+ */
+
 Algorithm.configure({
     controlNodePosition: true
 })
 
-const HORIZONTAL_GAP = 100;
-const VERTICAL_GAP = 50;
+// @todo these should not be needed
+const HORIZONTAL_GAP = 1;
+const VERTICAL_GAP = 1;
 
 let nodeIds = getNodes();
 showAllNodeWeights();

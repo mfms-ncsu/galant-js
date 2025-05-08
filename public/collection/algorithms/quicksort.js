@@ -2,6 +2,7 @@
  * An animation of Quicksort based on a project
  * submitted by Hayden Fuss, Solomon Yeh, and Jordan Connor
  * in CSC 316, Spring 2015.
+ * Works for sorting graphs only.
  */
 
 // Algorithm
@@ -19,8 +20,9 @@ Algorithm.configure({
     controlNodePosition: true
 })
 
-const HORIZONTAL_GAP = 80;
-const VERTICAL_GAP = 40;
+// @todo should not need these
+const HORIZONTAL_GAP = 1;
+const VERTICAL_GAP = 1;
 
 /**
  * @return a random element of an array/list

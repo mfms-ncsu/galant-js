@@ -1,6 +1,5 @@
 /**
- * @file kruskal.alg
- * animation of Kruskal's MST algorithm
+ * animation of Kruskal's minimum spanning tree algorithm
  */
 
 let parent = {}     // parent pointers for disjoint set structure

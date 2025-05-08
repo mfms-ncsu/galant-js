@@ -1,3 +1,7 @@
+/**
+ * Depth first search: works for both undirected and directed graphs
+ */
+
 // time at which each node is discovered
 let discoveryTimes = {};
 // time at which each node has finished being explored

@@ -20,7 +20,7 @@ const PopupWindow = ({examples, handleSelection}) => {
 
     return(
       <div>
-      <h1>Examples</h1>
+      <div><strong>Examples</strong></div>
       <ul>
         {examples.map((option, index) => (
           <div>

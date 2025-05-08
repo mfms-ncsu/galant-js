@@ -7,11 +7,22 @@ import PopupWindow from 'components/Tabs/PopupWindow';
  * Returns component for creating new tabs, including the button and popup.
  */
 export default function NewButton({examples, addNew}) {
+  React.useEffect(() => {
+        function onKeyPress(event) {
+            if (event.code === "KeyE" && (event.metaKey || event.ctrlKey)) {
+              event.preventDefault();
+              openPopup();
+            }
+        }
+        document.addEventListener("keydown", onKeyPress);
+        return () => document.removeEventListener("keydown", onKeyPress);
+    }, []);
+
   const openPopup = () => {
     const popupWindow = window.open(
       '',
       '_blank',
-      'width=400,height=400,scrollbars=yes,resizable=yes'
+      'width=800,height=600,scrollbars=yes,resizable=yes'
     );
 
     const handleSelection = (selection) => {
