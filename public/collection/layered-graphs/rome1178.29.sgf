@@ -1,6 +1,4 @@
-c generated 2016/04/15
-c $Id: mlcm2sgf.py 106 2015-04-13 17:01:05Z mfms $
-c 33 nodes 34 edges 5 layers
+c Another layered version of a Rome graph, has 5 layers
 t rome1178.29_GKNV 33 34 5
 
 n 0 0 0

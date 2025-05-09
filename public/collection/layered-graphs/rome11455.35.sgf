@@ -1,6 +1,4 @@
-c generated 2016/04/15
-c $Id: mlcm2sgf.py 106 2015-04-13 17:01:05Z mfms $
-c 35 nodes 35 edges 3 layers
+c The layered version of a Rome graph, based on postal routes in Rome, Italy; has 3 layers
 t rome11455.35_GKNV 35 35 3
 
 n 0 0 0

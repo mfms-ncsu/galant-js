@@ -1,0 +1,4 @@
+c This is a template for a layered graph.
+c The only difference from that of an ordinary graph is a required title line starting with 't';
+c  it has the form 't NAME [#_nodes #_edges #_layers]'
+t graph_name

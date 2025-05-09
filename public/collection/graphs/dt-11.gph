@@ -1,5 +1,5 @@
-# unweighted, based on a Delaunay triangulation
-# if directed, all nodes are reachable from anywhere
+c unweighted, based on a Delaunay triangulation
+c if directed, all nodes are reachable from anywhere, so strongly connected
 n 1 50 20
 n 2 30 20
 n 3 5 60

@@ -1,5 +1,4 @@
-c created by dot+ord2sgf, date/time = Sat Dec 19 21:09:51 UTC 2020
-c $Id: dot+ord2sgf 66 2014-03-29 16:58:11Z mfms $
+c One of hundreds of benchmark graphs used for comparing crossing minimization heuristics 
 t north42.32_GKNV 42 64 6
 n 0 0 0
 n 1 0 1

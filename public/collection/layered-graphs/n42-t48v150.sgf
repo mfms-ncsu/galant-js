@@ -1,9 +1,5 @@
-c  created from a cplex_ilp solution
-c  CurrentTime	Sat 2023/03/18 21:55:32 GMT
-c  runtime      	8849.67
-c  TimedOut	0
-c  ProvedOptimal	1
-c  value      	150
+c A version of north42.32 with minimum total non-verticality,
+c i.e., edges deviate as little as possible from being vertical
 t  north42.32-total_48_vertical 42 64 6
 n  0 0 9
 n  1 0 2

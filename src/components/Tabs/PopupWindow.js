@@ -36,7 +36,9 @@ const PopupWindow = ({examples, handleSelection}) => {
               {option.name}
             </a>
               {' - '}
-            {option.description ? option.description : ""}
+              <pre>
+                {option.description ? option.description : ""}
+              </pre>
           </li>
           </p>
           </div>

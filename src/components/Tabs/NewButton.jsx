@@ -22,7 +22,7 @@ export default function NewButton({examples, addNew}) {
     const popupWindow = window.open(
       '',
       '_blank',
-      'width=800,height=600,scrollbars=yes,resizable=yes'
+      'width=1000,height=600,scrollbars=yes,resizable=yes'
     );
 
     const handleSelection = (selection) => {

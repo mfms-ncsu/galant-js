@@ -1,3 +1,4 @@
+c a small example graph with 8 nodes and 9 edges
 n 0 1 1
 n 1 2 1
 n 2 4 1

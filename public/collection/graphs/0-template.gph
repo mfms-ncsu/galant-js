@@ -1,0 +1,7 @@
+c This is a template for a (non layered) graph.
+c Lines have four forms, beginning with 'c', 'g', 'n', or 'e'
+c   - 'c' followed by any text is a comment
+c   - 'g' (optional) is followed by # of nodes and # of edges
+c   - 'n ID X Y [W]' denotes a node with the given id at position (X,Y) and weight W
+c      see the User Manual (select Help to find the link) for info about other attributes
+c   - 'e S T [W]' denotes an edge with source S, target T and weight W; plus other attributes
