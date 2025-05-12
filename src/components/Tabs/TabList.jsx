@@ -1,7 +1,6 @@
 import TabInterface from "interfaces/TabInterface/TabInterface";
 import Tab from "./Tab";
 import NewButton from './NewButton';
-import PopupWindow from './PopupWindow'
 import UploadButton from './UploadButton';
 
 /**

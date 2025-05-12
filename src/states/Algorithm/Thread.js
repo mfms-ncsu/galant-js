@@ -941,6 +941,7 @@ function nodesOnLayer(layer) {
 } 
 
 function evenlySpacedLayout() {
+    console.log("-> envenlySpacedLayout, depth =", stepDepth)
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, changeManager);
     postMessage({ action: "evenlySpacedLayout",  });

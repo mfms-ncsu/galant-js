@@ -1,5 +1,3 @@
-import React from 'react'
-
 /**
  * @param closeWindow - window is opened by client, needs to be closed after addNew
  */

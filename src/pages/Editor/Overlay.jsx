@@ -16,13 +16,6 @@ function LoadButton({ tab, editorType }) {
     // Effect hook to handle keyboard shortcut for loading graph/algorithm
     useEffect(() => {
         function onKeyPress(event) {
-            // If user is typing into the editor text area, ignore.
-            // !!! this defeats the purpose of a kbd shortcut !!!
-            // if (event.target.tagName.toLowerCase() === "textarea") return;
-
-            // Only if user enters designated keyboard shortcut
-            //  cmd-l or ctrl-l the graph/algorithm in text area is loaded
-            // @todo function modifier(event) that returns true if it's a meta or ctrl
             if (event.code === "KeyL" && (event.metaKey || event.ctrlKey)) {
                 event.preventDefault();
                 load();

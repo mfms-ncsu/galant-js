@@ -248,6 +248,7 @@ function onMessage(algorithm, message) {
             updateState(newGraph, newChangeManager);
             break;
         case "evenlySpacedLayout":
+            console.log("in AlgorithmInterface, evenlySpacedLayout, graph =", graph)
             [newGraph, newChangeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, changeManager);
             updateState(newGraph, newChangeManager);
             break;

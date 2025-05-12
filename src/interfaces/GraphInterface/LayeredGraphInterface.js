@@ -681,6 +681,7 @@ function nodesOnLayer(graph, layerIndex) {
  * @author Michael Richardson (maricha6)
  */
 function evenlySpacedLayout(graph, changeManager) {
+    console.log("-> evenlySpacedLayout, graph =", graph)
 
     if (graph.type != "layered") {
         throw new Error(
@@ -703,7 +704,7 @@ function evenlySpacedLayout(graph, changeManager) {
     // Iterate over each layer and space the nodes evenly to fit the "widest" layer
     let newGraph = graph;
     let newChangeManager = changeManager;
-    newChangeManager = GraphInterface.startRecording(changeManager);
+//    newChangeManager = GraphInterface.startRecording(changeManager);
 
     for (let i = 0; i <= maxLayer; i++) {
         const layer = nodesOnLayer(graph, i);
@@ -743,7 +744,7 @@ function evenlySpacedLayout(graph, changeManager) {
         }
     }
 
-    newChangeManager = GraphInterface.endRecording(newChangeManager);
+//    newChangeManager = GraphInterface.endRecording(newChangeManager);
 
     return [newGraph, newChangeManager];
 }

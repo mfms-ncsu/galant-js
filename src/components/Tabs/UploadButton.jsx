@@ -1,11 +1,23 @@
 import { ArrowUpTrayIcon } from '@heroicons/react/24/solid';
 import PrimaryButton from 'components/Buttons/PrimaryButton';
+import React from 'react';
 
 /**
  * Returns component for uploading files and adding them as tabs.
  */
 export default function UploadButton({onUpload, acceptFileType}) {
     function onFileUploadEvent(event) {
+    //   useEffect(() => {
+    //     function onKeyPress(event) {
+    //         if (event.code === "KeyO" && (event.metaKey || event.ctrlKey)) {
+    //           event.preventDefault();
+    //           onUpload();
+    //         }
+    //     }
+    //     document.addEventListener("keydown", onKeyPress);
+    //     return () => document.removeEventListener("keydown", onKeyPress);
+    // }, []);
+
         const files = event.target.files;
 
         const tabs = [];
