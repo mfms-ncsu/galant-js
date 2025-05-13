@@ -9,7 +9,8 @@ option. The output format can be html, markdown or plain text.
 In html and markdown the entries are items in a bulleted list.
 """
 
-import argparse
+from argparse import ArgumentParser
+from argparse import RawTextHelpFormatter # to allow newlines in help messages
 import glob
 import os
 import sys
@@ -18,8 +19,12 @@ MY_NAME = 'Matthias F. (Matt) Stallmann'
 MY_URL = "http://mfms.wordpress.ncsu.edu"
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(
-        description = "creates an index file for the current directory in a specified format"
+    parser = ArgumentParser(
+    formatter_class=RawTextHelpFormatter,
+        description = "creates an index file for the current directory in a specified format",
+        epilog = 'The json format is designed for use with galant-js options.\n'
+                  + ' Output is a list of json items with attributes name, content, and description,\n'
+                  + ' corresponding to filename, file contents, and comments to be displayed, respectively.'
     )
     parser.add_argument("title", help="title for the index file")
     parser.add_argument("-f", "--files",
@@ -332,8 +337,9 @@ if __name__ == "__main__":
         dir_list = filter_directories(dir_list)
     else:
         dir_list = []
-    file_list.sort()
-    dir_list.sort()
+#   user often wants to control the order in which the files appear
+#    file_list.sort()
+#    dir_list.sort()
     filenames_with_comments = harvest_comments(file_list)
     # get comments from the comments file if requested
     comment_list = []

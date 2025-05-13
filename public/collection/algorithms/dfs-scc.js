@@ -16,9 +16,8 @@ let element_component = {}
 
 /**
  * rotation of colors to use for components
- * @todo can add more colors that are supported by Cytoscape
  */
-let component_color = ['brown', 'blue', 'red', 'violet', 'green']
+let component_color = ['brown', 'blue', 'red', 'violet', 'green', 'cyan', 'magenta']
 
 /**
  * sets the component of the element (node or edge) and colors it;
@@ -60,6 +59,7 @@ step(() => {
 
 /********** Main algorithm starts here ************/
 
+// let user choose another starting node if there are remaining unreachable nodes
 let unvisited = new Set(getNodes());
 while ( unvisited.size > 0 ) {
     let start = promptNodeFrom("Enter start node:", unvisited);

@@ -1,0 +1,1 @@
+0-template.gph small.gph [d-r]*.gph w*.gph valid_graph_ncsu.gph sorting*.gph 

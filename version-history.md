@@ -1,5 +1,14 @@
 # Version history of galant-js
 
+TODO - redo json file for graphs to get latest for sorting_08
+
+Version 2.1
+
+(1) The drop down menu in the algorithm and graph editors has been replaced by a popup menu to allow for a larger collection of examples and annotations for each
+(2) A conversion script `dir2index.py` has been added to allow easy conversion from files in the `public/collection` directories to the json files in `src/data`
+(3) Enhancements have been added to a few of the algorithms
+
+---------------------
 Features and bug fixes implemented as version 2.0 by the Spring 2025 Teams of Heath Dyer, Jacob Friend, Rishi Gupta, Ethan Haske, Henry Morris, Ravi Pavuluri, Michael Richardson, Krisjan Smith, Jacob Usher, and Ziyu Wang are marked S25.
 
 Features and bug fixes implemented by the Fall 2024 Senior Design Team of Harshica Balu, Shlok Dave, Ethan Godwin, Andrew Lanning, and Somya Pandey are marked F24. The major accomplishment of this team was on the back end: the implementation of ***change records***, which make the code more transparent and allow separation of logical and physical representation of the graph.
