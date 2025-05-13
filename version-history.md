@@ -1,6 +1,10 @@
 # Version history of galant-js
 
-TODO - redo json file for graphs to get latest for sorting_08
+TODO:
+- figure out whether src/pages/Algorithms is used; it's referred to in index.js
+- test using all browsers
+- develop a system test plan, record it in test-plan.md
+- publish version 2.1
 
 Version 2.1
 
