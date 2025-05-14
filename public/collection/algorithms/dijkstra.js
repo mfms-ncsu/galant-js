@@ -54,8 +54,11 @@ function removeMin() {
 step(() => {
     clearNodeMarks();
     clearNodeWeights();
+    clearNodeColors();
+    clearNodeShapes();
 
     clearEdgeColors();
+    clearEdgeHighlights();
 
     for (let edge of getEdges()) {
         if ( ! hasWeight(edge) ) {
@@ -88,7 +91,7 @@ while ( PQsize() > 0 ) {
             color(predecessorEdge[current_node], "blue")
             setEdgeWidth(predecessorEdge[current_node], 6)
             display(`node ${current_node} added
-                     with predecessor ${other(predecessorEdge[current_node], current_node)}`)
+                     with predecessor ${other(current_node, predecessorEdge[current_node])}`)
         }
     })
 

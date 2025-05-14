@@ -1,11 +1,5 @@
 # Version history of galant-js
 
-TODO:
-- figure out whether src/pages/Algorithms is used; it's referred to in index.js
-- test using all browsers
-- develop a system test plan, record it in test-plan.md
-- publish version 2.1
-
 Version 2.1
 
 (1) The drop down menu in the algorithm and graph editors has been replaced by a popup menu to allow for a larger collection of examples and annotations for each
