@@ -40,6 +40,7 @@ export default function Graph() {
 
         // Load a new graph
         function onGraphLoad(data, isInit) {
+            console.log(`-> onGraphLoad, data = [${data.name}, ${data.payload}]`)
             // Get the name and graph text from the data
             const { name: graphName, payload: graphText } = data;
             if (!graphText) return;

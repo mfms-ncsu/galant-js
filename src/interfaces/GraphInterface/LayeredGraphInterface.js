@@ -48,6 +48,7 @@ function isCrossed(graph, e, f) {
     let x = graph.nodes.get(f.source);
     let z = graph.nodes.get(f.target);
     // Check if layers are correct but swapped
+    // @todo this seems wrong - swapping if nodes are not on correct layers (?)
     if (w.layer == z.layer && y.layer == x.layer) {
         //we must swap for algorithm correctness
         let temp = x;
@@ -150,6 +151,7 @@ function nonVerticality(graph, e) {
     const source = graph.nodes.get(e.source);
     const target = graph.nodes.get(e.target);
     console.log(`-> nonVerticality, e = ${source.id}, ${target.id}`)
+    console.log(`    source x = ${source.position.x}, target x = ${target.position.x}`)
     console.log(`<- nonVerticality = ${(source.position.x - target.position.x) ** 2}`)
     return (source.position.x - target.position.x) ** 2;
 }
@@ -849,7 +851,7 @@ function numberOfLayers(graph) {
 /**
  * Given a graph, copys all node position data to an array
  * @param {Graph} graph Graph to copy nodes from
- * @returns Retursn array of objects contianing node id, position, and index
+ * @returns Returns array of objects contianing node id, position, and index
  */
 function copyNodePositions(graph) {
     const savedPositions = [];

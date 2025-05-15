@@ -17,6 +17,7 @@ export default class Node extends GraphElement {
      * @param {Number} index Layer index (layered only)
      */
     constructor(nodeId, x, y, layer, index) {
+        console.log(`-> Node, layer ${layer}, index ${index}, x ${x}`)
         // Call the super constructor with the map of attributes
         super(new Map([
             ["backgroundOpacity", undefined],
@@ -29,7 +30,6 @@ export default class Node extends GraphElement {
             ["size", undefined],
             ["weight", undefined]
         ]));
-
         // Set the id
         this.id = nodeId;
 

@@ -12,6 +12,7 @@ import { CheckIcon, ArrowDownTrayIcon, ArrowPathIcon, ArrowUpRightIcon } from "@
 function LoadButton({ tab, editorType }) {
     const [showLoadedMessage, setShowLoadedMessage] = useState(false);
     const [loadError, setLoadError] = useState("");
+    console.log("## LoadButton")
 
     // Effect hook to handle keyboard shortcut for loading graph/algorithm
     useEffect(() => {
@@ -27,6 +28,7 @@ function LoadButton({ tab, editorType }) {
 
     // loads in a graph/algorithm into a shared worker by sending a message to its port and preparing the necessary data
     function load() {
+        console.log("-> load ->")
         try {
             
             // Try to parse the file using the FileParser.

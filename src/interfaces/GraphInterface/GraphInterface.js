@@ -134,6 +134,7 @@ function verifyGraphChangeManager(graph, changeManager) {
  * @returns Updated graph and change manager
  */
 function shiftNodes(graph, changeManager, sortedLayer, nodeIndex, shiftRight) {
+  console.log(`-> shiftNodes, ${nodeIndex}, ${shiftRight}`)
         
     // Determine the shift "offset" (move one to the right or one to the left)
     let offset;
@@ -1357,6 +1358,7 @@ function setNodePosition(graph, changeManager, nodeId, x, y) {
  * @returns Updated graph and change manager
  */
 function setNodePositionLayered(graph, changeManager, nodeId, x) {
+  console.log(`-> setNodePositionLayered, ${nodeId}, ${x}`)
 
     // Get a reference to the node
     const node = graph.nodes.get(nodeId);
