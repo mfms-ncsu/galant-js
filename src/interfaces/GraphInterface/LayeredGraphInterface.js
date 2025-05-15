@@ -149,6 +149,8 @@ function nonVerticality(graph, e) {
     isLayered(graph);
     const source = graph.nodes.get(e.source);
     const target = graph.nodes.get(e.target);
+    console.log(`-> nonVerticality, e = ${source.id}, ${target.id}`)
+    console.log(`<- nonVerticality = ${(source.position.x - target.position.x) ** 2}`)
     return (source.position.x - target.position.x) ** 2;
 }
 

@@ -3,10 +3,13 @@
 TODO:
 - figure out whether src/pages/Algorithms is used; it's referred to in index.js
 - develop a system test plan, record it in system-test-plan.md [in progress]
+- add a highlightChannel() method to Thread.js using setChannelProperty() and use it in the barycenter algorithm
+- create a layered graph algorithm that simply reports all the relevant measures
+    [done, but there's a bug in the computation of verticalityl seems to be using index instead of position]
 - fix some of the glitches in the algorithms, especially lack of an ending announcement
 - redo json file for the graphs using a file list
 - redo json file for algorithms (file list already exists)
-- look into whether memory can be garbage collected after algorithm execution; this should improve performance, but runs the risk of failure to save important information
+- look into whether memory can be garbage collected after algorithm execution; this should improve performance, but runs the risk of failure to save important information [do this in the `speed-test` branch, set objects to null]; can be done after version publication
 - test using all platform/browser combinations
 - publish version 2.1
 
@@ -70,3 +73,9 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 
 1. Run prim on g-10 starting at node 2, then node 7. Results will differ.
 2. Run kruskal on g-10.
+
+### Layered graphs
+
+1. Run barycenter on ex_20
+2. Run simple algorithm that reports all measures on n42-t48v150 and check that the numbers are correct: total crossings = 48, bottleneck crossings = 7, nonverticality = 150, and bottleneck verticality = 16 
+
