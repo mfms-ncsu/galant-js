@@ -27,6 +27,7 @@ export default function Graph() {
     const [_, setAlgorithm] = useAtom(algorithmAtom);
     const [promptQueue, setPromptQueue] = useAtom(promptQueueAtom);
     const sentAliveMessage = useRef();
+    let algorithmLoading = false;
     
     /**
      * Creates SharedWorker instance on mount. Whenever graph updates, onMessage 
@@ -40,7 +41,12 @@ export default function Graph() {
 
         // Load a new graph
         function onGraphLoad(data, isInit) {
-            console.log(`-> onGraphLoad, data = [${data.name}, ${data.payload}]`)
+            // console.log(`-> onGraphLoad, data = [${data.name}, ${data.payload}]`)
+            if ( algorithmLoading ) {
+                console.log("     algorithm loading, graph not reloaded");
+                algorithmLoading = false;
+                return;
+            }
             // Get the name and graph text from the data
             const { name: graphName, payload: graphText } = data;
             if (!graphText) return;
@@ -57,8 +63,11 @@ export default function Graph() {
 
         // Load a new algorithm
         function onAlgorithmLoad(data) {
+            algorithmLoading = true
             
             // Undo any changes the old algorithm made
+            // @todo this should happen when the algorithm is terminated
+            //       and the algorithm change manager should be set to null
             AlgorithmInterface.revert();
 
             // Clear the PromptQueue if one exists

@@ -1297,6 +1297,7 @@ function setNodeAttributeAll(graph, changeManager, name, value) {
  */
 function setNodePosition(graph, changeManager, nodeId, x, y) {
   // Get a reference to the node
+  console.log("-> setNodePosiion", graph, changeManager, nodeId, x, y)
   const node = graph.nodes.get(nodeId);
 
   // Error checking
@@ -1344,6 +1345,8 @@ function setNodePosition(graph, changeManager, nodeId, x, y) {
       }
     ),
   ]);
+
+  console.log("<- setNodePosition, graph =", newGraph, ", changeManager =", newChangeManager)
 
   // Return mutated graph and change manager to trigger re-render
   return [newGraph, newChangeManager];
@@ -1548,6 +1551,10 @@ function startRecording(changeManager) {
  * @returns String representation of the current graph
  */
 function toString(graph) {
+  console.log("-> toString, graph = ", graph)
+  // for ( let node of graph.nodes ) {
+  //   console.log(`  node id ${node.attributes.get("id")}, weight ${node.attributes.get("weight")} `)
+  // }
   // Start this file with the header comments
   let content = "";
 
@@ -1625,6 +1632,8 @@ function toString(graph) {
       }
     });
   });
+
+  console.log("<- toString, content =", content)
   // Return the string
   return content;
 }

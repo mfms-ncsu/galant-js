@@ -142,16 +142,21 @@ function addTab(tabs, data) {
  * @returns Updated tab list
  */
 function updateTab(tabs, data) {
+    console.log("-> updateTab, data =", data)
     // Get the tab
     const tab = getTabByName(tabs, data.name);
 
     // Update the content if the tab exists or create a new tab
     if (tab) {
+        console.log("  found tab by name", data.name)
         tab.content = data.content;
     } else {
         return addTab(tabs, data);
     }
 
+    console.log("<- updateTab, content =", tab.content)
+    console.log(    "tabs =", [...tabs])
+    // everything is still correct up to this point !!??
     return [...tabs];
 }
 

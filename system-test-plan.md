@@ -2,12 +2,15 @@
 
 TODO:
 - fix the bug that changes the x-coordinates to the indexes, even in the text representation of a layered graph when an algorithm is loaded! Use the two_unequal_layer example to debug
+- once done, fix positions in rome1178.29
+- another annoyance: the save button in the editor does not work
 - add a highlightChannel() method to Thread.js using setChannelProperty() and use it in the barycenter algorithm
 - fix some of the glitches in the algorithms, especially lack of an ending announcement
 - redo json file for the graphs using a file list
 - redo json file for algorithms (file list already exists)
 - look into whether memory can be garbage collected after algorithm execution; this should improve performance, but runs the risk of failure to save important information [do this in the `speed-test` branch, set objects to null]; can be done after version publication
 - test using all platform/browser combinations
+- make sure the json files are up to date: see `public/collection/README.md`
 - publish version 2.1
 
 These tests should be carried out with the following platform/brower combinations. You may have to reload the main page or even clear browser history (Opera, in particular, forces you to do this).
