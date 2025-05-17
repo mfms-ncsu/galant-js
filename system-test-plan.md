@@ -1,9 +1,7 @@
 # System tests
 
 TODO:
-- fix the bug that changes the x-coordinates to the indexes, even in the text representation of a layered graph when an algorithm is loaded! Use the two_unequal_layer example to debug
 - once done, fix positions in rome1178.29
-- another annoyance: the save button in the editor does not work
 - add a highlightChannel() method to Thread.js using setChannelProperty() and use it in the barycenter algorithm
 - fix some of the glitches in the algorithms, especially lack of an ending announcement
 - redo json file for the graphs using a file list

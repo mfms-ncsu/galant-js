@@ -40,9 +40,6 @@ export default function Editor({ editorType, tabsAtom }) {
         // Update the tabs state to trigger re-render
         setTabs([...tabs]);
 
-        // this apparently does nothing useful
-        window.location.reload()
-
         // Set saved to false
         setSaved(false);
     }

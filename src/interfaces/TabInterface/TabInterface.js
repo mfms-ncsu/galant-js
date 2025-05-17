@@ -156,7 +156,6 @@ function updateTab(tabs, data) {
 
     console.log("<- updateTab, content =", tab.content)
     console.log(    "tabs =", [...tabs])
-    // everything is still correct up to this point !!??
     return [...tabs];
 }
 

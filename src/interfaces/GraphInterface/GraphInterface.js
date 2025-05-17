@@ -1589,7 +1589,7 @@ function toString(graph) {
         // Add the node line
             content += `n ${node.id} ${node.layer
             .toFixed(4)
-            .replace(/[.,]0000$/, "")} ${node.index
+            .replace(/[.,]0000$/, "")} ${node.position.x
             .toFixed(4)
             .replace(/[.,]0000$/, "")}${weightString}${attributesString}\n`;
     }

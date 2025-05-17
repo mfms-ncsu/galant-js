@@ -34,6 +34,8 @@ export default function EditControls() {
         console.log("<- save, graphData =", graphData)
         //Update the EditorTabs
         setTabs(TabInterface.updateTab(tabs, graphData));
+        // !!! solved the problem of not updating correctly !!!
+        window.open('/grapheditor', 'Graph Editor', `width=${window.screen.width / 2}, height=${window.screen.height}`);
     }
 
     // Function to revert graph edits (node movements, etc.)

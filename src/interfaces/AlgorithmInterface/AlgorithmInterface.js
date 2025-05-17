@@ -36,9 +36,8 @@ store.sub(promptQueueAtom, () => { promptQueue = store.get(promptQueueAtom) });
 function updateState(graph, changeManager) {
     // Otherwise, record the change to the actual state to update
     // the display
+    console.log("-> updateState, graph =", graph)
     store.set(graphAtom, graph);
-    let node_0 = graph.nodes.get("0")
-    console.log(`updating state, node 0, index ${node_0.index}, x ${node_0.position.x}`)
     store.set(algorithmChangeManagerAtom, changeManager);
 }
 
