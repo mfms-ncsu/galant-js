@@ -141,3 +141,4 @@ step(() => {
 
 lineUpNodes(nodeIds)
 quicksort(nodeIds, 0, nodeIds.length - 1, 1);
+display("Done sorting nodes by weight")

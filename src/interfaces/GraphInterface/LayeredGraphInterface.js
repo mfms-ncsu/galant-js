@@ -516,6 +516,56 @@ function setWeightsBoth(graph, changeManager, layer, type) {
 }
 
 /**
+ * Assigns weights to all nodes on layer i based on either their positions or their indexes
+ * @param {Graph} graph Graph on which to operate
+ * @param {ChangeManager} changeManager ChangeManager to use for storing changes
+ * @param {Integer} layer Layer to operate on
+ * @param {String} type Specify "position" or "index"
+ * @author Matthias Stallmann (mfms)
+ */
+function setWeights(graph, changeManager, layer, type) {
+    isLayered(graph);
+    if (type !== "index" && type !== "position") {
+        throw new Error('Invalid type. Type must be "index" or "position".');
+    }
+    const changeObjects = [];
+    //immer new graph
+    let newGraph = produce(graph, (draft) => {
+        // get nodes on layer
+        const layerNodes = nodesOnLayer(graph, layer);
+        // iterate through each node's edges on that layer
+        layerNodes.forEach(node => {
+            // set the weights appropriately
+            const newWeight = node.index
+            if ( type === "position" ) {
+                newWeight = node.position.x
+            }
+            //create change object
+            changeObjects.push(new ChangeObject("setNodeAttribute",
+                {
+                    id: node.id,
+                    attribute: {
+                        name: "weight",
+                        value: draft.nodes.get(node.id).attributes.get("weight"),
+                    },
+                },
+                {
+                    id: node.id,
+                    attribute: {
+                        name: "weight",
+                        value: newWeight,
+                    },
+                },
+            ));
+            draft.nodes.get(node.id).attributes.set("weight", newWeight);
+        });
+    });
+    //update change record
+    const newChangeManager = GraphInterface.recordChange(changeManager, changeObjects);
+    return [newGraph, changeManager];
+}
+
+/**
  * Sorts layer by the weights of its nodes
  * @param {Graph} graph Graph on which to operate
  * @param {ChangeManager} changeManager ChangeManager to use for storing changes
@@ -778,8 +828,8 @@ function showPositions(graph, changeManager, layer) {
                 {
                     id: node.id,
                     attribute: {
-                        name: "weight",
-                        value: draft.nodes.get(node.id).position.x,
+                        name: "hiddenWeight",
+                        value: false,
                     },
                 },
             ));
@@ -806,6 +856,8 @@ function showIndexes(graph, changeManager, layer) {
     // update graph
     let newGraph = produce(graph, (draft) => {
         layerNodes.forEach(node => {
+            //update attribute
+            draft.nodes.get(node.id).attributes.set("weight", draft.nodes.get(node.id).index);
             //create change object\
             changeObjects.push(new ChangeObject("setNodeAttribute",
                 {
@@ -818,13 +870,11 @@ function showIndexes(graph, changeManager, layer) {
                 {
                     id: node.id,
                     attribute: {
-                        name: "weight",
-                        value: draft.nodes.get(node.id).index,
+                        name: "hiddenWeight",
+                        value: false,
                     },
                 },
             ));
-            //update attribute
-            draft.nodes.get(node.id).attributes.set("weight", draft.nodes.get(node.id).index);
         });
     });
     //update change record
@@ -920,6 +970,7 @@ const LayeredGraphInterface = {
     setWeightsUp,
     setWeightsDown,
     setWeightsBoth,
+    setWeights,
     sortByWeight,
     swap,
     nodesOnLayer,

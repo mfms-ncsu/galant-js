@@ -123,3 +123,4 @@ while ( PQsize() > 0 ) {
         }
     }
 }
+display("Algorithm finished: all reachable nodes have been visited")

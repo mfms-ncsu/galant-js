@@ -111,3 +111,4 @@ while ( PQsize() > 0 ) {
     packing_size += 1
     display("packing size = " + packing_size)
 } // while nodePQ not empty
+display("Done: all nodes have been packed into edge-disjoint sets")

@@ -1,9 +1,7 @@
 # System tests
 
 TODO:
-- once done, fix positions in rome1178.29
-- add a highlightChannel() method to Thread.js using setChannelProperty() and use it in the barycenter algorithm
-- fix some of the glitches in the algorithms, especially lack of an ending announcement
+- [later] The showPositions() and showIndexes() methods only set the weights; they don't actually show them; the setWeights() method accomplishes that; probably should rename these methods
 - redo json file for the graphs using a file list
 - redo json file for algorithms (file list already exists)
 - look into whether memory can be garbage collected after algorithm execution; this should improve performance, but runs the risk of failure to save important information [do this in the `speed-test` branch, set objects to null]; can be done after version publication

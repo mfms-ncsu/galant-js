@@ -59,6 +59,7 @@ while ( nodeIds.length > 0 ) {
         display(`inserting: index = ${index}, weight = ${weight(toInsert)}`)
     })
 }
+display("Done: nodes are sorted by weight")
 
 // for (const nodeId of nodeIds) {
     // move it up by VERTICAL_GAP
