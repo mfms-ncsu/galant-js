@@ -134,8 +134,6 @@ function verifyGraphChangeManager(graph, changeManager) {
  * @returns Updated graph and change manager
  */
 function shiftNodes(graph, changeManager, sortedLayer, nodeIndex, shiftRight) {
-  console.log(`-> shiftNodes, ${nodeIndex}, ${shiftRight}`)
-        
     // Determine the shift "offset" (move one to the right or one to the left)
     let offset;
     if (shiftRight && nodeIndex + 1 < sortedLayer.length) {
@@ -1297,7 +1295,6 @@ function setNodeAttributeAll(graph, changeManager, name, value) {
  */
 function setNodePosition(graph, changeManager, nodeId, x, y) {
   // Get a reference to the node
-  console.log("-> setNodePosiion", graph, changeManager, nodeId, x, y)
   const node = graph.nodes.get(nodeId);
 
   // Error checking
@@ -1346,8 +1343,6 @@ function setNodePosition(graph, changeManager, nodeId, x, y) {
     ),
   ]);
 
-  console.log("<- setNodePosition, graph =", newGraph, ", changeManager =", newChangeManager)
-
   // Return mutated graph and change manager to trigger re-render
   return [newGraph, newChangeManager];
 }
@@ -1361,8 +1356,6 @@ function setNodePosition(graph, changeManager, nodeId, x, y) {
  * @returns Updated graph and change manager
  */
 function setNodePositionLayered(graph, changeManager, nodeId, x) {
-  console.log(`-> setNodePositionLayered, ${nodeId}, ${x}`)
-
     // Get a reference to the node
     const node = graph.nodes.get(nodeId);
 
@@ -1551,13 +1544,9 @@ function startRecording(changeManager) {
  * @returns String representation of the current graph
  */
 function toString(graph) {
-  console.log("-> toString, graph = ", graph)
-  // for ( let node of graph.nodes ) {
-  //   console.log(`  node id ${node.attributes.get("id")}, weight ${node.attributes.get("weight")} `)
-  // }
-  // Start this file with the header comments
   let content = "";
 
+  // Start this file with the header comments
   graph.comments.forEach((comment) => {
     content += `${comment}\n`;
   })
@@ -1633,7 +1622,6 @@ function toString(graph) {
     });
   });
 
-  console.log("<- toString, content =", content)
   // Return the string
   return content;
 }

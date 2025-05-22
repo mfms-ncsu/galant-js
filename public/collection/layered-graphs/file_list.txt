@@ -1,1 +1,7 @@
-0-template.sgf ex*.sgf [f-z]*.sgf
+0-template.sgf
+ex_10.sgf
+ex_20.sgf
+north42.32.sgf
+n42-t48v150.sgf
+rome1178.29.sgf
+two_unequal_layers.sgf

@@ -17,7 +17,7 @@ let element_component = {}
 /**
  * rotation of colors to use for components
  */
-let component_color = ['brown', 'blue', 'red', 'violet', 'green', 'cyan', 'magenta']
+let component_color = ['brown', 'blue', 'red', 'violet', 'green', 'cyan', 'magenta', 'yellow', 'gray']
 
 /**
  * sets the component of the element (node or edge) and colors it;
@@ -83,6 +83,7 @@ while ( finished.length > 0 ) {
         component++
     }
 }
+display("Algorithm finished: Nodes in their components based on their colors")
 
 /********** vist functions ****************/
 

@@ -83,13 +83,11 @@ function crossings(graph, e) {
     graph.nodes.forEach(node => {
         node.edges.forEach((f, index) => {
             if (e != f && !visitedEdges.has(index) && isCrossed(graph, e, f)) {
-                // console.log(`${e.attributes.get("label")} crosses ${f.attributes.get("label")}`);
                 crossings += 1;
             }
             visitedEdges.add(index);
         });
     });
-    // console.log(`crossings: ${crossings}`);
     return crossings;
 }
 
@@ -150,9 +148,6 @@ function nonVerticality(graph, e) {
     isLayered(graph);
     const source = graph.nodes.get(e.source);
     const target = graph.nodes.get(e.target);
-    console.log(`-> nonVerticality, e = ${source.id}, ${target.id}`)
-    console.log(`    source x = ${source.position.x}, target x = ${target.position.x}`)
-    console.log(`<- nonVerticality = ${(source.position.x - target.position.x) ** 2}`)
     return (source.position.x - target.position.x) ** 2;
 }
 
@@ -735,8 +730,6 @@ function nodesOnLayer(graph, layerIndex) {
  * @author Michael Richardson (maricha6)
  */
 function evenlySpacedLayout(graph, changeManager) {
-    console.log("-> evenlySpacedLayout, graph =", graph)
-
     if (graph.type != "layered") {
         throw new Error(
             `Cannot run evenly-spaced layout because this is not a layered graph`
@@ -931,8 +924,6 @@ function applyNodePositions(graph, changeManager, savedPositions) {
     //create new graph
     let newGraph = produce(graph, (draft) => {
         savedPositions.forEach(node => {
-            console.log("Old node index:", node.index);
-            console.log("new node index:", draft.nodes.get(node.id).index);
             changeObjects.push(new ChangeObject("setNodePosition",
                 {
                     id: node.id,

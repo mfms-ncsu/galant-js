@@ -2,14 +2,28 @@
 
 TODO:
 - [later] The showPositions() and showIndexes() methods only set the weights; they don't actually show them; the setWeights() method accomplishes that; probably should rename these methods
+- [later] see if it's possible to get headers when content in a json file === null; have to be careful about <ul></ul> pairs
 - redo json file for the graphs using a file list
 - redo json file for algorithms (file list already exists)
-- look into whether memory can be garbage collected after algorithm execution; this should improve performance, but runs the risk of failure to save important information [do this in the `speed-test` branch, set objects to null]; can be done after version publication
+- [later] look into whether memory can be garbage collected after algorithm execution; this should improve performance, but runs the risk of failure to save important information [do this in the `speed-test` branch, set objects to null]; can be done after version publication
 - test using all platform/browser combinations
 - make sure the json files are up to date: see `public/collection/README.md`
 - publish version 2.1
 
-These tests should be carried out with the following platform/brower combinations. You may have to reload the main page or even clear browser history (Opera, in particular, forces you to do this).
+## New release
+
+### Steps
+
+- merge changes from a working branch into `dev`
+- perform the tests below in `dev`
+- merge changes into `main`
+- get rid of console.log statements (should devise a script for this)
+- add notes to version-history.md
+- push changes and create version on github.com site
+
+## Testing overview
+
+These tests should be carried out with the following platform/brower combinations. You may have to reload the main page or even clear browser history (Opera, in particular, forces you to do this). For most tests the Mac/Chrome combination is sufficient. All combinations should be tested for those marked with (!). These should be tested with keyboard shortcuts. Files marked with + are in the `src/testing` directory.
 
 Tests should be done in the dev branch with console.log's added as needed. The logs should be removed in the main branch before deployment.
 
@@ -29,23 +43,34 @@ Tests should be done in the dev branch with console.log's added as needed. The l
 
 Make sure there are tests that use keyboard shortcuts as well as buttons.
 
+## Current bugs and inconveniences based on tests
+
+### Error handling
+
+1. Graph load error messages could be a lot more specific about cause of error and line number.
+2. Duplicate edges are not flagged as errors.
+3. Parallel edges in opposite directions are rendered too close to each other.
+4. Nodes with the same coordinates should be highlighted; this is also an issue during editing,
+5. Layered graphs: edges connecting nodes on the same layer or on nonadjacent layers are not flagged as errors.
+6. Nodes with the same layer and position do not cause a shift as they do during editing.
+
 ## Upload and Download
 
-### Simple upload/download in editor window
+### (!) Simple upload/download in editor window
 
 1. Upload a graph
 2. Make a few minor changes
 3. Download to a different name/location and upload again
 4. Do 1-3 with an algorithm
 
-### Saving graph after edits in main window
+### (!) Saving graph after edits in main window
 
 1. Upload and load a graph
 2. Do a sequence of edit operations that include an auto-layout followed by node move
 3. Save the result to the edit window, checking that changes took effect
 4. Download the graph and upload it again
 
-### Exporting a graph
+### (!) Exporting a graph
 
 1. Upload and load a graph; do the same for a simple algorithm
 2. Run the algorithm for a few steps
@@ -77,7 +102,18 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 ### Layered graphs
 
 1. Run barycenter on ex_20
-2. Run layered-graph-stats on two_unequal_layers: crossings = 0, nonverticality and bottleneck verticality = 1
+2. (!) Run layered-graph-stats on two_unequal_layers+: crossings = 0, nonverticality and bottleneck verticality = 1
 3. Run layered-graph-stats on n42-t48v150: total crossings = 48, bottleneck crossings = 7, nonverticality = 150, and bottleneck verticality = 16
 4. Move some nodes of n42-t48v150 to see if they shift correctly; do this both in edit mode and during algorithm execution
 
+## Error handling
+
+### Graph input
+
+1. Load all of of the graphs in the `src/testing` directory except for opposite-edge, same-coordinates, same-position, shift-test and two-unequal layers. There should be error messages reflecting what's wrong with these graphs.
+2. Load opposite-edge. The should be parallel edges 1,2 and 2,1.
+3. (!) Load same-coordinates. Instead of an error, the nodes should land on top of each other and allow user to fix this by editing.
+4. (!) Load same-position. In this case nodes should shift appropriately: node 3 should end up in position 1 of layer 0.
+5. (!) Load shift-test. Move node B into position 4, occupied by E. Then move node J into position 1, occupied by G.
+
+### Algorithm execution

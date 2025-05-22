@@ -1,4 +1,5 @@
-c a geometric graph with 12 nodes and 22 edges
+c A geometric graph with 12 nodes and 22 edges;
+c a useful example for most algorithms.
 g 12 22
 n 1 93 308 1
 n 2 356 45 1

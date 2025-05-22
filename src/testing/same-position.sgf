@@ -1,0 +1,7 @@
+c this graph has two nodes with the same layer and position
+t same-position
+n 0 0 2
+n 1 0 3
+n 2 1 1
+n 3 0 2
+n 4 1 2

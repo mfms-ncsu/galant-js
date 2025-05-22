@@ -41,9 +41,7 @@ export default function Graph() {
 
         // Load a new graph
         function onGraphLoad(data, isInit) {
-            // console.log(`-> onGraphLoad, data = [${data.name}, ${data.payload}]`)
             if ( algorithmLoading ) {
-                console.log("     algorithm loading, graph not reloaded");
                 algorithmLoading = false;
                 return;
             }

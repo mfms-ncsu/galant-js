@@ -18,20 +18,12 @@ export default function EditControls() {
 
     // Function to save the graph state
     function save() {
-        // graph is still correct here
-        console.log("-> save(), graph is", graph)
-        // for ( let nodeId of graph.nodes.keys() ) {
-        //     let node = graph.nodes.get(nodeId)
-        //     let position = node.position
-        //     console.log(`   node ${nodeId}, x ${position.x}, y ${position.y}`)
-        // }
         // Get the graph as a JSON object
         const graphData = {
             name: GraphInterface.getFileName(graph) ?? 'New Graph',
             content: GraphInterface.toString(graph),
         };
 
-        console.log("<- save, graphData =", graphData)
         //Update the EditorTabs
         setTabs(TabInterface.updateTab(tabs, graphData));
         // !!! solved the problem of not updating correctly !!!

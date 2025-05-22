@@ -152,12 +152,6 @@ function loadGraph(name, file) {
         // Calculate the smallest layer value to use as our offset (this will be layer 0)
         const minLayer = Math.min(...Array.from(layers.keys()));
 
-        // console.log("^^^ Before sort")
-        graph.nodes.forEach((node) => {
-            console.log(` ^^ before sort, node ${node.id}, layer ${node.layer}, index ${node.index}, x ${node.position.x}`)
-        });
-        // console.log("^^^^^^^^^^^^^")
-
         // Iterate through each layer, sort its nodes by x position and update the node's layer and index properties accordingly
         for (const [layer, nodes] of layers) {
             const sortedNodes = nodes.sort((a, b) => a.position.x - b.position.x);
@@ -166,11 +160,6 @@ function loadGraph(name, file) {
                 node.index = idx;
             }
         }
-        // console.log("%%% Done initializing layered graph %%%")
-        graph.nodes.forEach((node) => {
-            // console.log(`%% node ${node.id}, layer ${node.layer}, index ${node.index}, x ${node.position.x}`)
-        });
-        // console.log("%%%%%%%%%%%%%%%%%%%")
     }
 
     // Generate a scale for the graph based on the node positions
@@ -188,7 +177,6 @@ function loadGraph(name, file) {
 function parseLine(graph, line) {
     // Trim the line string to remove leading/trailing whitespace and split along spacez
     line = line.trim();
-    // console.log(`-> parseLine, line = ${line}`)
     let whitespaceRegex = /[ \t]+/
     const values = line.split(whitespaceRegex);
 
@@ -226,11 +214,9 @@ function parseComment(graph, line) {
  * @param {Array} values Values to parse
  */
 function parseNode(graph, values) {
-    // console.log("-> parseNode, values = ", values, ", graph =", graph)
     // Get the necessary values to create a node
     let id = values[1];
     let x = parseFloat(values[2]), y = parseFloat(values[3]);
-    // console.log(`--- id = ${id}, x = ${x}, y = ${y}`)
     let attributes = {};
     
     // Get the weight, but only if it is a numeric value
