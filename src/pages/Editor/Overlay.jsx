@@ -78,22 +78,22 @@ function LoadButton({ tab, editorType }) {
         <>
             {/* Conditionally render the loaded message */}
             {showLoadedMessage && (
-                <div className="px-2 py-1 mb-3 bg-green-500 rounded-lg text-lg font-semibold text-white text-center">
+                <div className="px-2 py-1 mb-3 bg-green-300 rounded-lg text-lg font-semibold text-black text-center">
                     {editorType} loaded
                 </div>
             )}
 
             {/* Persistently display the error message until cleared */}
             {loadError && (
-                <div className="px-2 py-1 mb-3 bg-red-500 rounded-lg font-semibold text-white text-center">
+                <div className="px-2 py-1 mb-3 bg-red-300 rounded-lg font-semibold text-black text-center">
                     {loadError}
                     <ExitButton onClick={clearError}>Clear</ExitButton>
                 </div>
             )}
 
             <PrimaryButton onClick={load}>
-                <ArrowUpRightIcon className="inline h-4 me-2 stroke-2 stroke-white"/>
-                Load {editorType}
+                <ArrowUpRightIcon className="inline h-4 me-2 stroke-2 stroke-black"/>
+                Load {editorType} (Ctrl-L)
             </PrimaryButton>
         </>
     );
@@ -117,8 +117,8 @@ function DownloadButton({ editorType, tab }) {
 
     return tab && tab.content.length >= 0 && (
         <PrimaryButton onClick={() => TabInterface.downloadTab(tab, editorType)}>
-            <ArrowDownTrayIcon className="inline h-4 me-2 stroke-2 stroke-white" />
-            Download File
+            <ArrowDownTrayIcon className="inline h-4 me-2 stroke-2 stroke-black" />
+            Download File (Ctrl-S)
         </PrimaryButton>
     );
 }

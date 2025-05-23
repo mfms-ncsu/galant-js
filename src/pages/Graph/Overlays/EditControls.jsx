@@ -84,8 +84,8 @@ export default function EditControls() {
                     </button>
                 </div>
                 <div className="flex w-fit mt-4 gap-x-4">
-                    <PrimaryButton onClick={revert}>Revert</PrimaryButton>
-                    <PrimaryButton onClick={save}>Save Changes</PrimaryButton>
+                    <PrimaryButton onClick={revert}>Revert (r)</PrimaryButton>
+                    <PrimaryButton onClick={save}>Save Changes (s)</PrimaryButton>
                 </div>
             </div>
         </div>

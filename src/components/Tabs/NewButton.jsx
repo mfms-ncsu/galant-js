@@ -46,7 +46,7 @@ export default function NewButton({examples, addNew}) {
   return (
     <div>
       <PrimaryButton className="m-1">
-        <button onClick={() => openPopup(true)}>Examples</button>
+        <button onClick={() => openPopup(true)}>Examples (Ctrl-E)</button>
       </PrimaryButton>
     </div>
   );

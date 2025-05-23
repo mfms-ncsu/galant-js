@@ -6,6 +6,8 @@ TODO:
 - redo json file for the graphs using a file list
 - redo json file for algorithms (file list already exists)
 - [later] look into whether memory can be garbage collected after algorithm execution; this should improve performance, but runs the risk of failure to save important information [do this in the `speed-test` branch, set objects to null]; can be done after version publication
+- redo json for shortest-path.js
+- add json for layered-graph-stats.js
 - test using all platform/browser combinations
 - make sure the json files are up to date: see `public/collection/README.md`
 - publish version 2.1
@@ -45,6 +47,15 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 
 ## Current bugs and inconveniences based on tests
 
+### Editing
+
+1. The drop down when right clicking on a node to make changes goes off screen if the node is too close to the bottom.
+2. The edit ChangeManager does not appear to be removed when a graph is loaded - it still remembers earlier edits.
+
+### Algorithm execution
+
+1. Node movements for algorithms that move nodes behave unexpectedly. They should not persist when user stops algorithm. And the impact on the algorithm should be consistent. It appears that the barycenter uses the new ordering to do its sorting, but does not count crossings correctly.
+
 ### Error handling
 
 1. Graph load error messages could be a lot more specific about cause of error and line number.
@@ -68,7 +79,6 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 1. Upload and load a graph
 2. Do a sequence of edit operations that include an auto-layout followed by node move
 3. Save the result to the edit window, checking that changes took effect
-4. Download the graph and upload it again
 
 ### (!) Exporting a graph
 
@@ -90,18 +100,19 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 
 ### Shortest paths
 
-1. Run dijkstra on weighted_6 using node A as the starting point; results will differ if graph is undirected versus directed.
-2. Run shortest_path on weighted_6 using node A as start node and node E as destination.
-3. Try changing some edge weights before they are accessed. They should at least remain changed after algorithm execution.
+1. Run dijkstra on weighted_6 using node A as the starting point; results will differ if graph is undirected versus directed. If undirected, the shortest path to D is A-C-D; if directed, it is A-D.
+2. Run shortest_path on weighted_6 using node A as start node and node E as destination. Algorithm should stop when destination is found.
+_3. Try changing some edge weights before they are accessed. They should at least remain changed after algorithm execution._ (apparently the only edits allowed are node movements)
 
 ### Minimum spanning trees
 
-1. Run prim on g-10 starting at node 2, then node 7. Results will differ.
+1. Run prim on g-10 starting at node 2, then node 7. Results will differ. The first run includes edge 2,9; the second edge 7,9
 2. Run kruskal on g-10.
 
 ### Layered graphs
 
-1. Run barycenter on ex_20
+1. Load ex_20 and check if window resizing changes shape of graph
+1. Run barycenter on ex_20; stop after one pass - minima reached at iteration 6: 32 crossings, 6 bottleneck; run again and continue with two passes; min at iteration 12 with 30 crossings, bottleneck 6
 2. (!) Run layered-graph-stats on two_unequal_layers+: crossings = 0, nonverticality and bottleneck verticality = 1
 3. Run layered-graph-stats on n42-t48v150: total crossings = 48, bottleneck crossings = 7, nonverticality = 150, and bottleneck verticality = 16
 4. Move some nodes of n42-t48v150 to see if they shift correctly; do this both in edit mode and during algorithm execution

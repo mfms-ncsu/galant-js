@@ -61,3 +61,4 @@ while (!marked(dest_node)) {
         }
     }
 }
+display("Algorithm finished, destination found")

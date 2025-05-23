@@ -143,14 +143,14 @@ export default function AlgorithmControls() {
                 <p id="algorithm-name" className="text-black whitespace-nowrap">{algorithm.name}</p>
                 <div className="flex justify-center items-center space-x-4 mt-1">
                     <PrimaryButton onClick={() => backButtonPress()}>
-                        <ArrowLeftIcon className="h-5 fill-white stroke-1 stroke-white" />
+                        <ArrowLeftIcon className="h-5 fill-white stroke-1 stroke-black" />
                     </PrimaryButton>
                     <p className="select-none">Step {algorithmChangeManager.index}</p>
                     <PrimaryButton onClick={() => frontButtonPress()}>
                         {!algorithm.fetchingSteps ?
-                            <ArrowRightIcon className="h-5 fill-white stroke-1 stroke-white"/>
+                            <ArrowRightIcon className="h-5 fill-white stroke-1 stroke-black"/>
                         :
-                            <ArrowPathIcon className="h-5 fill-white stroke-1 stroke-white animate-spin"/>
+                            <ArrowPathIcon className="h-5 fill-white stroke-1 stroke-black animate-spin"/>
                         }
                     </PrimaryButton>
                 </div>
