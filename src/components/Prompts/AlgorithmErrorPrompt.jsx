@@ -32,7 +32,7 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
 
     return (
         <div className="flex flex-col min-w-[550px] min-h-[270px] max-h-full bg-white shadow-lg p-4 rounded-xl" ref={promptRef}>
-            <span className="block text-center text-red-500 font-semibold pointer-events-none select-none text-xl">{title}</span>
+            <span className="block text-center text-red-900 font-semibold pointer-events-none select-none text-xl">{title}</span>
             <pre className="overflow-auto text-wrap my-4 text-xl flex-1">{code}</pre>
             <PrimaryButton className="mt-auto" onClick={callback}>Okay</PrimaryButton>
         </div>

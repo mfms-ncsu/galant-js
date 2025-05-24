@@ -121,10 +121,13 @@ _3. Try changing some edge weights before they are accessed. They should at leas
 
 ### Graph input
 
-1. Load all of of the graphs in the `src/testing` directory except for opposite-edge, same-coordinates, same-position, shift-test and two-unequal layers. There should be error messages reflecting what's wrong with these graphs.
+1. Load all of of the graphs in the `src/testing` directory except for opposite-edge, same-coordinates, same-position, shift-test, triangle, and two-unequal layers. There should be error messages reflecting what's wrong with these graphs.
 2. Load opposite-edge. The should be parallel edges 1,2 and 2,1.
 3. (!) Load same-coordinates. Instead of an error, the nodes should land on top of each other and allow user to fix this by editing.
-4. (!) Load same-position. In this case nodes should shift appropriately: node 3 should end up in position 1 of layer 0.
+4. (!) Load same-position. In this case nodes should shift appropriately: node 3 should end up in position 1 of layer 0. [!!! does not work !!!]
 5. (!) Load shift-test. Move node B into position 4, occupied by E. Then move node J into position 1, occupied by G.
 
 ### Algorithm execution
+
+1. (!) Run `color-nonexistent-node.js` on triangle (or any other graph)
+2. (!) Run `infinite-loop.js` on triangle
