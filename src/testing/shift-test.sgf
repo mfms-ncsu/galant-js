@@ -1,18 +1,18 @@
 c this graph can be used to test shifting after collisions in a layered graph
-c move b to the position occupied by e
-c move i to the position occupied by g
-n a 0 0
-n b 0 1
-n c 0 2
-n d 0 4
-n e 0 5
-n f 1 0
-n g 1 1
-n h 1 2
-n i 1 4
-n j 1 5
-e a f
-e b g
-e c h
-e d i
-e e j
+c move B to the position occupied by E
+c move J to the position occupied by G
+n A 0 0
+n B 0 1
+n C 0 2
+n D 0 4
+n E 0 5
+n F 1 0
+n G 1 1
+n H 1 2
+n J 1 4
+n K 1 5
+e A F
+e B G
+e C H
+e D J
+e E K

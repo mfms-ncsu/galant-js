@@ -3,13 +3,9 @@
 TODO:
 - [later] The showPositions() and showIndexes() methods only set the weights; they don't actually show them; the setWeights() method accomplishes that; probably should rename these methods
 - [later] see if it's possible to get headers when content in a json file === null; have to be careful about <ul></ul> pairs
-- redo json file for the graphs using a file list
-- redo json file for algorithms (file list already exists)
 - [later] look into whether memory can be garbage collected after algorithm execution; this should improve performance, but runs the risk of failure to save important information [do this in the `speed-test` branch, set objects to null]; can be done after version publication
-- redo json for shortest-path.js
-- add json for layered-graph-stats.js
 - test using all platform/browser combinations
-- make sure the json files are up to date: see `public/collection/README.md`
+- merge dev into main and get rid of all console logs
 - publish version 2.1
 
 ## New release
@@ -21,7 +17,8 @@ TODO:
 - merge changes into `main`
 - get rid of console.log statements (should devise a script for this)
 - add notes to version-history.md
-- push changes and create version on github.com site
+- push changes, create version on github.com site
+- deploy the version on the galant.csc.ncsu.edu site
 
 ## Testing overview
 
@@ -70,19 +67,23 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 ### (!) Simple upload/download in editor window
 
 1. Upload a graph
-2. Make a few minor changes
-3. Download to a different name/location and upload again
-4. Do 1-3 with an algorithm
+2. Make a few minor changes in the `Edit` window.
+3. Download to a different name/location, close the window, focus on a different graph, and upload again
+
+### Uploads with different node and edge attributes/variations; graphs are in src/testing
+
+1. Load opposite-edge. There should be parallel edges 1,2 and 2,1. Check both directed and undirected.
+2. Load attributes. The graph should be displayed as indicated in the text.
 
 ### (!) Saving graph after edits in main window
 
-1. Upload and load a graph
+1. Upload and load a graph, e.g., dt-11 from Examples
 2. Do a sequence of edit operations that include an auto-layout followed by node move
 3. Save the result to the edit window, checking that changes took effect
 
 ### (!) Exporting a graph
 
-1. Upload and load a graph; do the same for a simple algorithm
+1. Upload and load a graph (dt-11); do the same for a simple algorithm (bfs from Examples)
 2. Run the algorithm for a few steps
 3. Export the graph to a file
 4. Upload and load the exported graph and check that the export was correct
@@ -102,7 +103,7 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 
 1. Run dijkstra on weighted_6 using node A as the starting point; results will differ if graph is undirected versus directed. If undirected, the shortest path to D is A-C-D; if directed, it is A-D.
 2. Run shortest_path on weighted_6 using node A as start node and node E as destination. Algorithm should stop when destination is found.
-_3. Try changing some edge weights before they are accessed. They should at least remain changed after algorithm execution._ (apparently the only edits allowed are node movements)
+(3.) [currently does not work] Try changing some edge weights before they are accessed. They should at least remain changed after algorithm execution. (apparently the only edits allowed are node movements)
 
 ### Minimum spanning trees
 
@@ -113,21 +114,20 @@ _3. Try changing some edge weights before they are accessed. They should at leas
 
 1. Load ex_20 and check if window resizing changes shape of graph
 1. Run barycenter on ex_20; stop after one pass - minima reached at iteration 6: 32 crossings, 6 bottleneck; run again and continue with two passes; min at iteration 12 with 30 crossings, bottleneck 6
-2. (!) Run layered-graph-stats on two_unequal_layers+: crossings = 0, nonverticality and bottleneck verticality = 1
+2. (!) Run layered-graph-stats on two_unequal_layers (Examples): crossings = 0, nonverticality and bottleneck verticality = 1; move node 4 to position 0: crossings = bottleneck = 2; nonverticality = 5, bottleneck = 4
 3. Run layered-graph-stats on n42-t48v150: total crossings = 48, bottleneck crossings = 7, nonverticality = 150, and bottleneck verticality = 16
 4. Move some nodes of n42-t48v150 to see if they shift correctly; do this both in edit mode and during algorithm execution
+5. (!) Load shift-test. Move node B into position 4, occupied by E. Then move node J into position 1, occupied by G.
 
 ## Error handling
 
 ### Graph input
 
-1. Load all of of the graphs in the `src/testing` directory except for opposite-edge, same-coordinates, same-position, shift-test, triangle, and two-unequal layers. There should be error messages reflecting what's wrong with these graphs.
-2. Load opposite-edge. The should be parallel edges 1,2 and 2,1.
+1. (!) Load all of of the graphs in the `src/testing` directory except for opposite-edge, same-coordinates, same-position, shift-test, triangle, and two-unequal layers. There should be error messages reflecting what's wrong with these graphs. [!!! duplicate edge should result in an error, but des not !!!] [!!! errors on layered graphs are not detected !!!]
 3. (!) Load same-coordinates. Instead of an error, the nodes should land on top of each other and allow user to fix this by editing.
 4. (!) Load same-position. In this case nodes should shift appropriately: node 3 should end up in position 1 of layer 0. [!!! does not work !!!]
-5. (!) Load shift-test. Move node B into position 4, occupied by E. Then move node J into position 1, occupied by G.
 
 ### Algorithm execution
 
-1. (!) Run `color-nonexistent-node.js` on triangle (or any other graph)
+1. (!) Run `color-nonexistent-node.js` on triangle (or any other graph); check console.
 2. (!) Run `infinite-loop.js` on triangle
