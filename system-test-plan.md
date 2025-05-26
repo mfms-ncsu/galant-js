@@ -79,6 +79,7 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 
 1. Upload and load a graph, e.g., dt-11 from Examples
 2. Do a sequence of edit operations that include an auto-layout followed by node move
+4. Make sure you can backtrack (z shortcut) from at least two auto-layouts with intervening node moves.
 3. Save the result to the edit window, checking that changes took effect
 
 ### (!) Exporting a graph
@@ -89,6 +90,7 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 4. Upload and load the exported graph and check that the export was correct
 
 ## Running algorithms
+ * run at least one algorithm on all platform/browser combinations
 
 ### Graph searches
 

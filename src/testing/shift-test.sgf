@@ -1,6 +1,7 @@
 c this graph can be used to test shifting after collisions in a layered graph
 c move B to the position occupied by E
 c move J to the position occupied by G
+t shift-test
 n A 0 0
 n B 0 1
 n C 0 2
