@@ -24,16 +24,12 @@ Developer and User documentation can be found [here](https://galant.csc.ncsu.edu
       2. Executes `npm run test:cy`
       3. Combines coverage from `/coverage` and `/cypress-coverage`
       4. Create a new coverage report under directory `/total-coverage`
+- a comprehensive list of front end tests is in system-test-plan.md
 
 - Total Coverage:
   - Results are found under /total-coverage directory.
 
 ### Deployment
-Before deploying, make sure that all thoroughly tested changes - see system-test-plan.md - have been merged into the main branch. Then do
-```
-git push https://mfms-ncsu@github.com/mfms-ncsu/galant-js main
-```
-
 To deploy a change to the production server:
 - BOX currently refers to `galant.csc.ncsu.edu`, but can be replaced with any server, and UID to the login id on the box, unity id currently
 - log on to BOX using UID
