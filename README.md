@@ -24,6 +24,7 @@ Developer and User documentation can be found [here](https://galant.csc.ncsu.edu
       2. Executes `npm run test:cy`
       3. Combines coverage from `/coverage` and `/cypress-coverage`
       4. Create a new coverage report under directory `/total-coverage`
+- a comprehensive list of front end tests is in system-test-plan.md
 
 - Total Coverage:
   - Results are found under /total-coverage directory.

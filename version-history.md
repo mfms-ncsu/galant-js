@@ -1,5 +1,13 @@
 # Version history of galant-js
 
+Version 2.1.1
+
+(1) Fixed several minor bugs
+(2) Added system-test-plan.md, a comprehensive set of front end tests
+(3) Made some aesthetic changes in the buttons and messages
+
+--------------------
+
 Version 2.1
 
 (1) The drop down menu in the algorithm and graph editors has been replaced by a popup menu to allow for a larger collection of examples and annotations for each

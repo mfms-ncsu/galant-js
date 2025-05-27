@@ -14,6 +14,7 @@ fi
 
 
 sudo git checkout main
+# or simply "sudo git pull" if there's already an rsa key 
 sudo GIT_SSH_COMMAND="ssh -i /home/$1/.ssh/id_rsa" git pull
 
 # only run if that pull worked
