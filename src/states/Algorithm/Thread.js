@@ -952,7 +952,6 @@ function nodesOnLayer(layer) {
 } 
 
 function evenlySpacedLayout() {
-    console.log("-> envenlySpacedLayout, depth =", stepDepth)
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, changeManager);
     postMessage({ action: "evenlySpacedLayout",  });
@@ -1025,7 +1024,6 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
             // Start running the algorithm
             eval(message[3]); /* eslint-disable-line no-eval */
             // End recording of the last step
-            console.log("Algorithm completed");
             postMessage({action: "complete"});
 
         } catch (error) {

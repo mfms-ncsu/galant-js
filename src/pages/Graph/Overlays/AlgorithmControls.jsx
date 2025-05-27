@@ -130,7 +130,6 @@ export default function AlgorithmControls() {
     }, [graph, algorithm]);
 
     useEffect(() => {
-        console.log(algorithmChangeManager);
     }, [algorithmChangeManager]);
 
     // Return if no algorithm is available

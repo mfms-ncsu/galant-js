@@ -109,10 +109,8 @@ function getSelectedTab(tabs) {
  * @returns Updated tab list
  */
 function addTab(tabs, data) {
-    console.log("-> addTab, tabs =", tabs, "data =", data);
     // Ensure the tab has a unique name
     let updatedName = data.name;
-    console.log("updatedName = ", updatedName);
     let count = 1;
     while (getTabByName(tabs, updatedName)) {
         updatedName = data.name + count;
@@ -120,7 +118,6 @@ function addTab(tabs, data) {
     }
 
     let myContent = data.content;
-    console.log("data.content =", myContent);
     // Create the new tab and make it selected
     const tab = { name: updatedName, content: myContent || '', selected: true };
 
@@ -130,7 +127,6 @@ function addTab(tabs, data) {
 
     // Add the new tab to the list
     tabs.push(tab);
-    console.log("<- addTab, tab =", tab, "tabs =", tabs)
 
     return [...tabs];
 }
@@ -142,20 +138,16 @@ function addTab(tabs, data) {
  * @returns Updated tab list
  */
 function updateTab(tabs, data) {
-    console.log("-> updateTab, data =", data)
     // Get the tab
     const tab = getTabByName(tabs, data.name);
 
     // Update the content if the tab exists or create a new tab
     if (tab) {
-        console.log("  found tab by name", data.name)
         tab.content = data.content;
     } else {
         return addTab(tabs, data);
     }
 
-    console.log("<- updateTab, content =", tab.content)
-    console.log(    "tabs =", [...tabs])
     return [...tabs];
 }
 

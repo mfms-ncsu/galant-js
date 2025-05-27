@@ -36,7 +36,6 @@ store.sub(promptQueueAtom, () => { promptQueue = store.get(promptQueueAtom) });
 function updateState(graph, changeManager) {
     // Otherwise, record the change to the actual state to update
     // the display
-    console.log("-> updateState, graph =", graph)
     store.set(graphAtom, graph);
     store.set(algorithmChangeManagerAtom, changeManager);
 }
@@ -218,6 +217,7 @@ function onMessage(algorithm, message) {
             updateState(graph, newChangeManager);
             break;
         case "print":
+            // !!! do not remove; this is the print() function in the algorithm !!! 
             console.log(message.message);
             break;
         case "deleteNode":
@@ -249,7 +249,6 @@ function onMessage(algorithm, message) {
             updateState(newGraph, newChangeManager);
             break;
         case "evenlySpacedLayout":
-            console.log("in AlgorithmInterface, evenlySpacedLayout, graph =", graph)
             [newGraph, newChangeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, changeManager);
             updateState(newGraph, newChangeManager);
             break;
@@ -291,7 +290,6 @@ function onMessage(algorithm, message) {
             break;
         case "applyNodePositions":
             [newGraph, newChangeManager] = LayeredGraphInterface.applyNodePositions(graph, changeManager, message.savedPositions);
-            console.log("algorithm thread", message.savedPositions);
             updateState(newGraph, newChangeManager);
             break;
         case "startRecording":

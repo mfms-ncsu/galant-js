@@ -25,7 +25,6 @@ function Header({ children }) {
  */
 export default function TabList({tabs, setTabs, acceptFileType, examples}) {
     function onAddTab(data) {
-        console.log("-> onAddTab, data =", data);
         setTabs(TabInterface.addTab(tabs, data));
     }
 
@@ -49,7 +48,6 @@ export default function TabList({tabs, setTabs, acceptFileType, examples}) {
         setTabs(TabInterface.deleteTab(tabs, tab));
     }
 
-    console.log("In TabList: examples =", examples, "tabs =", tabs);    
     return (
         <>
             <Header>

@@ -12,7 +12,6 @@ const PopupWindow = ({examples, handleSelection}) => {
 
     const handleClick = (option) => {
       // Call the function passed as a prop
-      console.log('PopupWindow, handleClick, option =', option);
       handleSelection(option);
     };
 
