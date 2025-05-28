@@ -4,7 +4,6 @@ TODO:
 - [later] The showPositions() and showIndexes() methods only set the weights; they don't actually show them; the setWeights() method accomplishes that; probably should rename these methods
 - [later] see if it's possible to get headers when content in a json file === null; have to be careful about <ul></ul> pairs
 - look into whether memory can be garbage collected after algorithm execution; this should improve performance, but runs the risk of failure to save important information [do this in the `speed-test` branch, set objects to null]; can be done after version publication
-- test that editor spillover has been fixed: (i) load dt-11 and move several nodes far from their position; (ii) load du-16 and do some `z` and `y` shortcuts; do an `r` to revert.
 - test using all platform/browser combinations
 - merge dev into main and get rid of all console logs
 - publish version 2.1.1
