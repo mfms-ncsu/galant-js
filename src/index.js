@@ -52,7 +52,7 @@ const router = createBrowserRouter([
         path: '/instructions',
         element: <Instructions />
     }
-]);
+    ]);
 
 // Render the router wrapped in RouterProvider to provide routing context
 ReactDOM.createRoot(document.getElementById("root")).render(

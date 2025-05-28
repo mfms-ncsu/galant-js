@@ -1,6 +1,4 @@
-c created by dot+ord2sgf, date/time = Sat Dec 19 21:09:50 UTC 2020
-c $Id: dot+ord2sgf 66 2014-03-29 16:58:11Z mfms $
-c ./minimization -h vertical_bary -i 10 -w _ ../testing/TestData/ex_20.sgf
+c A small 4 layer example
 t ex_20 20 36 4
 n 0 0 1
 n 1 0 0

@@ -1,3 +1,8 @@
+/**
+ * A greedy heuristic for packing.
+ * A packing is a partition of vertices into sets consisting of a vertex and its neighbors.
+ * Greedy means that lowest degree vertices are packed first (degree is updated dynamically).
+ */
 let nodePQ = {}             // priority queue of nodes, key is node, value is weight
 let packing = new Set()       // set of nodes in the vertex cover
 
@@ -106,3 +111,4 @@ while ( PQsize() > 0 ) {
     packing_size += 1
     display("packing size = " + packing_size)
 } // while nodePQ not empty
+display("Done: all nodes have been packed into edge-disjoint sets")

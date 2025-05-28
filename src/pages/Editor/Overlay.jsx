@@ -12,17 +12,11 @@ import { CheckIcon, ArrowDownTrayIcon, ArrowPathIcon, ArrowUpRightIcon } from "@
 function LoadButton({ tab, editorType }) {
     const [showLoadedMessage, setShowLoadedMessage] = useState(false);
     const [loadError, setLoadError] = useState("");
+    console.log("## LoadButton")
 
     // Effect hook to handle keyboard shortcut for loading graph/algorithm
     useEffect(() => {
         function onKeyPress(event) {
-            // If user is typing into the editor text area, ignore.
-            // !!! this defeats the purpose of a kbd shortcut !!!
-            // if (event.target.tagName.toLowerCase() === "textarea") return;
-
-            // Only if user enters designated keyboard shortcut
-            //  cmd-l or ctrl-l the graph/algorithm in text area is loaded
-            // @todo function modifier(event) that returns true if it's a meta or ctrl
             if (event.code === "KeyL" && (event.metaKey || event.ctrlKey)) {
                 event.preventDefault();
                 load();
@@ -34,6 +28,7 @@ function LoadButton({ tab, editorType }) {
 
     // loads in a graph/algorithm into a shared worker by sending a message to its port and preparing the necessary data
     function load() {
+        console.log("-> load ->")
         try {
             
             // Try to parse the file using the FileParser.
@@ -83,22 +78,22 @@ function LoadButton({ tab, editorType }) {
         <>
             {/* Conditionally render the loaded message */}
             {showLoadedMessage && (
-                <div className="px-2 py-1 mb-3 bg-green-500 rounded-lg text-lg font-semibold text-white text-center">
+                <div className="px-2 py-1 mb-3 bg-green-300 rounded-lg text-lg font-semibold text-black text-center">
                     {editorType} loaded
                 </div>
             )}
 
             {/* Persistently display the error message until cleared */}
             {loadError && (
-                <div className="px-2 py-1 mb-3 bg-red-500 rounded-lg font-semibold text-white text-center">
+                <div className="px-2 py-1 mb-3 bg-red-300 rounded-lg font-semibold text-black text-center">
                     {loadError}
                     <ExitButton onClick={clearError}>Clear</ExitButton>
                 </div>
             )}
 
             <PrimaryButton onClick={load}>
-                <ArrowUpRightIcon className="inline h-4 me-2 stroke-2 stroke-white"/>
-                Load {editorType}
+                <ArrowUpRightIcon className="inline h-4 me-2 stroke-2 stroke-black"/>
+                Load {editorType} (Ctrl-L)
             </PrimaryButton>
         </>
     );
@@ -122,8 +117,8 @@ function DownloadButton({ editorType, tab }) {
 
     return tab && tab.content.length >= 0 && (
         <PrimaryButton onClick={() => TabInterface.downloadTab(tab, editorType)}>
-            <ArrowDownTrayIcon className="inline h-4 me-2 stroke-2 stroke-white" />
-            Download File
+            <ArrowDownTrayIcon className="inline h-4 me-2 stroke-2 stroke-black" />
+            Download File (Ctrl-S)
         </PrimaryButton>
     );
 }

@@ -29,7 +29,6 @@ export default class Node extends GraphElement {
             ["size", undefined],
             ["weight", undefined]
         ]));
-
         // Set the id
         this.id = nodeId;
 

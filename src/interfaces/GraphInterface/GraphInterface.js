@@ -134,7 +134,6 @@ function verifyGraphChangeManager(graph, changeManager) {
  * @returns Updated graph and change manager
  */
 function shiftNodes(graph, changeManager, sortedLayer, nodeIndex, shiftRight) {
-        
     // Determine the shift "offset" (move one to the right or one to the left)
     let offset;
     if (shiftRight && nodeIndex + 1 < sortedLayer.length) {
@@ -1357,7 +1356,6 @@ function setNodePosition(graph, changeManager, nodeId, x, y) {
  * @returns Updated graph and change manager
  */
 function setNodePositionLayered(graph, changeManager, nodeId, x) {
-
     // Get a reference to the node
     const node = graph.nodes.get(nodeId);
 
@@ -1546,9 +1544,9 @@ function startRecording(changeManager) {
  * @returns String representation of the current graph
  */
 function toString(graph) {
-  // Start this file with the header comments
   let content = "";
 
+  // Start this file with the header comments
   graph.comments.forEach((comment) => {
     content += `${comment}\n`;
   })
@@ -1580,7 +1578,7 @@ function toString(graph) {
         // Add the node line
             content += `n ${node.id} ${node.layer
             .toFixed(4)
-            .replace(/[.,]0000$/, "")} ${node.index
+            .replace(/[.,]0000$/, "")} ${node.position.x
             .toFixed(4)
             .replace(/[.,]0000$/, "")}${weightString}${attributesString}\n`;
     }
@@ -1623,6 +1621,7 @@ function toString(graph) {
       }
     });
   });
+
   // Return the string
   return content;
 }

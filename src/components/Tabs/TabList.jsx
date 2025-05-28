@@ -8,7 +8,7 @@ import UploadButton from './UploadButton';
  */
 function Header({ children }) {
     return (
-        <div className="w-full h-16 p-1 flex items-start justify-between bg-neutral-400">
+        <div className="w-full h-16 p-1 flex items-start justify-between bg-gray-100">
             <img src="img/galant_full_logo_without_words.svg" alt="GalantJS" className="m-1 h-full w-auto"/>
 
             <div className="flex">
@@ -25,6 +25,7 @@ function Header({ children }) {
  */
 export default function TabList({tabs, setTabs, acceptFileType, examples}) {
     function onAddTab(data) {
+        console.log("-> onAddTab, data =", data);
         setTabs(TabInterface.addTab(tabs, data));
     }
 
@@ -48,11 +49,11 @@ export default function TabList({tabs, setTabs, acceptFileType, examples}) {
         setTabs(TabInterface.deleteTab(tabs, tab));
     }
 
-    
+    console.log("In TabList: examples =", examples, "tabs =", tabs);    
     return (
         <>
             <Header>
-                <NewButton addTab={onAddTab} examples={examples} />
+                <NewButton examples={examples} addNew={onAddTab} />
                 <UploadButton onUpload={onFileUpload} acceptFileType={acceptFileType}/>
             </Header>
 

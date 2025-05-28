@@ -1,3 +1,8 @@
+/**
+ * Uses a greedy heuristic attempting to find a minimum vertex cover of a graph.
+ * Greedy means that vertices are chosen sorted decreasing degree, updated dynamically
+ */
+
 let nodePQ = {}             // priority queue of nodes, key is node, value is weight
 let cover = new Set()       // set of nodes in the vertex cover
 

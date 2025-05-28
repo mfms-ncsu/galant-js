@@ -3,6 +3,8 @@ import React from "react";
 /**
  * This component represents the page that users will be directed to when they press the 'Help' button in the application.
  * It consists of a list of keyboard shortcuts and contents of the Galant-JS User Guide written by the Spring 2024 team.
+ * @todo The style can be significantly improved; might be good to use a table;
+ *       also, html works differently in the jsx context
  */
 export default function Instructions() {
     return (
@@ -17,10 +19,10 @@ export default function Instructions() {
                                 Click <code>Graph Editor</code> or use the <code>g</code> key
                             </li>
                             <li>
-                                Click the <code>New</code> tab in the graph editor window
+                                Click the <code>Examples</code> tab in the graph editor window
                             </li>
                             <li>
-                                Select a graph in the drop down menu;
+                                Select a graph from the list in the popup window;
                                 the sorting graphs are for sorting algorithms only.
                             </li>
                             <li>
@@ -35,10 +37,10 @@ export default function Instructions() {
                                 Go back to the main window and click <code>Algorithm Editor</code> or use the <code>a</code> key
                             </li>
                             <li>
-                                Click the <code>New</code> tab in the algorithm editor window
+                                Click the <code>Examples</code> tab in the algorithm editor window
                             </li>
                             <li>
-                                Select an algorithm from the drop down menu                                
+                                Select an algorithm from popup window                                
                             </li>
                             <li>
                                 Click <code>Load Algorithm</code> or use the <code>Ctrl-L</code> (<code>Cmd-L</code> on a Mac) key.
@@ -55,10 +57,11 @@ export default function Instructions() {
                                 Use the left and right arrow keys or click on the arrows at the bottom of the display to step forward and backward
                             </li>
                             <li>
-                                Use the <code>Esc</code> key or click on the <code>x</code> to exit the algorithm
+                                Use the <code>Esc</code> key or click on the <code>Exit</code> button to exit the algorithm
                             </li>
                             <li>
-                                If you want to start over, go back to the algorithm editor and load the algorithm again
+                                If you want to start over, go back to the algorithm editor and load the algorithm again.
+                                The easiest way to do that is to use keyboard shortcuts: <code>a</code>, <code>Ctrl-L</code>
                             </li>
                         </ol>
                     </li>
@@ -76,9 +79,17 @@ export default function Instructions() {
                     </li>
                 </ol>
             </div>
-            For more information see the full (link below)
-            <p>
-             <strong><em><a href="https://docs.google.com/document/d/1FEi-RJ97UxsDuxHQrGmyOUanNWrWdq84NKicSdswGDY/view">User Manual</a></em></strong>
+            For more information see the full
+            <p align="center">
+                <strong>
+                <a href="https://docs.google.com/document/d/1FEi-RJ97UxsDuxHQrGmyOUanNWrWdq84NKicSdswGDY/view">User Manual</a>
+                </strong>
+            </p>
+            For a list of known bugs and annoyances, see
+            <p align="center">
+                <strong>
+                    <a href="https://docs.google.com/document/d/1oHE9ALc9YsKE-ndOJyjRe1H0eyE3vfTtGefPONHDRqE/view">List of Known Bugs</a>
+                </strong>
             </p>
         </div>
     );

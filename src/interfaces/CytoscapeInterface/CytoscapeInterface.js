@@ -201,7 +201,7 @@ function getStyle(graph) {
         {
             "selector": "node[?highlighted]",
             "style": {
-                "borderWidth": `${graph.nodeSize / 5}px`
+                "borderWidth": `${graph.nodeSize / 4}px`
             }
         },
         {
@@ -219,14 +219,14 @@ function getStyle(graph) {
         {
             "selector": "edge[?highlighted]",
             "style": {
-                "width": `${graph.nodeSize / 2.5}px`
+                "width": `${graph.nodeSize / 4}px`
             }
         },
         {
             "selector": "edge[label]",
             "style": {
                 "label": "data(textToDisplay)",
-                "fontSize": `${graph.nodeSize / 2.5}px`,
+                "fontSize": `${graph.nodeSize / 2}px`,
                 "textWrap": "wrap",
                 "textBackgroundColor": "white",
                 "textBackgroundOpacity": "1.0",

@@ -26,6 +26,8 @@ export default function EditControls() {
 
         //Update the EditorTabs
         setTabs(TabInterface.updateTab(tabs, graphData));
+        // !!! solved the problem of not updating correctly !!!
+        window.open('/grapheditor', 'Graph Editor', `width=${window.screen.width / 2}, height=${window.screen.height}`);
     }
 
     // Function to revert graph edits (node movements, etc.)
@@ -82,8 +84,8 @@ export default function EditControls() {
                     </button>
                 </div>
                 <div className="flex w-fit mt-4 gap-x-4">
-                    <PrimaryButton onClick={revert}>Revert</PrimaryButton>
-                    <PrimaryButton onClick={save}>Save Changes</PrimaryButton>
+                    <PrimaryButton onClick={revert}>Revert (r)</PrimaryButton>
+                    <PrimaryButton onClick={save}>Save Changes (s)</PrimaryButton>
                 </div>
             </div>
         </div>

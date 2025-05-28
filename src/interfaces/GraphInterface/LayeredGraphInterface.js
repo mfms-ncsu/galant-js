@@ -48,6 +48,7 @@ function isCrossed(graph, e, f) {
     let x = graph.nodes.get(f.source);
     let z = graph.nodes.get(f.target);
     // Check if layers are correct but swapped
+    // @todo this seems wrong - swapping if nodes are not on correct layers (?)
     if (w.layer == z.layer && y.layer == x.layer) {
         //we must swap for algorithm correctness
         let temp = x;
@@ -82,13 +83,11 @@ function crossings(graph, e) {
     graph.nodes.forEach(node => {
         node.edges.forEach((f, index) => {
             if (e != f && !visitedEdges.has(index) && isCrossed(graph, e, f)) {
-                // console.log(`${e.attributes.get("label")} crosses ${f.attributes.get("label")}`);
                 crossings += 1;
             }
             visitedEdges.add(index);
         });
     });
-    // console.log(`crossings: ${crossings}`);
     return crossings;
 }
 
@@ -512,6 +511,56 @@ function setWeightsBoth(graph, changeManager, layer, type) {
 }
 
 /**
+ * Assigns weights to all nodes on layer i based on either their positions or their indexes
+ * @param {Graph} graph Graph on which to operate
+ * @param {ChangeManager} changeManager ChangeManager to use for storing changes
+ * @param {Integer} layer Layer to operate on
+ * @param {String} type Specify "position" or "index"
+ * @author Matthias Stallmann (mfms)
+ */
+function setWeights(graph, changeManager, layer, type) {
+    isLayered(graph);
+    if (type !== "index" && type !== "position") {
+        throw new Error('Invalid type. Type must be "index" or "position".');
+    }
+    const changeObjects = [];
+    //immer new graph
+    let newGraph = produce(graph, (draft) => {
+        // get nodes on layer
+        const layerNodes = nodesOnLayer(graph, layer);
+        // iterate through each node's edges on that layer
+        layerNodes.forEach(node => {
+            // set the weights appropriately
+            const newWeight = node.index
+            if ( type === "position" ) {
+                newWeight = node.position.x
+            }
+            //create change object
+            changeObjects.push(new ChangeObject("setNodeAttribute",
+                {
+                    id: node.id,
+                    attribute: {
+                        name: "weight",
+                        value: draft.nodes.get(node.id).attributes.get("weight"),
+                    },
+                },
+                {
+                    id: node.id,
+                    attribute: {
+                        name: "weight",
+                        value: newWeight,
+                    },
+                },
+            ));
+            draft.nodes.get(node.id).attributes.set("weight", newWeight);
+        });
+    });
+    //update change record
+    const newChangeManager = GraphInterface.recordChange(changeManager, changeObjects);
+    return [newGraph, changeManager];
+}
+
+/**
  * Sorts layer by the weights of its nodes
  * @param {Graph} graph Graph on which to operate
  * @param {ChangeManager} changeManager ChangeManager to use for storing changes
@@ -681,7 +730,6 @@ function nodesOnLayer(graph, layerIndex) {
  * @author Michael Richardson (maricha6)
  */
 function evenlySpacedLayout(graph, changeManager) {
-
     if (graph.type != "layered") {
         throw new Error(
             `Cannot run evenly-spaced layout because this is not a layered graph`
@@ -703,7 +751,7 @@ function evenlySpacedLayout(graph, changeManager) {
     // Iterate over each layer and space the nodes evenly to fit the "widest" layer
     let newGraph = graph;
     let newChangeManager = changeManager;
-    newChangeManager = GraphInterface.startRecording(changeManager);
+//    newChangeManager = GraphInterface.startRecording(changeManager);
 
     for (let i = 0; i <= maxLayer; i++) {
         const layer = nodesOnLayer(graph, i);
@@ -743,7 +791,7 @@ function evenlySpacedLayout(graph, changeManager) {
         }
     }
 
-    newChangeManager = GraphInterface.endRecording(newChangeManager);
+//    newChangeManager = GraphInterface.endRecording(newChangeManager);
 
     return [newGraph, newChangeManager];
 }
@@ -773,8 +821,8 @@ function showPositions(graph, changeManager, layer) {
                 {
                     id: node.id,
                     attribute: {
-                        name: "weight",
-                        value: draft.nodes.get(node.id).position.x,
+                        name: "hiddenWeight",
+                        value: false,
                     },
                 },
             ));
@@ -801,6 +849,8 @@ function showIndexes(graph, changeManager, layer) {
     // update graph
     let newGraph = produce(graph, (draft) => {
         layerNodes.forEach(node => {
+            //update attribute
+            draft.nodes.get(node.id).attributes.set("weight", draft.nodes.get(node.id).index);
             //create change object\
             changeObjects.push(new ChangeObject("setNodeAttribute",
                 {
@@ -813,13 +863,11 @@ function showIndexes(graph, changeManager, layer) {
                 {
                     id: node.id,
                     attribute: {
-                        name: "weight",
-                        value: draft.nodes.get(node.id).index,
+                        name: "hiddenWeight",
+                        value: false,
                     },
                 },
             ));
-            //update attribute
-            draft.nodes.get(node.id).attributes.set("weight", draft.nodes.get(node.id).index);
         });
     });
     //update change record
@@ -846,7 +894,7 @@ function numberOfLayers(graph) {
 /**
  * Given a graph, copys all node position data to an array
  * @param {Graph} graph Graph to copy nodes from
- * @returns Retursn array of objects contianing node id, position, and index
+ * @returns Returns array of objects contianing node id, position, and index
  */
 function copyNodePositions(graph) {
     const savedPositions = [];
@@ -876,8 +924,6 @@ function applyNodePositions(graph, changeManager, savedPositions) {
     //create new graph
     let newGraph = produce(graph, (draft) => {
         savedPositions.forEach(node => {
-            console.log("Old node index:", node.index);
-            console.log("new node index:", draft.nodes.get(node.id).index);
             changeObjects.push(new ChangeObject("setNodePosition",
                 {
                     id: node.id,
@@ -915,6 +961,7 @@ const LayeredGraphInterface = {
     setWeightsUp,
     setWeightsDown,
     setWeightsBoth,
+    setWeights,
     sortByWeight,
     swap,
     nodesOnLayer,
