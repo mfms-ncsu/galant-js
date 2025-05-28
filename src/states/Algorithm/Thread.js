@@ -91,26 +91,19 @@ function step(code=null) {
         // our step
         stepDepth++;
 
-        try {
-            // Execute the code in this step
-            code();
-        } finally {
-            // End the recording of the steps
-            if (lowestLayer) {
-                postMessage({action: "endRecording"});
-            }
-
-            // Decrement the stepDepth counter and wait if the
-            // step is finished
-            stepDepth--;
-            
-            // Clean up any temporary objects
-            if (stepDepth === 0) {
-                changeManager = new ChangeManager();
-            }
-            
-            waitIfNeeded();
+        // Execute the code in this step
+        code();
+        
+        // End the recording of the steps
+        if (lowestLayer) {
+            postMessage({action: "endRecording"});
         }
+
+        // Decrement the stepDepth counter and wait if the
+        // step is finished
+        
+        stepDepth--;
+        waitIfNeeded();
     }
     else {
         
