@@ -1,26 +1,23 @@
-Algorithm.configure({
-    controlNodePosition: true
-})
-
-const HORIZONTAL_GAP = 100;
-const VERTICAL_GAP = 50;
+/**
+ * An animation of insertion sort
+ */
+const HORIZONTAL_GAP = 1;
+const VERTICAL_GAP = 1;
 
 let nodeIds = getNodes();
-showAllNodeWeights();
 
 // line up the nodes
 let i = 0; let j = 0
 step(() => {
     for (const nodeId of nodeIds) {
-        let initialPosition = {x: i, y: j};
-        setPosition(nodeId, initialPosition);
+        setPosition(nodeId, i, j);
         i += HORIZONTAL_GAP;
     }
 })
 
 let firstElement = nodeIds.shift(); // remove first element
 step(() => {
-    setPosition(firstElement, {x: 0, y: 2 * VERTICAL_GAP})
+    setPosition(firstElement, 0, 2 * VERTICAL_GAP)
     setShape(firstElement, "star")
     color(firstElement, "yellow")
 })
@@ -31,7 +28,7 @@ while ( nodeIds.length > 0 ) {
     let index = sorted.length
     step(() => {
         display(`toInsert = ${toInsert}, weight = ${weight(toInsert)}`)
-        setPosition(toInsert, {x: index * HORIZONTAL_GAP, y: VERTICAL_GAP})
+        setPosition(toInsert, index * HORIZONTAL_GAP, VERTICAL_GAP)
         setShape(toInsert, "vee")
         color(toInsert, "blue")
     })
@@ -42,8 +39,8 @@ while ( nodeIds.length > 0 ) {
             setShape(sorted[index], "triangle")
         })
         step(() => {
-            incrementPosition(sorted[index], {x: HORIZONTAL_GAP, y: 0})
-            incrementPosition(toInsert, {x: -HORIZONTAL_GAP, y: 0})
+            incrementPosition(sorted[index], HORIZONTAL_GAP, 0)
+            incrementPosition(toInsert, -HORIZONTAL_GAP, 0)
             color(sorted[index], "yellow")
             setShape(sorted[index], "star")
         })
@@ -56,12 +53,13 @@ while ( nodeIds.length > 0 ) {
     }
     sorted.splice(index, 0, toInsert)
     step(() => {
-        incrementPosition(toInsert, {x: 0, y: VERTICAL_GAP})
+        incrementPosition(toInsert, 0, VERTICAL_GAP)
         setShape(toInsert, "star")
         color(toInsert, "yellow")
         display(`inserting: index = ${index}, weight = ${weight(toInsert)}`)
     })
 }
+display("Done: nodes are sorted by weight")
 
 // for (const nodeId of nodeIds) {
     // move it up by VERTICAL_GAP

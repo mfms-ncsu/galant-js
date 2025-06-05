@@ -1,3 +1,6 @@
+/**
+ * Breadth first search on a graph; works for both directed and undirected graphs.
+ */
 // Queue of nodes to visit
 let queue = [];
 // Number of steps taken
@@ -57,3 +60,4 @@ while (queue.length > 0) {
         });
     }
 }
+display("Algorithm finished: all reachable nodes have been visited")

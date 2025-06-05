@@ -1,9 +1,8 @@
 /**
- * Does a sequence of reductions of a graph based on dominance, i.e., if vw
- * is an edge and the neighbors of v are a subset of the neighbors of w, then
- * there is always a minimum vertex cover that includes w. A special case is
- * a degree-one reduction: v has degree one implies that you can include w
- * and throw away v.
+ * Does a sequence of reductions of a graph based on dominance.
+ *  Vertex w dominates v if vw is an edge and neighbors of v are a subset of the neighbors of w.
+ *  In that case there is always a minimum vertex cover that includes w.
+ *  A special case is a degree-one reduction: if v has degree one, you can include w and throw away v.
  */
 
 let nodePQ = {}             // priority queue of nodes, key is node, value is weight

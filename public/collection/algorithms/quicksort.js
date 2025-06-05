@@ -15,12 +15,8 @@
 //      greater = quicksort(greater)
 //      return append less, equal, greater
 
-Algorithm.configure({
-    controlNodePosition: true
-})
-
-const HORIZONTAL_GAP = 80;
-const VERTICAL_GAP = 40;
+const HORIZONTAL_GAP = 1;
+const VERTICAL_GAP = 1;
 
 /**
  * @return a random element of an array/list
@@ -42,7 +38,7 @@ function lineUpNodes(nodeList) {
         for ( const node of nodeIds ) {
     //      to avoid multiple steps, we need to do this "manually"
     //        placeNode(node, level, index, "white", "circle")
-            setPosition(node, {x: HORIZONTAL_GAP * index, y: 2 * level * VERTICAL_GAP})
+            setPosition(node, HORIZONTAL_GAP * index, 2 * level * VERTICAL_GAP)
             color(node, "white")
             setShape(node, "circle")
             index++;
@@ -53,7 +49,7 @@ function lineUpNodes(nodeList) {
 function placeNode(node, level, index, desiredColor, shape) {
     step(()=> {
 //        display(`-> placeNode: ${node}, ${level}, ${index}`)
-        setPosition(node, {x: HORIZONTAL_GAP * index, y: 2 * level * VERTICAL_GAP})
+        setPosition(node, HORIZONTAL_GAP * index, 2 * level * VERTICAL_GAP)
         color(node, desiredColor)
         setShape(node, shape)
     })
@@ -62,7 +58,7 @@ function placeNode(node, level, index, desiredColor, shape) {
 function placePivot(pivot, level, index) {
     step(() => {
 //        display(`-> placePivot: ${pivot}, ${level}, ${index}`)
-        setPosition(pivot, {x: HORIZONTAL_GAP * index, y: (2 * level - 1) * VERTICAL_GAP})
+        setPosition(pivot, HORIZONTAL_GAP * index, (2 * level - 1) * VERTICAL_GAP)
         color(pivot, "black")
         setShape(pivot, "triangle")
     })
@@ -71,7 +67,7 @@ function placePivot(pivot, level, index) {
 function moveToSorted(node) {
     step(() => {
 //        display(`-> moveToSorted: ${node}`)
-        incrementPosition(node, {x: 0, y: -2 * VERTICAL_GAP})
+        incrementPosition(node, 0, -2 * VERTICAL_GAP)
         color(node, "yellow")
         setShape(node, "star")
     })
@@ -139,10 +135,10 @@ function quicksort(list, left, right, depth) {
 let nodeIds = getNodes();
 
 step(() => {
-    showAllNodeWeights();
     clearNodeColors();
     clearNodeShapes();
 })
 
 lineUpNodes(nodeIds)
 quicksort(nodeIds, 0, nodeIds.length - 1, 1);
+display("Done sorting nodes by weight")

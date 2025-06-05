@@ -1,3 +1,6 @@
+/**
+ * The barycenter heuristic attempts to minimize edge crossings in layered graphs
+ */
 let minCrossings = 100000000;
 let edgeCrossings = 0;
 let minEdgeCrossings = 100000000;
@@ -33,26 +36,29 @@ function displayAfterWeightAssignment( layer, sweepDirection ) {
     setLayerProperty(layer, "weightHidden", false);
     if (sweepDirection == "up") {
         setChannelProperty(layer - 1, "color", "blue");
+        setLayerProperty(layer - 1, "weightHidden", false)
     }
     else if (sweepDirection == "down") {
         setChannelProperty(layer, "color", "blue");
+        setLayerProperty(layer + 1, "weightHidden", false)
     }
     displayMessage( layer, sweepDirection );
 }
 
 /**
  * displays state of affairs after layer is sorted and begins a step that
- * resets weights and highlighting; nodes whose position is changed by the
- * sorting are marked
+ * resets weights and highlighting;
+ * [not yet true] nodes whose position is changed by the sorting are marked
  */
 function displayAfterSort( layer, sweepDirection ) {
     setLayerProperty(layer, "color", "cyan");
-    setLayerProperty(layer, "weightHidden", false);
     if (sweepDirection == "up") {
         setChannelProperty(layer - 1, "color", "blue");
+        setChannelProperty(layer - 1, "highlight", "true")
     }
     else if (sweepDirection == "down") {
         setChannelProperty(layer, "color", "blue");
+        setChannelProperty(layer + 1, "highlight", "true")
     }
     displayMessage( layer, sweepDirection );
 }
@@ -64,14 +70,18 @@ function displayAfterSort( layer, sweepDirection ) {
  */
 function reset( layer, sweepDirection ) {
     setLayerProperty(layer, "color", "white");
-    setLayerProperty(layer, "weightHidden", false);
+    setLayerProperty(layer, "weightHidden", true);
     setLayerProperty(layer, "marked", false);
     if (sweepDirection == "up") {
         setChannelProperty(layer - 1, "color", "black");
+        setChannelProperty(layer - 1, "highlight", "false")
     }
     else if (sweepDirection == "down") {
         setChannelProperty(layer, "color", "black");
+        setChannelProperty(layer + 1, "highlight", "false")
     }
+    // this does not currently work
+    evenlySpacedLayout();
 }
 
 /**
@@ -94,14 +104,15 @@ function checkCrossings() {
         //save graph state
         savedBottleneckPositions = copyNodePositions();
     }
-    
 }
 
 function upSweep( numLayers ) {
     const sweepDirection = "down";
     for (let layer = 0; layer < numLayers - 1; layer++) {
         step(() => {
-            setWeightsDown(layer, "position");
+            setWeights(layer + 1, "index")
+            showIndexes(layer + 1)
+            setWeightsDown(layer, "index");
             displayAfterWeightAssignment(layer, sweepDirection);
         })
         step(() => {
@@ -120,7 +131,9 @@ function downSweep( numLayers ) {
     const sweepDirection = "up";
     for (let layer = numLayers - 1; layer >= 1; layer--) {
         step(() => {
-            setWeightsUp(layer, "position");
+            setWeights(layer - 1, "index");
+            showIndexes(layer - 1);
+            setWeightsUp(layer, "index");
             displayAfterWeightAssignment(layer, sweepDirection);
         })
         step(() => {
@@ -136,19 +149,14 @@ function downSweep( numLayers ) {
 }
 
 //Start Barycenter aglorithm
-step(() => {
-    for (let i = 0; i < numLayers; i++) {
-        showPositions(i);
-    }
-    display("Total crossings: " + totalCrossings());
-});
 
 checkCrossings();
 while(true) {
+    hideAllNodeWeights();
     pass++;
     upSweep(numLayers);
     downSweep(numLayers);
-    let quit = promptBoolean("Do you want to quit? ('true' to quit, 'false' to continue to next iteration)");
+    let quit = promptBoolean("Do you want to quit? (y/n)");
     if (quit) {
         break;
     };

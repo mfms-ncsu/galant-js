@@ -1,42 +1,110 @@
-import { Fragment, useRef, useEffect } from "react";
-import { Menu, Transition } from '@headlessui/react';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 import PrimaryButton from 'components/Buttons/PrimaryButton';
-import { PlusIcon } from '@heroicons/react/24/solid';
+import PopupWindow from 'components/Tabs/PopupWindow';
 
 /**
- * Returns component for creating new tabs, including the button and dropdown.
+ * Returns component for creating new tabs, including the button and popup.
  */
-export default function NewButton({ addTab, examples }) {
-    const button = useRef(null);
-
-    // Effect hook to handle keyboard shortcut for opening New button
-    useEffect(() => {
-        if (!button.current) return;
-
-        function onKeyDown(event) {
+export default function NewButton({examples, addNew}) {
+  React.useEffect(() => {
+        function onKeyPress(event) {
             if (event.code === "KeyE" && (event.metaKey || event.ctrlKey)) {
-                event.preventDefault();
-                button.current.click();
+              event.preventDefault();
+              openPopup();
             }
         }
-        // function onKeyPress(event) {
-        //     event.preventDefault();
-        //     // Keyboard shortcut for new tab is Ctrl-N or Cmd-N; only the former works, even on a Mac
-        //     console.log("keypress = ", event);
-        //     if (event.key === 'n' && (event.getModifierState("Control") || event.getModifierState("Meta"))) {
-        //         event.preventDefault();
-        //         button.current.click();
-        //     }
-        // }
-        document.addEventListener('keydown', onKeyDown);
-        return () => document.removeEventListener('keydown', onKeyDown);
+        document.addEventListener("keydown", onKeyPress);
+        return () => document.removeEventListener("keydown", onKeyPress);
     }, []);
 
-    return (
-        <div className="relative">
-             <PrimaryButton className="m-1">
-                <a href="/algorithms">Examples</a>
-             </PrimaryButton>
-        </div>
+  const openPopup = () => {
+    const popupWindow = window.open(
+      '',
+      '_blank',
+      'width=1000,height=600,scrollbars=yes,resizable=yes'
     );
+
+    const handleSelection = (selection) => {
+      addNew(selection);
+      popupWindow.close();
+    }
+
+    if (popupWindow) {
+      popupWindow.document.title = 'Popup Window';
+
+      // Render the React component in the new window
+      const container = popupWindow.document.createElement('div');
+      popupWindow.document.body.appendChild(container);
+
+      ReactDOM.createRoot(container).render(<PopupWindow examples={examples} handleSelection={handleSelection} />);
+    } else {
+      alert('Popup blocked! Please allow popups for this website.');
+    }
+  }
+
+  return (
+    <div>
+      <PrimaryButton className="m-1">
+        <button onClick={() => openPopup(true)}>Examples (Ctrl-E)</button>
+      </PrimaryButton>
+    </div>
+  );
 }
+    //           <div className="relative">
+    //         <Menu>
+    //             <PrimaryButton className="m-1">
+    //                 <Menu.Button ref={button} className="flex items-center" data-cy="NewTabButton">
+    //                     <PlusIcon className="h-4 me-2 fill-white stroke stroke-white" />
+    //                     <span>New Tab</span>
+    //                 </Menu.Button>
+    //             </PrimaryButton>
+                
+    //             <Transition
+    //                 as={Fragment}
+    //                 enter="transition ease-out duration-100"
+    //                 enterFrom="transform opacity-0 scale-95"
+    //                 enterTo="transform opacity-100 scale-100"
+    //                 className="absolute z-20 p-4 w-fit bg-white rounded-xl shadow-lg"
+    //             >
+    //                 <Menu.Items className="">
+    //                     <Menu.Item>
+    //                         <button
+    //                             className="hover:underline"
+    //                             data-cy="BlankTab"
+    //                             onClick={() => {
+    //                                 try {
+    //                                     addTab({ 'name': 'Blank' });
+    //                                 } catch (error) {
+    //                                     console.error('An error occurred while adding the blank tab. Please try again.', error);
+    //                                 }
+    //                             }}
+    //                         >
+    //                             Blank
+    //                         </button>
+    //                     </Menu.Item>
+
+    //                     <div className="mt-2 flex flex-col items-start">
+    //                         <span className="font-bold" data-cy="ExamplesHeader">Examples</span>
+    //                         {examples.map(data => (
+    //                             <Menu.Item key={data.name}>
+    //                                 <button
+    //                                     className="text-nowrap hover:underline"
+    //                                     onClick={() => {
+    //                                         try {
+    //                                             addTab(data);
+    //                                         } catch (error) {
+    //                                             console.error(`Error adding tab for example ${data.name}:`, error);
+    //                                         }
+    //                                     }}
+    //                                 >
+    //                                     {data.name}
+    //                                 </button>
+    //                             </Menu.Item>
+    //                         ))}
+    //                     </div>
+    //                 </Menu.Items>
+    //             </Transition>
+    //         </Menu>
+    //     </div>
+    // );

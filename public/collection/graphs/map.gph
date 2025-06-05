@@ -1,3 +1,4 @@
+c A map of North Carolina with edges representing distances between cities
 n A 0 50 label:Ash
 n H 100 50 label:Hkr
 n S 200 0 label:W-S

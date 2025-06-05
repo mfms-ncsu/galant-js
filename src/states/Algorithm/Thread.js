@@ -744,7 +744,7 @@ function clearEdgeWidths() {
  */
 
 function promptBoolean(message) {
-    return promptFrom(message, ["true", "false"], "Error: Must enter a boolean value (true/false)") === "true";
+    return promptFrom(message, ["y", "n"], "Error: Must enter either 'y' (yes) or 'n' (no)") === "y";
 }
 
 function promptInteger(message) {
@@ -913,7 +913,18 @@ function setWeightsBoth(layer, type) {
         type: type,
     });
     waitIfNeeded();
-} 
+}
+
+function setWeights(layer, type) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = LayeredGraphInterface.setWeights(graph, changeManager, layer, type);
+    postMessage({ 
+        action: "setWeights",
+        layer: layer,
+        type: type,
+    });
+    waitIfNeeded();
+}
 
 function sortByWeight(layer) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
@@ -941,6 +952,7 @@ function nodesOnLayer(layer) {
 } 
 
 function evenlySpacedLayout() {
+    console.log("-> envenlySpacedLayout, depth =", stepDepth)
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, changeManager);
     postMessage({ action: "evenlySpacedLayout",  });

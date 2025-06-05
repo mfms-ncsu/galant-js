@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
-import { algorithmAtom, algorithmChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_atoms/atoms";
+import { algorithmAtom, algorithmChangeManagerAtom, userChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_atoms/atoms";
 import Cytoscape from "globals/Cytoscape";
 import SharedWorker from "globals/SharedWorker";
 import Algorithm from "states/Algorithm/Algorithm";
@@ -24,9 +24,11 @@ export default function Graph() {
     // Define state variables using React hooks
     const [graph, setGraph] = useAtom(graphAtom);
     const [algorithmChangeManager, setAlgorithmChangeManager] = useAtom(algorithmChangeManagerAtom);
+    const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
     const [_, setAlgorithm] = useAtom(algorithmAtom);
     const [promptQueue, setPromptQueue] = useAtom(promptQueueAtom);
     const sentAliveMessage = useRef();
+    let algorithmLoading = false;
     
     /**
      * Creates SharedWorker instance on mount. Whenever graph updates, onMessage 
@@ -40,6 +42,10 @@ export default function Graph() {
 
         // Load a new graph
         function onGraphLoad(data, isInit) {
+            if ( algorithmLoading ) {
+                algorithmLoading = false;
+                return;
+            }
             // Get the name and graph text from the data
             const { name: graphName, payload: graphText } = data;
             if (!graphText) return;
@@ -49,6 +55,10 @@ export default function Graph() {
 
             // Load the graph
             setGraph(FileParser.loadGraph(graphName, graphText));
+            setUserChangeManager(new ChangeManager());
+
+            // !!! need to reset the edit change manager here !!!
+            // could actually reset both change managers
 
             // We have to wait for cytoscape to read graph changes, and add graph.
             if (isInit) setTimeout(() => Cytoscape.fit(Cytoscape.elements(), 100), 25);
@@ -56,8 +66,11 @@ export default function Graph() {
 
         // Load a new algorithm
         function onAlgorithmLoad(data) {
+            algorithmLoading = true
             
             // Undo any changes the old algorithm made
+            // @todo this should happen when the algorithm is terminated
+            //       and the algorithm change manager should be set to null
             AlgorithmInterface.revert();
 
             // Clear the PromptQueue if one exists

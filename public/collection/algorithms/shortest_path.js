@@ -1,3 +1,6 @@
+/**
+ * A variation of Dijstra's algorithm that has both a starting node and a destination node
+ */
 let edgesUsed = {};
 
 step(() => {
@@ -58,3 +61,4 @@ while (!marked(dest_node)) {
         }
     }
 }
+display("Algorithm finished, destination found")

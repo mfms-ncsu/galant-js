@@ -7,7 +7,7 @@ export default function ExitButton({ shortcut, callback, onClick, className, chi
             shortcut={shortcut}
             callback={callback}
             onClick={onClick}
-            className={`px-2 py-1 bg-red-500 hover:bg-red-600 text-white ${className}`}
+            className={`px-2 py-1 bg-red-200 hover:bg-red-600 text-black ${className}`}
         >
             {children}
         </Button>

@@ -1,5 +1,5 @@
-# another example to use for shortest paths
-# start at node 1 if directed, anywhere if undirected; end at node 3
+c another example to use for shortest paths
+c start at node 1 if directed, anywhere if undirected; end at node 3
 n 1 60 30
 n 2 30 30
 n 3 10 10

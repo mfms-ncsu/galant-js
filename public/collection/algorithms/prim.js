@@ -123,3 +123,4 @@ while ( PQsize() > 0 ) {
         }
     }
 }
+display("Done: MST found for component reachable from start node")

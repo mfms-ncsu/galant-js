@@ -217,6 +217,7 @@ function onMessage(algorithm, message) {
             updateState(graph, newChangeManager);
             break;
         case "print":
+            // !!! do not remove; this is the print() function in the algorithm !!! 
             console.log(message.message);
             break;
         case "deleteNode":
@@ -289,7 +290,6 @@ function onMessage(algorithm, message) {
             break;
         case "applyNodePositions":
             [newGraph, newChangeManager] = LayeredGraphInterface.applyNodePositions(graph, changeManager, message.savedPositions);
-            console.log("algorithm thread", message.savedPositions);
             updateState(newGraph, newChangeManager);
             break;
         case "startRecording":

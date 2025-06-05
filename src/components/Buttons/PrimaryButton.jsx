@@ -7,7 +7,7 @@ export default function PrimaryButton({ shortcut, callback, onClick, className, 
             shortcut={shortcut}
             callback={callback}
             onClick={onClick}
-            className={`px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white ${className}`}
+            className={`px-2 py-1 bg-blue-200 hover:bg-blue-400 text-black ${className}`}
         >
             {children}
         </Button>

@@ -1,5 +1,5 @@
-# small weighted graph to illustrate the difference between directed and undirected shortest paths
-# start at node A, end at node F if prompted
+c small weighted graph to illustrate the difference between directed and undirected shortest paths
+c start at node A, end at node F if prompted
 n A 110 85
 n B 300 85
 n C 65 350
