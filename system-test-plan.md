@@ -8,6 +8,16 @@ TODO:
 - merge dev into main and get rid of all console logs
 - publish version 2.1.1
 
+## Test for speed
+
+To check whether the slow down problem has been resolved for algorithms, do the following.
+
+- load du-16
+- load and run kruskal holding down the arrow keys
+- repeat the previous step twice
+
+Currently, the first run is very fast, the second is much slower, and the third slower still. If you reload the page and run again, it's fast again.
+
 ## New release
 
 ### Steps

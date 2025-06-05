@@ -173,6 +173,11 @@ function enterPromptResult(algorithm, promptResult) {
 function revert() {
     let [newGraph, newChangeManager] = GraphInterface.revert(graph, changeManager);
 
+    // cause memory to be reclaimed? no such luck
+    changeManager = null;
+    // The following line ensures the atom no longer references the old object
+    store.set(algorithmChangeManagerAtom, null);
+    
     store.set(graphAtom, newGraph);
     store.set(algorithmChangeManagerAtom, newChangeManager);
 }

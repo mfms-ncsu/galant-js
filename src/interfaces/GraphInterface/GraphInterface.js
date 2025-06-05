@@ -1045,11 +1045,35 @@ function redo(graph, changeManager) {
  * @param {ChangeManager} changeManager ChangeManager from which to revert
  * @returns Updated graph and change manager
  */
+// function revert(graph, changeManager) {
+//   // Undo all changes
+//   while (changeManager.index > 0) {
+//     // Remove references to the change objects at the current index
+//     if (changeManager.changes[changeManager.index]) {
+//       // Overwrite the array slot with null to break references
+//       changeManager.changes[changeManager.index] = null;
+//     }
+//     [graph, changeManager] = undo(graph, changeManager);
+//   }
+
+//   // After all undos, clear the changes array to remove all references
+//   if (Array.isArray(changeManager.changes)) {
+//     changeManager.changes.length = 0;
+//   }
+
+//   return [graph, changeManager];
+// }
+
 function revert(graph, changeManager) {
   while (changeManager.index > 0) {
+    let theChangeObject = changeManager.changes[changeManager.index];
     [graph, changeManager] = undo(graph, changeManager);
+    if (theChangeObject) {
+      // Remove references to the change objects at the current index
+      // does not help with the slow down problem
+      theChangeObject = null;
+    }      
   }
-
   return [graph, changeManager];
 }
 
