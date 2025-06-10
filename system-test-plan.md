@@ -3,20 +3,11 @@
 TODO:
 - [later] The showPositions() and showIndexes() methods only set the weights; they don't actually show them; the setWeights() method accomplishes that; probably should rename these methods
 - [later] see if it's possible to get headers when content in a json file === null; have to be careful about <ul></ul> pairs
-- look into whether memory can be garbage collected after algorithm execution; this should improve performance, but runs the risk of failure to save important information [do this in the `speed-test` branch, set objects to null]; can be done after version publication
 - test using all platform/browser combinations
 - merge dev into main and get rid of all console logs
 - publish version 2.1.1
 
 ## Test for speed
-
-To check whether the slow down problem has been resolved for algorithms, do the following.
-
-- load du-16
-- load and run kruskal holding down the arrow keys
-- repeat the previous step twice
-
-Currently, the first run is very fast, the second is much slower, and the third slower still. If you reload the page and run again, it's fast again.
 
 ## New release
 
@@ -57,7 +48,7 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 ### Editing
 
 1. The drop down when right clicking on a node to make changes goes off screen if the node is too close to the bottom.
-2. The edit ChangeManager does not appear to be removed when a graph is loaded - it still remembers earlier edits.
+2. Labels/weights on nodes should change size with changes in node radius but they don't do that consistently.
 
 ### Algorithm execution
 
@@ -72,12 +63,12 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 5. Layered graphs: edges connecting nodes on the same layer or on nonadjacent layers are not flagged as errors.
 6. Nodes with the same layer and position do not cause a shift as they do during editing.
 
-## Upload and Download
+## Testing: Upload and Download
 
 ### (!) Simple upload/download in editor window
 
-1. Upload a graph
-2. Make a few minor changes in the `Edit` window.
+1. Upload a graph (e.g., triangle).
+2. Make a few minor changes in the `Edit` window: add a node and edge, change a position, color a node/edge, change shape, add a weight and label
 3. Download to a different name/location, close the window, focus on a different graph, and upload again
 
 ### Uploads with different node and edge attributes/variations; graphs are in src/testing
@@ -99,8 +90,8 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 3. Export the graph to a file
 4. Upload and load the exported graph and check that the export was correct
 
-## Running algorithms
- * run at least one algorithm on all platform/browser combinations
+## Testing: Running algorithms
+ * run at least one algorithm on all platform/browser combinations; dfs-scc on g-12 is a good choice (see item 3 below)
 
 ### Graph searches
 
