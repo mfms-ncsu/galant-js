@@ -110,13 +110,13 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 
 ### Minimum spanning trees
 
-1. Run prim on g-10 starting at node 2, then node 7. Results will differ. The first run includes edge 2,9; the second edge 7,9
+1. Run prim on g-10 starting at node 2, then starting on node 7. Results will differ. The first run includes edge 2,9; the second edge 7,9
 2. Run kruskal on g-10.
 
 ### Layered graphs
 
 1. Load ex_20 and check if window resizing changes shape of graph
-1. Run barycenter on ex_20; stop after one pass - minima reached at iteration 6: 32 crossings, 6 bottleneck; run again and continue with two passes; min at iteration 12 with 30 crossings, bottleneck 6
+1. Run barycenter on ex_20; stop after one pass - minima reached at iteration 6: 32 crossings, min bottleneck (not reported) is 6 at iteration 0; run again and continue with two passes; min at iteration 12 with 30 crossings; min bottleneck is still 6.
 2. (!) Run layered-graph-stats on two_unequal_layers (Examples): crossings = 0, nonverticality and bottleneck verticality = 1; move node 4 to position 0: crossings = bottleneck = 2; nonverticality = 5, bottleneck = 4
 3. Run layered-graph-stats on n42-t48v150: total crossings = 48, bottleneck crossings = 7, nonverticality = 150, and bottleneck verticality = 16
 4. Move some nodes of n42-t48v150 to see if they shift correctly; do this both in edit mode and during algorithm execution
