@@ -82,6 +82,7 @@ while ( PQsize() > 0 ) {
     inTree[current_node] = true
     if ( ! current_node ) {
         display("*** there are unreachable nodes ***")
+        break
     }
     print(current_node)
     step(() => {
