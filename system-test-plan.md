@@ -30,8 +30,6 @@ Tests should be done in the dev branch with console.log's added as needed. The l
 * Mac/Chrome
 * Mac/Firefox
 * Mac/Safari
-* Mac/Opera
-* Mac/Brave (oddly, the main page sometimes "jiggles")
 
 * Linux/Chrome
 * Linux/Firefox
@@ -72,7 +70,7 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 4. Upload and load the exported graph and check that the export was correct
 
 ## Testing: Running algorithms
- * run at least one algorithm on all platform/browser combinations; dfs-scc on g-12 is a good choice (see item 3 below)
+ * (!) Run at least one algorithm on all platform/browser combinations; dfs-scc on g-12 is a good choice (see item 3 below)
 
 ### Graph searches
 
@@ -122,7 +120,7 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 
 ### Editing
 
-1. The drop down when right clicking on a node to make changes goes off screen if the node is too close to the bottom.
+1. The drop down when right clicking on a node to make changes goes off screen if the node is too close to the bottom. Workaround is to pan and zoom.
 2. Labels/weights on nodes should change size with changes in node radius but they don't do that consistently.
 
 ### Algorithm execution

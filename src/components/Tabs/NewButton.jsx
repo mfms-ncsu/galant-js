@@ -7,7 +7,18 @@ import PopupWindow from 'components/Tabs/PopupWindow';
  * Returns component for creating new tabs, including the button and popup.
  */
 export default function NewButton({examples, addNew}) {
-  function openPopup() {
+  React.useEffect(() => {
+        function onKeyPress(event) {
+            if (event.code === "KeyE" && (event.metaKey || event.ctrlKey)) {
+              event.preventDefault();
+              openPopup();
+            }
+        }
+        document.addEventListener("keydown", onKeyPress);
+        return () => document.removeEventListener("keydown", onKeyPress);
+    }, []);
+
+  const openPopup = () => {
     const popupWindow = window.open(
       '',
       '_blank',
@@ -31,17 +42,6 @@ export default function NewButton({examples, addNew}) {
       alert('Popup blocked! Please allow popups for this website.');
     }
   }
-
-  React.useEffect(() => {
-        function onKeyPress(event) {
-            if (event.code === "KeyE" && (event.metaKey || event.ctrlKey)) {
-              event.preventDefault();
-              openPopup();
-            }
-        }
-        document.addEventListener("keydown", onKeyPress);
-        return () => document.removeEventListener("keydown", onKeyPress);
-    }, [openPopup]);
 
   return (
     <div>
