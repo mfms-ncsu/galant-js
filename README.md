@@ -30,7 +30,9 @@ Developer and User documentation can be found [here](https://galant.csc.ncsu.edu
   - Results are found under /total-coverage directory.
 
 ### Deployment
-Before deployment, do thorough testing in the branch where changes were made (typically `dev`), and, after committing,
+
+Before deployment, do thorough testing in the branch where changes were made (typically `dev`),
+merge `dev` into `main` and, after committing in `main`,
 ```
 git push https://mfms-ncsu@github.com/mfms-ncsu/galant-js main
 ```

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
-import { algorithmAtom, algorithmChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_atoms/atoms";
+import { algorithmAtom, algorithmChangeManagerAtom, userChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_atoms/atoms";
 import Cytoscape from "globals/Cytoscape";
 import SharedWorker from "globals/SharedWorker";
 import Algorithm from "states/Algorithm/Algorithm";
@@ -24,6 +24,7 @@ export default function Graph() {
     // Define state variables using React hooks
     const [graph, setGraph] = useAtom(graphAtom);
     const [algorithmChangeManager, setAlgorithmChangeManager] = useAtom(algorithmChangeManagerAtom);
+    const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
     const [_, setAlgorithm] = useAtom(algorithmAtom);
     const [promptQueue, setPromptQueue] = useAtom(promptQueueAtom);
     const sentAliveMessage = useRef();
@@ -54,6 +55,10 @@ export default function Graph() {
 
             // Load the graph
             setGraph(FileParser.loadGraph(graphName, graphText));
+            setUserChangeManager(new ChangeManager());
+
+            // !!! need to reset the edit change manager here !!!
+            // could actually reset both change managers
 
             // We have to wait for cytoscape to read graph changes, and add graph.
             if (isInit) setTimeout(() => Cytoscape.fit(Cytoscape.elements(), 100), 25);

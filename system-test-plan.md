@@ -3,10 +3,11 @@
 TODO:
 - [later] The showPositions() and showIndexes() methods only set the weights; they don't actually show them; the setWeights() method accomplishes that; probably should rename these methods
 - [later] see if it's possible to get headers when content in a json file === null; have to be careful about <ul></ul> pairs
-- [later] look into whether memory can be garbage collected after algorithm execution; this should improve performance, but runs the risk of failure to save important information [do this in the `speed-test` branch, set objects to null]; can be done after version publication
 - test using all platform/browser combinations
 - merge dev into main and get rid of all console logs
-- publish version 2.1
+- publish version 2.1.1
+
+## Test for speed
 
 ## New release
 
@@ -29,8 +30,6 @@ Tests should be done in the dev branch with console.log's added as needed. The l
 * Mac/Chrome
 * Mac/Firefox
 * Mac/Safari
-* Mac/Opera
-* Mac/Brave (oddly, the main page sometimes "jiggles")
 
 * Linux/Chrome
 * Linux/Firefox
@@ -42,32 +41,12 @@ Tests should be done in the dev branch with console.log's added as needed. The l
 
 Make sure there are tests that use keyboard shortcuts as well as buttons.
 
-## Current bugs and inconveniences based on tests
-
-### Editing
-
-1. The drop down when right clicking on a node to make changes goes off screen if the node is too close to the bottom.
-2. The edit ChangeManager does not appear to be removed when a graph is loaded - it still remembers earlier edits.
-
-### Algorithm execution
-
-1. Node movements for algorithms that move nodes behave unexpectedly. They should not persist when user stops algorithm. And the impact on the algorithm should be consistent. It appears that the barycenter uses the new ordering to do its sorting, but does not count crossings correctly.
-
-### Error handling
-
-1. Graph load error messages could be a lot more specific about cause of error and line number.
-2. Duplicate edges are not flagged as errors.
-3. Parallel edges in opposite directions are rendered too close to each other.
-4. Nodes with the same coordinates should be highlighted; this is also an issue during editing,
-5. Layered graphs: edges connecting nodes on the same layer or on nonadjacent layers are not flagged as errors.
-6. Nodes with the same layer and position do not cause a shift as they do during editing.
-
-## Upload and Download
+## Testing: Upload and Download
 
 ### (!) Simple upload/download in editor window
 
-1. Upload a graph
-2. Make a few minor changes in the `Edit` window.
+1. Upload a graph (e.g., triangle).
+2. Make a few minor changes in the `Edit` window: add a node and edge, change a position, color a node/edge, change shape, add a weight and label
 3. Download to a different name/location, close the window, focus on a different graph, and upload again
 
 ### Uploads with different node and edge attributes/variations; graphs are in src/testing
@@ -79,8 +58,9 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 
 1. Upload and load a graph, e.g., dt-11 from Examples
 2. Do a sequence of edit operations that include an auto-layout followed by node move
-4. Make sure you can backtrack (z shortcut) from at least two auto-layouts with intervening node moves.
-3. Save the result to the edit window, checking that changes took effect
+3. Make sure you can backtrack (z shortcut) from at least two auto-layouts with intervening node moves.
+4. Set the label and set/change the weight of a node and of an edge.
+5. Save the result to the edit window, checking that changes took effect
 
 ### (!) Exporting a graph
 
@@ -89,8 +69,8 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 3. Export the graph to a file
 4. Upload and load the exported graph and check that the export was correct
 
-## Running algorithms
- * run at least one algorithm on all platform/browser combinations
+## Testing: Running algorithms
+ * (!) Run at least one algorithm on all platform/browser combinations; dfs-scc on g-12 is a good choice (see item 3 below)
 
 ### Graph searches
 
@@ -109,27 +89,49 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 
 ### Minimum spanning trees
 
-1. Run prim on g-10 starting at node 2, then node 7. Results will differ. The first run includes edge 2,9; the second edge 7,9
+1. Run prim on g-10 starting at node 2, then starting on node 7. Results will differ. The first run includes edge 2,9; the second edge 7,9
 2. Run kruskal on g-10.
 
 ### Layered graphs
 
 1. Load ex_20 and check if window resizing changes shape of graph
-1. Run barycenter on ex_20; stop after one pass - minima reached at iteration 6: 32 crossings, 6 bottleneck; run again and continue with two passes; min at iteration 12 with 30 crossings, bottleneck 6
-2. (!) Run layered-graph-stats on two_unequal_layers (Examples): crossings = 0, nonverticality and bottleneck verticality = 1; move node 4 to position 0: crossings = bottleneck = 2; nonverticality = 5, bottleneck = 4
-3. Run layered-graph-stats on n42-t48v150: total crossings = 48, bottleneck crossings = 7, nonverticality = 150, and bottleneck verticality = 16
-4. Move some nodes of n42-t48v150 to see if they shift correctly; do this both in edit mode and during algorithm execution
-5. (!) Load shift-test. Move node B into position 4, occupied by E. Then move node J into position 1, occupied by G.
+2. Run barycenter on ex_20; stop after one pass - minima reached at iteration 6: 32 crossings, min bottleneck (not reported) is 6 at iteration 0; run again and continue with two passes; min at iteration 12 with 30 crossings; min bottleneck is still 6.
+3. (!) Run layered-graph-stats on two_unequal_layers: crossings = 0, nonverticality and bottleneck verticality = 1; move node 4 to position 0: crossings = bottleneck = 2; nonverticality = 5, bottleneck = 4
+4. Run layered-graph-stats on n42-t48v150: total crossings = 48, bottleneck crossings = 7, nonverticality = 150, and bottleneck verticality = 16
+5. Move some nodes of n42-t48v150 to see if they shift correctly; do this both in edit mode and during algorithm execution
+6. (!) Load shift-test. Move node B into position 4, occupied by E. Then move node J into position 1, occupied by G.
 
 ## Error handling
 
 ### Graph input
 
-1. (!) Load all of of the graphs in the `src/testing` directory except for opposite-edge, same-coordinates, same-position, shift-test, triangle, and two-unequal layers. There should be error messages reflecting what's wrong with these graphs. [!!! duplicate edge should result in an error, but des not !!!] [!!! errors on layered graphs are not detected !!!]
-3. (!) Load same-coordinates. Instead of an error, the nodes should land on top of each other and allow user to fix this by editing.
-4. (!) Load same-position. In this case nodes should shift appropriately: node 3 should end up in position 1 of layer 0. [!!! does not work !!!]
+1. (!) Load all of of the graphs with prefix `bad` in the `src/testing` directory. There should be error messages reflecting what's wrong with these graphs. [!!! duplicate edge should result in an error, but des not !!!] [!!! errors on layered graphs are not detected !!!]
+2. Load same-coordinates. Instead of an error, the nodes should land on top of each other and allow user to fix this by editing.
+3. Load same-position. In this case nodes should shift appropriately: node 3 should end up in position 1 of layer 0. [!!! does not work !!!]
 
 ### Algorithm execution
 
 1. (!) Run `color-nonexistent-node.js` on triangle (or any other graph); check console.
 2. (!) Run `infinite-loop.js` on triangle
+
+-----------------------------------
+
+## Current bugs and inconveniences based on tests
+
+### Editing
+
+1. The drop down when right clicking on a node to make changes goes off screen if the node is too close to the bottom. Workaround is to pan and zoom.
+2. Labels/weights on nodes should change size with changes in node radius but they don't do that consistently.
+
+### Algorithm execution
+
+1. Node movements for algorithms that move nodes behave unexpectedly. They should not persist when user stops algorithm. And the impact on the algorithm should be consistent. It appears that the barycenter uses the new ordering to do its sorting, but does not count crossings correctly.
+
+### Error handling
+
+1. Graph load error messages could be a lot more specific about cause of error and line number.
+2. Duplicate edges are not flagged as errors.
+3. Parallel edges in opposite directions are rendered too close to each other.
+4. Nodes with the same coordinates should be highlighted; this is also an issue during editing,
+5. Layered graphs: edges connecting nodes on the same layer or on nonadjacent layers are not flagged as errors.
+6. Nodes with the same layer and position do not cause a shift as they do during editing.

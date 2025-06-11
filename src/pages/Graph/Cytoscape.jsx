@@ -72,7 +72,7 @@ export default function CytoscapeComponent() {
         window.cytoscape = Cytoscape;
 
         // react-hooks/exhaustive-deps
-    }, [cytoscapeElement, graph]);
+    }, [cytoscapeElement]);
 
     /**
      * Create a function to call whenever cytoscape needs to be updated
