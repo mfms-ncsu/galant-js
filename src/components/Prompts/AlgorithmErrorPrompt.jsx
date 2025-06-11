@@ -9,10 +9,8 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
     // Error object and name
     const errorObject = prompt.errorObject;
     let errorString = `${errorObject.name}: ${errorObject.message}`;
-//    let errorName = errorObject.stack.split("\n")[0]//.split(":")[0]
-    console.log("error object", errorObject);
-    console.log("error string", errorString);
-//    console.log("error name", errorName);
+//    console.log("error object", errorObject);
+//    console.log("error string", errorString);
 
     let title, code;
 
@@ -31,7 +29,9 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
         }
         else {
             // code = errorObject.stack
-            code = "For more information, check the console: Ctrl/Cmd + Alt + I"
+            code = "For more information, check the console: Cmd+Alt+I (Mac) or Ctrl+Shift+I (Windows/Linux)"
+            code += "\nand click on the 'Console' tab (may not be necessary)."
+            code += "\nLine number info is after 'at eval ... <anonymous>:'.";
         }
     }
 

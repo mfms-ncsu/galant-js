@@ -105,7 +105,7 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 
 ### Graph input
 
-1. (!) Load all of of the graphs in the `src/testing` directory except for opposite-edge, same-coordinates, same-coordinates, same-position, shift-test, triangle, and two-unequal layers. There should be error messages reflecting what's wrong with these graphs. [!!! duplicate edge should result in an error, but des not !!!] [!!! errors on layered graphs are not detected !!!]
+1. (!) Load all of of the graphs with prefix `bad` in the `src/testing` directory. There should be error messages reflecting what's wrong with these graphs. [!!! duplicate edge should result in an error, but des not !!!] [!!! errors on layered graphs are not detected !!!]
 3. (!) Load same-coordinates. Instead of an error, the nodes should land on top of each other and allow user to fix this by editing.
 4. (!) Load same-position. In this case nodes should shift appropriately: node 3 should end up in position 1 of layer 0. [!!! does not work !!!]
 
