@@ -8,8 +8,10 @@ import PrimaryButton from "components/Buttons/PrimaryButton";
 export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
     // Error object and name
     const errorObject = prompt.errorObject;
-    let errorName = errorObject.stack.split("\n")[0].split(":")[0]
-    
+    let errorName = errorObject.stack.split("\n")[0]//.split(":")[0]
+    console.log("error object", errorObject);
+    console.log("error name", errorName);
+
     let title, code;
 
     // This next code is from a previous team, but no author reference was found. 
@@ -26,7 +28,8 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
             code = "There is an error with the algorithm code in the Algorithm Editor that we cannot identify."
         }
         else {
-            code = errorObject.stack
+            // code = errorObject.stack
+            code = "For more information, check the console: Ctrl/Cmd + Alt + I"
         }
     }
 
