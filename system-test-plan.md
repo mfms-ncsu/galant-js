@@ -95,19 +95,19 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 ### Layered graphs
 
 1. Load ex_20 and check if window resizing changes shape of graph
-1. Run barycenter on ex_20; stop after one pass - minima reached at iteration 6: 32 crossings, min bottleneck (not reported) is 6 at iteration 0; run again and continue with two passes; min at iteration 12 with 30 crossings; min bottleneck is still 6.
-2. (!) Run layered-graph-stats on two_unequal_layers: crossings = 0, nonverticality and bottleneck verticality = 1; move node 4 to position 0: crossings = bottleneck = 2; nonverticality = 5, bottleneck = 4
-3. Run layered-graph-stats on n42-t48v150: total crossings = 48, bottleneck crossings = 7, nonverticality = 150, and bottleneck verticality = 16
-4. Move some nodes of n42-t48v150 to see if they shift correctly; do this both in edit mode and during algorithm execution
-5. (!) Load shift-test. Move node B into position 4, occupied by E. Then move node J into position 1, occupied by G.
+2. Run barycenter on ex_20; stop after one pass - minima reached at iteration 6: 32 crossings, min bottleneck (not reported) is 6 at iteration 0; run again and continue with two passes; min at iteration 12 with 30 crossings; min bottleneck is still 6.
+3. (!) Run layered-graph-stats on two_unequal_layers: crossings = 0, nonverticality and bottleneck verticality = 1; move node 4 to position 0: crossings = bottleneck = 2; nonverticality = 5, bottleneck = 4
+4. Run layered-graph-stats on n42-t48v150: total crossings = 48, bottleneck crossings = 7, nonverticality = 150, and bottleneck verticality = 16
+5. Move some nodes of n42-t48v150 to see if they shift correctly; do this both in edit mode and during algorithm execution
+6. (!) Load shift-test. Move node B into position 4, occupied by E. Then move node J into position 1, occupied by G.
 
 ## Error handling
 
 ### Graph input
 
 1. (!) Load all of of the graphs with prefix `bad` in the `src/testing` directory. There should be error messages reflecting what's wrong with these graphs. [!!! duplicate edge should result in an error, but des not !!!] [!!! errors on layered graphs are not detected !!!]
-3. (!) Load same-coordinates. Instead of an error, the nodes should land on top of each other and allow user to fix this by editing.
-4. (!) Load same-position. In this case nodes should shift appropriately: node 3 should end up in position 1 of layer 0. [!!! does not work !!!]
+2. Load same-coordinates. Instead of an error, the nodes should land on top of each other and allow user to fix this by editing.
+3. Load same-position. In this case nodes should shift appropriately: node 3 should end up in position 1 of layer 0. [!!! does not work !!!]
 
 ### Algorithm execution
 

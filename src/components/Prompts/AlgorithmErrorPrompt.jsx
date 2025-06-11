@@ -31,13 +31,13 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
             // code = errorObject.stack
             code = "For more information, check the console: Cmd+Alt+I (Mac) or Ctrl+Shift+I (Windows/Linux)"
             code += "\nand click on the 'Console' tab (may not be necessary)."
-            code += "\nLine number info is after 'at eval ... <anonymous>:'.";
+            code += "\nLine number is after '<anonymous>:' or after 'eval:'.";
         }
     }
 
     return (
         <div className="flex flex-col min-w-[550px] min-h-[270px] max-h-full bg-white shadow-lg p-4 rounded-xl" ref={promptRef}>
-            <span className="block text-center text-red-900 font-semibold pointer-events-none select-none text-xl">{title}</span>
+            <span className="block text-left text-red-900 font-semibold pointer-events-none select-none text-xl">{title}</span>
             <pre className="overflow-auto text-wrap my-4 text-xl flex-1">{code}</pre>
             <PrimaryButton className="mt-auto" onClick={callback}>Okay</PrimaryButton>
         </div>
