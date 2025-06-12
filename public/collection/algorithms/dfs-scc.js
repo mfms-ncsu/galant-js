@@ -1,6 +1,8 @@
 /**
- * Depth first search for directed graphs, followed by a reverse DFS that identifies strongly connected components
+ * Depth first search for directed graphs, followed by a reverse DFS that identifies strongly connected components.
+ * Try it out on the graph g-12.
  */
+
 // time at which each node is discovered
 let discoveryTimes = {};
 // time at which each node has finished being explored

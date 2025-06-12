@@ -78,6 +78,12 @@ export default function Instructions() {
                         </ol>
                     </li>
                 </ol>
+                
+                <p>
+                    <strong>You can use the mouse to pan and zoom in and out of the graph,</strong>
+                    as you would in a map application. The Auto-Camera feature, under Layout,
+                    will center the graph on the canvas.
+                </p>
             </div>
             For more information see the full
             <p align="center">
