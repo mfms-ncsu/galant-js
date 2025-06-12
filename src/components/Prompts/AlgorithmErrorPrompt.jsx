@@ -9,9 +9,6 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
     // Error object and name
     const errorObject = prompt.errorObject;
     let errorString = `${errorObject.name}: ${errorObject.message}`;
-//    console.log("error object", errorObject);
-//    console.log("error string", errorString);
-
     let title, code;
 
     // This next code is from a previous team, but no author reference was found. 

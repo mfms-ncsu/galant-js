@@ -1632,7 +1632,6 @@ function toString(graph) {
  * @returns Updated graph and change manager
  */
 function undo(graph, changeManager) {
-  console.log("-> undo, graph =", graph, "changeManager =", changeManager);
   // Check if there are any changes to undo
   if (changeManager.index > 0) {
     // Get the previous step
