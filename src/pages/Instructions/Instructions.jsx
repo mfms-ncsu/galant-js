@@ -9,7 +9,7 @@ import React from "react";
 export default function Instructions() {
     return (
         <div>
-            <h1 className="font-bold text-3xl">Quick Start Guide to using Galant-JS</h1>
+            <h1 className="font-bold text-3xl">Quick Start Guide to using Galant-JS, Version 2.2</h1>
             <div>
                 <ol>
                     <li>

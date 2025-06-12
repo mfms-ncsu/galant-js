@@ -15,11 +15,14 @@ TODO:
 
 - merge changes from a working branch into `dev`
 - perform the tests below in `dev`
+- add notes to version-history.md
+- put version number in the help page: see `pages/Instructions/Instructions.jsx`
 - merge changes into `main`
 - get rid of console.log statements (should devise a script for this)
-- add notes to version-history.md
 - push changes, create version on github.com site
+- add version history notes to the comments on the version
 - deploy the version on the galant.csc.ncsu.edu site
+- make changes in user documentation and bugs document as needed
 
 ## Testing overview
 
