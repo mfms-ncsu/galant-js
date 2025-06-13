@@ -53,7 +53,7 @@ function removeMin() {
 
 step(() => {
     clearNodeMarks();
-    clearNodeWeights();
+    hideAllNodeWeights();
     clearNodeColors();
     clearNodeShapes();
 
@@ -75,6 +75,7 @@ step(() => {
 
 let start_node = promptNode("Enter starting node:", "invalid node ${start_node}");
 setWeight(start_node, 0)
+showWeight(start_node)
 nodePQ[start_node] = 0
 
 while ( PQsize() > 0 ) {
@@ -99,7 +100,8 @@ while ( PQsize() > 0 ) {
     let current_dist = weight(current_node)
     for (let edge of outgoing(current_node)) {
         let next_node = other(current_node, edge)
-        if ( inTree[next_node ]) continue
+        if ( inTree[next_node ] ) continue
+        showWeight(next_node)
         let next_dist = current_dist + weight(edge)
         print(next_node + " " + next_dist)
         color(edge, "violet")

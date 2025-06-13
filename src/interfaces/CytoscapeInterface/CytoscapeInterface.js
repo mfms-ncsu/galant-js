@@ -201,7 +201,8 @@ function getStyle(graph) {
         {
             "selector": "node[?highlighted]",
             "style": {
-                "borderWidth": `${graph.nodeSize / 4}px`
+                "borderWidth": `${graph.nodeSize / 4}px`,
+                "borderColor": "red",
             }
         },
         {
@@ -219,7 +220,7 @@ function getStyle(graph) {
         {
             "selector": "edge[?highlighted]",
             "style": {
-                "width": `${graph.nodeSize / 4}px`
+                "width": `6px`
             }
         },
         {
