@@ -17,7 +17,7 @@ export default function CytoscapeComponent() {
     const [message, setMessage] = useState(null);
 
     /**
-     * Initialize cytoscape on mount (When cytoscapeElement ref is set to the div element)
+     * Initialize Cytoscape on mount or update it otherwise
      */
     useEffect(() => {
         // Return if window.cytoscape has already been mounted
@@ -25,7 +25,7 @@ export default function CytoscapeComponent() {
         // TODO: To get the Node HTML labels to update properly, we need to
         // restart cytoscape with each change. There must be a more efficient
         // way to do this.
-        // if (!Cytoscape.container()) {
+        if (!Cytoscape.container()) {
         
             // Initialize the cytoscape instance
             Cytoscape.mount(cytoscapeElement.current);
@@ -34,12 +34,14 @@ export default function CytoscapeComponent() {
             Cytoscape.minZoom(0.1);
             Cytoscape.maxZoom(10);
             Cytoscape.autounselectify(true); // Disable multi-select for now (until supported in ChangeRecords)
-        // }
+        }
         
         Cytoscape.nodeHtmlLabel([{
             query: "node",
             valign: "top",
             valignBox: "top",
+            halign: "center",
+            halignBox: "center",
             tpl: (data) => {
                 const showWeights = graph.showNodeWeights;
                 const showLabels = graph.showNodeLabels;

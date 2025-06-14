@@ -21,11 +21,10 @@ function openAlgorithmEditor() {
 }
 
 /**
- * Opens the instructions page in a new window.
- * Preferred over a Link to ensure only one instance open at a time. 
+ * Opens the instructions page in an external window.
  */
 function openInstructionsPage() {
-    window.open('/instructions', 'Getting started with GalantJS', `width=${window.screen.width / 2}, height=${window.screen.height}`);
+    window.open('https://docs.google.com/document/d/1_CX-rv_dFlnWL3BacHnernQ4tapzhmhPUzUx2cWaBc0/view', '_blank');
 }
 
 /**

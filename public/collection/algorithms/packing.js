@@ -94,7 +94,7 @@ while ( PQsize() > 0 ) {
             for ( let cousin_edge of outgoing(neighbor) ) {
                 let cousin = other(neighbor, cousin_edge)
                 if ( cousin !== next_node ) {
-                    hideEdge(cousin_edge)
+                    color(cousin_edge, "yellow")
                 }
                 // cousins cannot be used as central nodes of a hyperedge
                 // for the remainder of the packing
@@ -111,4 +111,4 @@ while ( PQsize() > 0 ) {
     packing_size += 1
     display("packing size = " + packing_size)
 } // while nodePQ not empty
-display("Done: all nodes have been packed into edge-disjoint sets")
+display("Done: all nodes have been packed into edge-disjoint sets, packing size = " + packing_size)
