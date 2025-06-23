@@ -1,48 +1,53 @@
 import { ArrowUpTrayIcon } from '@heroicons/react/24/solid';
 import PrimaryButton from 'components/Buttons/PrimaryButton';
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 
 /**
  * Returns component for uploading files and adding them as tabs.
  */
-export default function UploadButton({onUpload, acceptFileType}) {
-    function onFileUploadEvent(event) {
-    //   useEffect(() => {
-    //     function onKeyPress(event) {
-    //         if (event.code === "KeyO" && (event.metaKey || event.ctrlKey)) {
-    //           event.preventDefault();
-    //           onUpload();
-    //         }
-    //     }
-    //     document.addEventListener("keydown", onKeyPress);
-    //     return () => document.removeEventListener("keydown", onKeyPress);
-    // }, []);
+export default function UploadButton({onFileUpload, acceptFileType}) {
+    const inputRef = useRef(null);
 
-        const files = event.target.files;
-
-        const tabs = [];
-        for (let file of files) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const tab = {name: file.name, content: e.target.result};
-                tabs.push(tab);
-                // If all files have been loaded, go ahead and call the onUpload handler
-                if (tabs.length >= files.length) {
-                    onUpload(tabs);
-                }
-            };
-
-            reader.readAsText(file);
+    // Keyboard shortcut for uploading files
+    useEffect(() => {
+        function onKeyPress(event) {
+            if (event.code === "KeyO" && (event.metaKey || event.ctrlKey)) {
+              event.preventDefault();
+                inputRef.current && inputRef.current.click();
+            }
         }
+        document.addEventListener("keydown", onKeyPress);
+        return () => document.removeEventListener("keydown", onKeyPress);
+    }, []);
+
+    function handleChange(event) {
+        console.log("onFileUploadEvent called, event =", event);
+        const file = event.target.files && event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            if (typeof onFileUpload === 'function') {
+                onFileUpload(event.target.result);
+            }
+       };
+       reader.readAsText(file);
+       event.target.value = ''; // Clear the input value to allow re-uploading the same file
     }
 
     return (
         <PrimaryButton className="m-1">
-            <label htmlFor="file-upload" className="cursor-pointer flex items-center"> 
+      <button
+        type="button"
+        onClick={() => inputRef.current && inputRef.current.click()}
+      >
+        Open File (Ctrl+O)
+      </button>
+
+            <label htmlFor="file-upload
+            " className="cursor-pointer flex items-center"> 
                 <ArrowUpTrayIcon className="inline h-4 me-2 fill-black stroke stroke-black"/>
                 Upload File
             </label>
-            <input id="file-upload" type="file" accept={acceptFileType} multiple className="hidden" onChange={onFileUploadEvent}></input>
+            <input id="file-upload" type="file" accept={acceptFileType} multiple className="hidden" onChange={onFileUpload}></input>
         </PrimaryButton>
     );
 }

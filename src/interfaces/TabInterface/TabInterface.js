@@ -109,6 +109,8 @@ function getSelectedTab(tabs) {
  * @returns Updated tab list
  */
 function addTab(tabs, data) {
+    console.log("Adding new tab with data:", data);
+    console.log("Current tabs:", tabs);
     // Ensure the tab has a unique name
     let updatedName = data.name;
     let count = 1;
@@ -158,6 +160,7 @@ function updateTab(tabs, data) {
  * @returns Updated tab list
  */
 function deleteTab(tabs, tab) {
+    console.log("Deleting tab:", tab);
     // Filter out the given tab
     tabs = tabs.filter(aTab => aTab !== tab);
 

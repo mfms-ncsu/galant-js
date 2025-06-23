@@ -1,6 +1,6 @@
 import TabInterface from "interfaces/TabInterface/TabInterface";
 import Tab from "./Tab";
-import NewButton from './NewButton';
+import ExamplesButton from './ExamplesButton';
 import UploadButton from './UploadButton';
 
 /**
@@ -20,15 +20,20 @@ function Header({ children }) {
 
 /**
  * Given a list of tabs, create a tablist component that lists each tab component (@see {@link Tab}).
- * Also adds buttons "new" (@see {@link NewButton}) and "import" (@see {@link UploadButton}) to the end of component.
+ * Also adds buttons "new" (@see {@link ExamplesButton,
+ * }) and "import" (@see {@link UploadButton}) to the end of component.
  * Contains function handlers for several functionalities such as when a tab is selected, renamed, or deleted.
  */
 export default function TabList({tabs, setTabs, acceptFileType, examples}) {
+
     function onAddTab(data) {
+        console.log("Adding new tab with data:", data);
+        console.log("Current tabs:", tabs);
         setTabs(TabInterface.addTab(tabs, data));
     }
 
     function onFileUpload(dataList) {
+        console.log("File upload dataList:", dataList);
         let newTabs;
         for (let data of dataList) {
             newTabs = TabInterface.addTab(tabs, data);
@@ -51,8 +56,8 @@ export default function TabList({tabs, setTabs, acceptFileType, examples}) {
     return (
         <>
             <Header>
-                <NewButton examples={examples} addNew={onAddTab} />
-                <UploadButton onUpload={onFileUpload} acceptFileType={acceptFileType}/>
+                <ExamplesButton examples={examples} addNew={onAddTab} />
+                <UploadButton onFileUpload={onAddTab} acceptFileType={acceptFileType}/>
             </Header>
 
             <div className="flex bg-neutral-400">

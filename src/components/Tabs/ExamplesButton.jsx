@@ -6,7 +6,7 @@ import PopupWindow from 'components/Tabs/PopupWindow';
 /**
  * Returns component for creating new tabs, including the button and popup.
  */
-export default function NewButton({examples, addNew}) {
+export default function ExamplesButton({examples, addNew}) {
   React.useEffect(() => {
         function onKeyPress(event) {
             if (event.code === "KeyE" && (event.metaKey || event.ctrlKey)) {

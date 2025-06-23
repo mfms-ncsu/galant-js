@@ -2,8 +2,7 @@ import Button from "./Button";
 
 export default function PrimaryButton({ shortcut, callback, onClick, className, children }) {
     return(
-        <
-            Button
+        <Button
             shortcut={shortcut}
             callback={callback}
             onClick={onClick}
