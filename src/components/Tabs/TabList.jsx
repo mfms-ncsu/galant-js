@@ -57,7 +57,7 @@ export default function TabList({tabs, setTabs, acceptFileType, examples}) {
         <>
             <Header>
                 <ExamplesButton examples={examples} addNew={onAddTab} />
-                <UploadButton onFileUpload={onAddTab} acceptFileType={acceptFileType}/>
+                <UploadButton onFileUpload={onFileUpload} acceptFileType={acceptFileType}/>
             </Header>
 
             <div className="flex bg-neutral-400">
