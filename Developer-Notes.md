@@ -31,5 +31,18 @@ Source files are organized into several subdirectors, based on their function.
 - `interfaces` define interfaces for the backend; these are
     - `GraphInterface`: all functionality related to getting and changing graph characteristics; undo/redo (step back/forward) functionality are handled here as well
     - `LayeredGraphInterface`: functionality specific to layered graphs, effectively a subclass of graphs
+    - `FileParser` handles converting the text representation of a graph (`gph` or `sgf` format) to its internal representation
     - `AlgorithmInterface` interacts with the thread running the algorithm; the most important functionality is receiving messages from the thread and calling on the `GraphInterface`; the messages are more generic than the specific setters: for example, `setEdgeAttribute` instead of `setWeight`
+    - `CytoscapeInterface` generates a Cytpscape respresentation of the graph for visual display
+    - `TabInterface` is the backend for editor tabs, managing the content of the tabs
+    - `PromptInterface` manages a queue of prompts for situations where a succession of prompts is generated (e.g., an error prompt followed by a confirmation)
+
+- `states` is where the equivalent of classes are defined
+    - _atoms sets up `atoms` for various objects; the developer documentation has a more detailed explanation
+    - `Algorithm/Algorithm.js` is a simple initialization of an algorithm and all of its necessary components
+    - `Algorithm/Thread.js` contains both the data initialization for the thread that runs an algorithm and all of the functions in the API, which are either called directly from the `GraphInterface` (getters) or result in messages (setters)
+    - `Graph` contains constructors/definitions of classes related to the graph; class relationships are similar to those in the Java version.
+        - `GraphElement` is the super class for nodes, edges, and messages
+        - `Graph` is the super class for `StandardGraph` and `LayeredGraph`
+    - `ChangeManager` is a list of `ChangeObject`s, each of which records an action, the previous state, and the new state resulting from the action; states are local in the sense that each applies to a single element only; in reality, the change manager is a list of lists, since a single step can trigger a set of changes via the `step(() =>{...})` incantation
 
