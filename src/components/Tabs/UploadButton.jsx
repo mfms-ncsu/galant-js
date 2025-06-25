@@ -7,22 +7,31 @@ import React from 'react';
  */
 export default function UploadButton({onFileUpload, acceptFileType}) {
     // Keyboard shortcut for uploading files
-    // Does not work in any browser for some reason, so we need to use the button instead
+    // Does not work in any browser
+    // The keyboard event is fundamentally different from the click event,
+    // which has access to a file picker dialog.
+    // This is because the file input element is not focusable by default,
+    // and the click event is not triggered by keyboard events.
     React.useEffect(() => {
         function onKeyPress(event) {
+            console.log("Upload key (Upload button) pressed: ", event);
             if (event.code === "KeyO" && (event.metaKey || event.ctrlKey)) {
-              event.preventDefault();
-              onUploadEvent(event)
+                event.preventDefault();
+                console.log("Upload key identified as Ctrl-O", event);
+                // Trigger the file input click event to open the file dialog
+                const fileInput = document.getElementById("file-upload");
+                processFiles(fileInput);
             }
         }
         document.addEventListener("keydown", onKeyPress);
         return () => document.removeEventListener("keydown", onKeyPress);
     }, []);
 
-    function onUploadEvent(event) {
-        const files = event.target.files;
+    // An attempt to level the playing field for keyboard versus mouse events.
+    // Still does not work in any browser.
+    function processFiles(files) {
+        console.log("Processing files: ", files);
         const tabs = [];
-        // This appears to be the way to read multiple files in a single input event
         for (let file of files) {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -42,6 +51,11 @@ export default function UploadButton({onFileUpload, acceptFileType}) {
             };
             reader.readAsText(file);
         }
+    }
+
+    function onUploadEvent(event) {
+        console.log("Upload event: ", event);
+        processFiles(event.target.files);
     }
 
     return (

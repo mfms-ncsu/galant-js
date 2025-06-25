@@ -40,19 +40,28 @@ function getTabByName(tabs, name) {
  * @param {Tab} tab Tab value
  */
 function downloadTab(tab, type) {
+    console.log("Downloading tab:", tab, ",type =", type);
     if (!tab) return;
     const isAlgorithm = type === "Algorithm";
     
     //Update the file extension if it is missing or incorrect
     let name = tab.name;
+    console.log("Tab name before extension check:", name);
     if (isAlgorithm && !tab.name.match(/\.js$/)) {
         name = name.replace(/\.[a-z]+$/).concat(".js")
     }
     if (!isAlgorithm && !tab.name.match(/\.(?:gph|sgf)$/)) {
+        console.log("Updating tab name to have .gph extension, name was:", name);
         name = name.replace(/\.[a-z]+$/).concat(".gph")
+        console.log("Updated tab name to:", name);
     }
     const ext = name.match(/\.[a-zA-Z0-9]+$/);
 
+    console.log("Downloading tab with name:", name, ", extension:", ext, ", content length:", tab.content.length);
+    console.log("window.showSaveFilePicker:", window.showSaveFilePicker);
+    // If the browser supports the File System Access API, use it to save the file.
+    // The showSaveFilePicker method does not work with Brave, Firefox, or Safari for security reasons,
+    // but it's still possible to download files, albeit without a convenient file picker
     if (window.showSaveFilePicker) {
         (async () => {
             try {
