@@ -13,7 +13,7 @@ The rest of the files relevant files are in `src`
 
 Source files are organized into several subdirectors, based on their function.
 
-### Front end
+### Frontend
 
 - `pages` defines the graph and editor pages/windows; user actions in these windows are delgated to other, relevant parts of the code; each page type has overlays that define buttons, menus, etc.; a special case is `Cytoscape.jsx`, which handles graph drawing via the Cytoscape plugin
 
