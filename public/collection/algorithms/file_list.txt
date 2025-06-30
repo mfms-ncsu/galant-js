@@ -1,4 +1,5 @@
-0-template.js
+blank.js
+guide.js
 bfs.js
 dfs.js
 dfs-scc.js
@@ -8,6 +9,7 @@ prim.js
 kruskal.js
 insertion_sort.js
 quicksort.js
+dfa.js
 dominance.js
 greedy_vertex_cover.js
 packing.js

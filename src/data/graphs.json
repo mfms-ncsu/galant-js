@@ -1,9 +1,14 @@
 [
-    {
-        "name": "0-template.gph",
-        "content": "c This is a template for a (non layered) graph.\nc Lines have four forms, beginning with 'c', 'g', 'n', or 'e'\nc   - 'c' followed by any text is a comment\nc   - 'g' (optional) is followed by # of nodes and # of edges\nc   - 'n ID X Y [W]' denotes a node with the given id at position (X,Y) and weight W\nc      see the User Manual (select Help to find the link) for info about other attributes\nc   - 'e S T [W]' denotes an edge with source S, target T and weight W; plus other attributes\nc   - other attributes have the form 'atttribute:value'; they include shape, color, ...",
-        "description": " This is a template for a (non layered) graph.\n Lines have four forms, beginning with 'c', 'g', 'n', or 'e'\n   - 'c' followed by any text is a comment\n   - 'g' (optional) is followed by # of nodes and # of edges\n   - 'n ID X Y [W]' denotes a node with the given id at position (X,Y) and weight W\n      see the User Manual (select Help to find the link) for info about other attributes\n   - 'e S T [W]' denotes an edge with source S, target T and weight W; plus other attributes\n   - other attributes have the form 'atttribute:value'; they include shape, color, ..."
-    },
+	{
+		"name": "blank.gph",
+		"content": "",
+		"description": ""
+	},
+	{
+		"name": "template.gph",
+		"content": "c This is a template for a (non layered) graph.\nc Lines have four forms, beginning with 'c', 'g', 'n', or 'e'\nc   - 'c' followed by any text is a comment\nc   - 'g' (optional) is followed by # of nodes and # of edges\nc   - 'n ID X Y [W]' denotes a node with the given id at position (X,Y) and weight W\nc      see the User Manual (select Help to find the link) for info about other attributes\nc   - 'e S T [W]' denotes an edge with source S, target T and weight W; plus other attributes\nc   - other attributes have the form 'atttribute:value'; they include shape, color, ...",
+		"description": " This is a template for a (non layered) graph.\n Lines have four forms, beginning with 'c', 'g', 'n', or 'e'\n   - 'c' followed by any text is a comment\n   - 'g' (optional) is followed by # of nodes and # of edges\n   - 'n ID X Y [W]' denotes a node with the given id at position (X,Y) and weight W\n      see the User Manual (select Help to find the link) for info about other attributes\n   - 'e S T [W]' denotes an edge with source S, target T and weight W; plus other attributes\n   - other attributes have the form 'atttribute:value'; they include shape, color, ..."
+	},
 	{
 		"name": "dt-11.gph",
 		"content": "c unweighted, based on a Delaunay triangulation\nc if directed, all nodes are reachable from anywhere, so strongly connected\nn 1 50 20\nn 2 30 20\nn 3 5 60\nn 4 35 5\nn 5 20 50\nn 6 10 30\nn 7 25 30\nn 8 50 60\nn 9 40 35\nn 10 5 40\nn 11 60 40\ne 1 9\ne 1 8\ne 1 4\ne 4 2\ne 2 6\ne 2 7\ne 2 9\ne 3 10\ne 3 8\ne 5 3\ne 4 9\ne 4 6\ne 5 7\ne 5 6\ne 10 5\ne 5 8\ne 6 10\ne 6 7\ne 7 8\ne 7 9\ne 8 9\ne 8 11\ne 11 1\n",
@@ -85,6 +90,21 @@
 		"description": " another sorting graph with 13 vertices"
 	},
 	{
+		"name": "h3p7.gph",
+		"content": "c DFA from Sipser text, Homework 3, problem 7\nc start at 0; if F = {3}, language = {odd # of a's, ends with b}\ng 4 8\nn 0 1 1\nn 1 2 1\nn 2 1 3\nn 3 2 2\ne 0 2 label:a\ne 0 1 label:b\ne 1 2 label:a\ne 1 1 label:b\ne 2 0 label:a\ne 2 3 label:b\ne 3 0 label:a\ne 3 3 label:b",
+		"description": " DFA from Sipser text, Homework 3, problem 7\n start at 0; if F = {3}, language = {odd # of a's, ends with b}"
+	},
+	{
+		"name": "dfa_hu_2_29_b.gph",
+		"content": "c This a DFA based on the Hopcroft and Ullman 1979 text, Figure 2.29(b)\ng 4 8\nn 0 1 1\nn 1 2 2\nn 2 2 3\nn 3 3 1\ne 0 0 label:a\ne 0 1 label:b\ne 1 2 label:a\ne 1 1 label:b\ne 2 0 label:a\ne 2 3 label:b\ne 3 0 label:a\ne 3 1 label:b",
+		"description": " This a DFA based on the Hopcroft and Ullman 1979 text, Figure 2.29(b)"
+	},
+	{
+		"name": "ss_ba_ne_ab.gph",
+		"content": "c DFA for strings that contain ba as a substring and do not end in ab\nc start state is 0, F = {4,6}\ng 7 14\n\nn 0 1 1 \nn 1 2 1 \nn 2 3 1 \nn 3 2 2 \nn 4 3 2 \nn 5 2 3 \nn 6 3 3 \ne 0 1 label:a\ne 0 3 label:b\ne 1 1 label:a\ne 1 2 label:b\ne 2 4 label:a\ne 2 3 label:b\ne 3 4 label:a\ne 3 3 label:b\ne 4 4 label:a\ne 4 5 label:b\ne 5 4 label:a\ne 5 6 label:b\ne 6 4 label:a\ne 6 6 label:b\n",
+		"description": " DFA for strings that contain ba as a substring and do not end in ab\n start state is 0, F = {4,6}"
+	},
+	{
 		"name": "0-template.sgf",
 		"content": "c This is a template for a layered graph.\nc The only difference from that of an ordinary graph is a required title line starting with 't';\nc  it has the form 't NAME [#_nodes #_edges #_layers]'\nt graph_name\n",
 		"description": " This is a template for a layered graph.\n The only difference from that of an ordinary graph is a required title line starting with 't';\n  it has the form 't NAME [#_nodes #_edges #_layers]'"
@@ -113,10 +133,5 @@
 		"name": "rome1178.29.sgf",
 		"content": "c Another layered version of a Rome graph, has 5 layers\nt rome1178.29_GKNV 33 34 5\n\nn 0 0 6 \nn 1 1 1 \nn 2 1 2 \nn 3 1 3 \nn 4 1 4 \nn 5 1 5 \nn 6 1 6 \nn 7 1 7 \nn 8 1 8 \nn 9 1 9 \nn 10 1 11 \nn 11 1 12 \nn 12 2 0 \nn 13 2 1 \nn 14 2 2 \nn 15 2 3 \nn 16 2 4 \nn 17 2 5 \nn 18 2 6 \nn 19 2 7 \nn 20 2 8 \nn 21 2 9 \nn 22 2 10 \nn 23 2 11 \nn 24 2 12 \nn 25 3 3 \nn 26 3 4 \nn 27 3 5 \nn 28 3 7 \nn 29 3 10 \nn 30 3 12 \nn 31 4 4 \nn 32 4 8 \ne 0 3 \ne 0 11 \ne 1 12 \ne 1 13 \ne 2 14 \ne 2 13 \ne 2 15 \ne 3 15 \ne 3 18 \ne 4 16 \ne 4 18 \ne 5 18 \ne 6 18 \ne 7 18 \ne 7 19 \ne 8 18 \ne 8 21 \ne 9 21 \ne 10 22 \ne 10 21 \ne 10 23 \ne 11 24 \ne 16 25 \ne 17 27 \ne 17 26 \ne 17 28 \ne 20 29 \ne 20 28 \ne 22 29 \ne 23 29 \ne 24 30 \ne 26 31 \ne 27 32 \ne 30 32 \n",
 		"description": " Another layered version of a Rome graph, has 5 layers"
-	},
-	{
-		"name": "two_unequal_layers.sgf",
-		"content": "c A simple two-layer graph whose layers differ in size\nc - for testing the difference between index and position\nt two_unequal_layers\nn 0 0 0\nn 1 0 1\nn 2 0 2\nn 3 1 1\nn 4 1 2\ne 0 3\ne 1 3\ne 2 4",
-		"description": " A simple two-layer graph whose layers differ in size\n - for testing the difference between index and position"
 	}
 ]

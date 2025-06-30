@@ -17,7 +17,12 @@ function init_transitions() {
             for ( let symbol of symbols ) {
                 // Remove whitespace from the symbol
                 symbol = symbol.trim();
-                transition_table[state][symbol] = transition;
+                if ( transition_table[state][symbol] === undefined ) {
+                    transition_table[state][symbol] = transition;
+                } else {
+                    display(`Warning: Multiple values of delta(${state},${symbol}}, using delta(${state},${symbol}}) = target(${transition})`);
+                    transition_table[state][symbol] = transition;
+                }
             }
         }
     }
@@ -51,12 +56,13 @@ while (remaining_string.length > 0) {
         console.log(`Transitioning from ${current_state} to ${target(transition)} on symbol '${current_symbol}'`);
     } else {
         console.log(`No transition found for state ${current_state} on symbol '${current_symbol}'`);
+        display(`No transition found for state ${current_state} on symbol '${current_symbol}', assume reject`);
         break;
     }
     step(() => {
         highlight(current_state);
         highlight(transition);
         color(transition, "green");
-        display(`Read so far: ${read_so_far}, Remaining string: ${remaining_string}`);
+        display(`${read_so_far}-${remaining_string}`);
     });
 }
