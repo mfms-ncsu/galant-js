@@ -15,12 +15,16 @@ export default function UploadButton({onFileUpload, acceptFileType}) {
     React.useEffect(() => {
         function onKeyPress(event) {
             console.log("Upload key (Upload button) pressed: ", event);
-            if (event.code === "KeyO" && (event.metaKey || event.ctrlKey)) {
+            event.preventDefault();
+            // Using Ctrl-U because Ctrl-O is not even recognized as a key event on MacOS.
+            if (event.code === "KeyU" && (event.metaKey || event.ctrlKey)) {
                 event.preventDefault();
-                console.log("Upload key identified as Ctrl-O", event);
-                // Trigger the file input click event to open the file dialog
+                console.log("Upload key identified as Ctrl-U", event);
                 const fileInput = document.getElementById("file-upload");
-                processFiles(fileInput);
+                console.log("File input element: ", fileInput);
+                // Simulate a click on the file input element to open the file picker dialog
+                // Oddly, this throws an exception - passes undefined to the function - but still works.
+                onUploadEvent(fileInput.click());
             }
         }
         document.addEventListener("keydown", onKeyPress);
@@ -62,7 +66,7 @@ export default function UploadButton({onFileUpload, acceptFileType}) {
         <PrimaryButton className="m-1">
             <label htmlFor="file-upload" className="cursor-pointer flex items-center"> 
                 <ArrowUpTrayIcon className="inline h-4 me-2 fill-black stroke stroke-black"/>
-                Upload File
+                Upload File (Ctrl-U)
             </label>
             <input id="file-upload" type="file" accept={acceptFileType} multiple className="hidden" onChange={onUploadEvent}></input>
         </PrimaryButton>
