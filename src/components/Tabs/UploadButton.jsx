@@ -15,7 +15,7 @@ export default function UploadButton({onFileUpload, acceptFileType}) {
     React.useEffect(() => {
         function onKeyPress(event) {
             console.log("Upload key (Upload button) pressed: ", event);
-            event.preventDefault();
+            // event.preventDefault(); this disables all keys
             // Using Ctrl-U because Ctrl-O is not even recognized as a key event on MacOS.
             if (event.code === "KeyU" && (event.metaKey || event.ctrlKey)) {
                 event.preventDefault();

@@ -730,6 +730,7 @@ function nodesOnLayer(graph, layerIndex) {
  * @author Michael Richardson (maricha6)
  */
 function evenlySpacedLayout(graph, changeManager) {
+    console.log("Running evenly-spaced layout on graph:", graph);
     if (graph.type != "layered") {
         throw new Error(
             `Cannot run evenly-spaced layout because this is not a layered graph`

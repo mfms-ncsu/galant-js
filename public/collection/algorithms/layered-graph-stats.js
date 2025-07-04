@@ -1,5 +1,10 @@
 /**
- * A layered graph algorithm with one step. It simply reports all measures.
+ * A layered graph algorithm with one step. It simply reports all measures:
+ *  - total number of edge crossings
+ *  - bottleneck crossings = maximum number of crossings for any edge
+ *  - nonverticality = total amount by which edges deviate from vertical
+ *  - bottleneck verticality = maximum amount of deviation for any edge
+ *  - deviation of edge vw = (x-coord(v) - x-coord(w))^2
  */
 let total = totalCrossings()
 let bottleneck = bottleneckCrossings()

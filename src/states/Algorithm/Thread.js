@@ -952,7 +952,8 @@ function nodesOnLayer(layer) {
 } 
 
 function evenlySpacedLayout() {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    console.log("Evenly spaced layout called from Thread, stepDepth: ", stepDepth);
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, changeManager);
     postMessage({ action: "evenlySpacedLayout",  });
     waitIfNeeded();

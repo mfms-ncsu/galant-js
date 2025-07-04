@@ -42,7 +42,7 @@ function displayAfterWeightAssignment( layer, sweepDirection ) {
         setChannelProperty(layer, "color", "blue");
         setLayerProperty(layer + 1, "weightHidden", false)
     }
-    displayMessage( layer, sweepDirection );
+    displayMessage( layer, sweepDirection )
 }
 
 /**
@@ -80,8 +80,6 @@ function reset( layer, sweepDirection ) {
         setChannelProperty(layer, "color", "black");
         setChannelProperty(layer + 1, "highlight", "false")
     }
-    // this does not currently work
-    evenlySpacedLayout();
 }
 
 /**
@@ -114,15 +112,18 @@ function upSweep( numLayers ) {
             showIndexes(layer + 1)
             setWeightsDown(layer, "index");
             displayAfterWeightAssignment(layer, sweepDirection);
+            evenlySpacedLayout()
         })
         step(() => {
             sortByWeight(layer);
             iteration++;
             checkCrossings();
             displayAfterSort(layer, sweepDirection);
+            evenlySpacedLayout()
         })
         step(() => {
             reset(layer, sweepDirection);
+            evenlySpacedLayout()
         })
     }
 }
@@ -135,15 +136,18 @@ function downSweep( numLayers ) {
             showIndexes(layer - 1);
             setWeightsUp(layer, "index");
             displayAfterWeightAssignment(layer, sweepDirection);
+            evenlySpacedLayout()
         })
         step(() => {
             sortByWeight(layer);
             iteration++;
             checkCrossings();
             displayAfterSort(layer, sweepDirection);
+            evenlySpacedLayout()
         })
         step(() => {
             reset(layer, sweepDirection);
+            evenlySpacedLayout()
         })
     }
 }
@@ -167,10 +171,12 @@ while(true) {
 step(() => {
     applyNodePositions(savedPositions);
     display( `min pass = ${minPass}, min iteration = ${minIteration}, min crossings = ${minCrossings} `);
+    evenlySpacedLayout()
 })
 
 //display minimum bottlneck graph
 step(() => {
     applyNodePositions(savedBottleneckPositions);
     display( `min pass = ${minBottleneckPass}, min iteration = ${minBottleneckIteration}, min bottlneck = ${minEdgeCrossings} `);
+    evenlySpacedLayout()
 })
