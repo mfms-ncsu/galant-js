@@ -67,7 +67,7 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 
 ### (!) Exporting a graph
 
-1. Upload and load a graph (dt-11); do the same for a simple algorithm (bfs from Examples)
+1. Upload and load a graph (dt-11); upload and load a simple algorithm (bfs from Examples)
 2. Run the algorithm for a few steps
 3. Export the graph to a file
 4. Upload and load the exported graph and check that the export was correct
@@ -82,7 +82,7 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 1. Run bfs on g-12; start at any node if undirected; at node 1 if directed; bfs does not have restart capability when some nodes are unreachable; also, the messages are a little out of sync with the algorithm actions.
 2. Run dfs on g-12; start anywhere if undirected; start at nodes 7, 4, and 1; also try an illegal starting point before choosing 4 (e.g. 11); dfs could be more informative about the edges it is exploring; and it could let you know when it's done (same for other search algorithms)
 3. Run dfs-scc on g-12, starting at node 3, then 1.
-4. During all of these runs, move nodes to see if the positions are preserved.
+4. During at least one of these runs, move nodes to see if the positions are preserved.
 
 ### Shortest paths
 

@@ -19,28 +19,13 @@ function PQsize() {
 }
 
 /**
- * This does not work - node_map is undefined, probably have to import something
- * @param edge edge whose Euclidian distance is to be calculated 
- * @returns distance between endpoints of the edge
- */
-function euclidian(edge) {
-    let x_1 = node_map[source(edge)]['x']
-    let y_1 = node_map[source(edge)]['y']
-    let x_2 = node_map[target(edge)]['x']
-    let y_2 = node_map[target(edge)]['y']
-    let diff_x = x_1 - x_2
-    let diff_y = y_1 - y_2
-    return Math.sqrt(diff_x * diff_x + diff_y * diff_y)
-}
-
-/**
  * uses a linear search of the queue
  * @returns node with minimum weight
  */
 function removeMin() {
     let min_weight = Infinity
     let min_node = null
-    for ( var node in nodePQ ) {
+    for ( let node of nodePQ ) {
         let weight = nodePQ[node]
         if ( weight < min_weight ) {
             min_weight = weight
@@ -62,7 +47,7 @@ step(() => {
 
     for (let edge of getEdges()) {
         if ( ! hasWeight(edge) ) {
-            display("*** edge ${edge} has no weight, setting to 1, Euclidian distance does not work ***")
+            display("*** edge ${edge} has no weight, setting to 1 ***")
             setWeight(edge, 1)
         }
     }

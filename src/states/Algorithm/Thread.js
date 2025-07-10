@@ -308,6 +308,24 @@ function addNode(x, y) {
     return newNode;
 }
 
+/**
+ * Functions related to positions of nodes; shold probably moved to a separate section
+ */
+
+function getPosition(nodeId) {
+    return GraphInterface.getNodePosition(graph, nodeId);
+}
+
+function getX(nodeId) {
+    let pos = GraphInterface.getNodePosition(graph, nodeId);
+    return pos ? pos.x : undefined;
+}
+
+function getY(nodeId) {
+    let pos = GraphInterface.getNodePosition(graph, nodeId);
+    return pos ? pos.y : undefined;
+}
+
 function setPosition(nodeId, x, y) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = GraphInterface.setNodePosition(graph, changeManager, nodeId, x, y);
