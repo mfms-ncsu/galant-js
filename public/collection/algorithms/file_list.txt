@@ -4,7 +4,7 @@ bfs.js
 dfs.js
 dfs-scc.js
 dijkstra.js
-shortest_path.js
+shortest-path.js
 prim.js
 kruskal.js
 insertion_sort.js
@@ -13,4 +13,5 @@ dfa.js
 dominance.js
 greedy_vertex_cover.js
 packing.js
+layered-graph-stats.js
 barycenter.js
