@@ -9,8 +9,8 @@
 // Assume the graph has node "1" and edge "1,2" - weighted_7 is an example.
 // Any string can be used as a node Id; an edge id is a string of the form "node1,node2".
 // If the graph is undirected, the edge "1,2" is the same as "2,1".
-let node = "1";
-let edge = "1,2";
+const node = "1";
+const edge = "1,2";
 
 // Some common API calls for algorithm animation programs:
 color(node, "yellow");  // Change the color of a node to yellow
@@ -19,11 +19,11 @@ label(node, "A");    // Set the label of a node to "A"
 highlight(edge);        // Highlight an edge, i.e., make it thicker
 
 // Do something for each outgoing edge from a given node
-for ( let edge of outgoing(node) ) {
+for ( const edge of outgoing(node) ) {
     // Do something with the edge, for example:
     highlight(edge);  // Highlight the edge
     // Do something with the other end of the edge
-    let otherNode = other(node, edge);
+    const otherNode = other(node, edge);
     color(otherNode, "blue");       // Change the color of the other end node to blue
 }
 

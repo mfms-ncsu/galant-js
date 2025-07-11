@@ -26,26 +26,26 @@ step(() => { // Initialize with start node
     clearEdgeHighlights();
     clearEdgeColors();
 
-    let start = promptNode("Enter start node:");
+    const start = promptNode("Enter start node:");
     queueNode(start, 0);
     print(`Starting at node '${start}'`);
 });
 
 while (queue.length > 0) {
-    let current = queue.shift();
+    const current = queue.shift();
     step(() => { // Visit node
         display("Queue: " + queue);
         print(`Visiting node '${current}'`);
         mark(current);
     });
     
-    for (let edge of outgoing(current)) {
-        let next = other(current, edge);
+    for ( const edge of outgoing(current) ) {
+        const next = other(current, edge);
 
         step(() => { // Check outgoing edges
             print(`Checking edge '${edge}'`);
             if ( ! hasColor(edge) ) { // never seen this edge, only relevant for undirected
-                if (highlighted(next)) { // already visited node
+                if ( highlighted(next) ) { // already visited node
                     color(edge, "red");
                 }
                 else { // have not visited node

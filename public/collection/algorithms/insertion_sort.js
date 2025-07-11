@@ -9,7 +9,7 @@ let nodeIds = getNodes();
 // line up the nodes
 let i = 0; let j = 0
 step(() => {
-    for (const nodeId of nodeIds) {
+    for ( const nodeId of nodeIds) {
         setPosition(nodeId, i, j);
         i += HORIZONTAL_GAP;
     }
@@ -61,7 +61,7 @@ while ( nodeIds.length > 0 ) {
 }
 display("Done: nodes are sorted by weight")
 
-// for (const nodeId of nodeIds) {
+// for ( const nodeId of nodeIds) {
     // move it up by VERTICAL_GAP
     // insert it into sorted list (see below)
 // }

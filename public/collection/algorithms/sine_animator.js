@@ -17,18 +17,18 @@ const nodeIds = getNodes();
 let i = 0;
 step(() =>
     {
-        for (const nodeId of nodeIds) {
+        for ( const nodeId of nodeIds ) {
             const newPosition = {x: i, y: getYCoordinate(i)};
             setPosition(nodeId, newPosition);
-            i+=xDistanceBetween;
+            i += xDistanceBetween;
         }
     }
 )
 
-for (let inc = 1; true; inc+= 50) {
+for ( let inc = 1; true; inc+= 50) {
     step(() => {
         let i = 0;
-        for (const nodeId of nodeIds) {
+        for ( const nodeId of nodeIds ) {
             const newPosition = {x: i, y: getYCoordinate(i+inc)};
             setPosition(nodeId, newPosition);
             i+=xDistanceBetween;

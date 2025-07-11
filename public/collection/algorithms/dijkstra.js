@@ -25,8 +25,8 @@ function PQsize() {
 function removeMin() {
     let min_weight = Infinity
     let min_node = null
-    for ( let node of nodePQ ) {
-        let weight = nodePQ[node]
+    for ( const node of nodePQ ) {
+        const weight = nodePQ[node]
         if ( weight < min_weight ) {
             min_weight = weight
             min_node = node
@@ -34,6 +34,23 @@ function removeMin() {
     }
     delete nodePQ[min_node]
     return min_node
+}
+
+/**
+ * @return the average weight of the edges, ignoring edges with no weight,
+ * and those with non-positive weight.
+ * if there are no edges with positive weight, returns 1
+ */
+function averageWeight() {
+    let totalWeight = 0;
+    let count = 0;
+    for ( const edge of getEdges() ) {
+        if ( hasWeight(edge) && weight(edge) > 0 ) {
+            totalWeight += weight(edge);
+            count++;
+        }
+    }
+    return count > 0 ? totalWeight / count : 1;
 }
 
 step(() => {
@@ -45,14 +62,15 @@ step(() => {
     clearEdgeColors();
     clearEdgeHighlights();
 
-    for (let edge of getEdges()) {
+    for ( const edge of getEdges() ) {
         if ( ! hasWeight(edge) ) {
-            display("*** edge ${edge} has no weight, setting to 1 ***")
-            setWeight(edge, 1)
+            const weight = averageWeight()
+            display(`*** edge ${edge} has no weight, setting to average weight ${weight} ***`)
+            setWeight(edge, weight)
         }
     }
 
-    for ( let node of getNodes() ) {
+    for ( const node of getNodes() ) {
         nodePQ[node] = Infinity
         setWeight(node, Infinity)
     }
@@ -64,7 +82,7 @@ showWeight(start_node)
 nodePQ[start_node] = 0
 
 while ( PQsize() > 0 ) {
-    let current_node = removeMin()
+    const current_node = removeMin()
     inTree[current_node] = true
     if ( ! current_node ) {
         display("*** there are unreachable nodes ***")
@@ -82,12 +100,12 @@ while ( PQsize() > 0 ) {
         }
     })
 
-    let current_dist = weight(current_node)
-    for (let edge of outgoing(current_node)) {
-        let next_node = other(current_node, edge)
+    const current_dist = weight(current_node)
+    for ( const edge of outgoing(current_node) ) {
+        const next_node = other(current_node, edge)
         if ( inTree[next_node ] ) continue
         showWeight(next_node)
-        let next_dist = current_dist + weight(edge)
+        const next_dist = current_dist + weight(edge)
         print(next_node + " " + next_dist)
         color(edge, "violet")
         if ( next_dist < weight(next_node) ) {

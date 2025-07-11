@@ -24,7 +24,7 @@ function removeMin() {
     let min_weight = Infinity
     let min_node = null
     for ( var node in nodePQ ) {
-        let weight = nodePQ[node]
+        const weight = nodePQ[node]
         if ( weight < min_weight ) {
             min_weight = weight
             min_node = node
@@ -36,7 +36,7 @@ function removeMin() {
 
 function queueAllNodes() {
     step(() => {
-        for ( let node of getNodes() ) {
+        for ( const node of getNodes() ) {
             setWeight(node, degree(node))
             nodePQ[node] = degree(node)
         }
@@ -50,8 +50,8 @@ function queueAllNodes() {
 function addToCover(next_node, neighbor) {
     step(() => {
         display(`node ${neighbor} dominates ${next_node}`)
-        for ( let edge_to_remove of incident(neighbor) ) {
-            let to_decrease = other(neighbor, edge_to_remove)
+        for ( const edge_to_remove of incident(neighbor) ) {
+            const to_decrease = other(neighbor, edge_to_remove)
             setWeight(to_decrease, weight(to_decrease) - 1)
             if ( weight(to_decrease) > 0 ) {
                 nodePQ[to_decrease] = weight(to_decrease)
@@ -87,7 +87,7 @@ let cover_size = 0
  * traversing neighbors is more efficient for a low degree node than a high degree one 
  */
 while ( ! PQisEmpty() ) {
-    let next_node = removeMin()
+    const next_node = removeMin()
     if ( ! next_node ) break   // apparently need this, not clear why
     // skip nodes that are already in the cover
     if ( isHidden(next_node) ) continue
@@ -97,7 +97,7 @@ while ( ! PQisEmpty() ) {
         color(next_node, "yellow")
         setShape(next_node, "star")
     })
-    for ( let neighbor of visibleNeighbors(next_node) ) {
+    for ( const neighbor of visibleNeighbors(next_node) ) {
         display(`Does ${neighbor} dominate ${next_node}?`)
         let next_incident = new Set(incident(next_node))
         let neighbor_incident = new Set(incident(neighbor))              
@@ -110,10 +110,10 @@ while ( ! PQisEmpty() ) {
         step(() => {
             // show edges incident on neighbor and their endpoints
             // distinguish between ones adjacent to both and those not
-            for ( let both_adjacent_node of neighbor_adjacent.intersection(next_adjacent) ) {
+            for ( const both_adjacent_node of neighbor_adjacent.intersection(next_adjacent) ) {
                 if ( next_node == both_adjacent_node ) continue
                 // nodes adjacent to both
-                let edge_between = getEdgeBetween(next_node, both_adjacent_node)
+                const edge_between = getEdgeBetween(next_node, both_adjacent_node)
                 color(both_adjacent_node, "cyan")
                 highlight(both_adjacent_node)
                 setShape(both_adjacent_node, "star")
@@ -124,15 +124,15 @@ while ( ! PQisEmpty() ) {
                     color(edge_between, "black")
                 }
             }
-            for ( let neighbor_only_adjacent_node of neighbor_adjacent.difference(next_adjacent) ) {
-                let edge_between = getEdgeBetween(neighbor, neighbor_only_adjacent_node)
+            for ( const neighbor_only_adjacent_node of neighbor_adjacent.difference(next_adjacent) ) {
+                const edge_between = getEdgeBetween(neighbor, neighbor_only_adjacent_node)
                 color(neighbor_only_adjacent_node, "yellow")
                 setShape(neighbor_only_adjacent_node, "star")
                 color(edge_between, "green")
                 highlight(edge_between)
             }
-            for ( let next_only_adjacent_node of next_adjacent.difference(neighbor_adjacent) ) {
-                let edge_between = getEdgeBetween(next_node, next_only_adjacent_node)
+            for ( const next_only_adjacent_node of next_adjacent.difference(neighbor_adjacent) ) {
+                const edge_between = getEdgeBetween(next_node, next_only_adjacent_node)
                 color(next_only_adjacent_node, "red")
                 setShape(next_only_adjacent_node, "triangle")
                 color(edge_between, "red")
@@ -147,11 +147,11 @@ while ( ! PQisEmpty() ) {
         }
         // clear all animations from this dominance check and blacken nodes removed from queue
         step(() => {
-            for ( let incident_edge of all_incident ) {
+            for ( const incident_edge of all_incident ) {
                 unhighlight(incident_edge)
                 uncolor(incident_edge)
             }
-            for ( let adjacent_node of all_adjacent ) {
+            for ( const adjacent_node of all_adjacent ) {
                 unhighlight(adjacent_node)
                 uncolor(adjacent_node)
                 clearShape(adjacent_node)
@@ -160,7 +160,7 @@ while ( ! PQisEmpty() ) {
     } // for each neighbor
     // color all nodes not in the priority queue black
     step(() => {
-            for ( let node of getNodes() ) {
+            for ( const node of getNodes() ) {
             if ( ! nodePQ[node] ) {
                 color(node, "black")
             }
@@ -168,7 +168,7 @@ while ( ! PQisEmpty() ) {
     })
 } // while nodePQ not empty
 step(() => {
-    for ( let node of getNodes() ) {
+    for ( const node of getNodes() ) {
         showNode(node)
         hideWeight(node)
         uncolor(node)
@@ -177,7 +177,7 @@ step(() => {
             setShape(node, "square")
         }
     }
-    for ( let edge of getEdges() ) {
+    for ( const edge of getEdges() ) {
         if ( ! (cover.has(source(edge)) || cover.has(target(edge))) ) {
             highlight(edge)
             color(edge, "red")

@@ -9,11 +9,11 @@
 let transition_table = {}
 
 function init_transitions() {
-    for ( let state of getNodes() ) {
+    for ( const state of getNodes() ) {
         transition_table[state] = {}
-        for ( let transition of outgoing(state) ) {
-            let label = getLabel(transition);
-            let symbols = label.split(",");
+        for ( const transition of outgoing(state) ) {
+            const label = getLabel(transition);
+            const symbols = label.split(",");
             for ( let symbol of symbols ) {
                 // Remove whitespace from the symbol
                 symbol = symbol.trim();
@@ -30,8 +30,8 @@ function init_transitions() {
 
 setDirected(true)
 init_transitions();
-let start_state = promptNode("Enter the start state:");
-let input_string = prompt("Enter the input string:");
+const start_state = promptNode("Enter the start state:");
+const input_string = prompt("Enter the input string:");
 
 let remaining_string = input_string;
 let read_so_far = "";
@@ -46,7 +46,7 @@ while (remaining_string.length > 0) {
             uncolor(transition)
         }
     })
-    let current_symbol = remaining_string[0];
+    const current_symbol = remaining_string[0];
     remaining_string = remaining_string.slice(1);
     read_so_far += current_symbol;
 

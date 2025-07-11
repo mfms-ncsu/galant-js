@@ -1,6 +1,8 @@
 /**
  * Like Dijkstra's algorithm: takes both a start node and a destination; uses an a-star search
- *  that incorporates the Euclidian distance between each node and the destination
+ *  that incorporates the Euclidian distance between each node and the destination.
+ * Usually visits far fewer nodes than Dijkstra's algorithm, because it focuses
+ * on the nodes that are closer to the destination.
  */
 
 
@@ -23,9 +25,8 @@ function PQsize() {
 function removeMin() {
     let min_weight = Infinity
     let min_node = null
-    // let node of nodePQ does not work because "nodePQ is not iterable"
     for ( const node in nodePQ ) {
-        let weight = nodePQ[node]
+        const weight = nodePQ[node]
         if ( weight < min_weight ) {
             min_weight = weight
             min_node = node
@@ -60,14 +61,14 @@ step(() => {
         showEdgeWeight(edge)
     }
 
-    for ( let node of getNodes() ) {
+    for ( const node of getNodes() ) {
         nodePQ[node] = Infinity
         setWeight(node, Infinity)
     }
 })
 
-let start = promptNode("Enter starting node:", "invalid node ${start}");
-let destination = promptNode("Enter destination node:", "invalid node ${destination}");
+const start = promptNode("Enter starting node:", "invalid node ${start}");
+const destination = promptNode("Enter destination node:", "invalid node ${destination}");
 for ( const node of getNodes() ) {
     destDist[node] = distance(node, destination)
 }
@@ -80,7 +81,7 @@ nodePQ[start] = destDist[start]
 
 let destination_reached = false
 while ( PQsize() > 0 ) {
-    let current_node = removeMin()
+    const current_node = removeMin()
     inTree[current_node] = true
     if ( ! current_node ) {
         display("*** there are unreachable nodes ***")
@@ -104,10 +105,10 @@ while ( PQsize() > 0 ) {
     }
 
     for ( const edge of outgoing(current_node) ) {
-        let next_node = other(current_node, edge)
+        const next_node = other(current_node, edge)
         if ( inTree[next_node ] ) continue
         showWeight(next_node)
-        let new_weight = weight(current_node) + weight(edge) + destDist[next_node] - destDist[current_node]
+        const new_weight = weight(current_node) + weight(edge) + destDist[next_node] - destDist[current_node]
         color(edge, "violet")
         if ( new_weight < weight(next_node) ) {
             step(() => {

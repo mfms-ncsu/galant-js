@@ -12,7 +12,7 @@ let packing = new Set()       // set of nodes in the vertex cover
 
 function degree(node) {
     let deg = 0
-    for ( let edge of outgoing(node) ) {
+    for ( const edge of outgoing(node) ) {
         deg += 1
     }
     return deg
@@ -22,7 +22,7 @@ function degree(node) {
  * @todo implement this in Galant
  */
 function showAllNodes() {
-    for ( let node of getNodes() ) {
+    for ( const node of getNodes() ) {
         showNode(node)
     }
 }
@@ -41,8 +41,8 @@ function PQsize() {
 function removeMin() {
     let min_weight = Infinity
     let min_node = null
-    for ( var node in nodePQ ) {
-        let weight = nodePQ[node]
+    for ( const node in nodePQ ) {
+        const weight = nodePQ[node]
         if ( weight < min_weight ) {
             min_weight = weight
             min_node = node
@@ -54,7 +54,7 @@ function removeMin() {
 
 function queueAllNodes() {
     step(() => {
-        for ( let node of getNodes() ) {
+        for ( const node of getNodes() ) {
             setWeight(node, degree(node))
             nodePQ[node] = degree(node)
         }
@@ -75,7 +75,7 @@ queueAllNodes()
 let packing_size = 0
 
 while ( PQsize() > 0 ) {
-    let next_node = removeMin()
+    const next_node = removeMin()
     step(() => {
         highlight(next_node)
         hideNodeWeight(next_node)
@@ -84,15 +84,15 @@ while ( PQsize() > 0 ) {
         setShape(next_node, "star")
     })
     step(() => {
-        for ( let edge of outgoing(next_node) ) {
+        for ( const edge of outgoing(next_node) ) {
             color(edge, "green")
             setEdgeWidth(edge, 5)
-            let neighbor = other(next_node, edge)
+            const neighbor = other(next_node, edge)
             hideNodeWeight(neighbor)
             color(neighbor, "green")
             delete nodePQ[neighbor]
-            for ( let cousin_edge of outgoing(neighbor) ) {
-                let cousin = other(neighbor, cousin_edge)
+            for ( const cousin_edge of outgoing(neighbor) ) {
+                const cousin = other(neighbor, cousin_edge)
                 if ( cousin !== next_node ) {
                     color(cousin_edge, "yellow")
                 }
