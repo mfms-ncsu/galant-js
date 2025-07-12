@@ -25,7 +25,7 @@ function PQsize() {
 function removeMin() {
     let min_weight = Infinity
     let min_node = null
-    for ( const node of nodePQ ) {
+    for ( const node in nodePQ ) {
         const weight = nodePQ[node]
         if ( weight < min_weight ) {
             min_weight = weight
