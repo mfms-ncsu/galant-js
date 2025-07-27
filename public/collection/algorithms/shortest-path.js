@@ -5,6 +5,9 @@
  * on the nodes that are closer to the destination.
  */
 
+ const START_COLOR = "cyan"
+ const END_COLOR = "magenta"
+ const DEFAULT_COLOR = "yellow"
 
 let predecessorEdge = {}    // edge currently leading to shortest path
 let nodePQ = {}             // priority queue of nodes, key is node, value is weight
@@ -69,6 +72,10 @@ step(() => {
 
 const start = promptNode("Enter starting node:", "invalid node ${start}");
 const destination = promptNode("Enter destination node:", "invalid node ${destination}");
+step(() => {
+    color(start, START_COLOR)
+    color(destination, END_COLOR)
+})
 for ( const node of getNodes() ) {
     destDist[node] = distance(node, destination)
 }
@@ -88,7 +95,13 @@ while ( PQsize() > 0 ) {
         break
     }
     step(() => {
-        color(current_node, "yellow");
+        if ( current_node == start ) {
+            color(current_node, START_COLOR)
+        } else if ( current_node == destination ) {
+            color(current_node, END_COLOR)
+        } else {
+            color(current_node, DEFAULT_COLOR);
+        }
         setShape(current_node, "star")
         if ( predecessorEdge[current_node] ) {
             color(predecessorEdge[current_node], "blue")
@@ -132,5 +145,5 @@ while ( PQsize() > 0 ) {
     }
 }
 if ( ! destination_reached ) {
-    display("All reachable nodes have been visited, but destination has not been found")
+        display("All reachable nodes have been visited, but destination has not been found")
 }
