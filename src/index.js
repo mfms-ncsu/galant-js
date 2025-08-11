@@ -5,7 +5,6 @@ import { getDefaultStore, Provider } from "jotai";
 import { algorithmTabsAtom, graphTabsAtom } from "states/_atoms/atoms";
 import Graph from "pages/Graph/Graph";
 import Editor from "pages/Editor/Editor";
-import Instructions from "pages/Instructions/Instructions";
 import "./index.css";
 
 /**
@@ -47,10 +46,6 @@ const router = createBrowserRouter([
     {
         path: '/grapheditor',
         element: <Editor editorType="Graph" tabsAtom={graphTabsAtom} />
-    },
-    {
-        path: '/instructions',
-        element: <Instructions />
     }
     ]);
 

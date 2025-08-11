@@ -13,13 +13,12 @@ let minBottleneckPass = 0;
 const numLayers = numberOfLayers();
 let savedPositions = copyNodePositions();
 let savedBottleneckPositions = copyNodePositions();
-// saveGraphState();
 
 /**
  * writes a message about current number of crossings, along with context information
  */
 function displayMessage( layer, sweepDirection ) {
-    let crossings = totalCrossings();
+    const crossings = totalCrossings();
     display( `pass = ${pass}, iteration = ${iteration}, layer = ${layer}, direction = ${sweepDirection}, crossings = ${crossings}, min = ${minCrossings}, bottleneck = ${edgeCrossings}, min = ${minEdgeCrossings}`);
 };
 
@@ -34,15 +33,15 @@ function displayMessage( layer, sweepDirection ) {
 function displayAfterWeightAssignment( layer, sweepDirection ) {
     setLayerProperty(layer, "color", "cyan");
     setLayerProperty(layer, "weightHidden", false);
-    if (sweepDirection == "up") {
+    if (sweepDirection == "up" ) {
         setChannelProperty(layer - 1, "color", "blue");
         setLayerProperty(layer - 1, "weightHidden", false)
     }
-    else if (sweepDirection == "down") {
+    else if (sweepDirection == "down" ) {
         setChannelProperty(layer, "color", "blue");
         setLayerProperty(layer + 1, "weightHidden", false)
     }
-    displayMessage( layer, sweepDirection );
+    displayMessage( layer, sweepDirection )
 }
 
 /**
@@ -52,11 +51,11 @@ function displayAfterWeightAssignment( layer, sweepDirection ) {
  */
 function displayAfterSort( layer, sweepDirection ) {
     setLayerProperty(layer, "color", "cyan");
-    if (sweepDirection == "up") {
+    if (sweepDirection == "up" ) {
         setChannelProperty(layer - 1, "color", "blue");
         setChannelProperty(layer - 1, "highlight", "true")
     }
-    else if (sweepDirection == "down") {
+    else if (sweepDirection == "down" ) {
         setChannelProperty(layer, "color", "blue");
         setChannelProperty(layer + 1, "highlight", "true")
     }
@@ -72,16 +71,14 @@ function reset( layer, sweepDirection ) {
     setLayerProperty(layer, "color", "white");
     setLayerProperty(layer, "weightHidden", true);
     setLayerProperty(layer, "marked", false);
-    if (sweepDirection == "up") {
+    if (sweepDirection == "up" ) {
         setChannelProperty(layer - 1, "color", "black");
         setChannelProperty(layer - 1, "highlight", "false")
     }
-    else if (sweepDirection == "down") {
+    else if (sweepDirection == "down" ) {
         setChannelProperty(layer, "color", "black");
         setChannelProperty(layer + 1, "highlight", "false")
     }
-    // this does not currently work
-    evenlySpacedLayout();
 }
 
 /**
@@ -89,7 +86,7 @@ function reset( layer, sweepDirection ) {
  */
 function checkCrossings() {
     const crossings = totalCrossings();
-    if (crossings < minCrossings) {
+    if (crossings < minCrossings ) {
         minCrossings = crossings;
         minIteration = iteration;
         minPass = pass;
@@ -97,7 +94,7 @@ function checkCrossings() {
         savedPositions = copyNodePositions();
     }
     edgeCrossings = bottleneckCrossings();
-    if (edgeCrossings < minEdgeCrossings) {
+    if (edgeCrossings < minEdgeCrossings ) {
         minEdgeCrossings = edgeCrossings;
         minBottleneckIteration = iteration;
         minBottleneckPass = pass;
@@ -108,42 +105,48 @@ function checkCrossings() {
 
 function upSweep( numLayers ) {
     const sweepDirection = "down";
-    for (let layer = 0; layer < numLayers - 1; layer++) {
+    for ( let layer = 0; layer < numLayers - 1; layer++ ) {
         step(() => {
             setWeights(layer + 1, "index")
             showIndexes(layer + 1)
             setWeightsDown(layer, "index");
             displayAfterWeightAssignment(layer, sweepDirection);
+            evenlySpacedLayout()
         })
         step(() => {
             sortByWeight(layer);
             iteration++;
             checkCrossings();
             displayAfterSort(layer, sweepDirection);
+            evenlySpacedLayout()
         })
         step(() => {
             reset(layer, sweepDirection);
+            evenlySpacedLayout()
         })
     }
 }
 
 function downSweep( numLayers ) {
     const sweepDirection = "up";
-    for (let layer = numLayers - 1; layer >= 1; layer--) {
+    for ( let layer = numLayers - 1; layer >= 1; layer-- ) {
         step(() => {
             setWeights(layer - 1, "index");
             showIndexes(layer - 1);
             setWeightsUp(layer, "index");
             displayAfterWeightAssignment(layer, sweepDirection);
+            evenlySpacedLayout()
         })
         step(() => {
             sortByWeight(layer);
             iteration++;
             checkCrossings();
             displayAfterSort(layer, sweepDirection);
+            evenlySpacedLayout()
         })
         step(() => {
             reset(layer, sweepDirection);
+            evenlySpacedLayout()
         })
     }
 }
@@ -151,13 +154,13 @@ function downSweep( numLayers ) {
 //Start Barycenter aglorithm
 
 checkCrossings();
-while(true) {
+while( true ) {
     hideAllNodeWeights();
     pass++;
     upSweep(numLayers);
     downSweep(numLayers);
     let quit = promptBoolean("Do you want to quit? (y/n)");
-    if (quit) {
+    if (quit ) {
         break;
     };
 }
@@ -167,10 +170,12 @@ while(true) {
 step(() => {
     applyNodePositions(savedPositions);
     display( `min pass = ${minPass}, min iteration = ${minIteration}, min crossings = ${minCrossings} `);
+    evenlySpacedLayout()
 })
 
 //display minimum bottlneck graph
 step(() => {
     applyNodePositions(savedBottleneckPositions);
     display( `min pass = ${minBottleneckPass}, min iteration = ${minBottleneckIteration}, min bottlneck = ${minEdgeCrossings} `);
+    evenlySpacedLayout()
 })

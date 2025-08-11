@@ -308,6 +308,24 @@ function addNode(x, y) {
     return newNode;
 }
 
+/**
+ * Functions related to positions of nodes; shold probably moved to a separate section
+ */
+
+function getPosition(nodeId) {
+    return GraphInterface.getNodePosition(graph, nodeId);
+}
+
+function getX(nodeId) {
+    let pos = GraphInterface.getNodePosition(graph, nodeId);
+    return pos ? pos.x : undefined;
+}
+
+function getY(nodeId) {
+    let pos = GraphInterface.getNodePosition(graph, nodeId);
+    return pos ? pos.y : undefined;
+}
+
 function setPosition(nodeId, x, y) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = GraphInterface.setNodePosition(graph, changeManager, nodeId, x, y);
@@ -952,8 +970,8 @@ function nodesOnLayer(layer) {
 } 
 
 function evenlySpacedLayout() {
-    console.log("-> envenlySpacedLayout, depth =", stepDepth)
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    console.log("Evenly spaced layout called from Thread, stepDepth: ", stepDepth);
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, changeManager);
     postMessage({ action: "evenlySpacedLayout",  });
     waitIfNeeded();
@@ -1025,7 +1043,6 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
             // Start running the algorithm
             eval(message[3]); /* eslint-disable-line no-eval */
             // End recording of the last step
-            console.log("Algorithm completed");
             postMessage({action: "complete"});
 
         } catch (error) {

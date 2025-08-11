@@ -23,7 +23,7 @@ step(() => {
 // let user choose another starting node if there are remaining unreachable nodes
 let unvisited = new Set(getNodes());
 while ( unvisited.size > 0 ) {
-    let start = promptNodeFrom("Enter start node:", unvisited);
+    const start = promptNodeFrom("Enter start node:", unvisited);
     visit(start);
 }
 
@@ -37,9 +37,9 @@ function visit(node) {
         label(node, discoveryTimes[node]);
     });
 
-     for ( let edge of outgoing(node) ) {
+     for ( const edge of outgoing(node) ) {
         if ( hasColor(edge) ) continue; // seen this edge from the other end (undirected)
-           let nextNode = other(node, edge);
+           const nextNode = other(node, edge);
             if ( hasLabel(edge) ) {
                 continue;
             }

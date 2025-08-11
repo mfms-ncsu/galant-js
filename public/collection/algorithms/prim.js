@@ -27,12 +27,12 @@ function PQsize() {
  * @returns distance between endpoints of the edge
  */
 function euclidian(edge) {
-    let x_1 = node_map[source(edge)]['x']
-    let y_1 = node_map[source(edge)]['y']
-    let x_2 = node_map[target(edge)]['x']
-    let y_2 = node_map[target(edge)]['y']
-    let diff_x = x_1 - x_2
-    let diff_y = y_1 - y_2
+    const x_1 = node_map[source(edge)]['x']
+    const y_1 = node_map[source(edge)]['y']
+    const x_2 = node_map[target(edge)]['x']
+    const y_2 = node_map[target(edge)]['y']
+    const diff_x = x_1 - x_2
+    const diff_y = y_1 - y_2
     return Math.sqrt(diff_x * diff_x + diff_y * diff_y)
 }
 
@@ -43,8 +43,8 @@ function euclidian(edge) {
 function removeMin() {
     let min_weight = Infinity
     let min_node = null
-    for ( var node in nodePQ ) {
-        let weight = nodePQ[node]
+    for ( const node in nodePQ ) {
+        const weight = nodePQ[node]
         if ( weight < min_weight ) {
             min_weight = weight
             min_node = node
@@ -60,27 +60,27 @@ step(() => {
 
     clearEdgeColors();
 
-    for (let edge of getEdges()) {
+    for ( const edge of getEdges() ) {
         if ( ! hasWeight(edge) ) {
             display("*** edge ${edge} has no weight, setting to 1, Euclidian distance does not work ***")
             setWeight(edge, 1)
         }
     }
 
-    for ( let node of getNodes() ) {
+    for ( const node of getNodes() ) {
         nodePQ[node] = Infinity
         setWeight(node, Infinity)
     }
 })
 
-let start_node = promptNode("Enter starting node:", "invalid node ${start_node}");
+const start_node = promptNode("Enter starting node:", "invalid node ${start_node}");
 setWeight(start_node, 0)
 nodePQ[start_node] = 0
 
 let total_weight = 0
 
 while ( PQsize() > 0 ) {
-    let current_node = removeMin()
+    const current_node = removeMin()
     inTree[current_node] = true
     if ( ! current_node ) {
         display("*** there are unreachable nodes ***")
@@ -97,10 +97,10 @@ while ( PQsize() > 0 ) {
         }
     })
 
-    for (let edge of outgoing(current_node)) {
-        let next_node = other(current_node, edge)
+    for (const edge of outgoing(current_node) ) {
+        const next_node = other(current_node, edge)
         if ( inTree[next_node ]) continue
-        let next_dist = weight(edge)
+        const next_dist = weight(edge)
         print(next_node + " " + next_dist)
         color(edge, "violet")
         if ( next_dist < weight(next_node) ) {

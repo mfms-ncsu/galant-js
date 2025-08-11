@@ -1,6 +1,8 @@
 /**
- * Depth first search for directed graphs, followed by a reverse DFS that identifies strongly connected components
+ * Depth first search for directed graphs, followed by a reverse DFS that identifies strongly connected components.
+ * Try it out on the graph g-12.
  */
+
 // time at which each node is discovered
 let discoveryTimes = {};
 // time at which each node has finished being explored
@@ -17,7 +19,7 @@ let element_component = {}
 /**
  * rotation of colors to use for components
  */
-let component_color = ['brown', 'blue', 'red', 'violet', 'green', 'cyan', 'magenta', 'yellow', 'gray']
+const component_color = ['brown', 'blue', 'red', 'violet', 'green', 'cyan', 'magenta', 'yellow', 'gray']
 
 /**
  * sets the component of the element (node or edge) and colors it;
@@ -26,7 +28,7 @@ let component_color = ['brown', 'blue', 'red', 'violet', 'green', 'cyan', 'magen
 function color_component(element, component) {
     step(() => {
         display(`component for ${element} is ${component}`)
-        let color_index = component % component_color.length
+        const color_index = component % component_color.length
         color(element, component_color[color_index])
         highlight(element)
         label(element, component)
@@ -77,7 +79,7 @@ step(() => {
 display("Start reverse dfs")
 let component = 1
 while ( finished.length > 0 ) {
-    let node = finished.pop()
+    const node = finished.pop()
     if ( ! has_component(node) ) {
         reverse_visit(node, component)
         component++
@@ -96,8 +98,8 @@ function visit(node) {
         label(node, discoveryTimes[node]);
     });
 
-	for ( let edge of outgoing(node) ) {
-	    let nextNode = other(node, edge);
+	for ( const edge of outgoing(node) ) {
+	    const nextNode = other(node, edge);
         display(`considering neighbor ${nextNode}`)
         if ( ! marked(nextNode) ) { // not yet visited
             step(() => {
@@ -140,9 +142,9 @@ function reverse_visit(node, component) {
     display(`reverse visiting node ${node}`)
     step(() => {
         color_component(node, component)
-        for ( let in_edge of incoming(node) ) {
+        for ( const in_edge of incoming(node) ) {
             display(`incoming edge is ${in_edge}`)
-            let neighbor = other(node, in_edge)
+            const neighbor = other(node, in_edge)
             if ( ! has_component(neighbor) ) {
                 color_component(neighbor, component)
                 color_component(in_edge, component)
@@ -154,8 +156,8 @@ function reverse_visit(node, component) {
     })
     // separating logic from animation
     set_component(node, component)
-    for ( let in_edge of incoming(node) ) {
-        let neighbor = other(node, in_edge)
+    for ( const in_edge of incoming(node) ) {
+        const neighbor = other(node, in_edge)
         if ( ! has_component(neighbor) ) {
             set_component(neighbor, component)
             reverse_visit(neighbor, component)

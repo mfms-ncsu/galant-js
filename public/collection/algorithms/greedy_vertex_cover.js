@@ -12,7 +12,7 @@ let cover = new Set()       // set of nodes in the vertex cover
 
 function degree(node) {
     let deg = 0
-    for ( let edge of outgoing(node) ) {
+    for ( const edge of outgoing(node) ) {
         deg += 1
     }
     return deg
@@ -22,7 +22,7 @@ function degree(node) {
  * @todo implement this in Galant
  */
 function showAllNodes() {
-    for ( let node of getNodes() ) {
+    for ( const node of getNodes() ) {
         showNode(node)
     }
 }
@@ -41,8 +41,8 @@ function PQsize() {
 function removeMax() {
     let max_weight = -1
     let max_node = null
-    for ( var node in nodePQ ) {
-        let weight = nodePQ[node]
+    for ( const node in nodePQ ) {
+        const weight = nodePQ[node]
         if ( weight > max_weight ) {
             max_weight = weight
             max_node = node
@@ -54,7 +54,7 @@ function removeMax() {
 }
 
 function checkCover() {
-    for ( let edge of getEdges() ) {
+    for ( const edge of getEdges() ) {
         // checking "source(edge) in cover" does not work because of the way JavaScript handles arrays
         // the only way to tell is if the edge has been colored (green)
         // ideally, we would be able to direct the edge at this point
@@ -66,7 +66,7 @@ function checkCover() {
 
 function queueAllNodes() {
     step(() => {
-        for ( let node of getNodes() ) {
+        for ( const node of getNodes() ) {
             setWeight(node, degree(node))
             nodePQ[node] = degree(node)
         }
@@ -87,7 +87,7 @@ queueAllNodes()
 let cover_size = 0
 
 while ( PQsize() > 0 ) {
-    let next_node = removeMax()
+    const next_node = removeMax()
     if ( weight(next_node) === 0 ) break;
     step(() => {
         highlight(next_node)
@@ -96,10 +96,10 @@ while ( PQsize() > 0 ) {
         setShape(next_node, "star")
     })
     step(() => {
-        for ( let edge of outgoing(next_node) ) {
+        for ( const edge of outgoing(next_node) ) {
             color(edge, "green")
             setEdgeWidth(edge, 5)
-            let neighbor = other(next_node, edge)
+            const neighbor = other(next_node, edge)
             if ( nodePQ[neighbor] ) {
                 // neighbor is in the queue ?
                 nodePQ[neighbor] -= 1

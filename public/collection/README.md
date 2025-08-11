@@ -4,9 +4,9 @@ To create a json file of graphs for the list of examples, do the following.
 ```
 ../../../conversion-scripts/dir2index.py -F json -f "`cat file_list.txt`" "" > tmp.json
 ```
-* move the json file in `algorithms` to `../../../src/data/algorithms.json`
-* Use a text editor to combine the two json files from graphs and layered-graphs into a single list and save the result as `../../../src/data/graphs.json`
-* delete all the `tmp.json` files
+* move `algorithms/tmp.json` to `../../src/data/algorithms.json`
+* Use a text editor to combine the two json files in `graphs` and `layered-graphs` into a single list and move the result as `../../src/data/graphs.json`
+* delete the `tmp.json` files in `graphs`, `layered-graphs`, and the combined version, if any
 
 If only a single or small number of files need to change, you can do, for example,
 ```

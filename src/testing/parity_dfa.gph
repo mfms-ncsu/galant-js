@@ -1,0 +1,8 @@
+c A simple DFA
+
+n 0 10 5 
+n 1 15 5 
+e 0 1 label:a
+e 1 0 label:a
+e 0 0 label:b
+e 1 1 label:b

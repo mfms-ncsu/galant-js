@@ -8,8 +8,7 @@ import PrimaryButton from "components/Buttons/PrimaryButton";
 export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
     // Error object and name
     const errorObject = prompt.errorObject;
-    let errorName = errorObject.stack.split("\n")[0].split(":")[0]
-    
+    let errorString = `${errorObject.name}: ${errorObject.message}`;
     let title, code;
 
     // This next code is from a previous team, but no author reference was found. 
@@ -20,20 +19,31 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
     }
     else {
         // Other errors encountered
-        title = errorName
+        title = errorString
         // Do not display stack trace if a syntax error has occurred
         if (title === "SyntaxError") {
             code = "There is an error with the algorithm code in the Algorithm Editor that we cannot identify."
         }
         else {
-            code = errorObject.stack
+            code = "Line number is after '<anonymous>:' or after 'eval:'.\n"
+            let errorStack = errorObject.stack;
+            if ( errorStack ) {
+                // Remove the first line which is the error message
+                code += errorStack.split("\n").slice(1).join("\n");
+            } else {
+                // Fallback if stack trace is not available
+                code = "An error occurred, but no stack trace is available.\n";
+            }
+            // code = "For more information, check the console: Cmd+Alt+I (Mac) or Ctrl+Shift+I (Windows/Linux)"
+            // code += "\nand click on the 'Console' tab (may not be necessary)."
+            // code += "\nLine number is after '<anonymous>:' or after 'eval:'.";
         }
     }
 
     return (
-        <div className="flex flex-col min-w-[550px] min-h-[270px] max-h-full bg-white shadow-lg p-4 rounded-xl" ref={promptRef}>
-            <span className="block text-center text-red-900 font-semibold pointer-events-none select-none text-xl">{title}</span>
-            <pre className="overflow-auto text-wrap my-4 text-xl flex-1">{code}</pre>
+        <div className="flex flex-col min-w-[600px] min-h-[400px] max-h-full bg-white shadow-lg p-4 rounded-xl" ref={promptRef}>
+            <span className="block text-left text-red-900 font-semibold pointer-events-none select-none text-xl">{title}</span>
+            <pre className="overflow-auto text-wrap my-4 text-l flex-1">{code}</pre>
             <PrimaryButton className="mt-auto" onClick={callback}>Okay</PrimaryButton>
         </div>
     )

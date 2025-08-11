@@ -1,14 +1,17 @@
 /**
- * an implementation of Dijkstra's algorithm
- * edges turn yellow when being explored, then
- *  - red if other end seen for the first time
- *  - green if relax yields improvement
- *  - blue when edge becomes part of the tree
+ * Like Dijkstra's algorithm: takes both a start node and a destination; uses an a-star search
+ *  that incorporates the Euclidian distance between each node and the destination.
+ * Usually visits far fewer nodes than Dijkstra's algorithm, because it focuses
+ * on the nodes that are closer to the destination.
  */
 
+ const START_COLOR = "cyan"
+ const END_COLOR = "magenta"
+ const DEFAULT_COLOR = "yellow"
 
 let predecessorEdge = {}    // edge currently leading to shortest path
 let nodePQ = {}             // priority queue of nodes, key is node, value is weight
+let destDist = {}           // distance of each node to the destination
 let inTree = {}             // true if a node is in the shortest paths tree
 
 /**
@@ -36,24 +39,18 @@ function removeMin() {
     return min_node
 }
 
-/**
- * @return the average weight of the edges, ignoring edges with no weight,
- * and those with non-positive weight.
- * if there are no edges with positive weight, returns 1
- */
-function averageWeight() {
-    let totalWeight = 0;
-    let count = 0;
-    for ( const edge of getEdges() ) {
-        if ( hasWeight(edge) && weight(edge) > 0 ) {
-            totalWeight += weight(edge);
-            count++;
-        }
-    }
-    return count > 0 ? totalWeight / count : 1;
+function distance(node1, node2) {
+    const x1 = getX(node1)
+    const x2 = getX(node2)
+    const y1 = getY(node1)
+    const y2 = getY(node2)
+    const xdiff = x1 - x2
+    const ydiff = y1 - y2
+    return Math.sqrt(xdiff * xdiff + ydiff * ydiff)
 }
 
 step(() => {
+    setDirected(false);
     clearNodeMarks();
     hideAllNodeWeights();
     clearNodeColors();
@@ -63,11 +60,8 @@ step(() => {
     clearEdgeHighlights();
 
     for ( const edge of getEdges() ) {
-        if ( ! hasWeight(edge) ) {
-            const weight = averageWeight()
-            display(`*** edge ${edge} has no weight, setting to average weight ${weight} ***`)
-            setWeight(edge, weight)
-        }
+        setWeight(edge, distance(source(edge), target(edge)))
+        showEdgeWeight(edge)
     }
 
     for ( const node of getNodes() ) {
@@ -76,11 +70,23 @@ step(() => {
     }
 })
 
-let start_node = promptNode("Enter starting node:", "invalid node ${start_node}");
-setWeight(start_node, 0)
-showWeight(start_node)
-nodePQ[start_node] = 0
+const start = promptNode("Enter starting node:", "invalid node ${start}");
+const destination = promptNode("Enter destination node:", "invalid node ${destination}");
+step(() => {
+    color(start, START_COLOR)
+    color(destination, END_COLOR)
+})
+for ( const node of getNodes() ) {
+    destDist[node] = distance(node, destination)
+}
 
+step(() => {
+    setWeight(start, destDist[start])
+    showWeight(start)
+})
+nodePQ[start] = destDist[start]
+
+let destination_reached = false
 while ( PQsize() > 0 ) {
     const current_node = removeMin()
     inTree[current_node] = true
@@ -88,9 +94,14 @@ while ( PQsize() > 0 ) {
         display("*** there are unreachable nodes ***")
         break
     }
-    print(current_node)
     step(() => {
-        color(current_node, "yellow");
+        if ( current_node == start ) {
+            color(current_node, START_COLOR)
+        } else if ( current_node == destination ) {
+            color(current_node, END_COLOR)
+        } else {
+            color(current_node, DEFAULT_COLOR);
+        }
         setShape(current_node, "star")
         if ( predecessorEdge[current_node] ) {
             color(predecessorEdge[current_node], "blue")
@@ -100,28 +111,32 @@ while ( PQsize() > 0 ) {
         }
     })
 
-    const current_dist = weight(current_node)
+    if ( current_node == destination ) {
+        display(`destination ${current_node} reached`)
+        destination_reached = true
+        break
+    }
+
     for ( const edge of outgoing(current_node) ) {
         const next_node = other(current_node, edge)
         if ( inTree[next_node ] ) continue
         showWeight(next_node)
-        const next_dist = current_dist + weight(edge)
-        print(next_node + " " + next_dist)
+        const new_weight = weight(current_node) + weight(edge) + destDist[next_node] - destDist[current_node]
         color(edge, "violet")
-        if ( next_dist < weight(next_node) ) {
+        if ( new_weight < weight(next_node) ) {
             step(() => {
                 if ( predecessorEdge[next_node] ) {
                     color(predecessorEdge[next_node], "yellow")
                     color(edge, "green")
                     setEdgeWidth(edge, 4)
-                    display(`relax ${edge} updated distance of ${next_node} to ${next_dist}`)
+                    display(`relax ${edge} updated weight for ${next_node}`)
                 }
                 else {
                     color(edge, "red")
                 }
                 predecessorEdge[next_node] = edge
-                setWeight(next_node, next_dist)
-                nodePQ[next_node] = next_dist
+                setWeight(next_node, new_weight)
+                nodePQ[next_node] = new_weight
             })
         }
         else {
@@ -129,4 +144,6 @@ while ( PQsize() > 0 ) {
         }
     }
 }
-display("Algorithm finished: all reachable nodes have been visited")
+if ( ! destination_reached ) {
+        display("All reachable nodes have been visited, but destination has not been found")
+}

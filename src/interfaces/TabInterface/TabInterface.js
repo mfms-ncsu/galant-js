@@ -40,19 +40,28 @@ function getTabByName(tabs, name) {
  * @param {Tab} tab Tab value
  */
 function downloadTab(tab, type) {
+    console.log("Downloading tab:", tab, ",type =", type);
     if (!tab) return;
     const isAlgorithm = type === "Algorithm";
     
     //Update the file extension if it is missing or incorrect
     let name = tab.name;
+    console.log("Tab name before extension check:", name);
     if (isAlgorithm && !tab.name.match(/\.js$/)) {
         name = name.replace(/\.[a-z]+$/).concat(".js")
     }
     if (!isAlgorithm && !tab.name.match(/\.(?:gph|sgf)$/)) {
+        console.log("Updating tab name to have .gph extension, name was:", name);
         name = name.replace(/\.[a-z]+$/).concat(".gph")
+        console.log("Updated tab name to:", name);
     }
     const ext = name.match(/\.[a-zA-Z0-9]+$/);
 
+    console.log("Downloading tab with name:", name, ", extension:", ext, ", content length:", tab.content.length);
+    console.log("window.showSaveFilePicker:", window.showSaveFilePicker);
+    // If the browser supports the File System Access API, use it to save the file.
+    // The showSaveFilePicker method does not work with Brave, Firefox, or Safari for security reasons,
+    // but it's still possible to download files, albeit without a convenient file picker
     if (window.showSaveFilePicker) {
         (async () => {
             try {
@@ -109,10 +118,10 @@ function getSelectedTab(tabs) {
  * @returns Updated tab list
  */
 function addTab(tabs, data) {
-    console.log("-> addTab, tabs =", tabs, "data =", data);
+    console.log("Adding new tab with data:", data);
+    console.log("Current tabs:", tabs);
     // Ensure the tab has a unique name
     let updatedName = data.name;
-    console.log("updatedName = ", updatedName);
     let count = 1;
     while (getTabByName(tabs, updatedName)) {
         updatedName = data.name + count;
@@ -120,7 +129,6 @@ function addTab(tabs, data) {
     }
 
     let myContent = data.content;
-    console.log("data.content =", myContent);
     // Create the new tab and make it selected
     const tab = { name: updatedName, content: myContent || '', selected: true };
 
@@ -130,7 +138,6 @@ function addTab(tabs, data) {
 
     // Add the new tab to the list
     tabs.push(tab);
-    console.log("<- addTab, tab =", tab, "tabs =", tabs)
 
     return [...tabs];
 }
@@ -142,20 +149,16 @@ function addTab(tabs, data) {
  * @returns Updated tab list
  */
 function updateTab(tabs, data) {
-    console.log("-> updateTab, data =", data)
     // Get the tab
     const tab = getTabByName(tabs, data.name);
 
     // Update the content if the tab exists or create a new tab
     if (tab) {
-        console.log("  found tab by name", data.name)
         tab.content = data.content;
     } else {
         return addTab(tabs, data);
     }
 
-    console.log("<- updateTab, content =", tab.content)
-    console.log(    "tabs =", [...tabs])
     return [...tabs];
 }
 
@@ -166,6 +169,7 @@ function updateTab(tabs, data) {
  * @returns Updated tab list
  */
 function deleteTab(tabs, tab) {
+    console.log("Deleting tab:", tab);
     // Filter out the given tab
     tabs = tabs.filter(aTab => aTab !== tab);
 

@@ -1,5 +1,13 @@
 # Version history of galant-js
 
+Version 2.2
+
+(1) Fixed problem leading to slowing down of algorithm steps.
+(2) Fixed some other minor bugs.
+(3) Cleaned up the code.
+
+-------------------
+
 Version 2.1.1
 
 (1) Fixed several minor bugs

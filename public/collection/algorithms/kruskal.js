@@ -5,7 +5,7 @@
 let parent = {}     // parent pointers for disjoint set structure
 
 function initDisjointSets() {
-    for ( let node of getNodes() ) {
+    for ( const node of getNodes() ) {
         parent[node] = node
     }
 }
@@ -34,7 +34,7 @@ step(() => {
     clearNodeWeights();
     clearEdgeColors();
 
-    for (let edge of getEdges()) {
+    for ( const edge of getEdges() ) {
         if ( ! hasWeight(edge) ) {
             // setWeight(edge, euclidian(edge));
             display("*** edge ${edge} has no weight, setting to 1 ***")
@@ -52,11 +52,11 @@ let edgeList = getEdges()
 edgeList.sort(byWeight)
 let totalWeight = 0
 let numForestEdges = 0
-let numNodes = getNodes().length
+const numNodes = getNodes().length
 
-for ( let edge of edgeList ) {
-    let s = source(edge)
-    let t = target(edge)
+for ( const edge of edgeList ) {
+    const s = source(edge)
+    const t = target(edge)
     step(() => {
         color(edge, "red")
         setShape(s, "star")
@@ -64,7 +64,6 @@ for ( let edge of edgeList ) {
         color(s, "yellow")
         color(t, "yellow")
     })
-    print(`--- find(${s}) = ${findSet(s)}, find(${t}) = ${findSet(t)}`)
     step(() => {
         if ( findSet(s) == findSet(t) ) {
             color(edge, "yellow")

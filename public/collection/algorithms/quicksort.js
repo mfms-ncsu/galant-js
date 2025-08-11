@@ -92,7 +92,7 @@ function quicksort(list, left, right, depth) {
     let lessEnd = left
     let greaterEnd = right
     // partition
-    for ( let node of list ) {
+    for ( const node of list ) {
         if ( weight(node) < weight(pivot) ) {
             less.push(node)
             placeNode(node, depth, lessEnd, "red", "trapezoid")
@@ -115,7 +115,7 @@ function quicksort(list, left, right, depth) {
     display("  equal   = " + weights(equal))
     display("  greater = " + weights(greater))
     equal.push(pivot)
-    for ( let node of equal ) {
+    for ( const node of equal ) {
         placeNode(node, depth, lessEnd, "yellow", "star")
         lessEnd++
     }
@@ -125,14 +125,14 @@ function quicksort(list, left, right, depth) {
     display("  greater (sorted) = " + weights(greater))
 
     list = less.concat(equal).concat(greater)
-    for ( let node of list ) {
+    for ( const node of list ) {
         moveToSorted(node)
     }
     display(`<- [${weights(list)}]`)
     return list
 }
 
-let nodeIds = getNodes();
+const nodeIds = getNodes();
 
 step(() => {
     clearNodeColors();

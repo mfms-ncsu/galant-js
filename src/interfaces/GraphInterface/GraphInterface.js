@@ -1039,17 +1039,16 @@ function redo(graph, changeManager) {
   return [graph, changeManager];
 }
 
-/**
- * Undoes all changes back to the original graph.
- * @param {Graph} graph Graph on which to operate
- * @param {ChangeManager} changeManager ChangeManager from which to revert
- * @returns Updated graph and change manager
- */
 function revert(graph, changeManager) {
   while (changeManager.index > 0) {
+//    let theChangeObject = changeManager.changes[changeManager.index];
     [graph, changeManager] = undo(graph, changeManager);
+//    if (theChangeObject) {
+      // Remove references to the change objects at the current index
+      // does not help with the slow down problem
+//      theChangeObject = null;
+//    }      
   }
-
   return [graph, changeManager];
 }
 
