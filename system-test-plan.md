@@ -5,7 +5,7 @@ TODO:
 - [later] see if it's possible to get headers when content in a json file === null; have to be careful about <ul></ul> pairs
 - test using all platform/browser combinations
 - merge dev into main and get rid of all console logs
-- publish version 2.1.1
+- publish version 2.1.2
 
 ## Test for speed
 
