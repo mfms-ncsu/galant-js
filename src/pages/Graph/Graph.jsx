@@ -25,7 +25,7 @@ export default function Graph() {
     const [graph, setGraph] = useAtom(graphAtom);
     const [algorithmChangeManager, setAlgorithmChangeManager] = useAtom(algorithmChangeManagerAtom);
     const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
-    const [_, setAlgorithm] = useAtom(algorithmAtom);
+    const [algorithm, setAlgorithm] = useAtom(algorithmAtom);
     const [promptQueue, setPromptQueue] = useAtom(promptQueueAtom);
     const sentAliveMessage = useRef();
     let algorithmLoading = false;
@@ -77,8 +77,10 @@ export default function Graph() {
             setPromptQueue([]);
             
             // Load the algorithm and reset the ChangeManager
-            setAlgorithm(new Algorithm(data.name, data.payload));
+            let algorithm = new Algorithm(data.name, data.payload);
+            setAlgorithm(algorithm);
             setAlgorithmChangeManager(new ChangeManager());
+            algorithm.start();
         }
 
         // Register the functions in shared worker

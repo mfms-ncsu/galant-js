@@ -111,7 +111,21 @@ export default function AlgorithmControls() {
 
         // Set the algorithm to null and reset its changeManager
         setAlgorithm(null);
+        setAlgorithmChangeManager(null);
         setAlgorithmChangeManager(new ChangeManager());
+    }
+
+    function restartAlgorithm() {
+        if (!algorithm) return;
+        // Remove any prompts the algorithm had up
+        setPromptQueue([]);
+        AlgorithmInterface.revert();
+
+        // Reset the algorithm change manager
+        setAlgorithmChangeManager(null);
+        setAlgorithmChangeManager(new ChangeManager());
+        // Restart the algorithm
+        algorithm.start();
     }
 
     // Effect hook to handle keyboard shortcuts for stepping through the algorithm
@@ -121,6 +135,7 @@ export default function AlgorithmControls() {
             if (event.key === 'ArrowLeft') backButtonPress();
             else if (!event.metaKey && event.key === 'ArrowRight') frontButtonPress();
             else if (event.key === 'q') terminateAlgorithm();
+            else if (event.key === 'a') restartAlgorithm();
             else if (event.key === 'x') exportGraph();
             else if (event.key === '1') debugMode();
         }
@@ -157,6 +172,7 @@ export default function AlgorithmControls() {
 
             <div className="space-y-1">
                 <PrimaryButton onClick={exportGraph}>Export Graph (x)</PrimaryButton>
+                <PrimaryButton onClick={restartAlgorithm}>Restart Algorithm (a)</PrimaryButton>
                 <ExitButton onClick={terminateAlgorithm}>Exit (q)</ExitButton>
             </div>
         </div>
