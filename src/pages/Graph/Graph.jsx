@@ -29,6 +29,7 @@ export default function Graph() {
     const [promptQueue, setPromptQueue] = useAtom(promptQueueAtom);
     const sentAliveMessage = useRef();
     let algorithmLoading = false;
+    let myAlgorithm = null;
     
     /**
      * Creates SharedWorker instance on mount. Whenever graph updates, onMessage 
@@ -77,10 +78,18 @@ export default function Graph() {
             setPromptQueue([]);
             
             // Load the algorithm and reset the ChangeManager
-            let algorithm = new Algorithm(data.name, data.payload);
-            setAlgorithm(algorithm);
+            myAlgorithm = new Algorithm(data.name, data.payload);
+            setAlgorithm(myAlgorithm);
             setAlgorithmChangeManager(new ChangeManager());
-            algorithm.start();
+            myAlgorithm.start();
+        }
+
+        function onAlgorithmStart(data) {
+            if (myAlgorithm) {
+                myAlgorithm.start();
+            } else {
+                console.error("No algorithm loaded to start");
+            }
         }
 
         // Register the functions in shared worker

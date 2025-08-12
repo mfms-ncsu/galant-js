@@ -135,7 +135,7 @@ export default function AlgorithmControls() {
             if (event.key === 'ArrowLeft') backButtonPress();
             else if (!event.metaKey && event.key === 'ArrowRight') frontButtonPress();
             else if (event.key === 'q') terminateAlgorithm();
-            else if (event.key === 'a') restartAlgorithm();
+            else if (event.key === ';') restartAlgorithm();
             else if (event.key === 'x') exportGraph();
             else if (event.key === '1') debugMode();
         }
@@ -172,7 +172,7 @@ export default function AlgorithmControls() {
 
             <div className="space-y-1">
                 <PrimaryButton onClick={exportGraph}>Export Graph (x)</PrimaryButton>
-                <PrimaryButton onClick={restartAlgorithm}>Restart Algorithm (a)</PrimaryButton>
+                <ExitButton onClick={restartAlgorithm}>Restart (;)</ExitButton>
                 <ExitButton onClick={terminateAlgorithm}>Exit (q)</ExitButton>
             </div>
         </div>
