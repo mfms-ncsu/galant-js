@@ -78,6 +78,10 @@ export default function Graph() {
             setPromptQueue([]);
             
             // Load the algorithm and reset the ChangeManager
+            // The following might also work:
+            //   setAlgorithm(new Algorithm(data.name, data.payload));
+            //   algorithm.start();
+            // But this way we can handle errors more gracefully.
             myAlgorithm = new Algorithm(data.name, data.payload);
             setAlgorithm(myAlgorithm);
             setAlgorithmChangeManager(new ChangeManager());

@@ -5,7 +5,7 @@ TODO:
 - [later] see if it's possible to get headers when content in a json file === null; have to be careful about <ul></ul> pairs
 - test using all platform/browser combinations
 - merge dev into main and get rid of all console logs
-- publish version 2.1.2
+- publish version 2.2.1
 
 ## Test for speed
 
@@ -81,7 +81,7 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 
 1. Run bfs on g-12; start at any node if undirected; at node 1 if directed; bfs does not have restart capability when some nodes are unreachable; also, the messages are a little out of sync with the algorithm actions.
 2. Run dfs on g-12; start anywhere if undirected; start at nodes 7, 4, and 1; also try an illegal starting point before choosing 4 (e.g. 11); dfs could be more informative about the edges it is exploring; and it could let you know when it's done (same for other search algorithms)
-3. Run dfs-scc on g-12, starting at node 3, then 1.
+3. Run dfs-scc on g-12, starting at node 3, then 1. Use the restart feature for the second run.
 4. During at least one of these runs, move nodes to see if the positions are preserved.
 
 ### Shortest paths

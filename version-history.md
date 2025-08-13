@@ -1,5 +1,13 @@
 # Version history of galant-js
 
+Version 2.2.1
+
+(1) added ability to restart algorithm without reloading
+(2) simplified some keyboard shortcutsd
+(3) fixed some minor bugs
+
+------------------
+
 Version 2.2
 
 (1) Fixed problem leading to slowing down of algorithm steps.
