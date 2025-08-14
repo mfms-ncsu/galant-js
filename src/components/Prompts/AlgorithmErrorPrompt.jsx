@@ -25,7 +25,12 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
             code = "There is an error with the algorithm code in the Algorithm Editor that we cannot identify."
         }
         else {
-            code = "Line number is after '<anonymous>:' or after 'eval:'.\n"
+            let lineNumber = errorObject.lineNumber;
+            if (lineNumber) {
+                code = `Line number ${errorObject.lineNumber}\n`;
+            } else {
+                code = "Line number may be after '<anonymous>:' or after 'eval:'.\n You may also check the console for more information.\n\n";
+            }
             let errorStack = errorObject.stack;
             if ( errorStack ) {
                 // Remove the first line which is the error message

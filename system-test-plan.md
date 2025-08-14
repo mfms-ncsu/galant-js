@@ -48,14 +48,14 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 
 ### (!) Simple upload/download in editor window
 
-1. Upload a graph (e.g., triangle).
+1. Upload a graph (e.g., (+) triangle).
 2. Make a few minor changes in the `Edit` window: add a node and edge, change a position, color a node/edge, change shape, add a weight and label
 3. Download to a different name/location, close the window, focus on a different graph, and upload again
 
 ### Uploads with different node and edge attributes/variations; graphs are in src/testing
 
-1. Load opposite-edge. There should be parallel edges 1,2 and 2,1. Check both directed and undirected.
-2. Load attributes. The graph should be displayed as indicated in the text.
+1. Load (+) opposite-edge. There should be parallel edges 1,2 and 2,1. Check both directed and undirected.
+2. Load (+) attributes. The graph should be displayed as indicated in the text.
 
 ### (!) Saving graph after edits in main window
 
@@ -77,11 +77,11 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 
 ### Graph searches
 
-Run these on both undirected and directed graphs; dfs-scc forces the graph to be directed. Make sure both the back and forward buttons/arrow keys work.
+Run these on both undirected and directed graphs; dfs-scc forces the graph to be directed. Make sure both the back and forward buttons/arrow keys work. The restart feature does not work consistently for some reason. This may be slow reaction for algorithms that ask for a start node.
 
 1. Run bfs on g-12; start at any node if undirected; at node 1 if directed; bfs does not have restart capability when some nodes are unreachable; also, the messages are a little out of sync with the algorithm actions.
 2. Run dfs on g-12; start anywhere if undirected; start at nodes 7, 4, and 1; also try an illegal starting point before choosing 4 (e.g. 11); dfs could be more informative about the edges it is exploring; and it could let you know when it's done (same for other search algorithms)
-3. Run dfs-scc on g-12, starting at node 3, then 1. Use the restart feature for the second run.
+3. Run dfs-scc on g-12, starting at node 3, then 1. Use the restart feature to do a second run with a different sequence. 
 4. During at least one of these runs, move nodes to see if the positions are preserved.
 
 ### Shortest paths
@@ -98,24 +98,24 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 ### Layered graphs
 
 1. Load ex_20 and check if window resizing changes shape of graph
-2. Run barycenter on ex_20; stop after one pass - minima reached at iteration 6: 32 crossings, min bottleneck (not reported) is 6 at iteration 0; run again and continue with two passes; min at iteration 12 with 30 crossings; min bottleneck is still 6.
-3. (!) Run layered-graph-stats on two_unequal_layers: crossings = 0, nonverticality and bottleneck verticality = 1; move node 4 to position 0: crossings = bottleneck = 2; nonverticality = 5, bottleneck = 4
+2. Run barycenter on ex_20; stop after one pass - minima reached at iteration 6: 32 crossings, min bottleneck is 6 at iteration 0; run again and continue with two passes; min at iteration 12 with 30 crossings; min bottleneck is still 6.
+3. (!) Run layered-graph-stats on (+) two_unequal_layers: crossings = 0, nonverticality and bottleneck verticality = 1; move node 4 to position 0: crossings = bottleneck = 2; nonverticality = 5, bottleneck = 4
 4. Run layered-graph-stats on n42-t48v150: total crossings = 48, bottleneck crossings = 7, nonverticality = 150, and bottleneck verticality = 16
 5. Move some nodes of n42-t48v150 to see if they shift correctly; do this both in edit mode and during algorithm execution
-6. (!) Load shift-test. Move node B into position 4, occupied by E. Then move node J into position 1, occupied by G.
+6. (!) Load (+) shift-test. Move node B into position 4, occupied by E. Then move node J into position 1, occupied by G.
 
 ## Error handling
 
 ### Graph input
 
 1. (!) Load all of of the graphs with prefix `bad` in the `src/testing` directory. There should be error messages reflecting what's wrong with these graphs. [!!! duplicate edge should result in an error, but des not !!!] [!!! errors on layered graphs are not detected !!!]
-2. Load same-coordinates. Instead of an error, the nodes should land on top of each other and allow user to fix this by editing.
-3. Load same-position. In this case nodes should shift appropriately: node 3 should end up in position 1 of layer 0. [!!! does not work !!!]
+2. Load (+) same-coordinates. Instead of an error, the nodes should land on top of each other and allow user to fix this by editing.
+3. Load (+) same-position. In this case nodes should shift appropriately: node 3 should end up in position 1 of layer 0. [!!! does not work !!!]
 
 ### Algorithm execution
 
-1. (!) Run `color-nonexistent-node.js` on triangle (or any other graph); check console.
-2. (!) Run `infinite-loop.js` on triangle
+1. (!) Run (+) `color-nonexistent-node.js` on triangle (or any other graph); check console.
+2. (!) Run (+) `infinite-loop.js` on triangle
 
 -----------------------------------
 
