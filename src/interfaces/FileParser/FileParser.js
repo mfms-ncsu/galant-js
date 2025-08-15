@@ -37,7 +37,7 @@ import StandardGraph from "../../states/Graph/StandardGraph";
 
 
     // Regexes to match simple node and edge lines
-    const nodeRegex = /^n[ \t]+\S+[ \t]+-?\d+.?\d*[ \t]+-?\d+.?\d*([ \t]+-?\d+)?([ \t]+[^ \n\t:]+:[^ \n\t:]+)*$/;
+    const nodeRegex = /^n[ \t]+\S+[ \t]+-?\d+.?\d*[ \t]+-?\d+.?\d*([ \t]+-?\d+.?\d*)?([ \t]+[^ \n\t:]+:[^ \n\t:]+)*$/;
     /*
         nodeRegex documentation:
         
@@ -46,13 +46,13 @@ import StandardGraph from "../../states/Graph/StandardGraph";
             - An id (any amount of non-whitespace characters)
             - An integer x coordinate
             - An integer y coordinate
-            - Optionally, an integer weight
+            - Optionally, an integer weight (floating point numbers are allowed - check)
             - Any amount of attributes. Attributes are specified as follows:
                 any amount of non-whitespace, non-colon characters, followed by a colon (no space),
                 followed by any amount of non-whitespace, non-colon characters.
     */
 
-    const edgeRegex = /^e[ \t]+\S+[ \t]+\S+([ \t]+-?\d+)?([ \t]+[^ \n\t:]+:[^ \n\t:]+)*$/;
+    const edgeRegex = /^e[ \t]+\S+[ \t]+\S+([ \t]+-?\d+.?\d*)?([ \t]+[^ \n\t:]+:[^ \n\t:]+)*$/;
     /*
         edgeRegex documentation:
         
@@ -107,6 +107,7 @@ function isLayeredGraph(name, file) {
  * @author see: https://stackoverflow.com/a/175787
  * @param {String} str String to check
  * @returns True if the string is numeric, false otherwise
+ * @todo Allow for Infinity, NaN, and other special numeric values
  */
 function isNumeric(str) {
     if (typeof str !== "string") return false;
@@ -286,7 +287,9 @@ function parseEdge(graph, values) {
     let attributes = {};
     
     // Get the weight, but only if it is a numeric value
+    console.log("parsing edge:", values);
     if (isNumeric(values[3])) {
+        console.log("found weight:", values[3]);
         attributes["weight"] = parseFloat(values[3]);
     }
 

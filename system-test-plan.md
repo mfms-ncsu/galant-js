@@ -50,6 +50,7 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 
 1. Upload a graph (e.g., (+) triangle).
 2. Make a few minor changes in the `Edit` window: add a node and edge, change a position, color a node/edge, change shape, add a weight and label
+2'. Make some changes in the  main window.
 3. Download to a different name/location, close the window, focus on a different graph, and upload again
 
 ### Uploads with different node and edge attributes/variations; graphs are in src/testing
@@ -108,7 +109,7 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 
 ### Graph input
 
-1. (!) Load all of of the graphs with prefix `bad` in the `src/testing` directory. There should be error messages reflecting what's wrong with these graphs. [!!! duplicate edge should result in an error, but des not !!!] [!!! errors on layered graphs are not detected !!!]
+1. (!) Load all of of the graphs with prefix `bad` in the `src/testing` directory. There should be error messages reflecting what's wrong with these graphs. You should be able to select and upload all of these at once. [!!! duplicate edge should result in an error, but des not !!!] [!!! errors on layered graphs are not detected !!!]
 2. Load (+) same-coordinates. Instead of an error, the nodes should land on top of each other and allow user to fix this by editing.
 3. Load (+) same-position. In this case nodes should shift appropriately: node 3 should end up in position 1 of layer 0. [!!! does not work !!!]
 
