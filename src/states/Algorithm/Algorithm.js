@@ -37,7 +37,6 @@ export default class Algorithm {
     }
 
     start() {
-        console.log("Starting algorithm:", this.name);
         // Shared array used to pass wake messages and prompt results to the Thread
         this.array = new Int32Array(new SharedArrayBuffer(1024));
         this.array[1] = 0;

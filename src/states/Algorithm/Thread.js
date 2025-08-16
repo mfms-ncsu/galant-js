@@ -970,7 +970,6 @@ function nodesOnLayer(layer) {
 } 
 
 function evenlySpacedLayout() {
-    console.log("Evenly spaced layout called from Thread, stepDepth: ", stepDepth);
     if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, changeManager);
     postMessage({ action: "evenlySpacedLayout",  });
@@ -1028,7 +1027,6 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         flags = message[2];
 
     } else if (message[0] === "graph/algorithm") {
-        console.log("Thread received graph and algorithm code");
         // Load the graph with isDirected flag
         graph = FileParser.loadGraph("", message[1]);
         graph.isDirected = message[2];

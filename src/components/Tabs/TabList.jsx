@@ -27,13 +27,10 @@ function Header({ children }) {
 export default function TabList({tabs, setTabs, acceptFileType, examples}) {
 
     function onAddTab(data) {
-        console.log("Adding new tab with data:", data);
-        console.log("Current tabs:", tabs);
         setTabs(TabInterface.addTab(tabs, data));
     }
 
     function onFileUpload(dataList) {
-        console.log("File upload dataList:", dataList);
         let newTabs;
         for (let data of dataList) {
             newTabs = TabInterface.addTab(tabs, data);

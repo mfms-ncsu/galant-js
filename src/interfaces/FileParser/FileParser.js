@@ -24,6 +24,13 @@ import StandardGraph from "../../states/Graph/StandardGraph";
         probably have trouble understanding them without documentation.
      */
 
+        /**
+         * @todo While these regular expressions are clever, they are a bad idea.
+         *      - they are difficult to read, and will be difficult to maintain
+         *      - they are not very flexible; they will make it hard to add new file formats
+         * They should be replaced with one token at a time processing of each line, which not only addresses the above issues, but also allows for more transparent error handling.
+         */
+
     // Regex to match comments
     const commentRegex = /^([gct].*)?$/;
     /*
@@ -287,9 +294,7 @@ function parseEdge(graph, values) {
     let attributes = {};
     
     // Get the weight, but only if it is a numeric value
-    console.log("parsing edge:", values);
     if (isNumeric(values[3])) {
-        console.log("found weight:", values[3]);
         attributes["weight"] = parseFloat(values[3]);
     }
 

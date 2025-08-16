@@ -66,7 +66,6 @@ export default function ControlSettingsPopover() {
     }
 
     function evenlySpacedLayout() {
-        console.log("Evenly spaced layout called from Popover, graph: ", graph, " changeManager: ", userChangeManager);
         const [newGraph, newChangeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, userChangeManager);
         setGraph(newGraph);
         setUserChangeManager(newChangeManager);

@@ -1,7 +1,7 @@
 # System tests
 
 TODO:
-- [later] The showPositions() and showIndexes() methods only set the weights; they don't actually show them; the setWeights() method accomplishes that; probably should rename these methods
+- [later] The showPositions() and showIndexes() methods for layered graphs only set the weights; they don't actually show them; the setWeights() method accomplishes that; probably should rename these methods
 - [later] see if it's possible to get headers when content in a json file === null; have to be careful about <ul></ul> pairs
 - test using all platform/browser combinations
 - merge dev into main and get rid of all console logs
@@ -16,7 +16,7 @@ TODO:
 - merge changes from a working branch into `dev`
 - perform the tests below in `dev`
 - add notes to version-history.md
-- put version number in the help page: see `pages/Instructions/Instructions.jsx`
+- put version number in the help page: see https://docs.google.com/document/d/1_CX-rv_dFlnWL3BacHnernQ4tapzhmhPUzUx2cWaBc0/view
 - merge changes into `main`
 - get rid of console.log statements (should devise a script for this)
 - push changes, create version on github.com site
@@ -109,7 +109,7 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 
 ### Graph input
 
-1. (!) Load all of of the graphs with prefix `bad` in the `src/testing` directory. There should be error messages reflecting what's wrong with these graphs. You should be able to select and upload all of these at once. [!!! duplicate edge should result in an error, but des not !!!] [!!! errors on layered graphs are not detected !!!]
+1. (!) Load all of of the graphs with prefix `bad` in the `src/testing` directory (there are six). There should be error messages reflecting what's wrong with these graphs. You should be able to select and upload all of these at once. [!!! duplicate edge should result in an error, but des not !!!] [!!! errors on layered graphs are not detected !!!]
 2. Load (+) same-coordinates. Instead of an error, the nodes should land on top of each other and allow user to fix this by editing.
 3. Load (+) same-position. In this case nodes should shift appropriately: node 3 should end up in position 1 of layer 0. [!!! does not work !!!]
 

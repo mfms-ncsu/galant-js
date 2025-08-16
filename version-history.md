@@ -3,7 +3,7 @@
 Version 2.2.1
 
 (1) added ability to restart algorithm without reloading
-(2) simplified some keyboard shortcutsd
+(2) simplified some keyboard shortcuts
 (3) fixed some minor bugs
 
 ------------------

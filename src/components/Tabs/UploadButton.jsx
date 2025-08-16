@@ -14,14 +14,11 @@ export default function UploadButton({onFileUpload, acceptFileType}) {
     // and the click event is not triggered by keyboard events.
     React.useEffect(() => {
         function onKeyPress(event) {
-            console.log("Upload key (Upload button) pressed: ", event);
             // event.preventDefault(); this disables all keys
             // Using Ctrl-U because Ctrl-O is not even recognized as a key event on MacOS.
             if (event.code === "KeyU" && (event.metaKey || event.ctrlKey)) {
                 event.preventDefault();
-                console.log("Upload key identified as Ctrl-U", event);
                 const fileInput = document.getElementById("file-upload");
-                console.log("File input element: ", fileInput);
                 // Simulate a click on the file input element to open the file picker dialog
                 // Oddly, this throws an exception - passes undefined to the function - but still works.
                 onUploadEvent(fileInput.click());
@@ -34,7 +31,6 @@ export default function UploadButton({onFileUpload, acceptFileType}) {
     // An attempt to level the playing field for keyboard versus mouse events.
     // Still does not work in any browser.
     function processFiles(files) {
-        console.log("Processing files: ", files);
         const tabs = [];
         for (let file of files) {
             const reader = new FileReader();
@@ -58,7 +54,6 @@ export default function UploadButton({onFileUpload, acceptFileType}) {
     }
 
     function onUploadEvent(event) {
-        console.log("Upload event: ", event);
         processFiles(event.target.files);
     }
 

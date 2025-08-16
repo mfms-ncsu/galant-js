@@ -24,7 +24,6 @@ export default function EditControls() {
             content: GraphInterface.toString(graph),
         };
 
-        console.log("Saving graph data:", graphData);
         //Update the EditorTabs
         setTabs(TabInterface.updateTab(tabs, graphData));
         // !!! solved the problem of not updating correctly !!!
