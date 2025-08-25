@@ -22,18 +22,26 @@ if ('serviceWorker' in navigator) {
     // site using the default scope.
     navigator.serviceWorker.register(`../serviceworker.js`).then(
         registration => {
-            console.log('*** Service worker registration succeeded ***:', registration);
+            console.log('--- Service worker registration succeeded:', registration);
         },
         error => {
-            console.error(`Service worker registration failed: ${error}`);
+            console.error(`!!! Service worker registration failed: ${error} !!!`);
         }
     );
 } else {
     // Log an error if service workers are not supported
-    console.error('Service workers are not supported.');
+    console.error('!!! Service workers are not supported. !!!');
 }
 
-// Create a router with routes mapping paths to React components
+/**
+ *  Create a router with routes mapping paths to React components.
+ *  The paths correspond to three main pages of the application:
+ * - "/" renders the main page when the application is initiated - it displays the graph and related controls.
+ * - "/algorithmeditor" renders the algorithm editor page where users can create and edit algorithms;
+ * - "/grapheditor" renders the graph editor page where users can create and edit
+ * Both editor pages also allow uploading content from computer files or predefined examples.
+ * They also allow users to save their work on their computers. 
+ */
 const router = createBrowserRouter([
     {
         path: "/",

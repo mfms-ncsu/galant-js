@@ -16,7 +16,7 @@ import { RampRightOutlined } from '@mui/icons-material';
  * Used to inform the thread when to run and storing prompt results to be accessed in
  * the thread.
  * If sharedArray[0] is 0, that means the Thread should wait. Once it is changed, the 
- * Thread wakes up from Atoimics.notify() from the Handler.
+ * Thread wakes up from Atomics.notify() in AlgorithmInterface.
  */
 let sharedArray;
 
@@ -43,20 +43,18 @@ let changeManager = new ChangeManager();
  * This function uses Atomics to cause the algorithm to wait for user input before continuing
  */
 function wait() {
-
-    // Store a 0 in the sharedArray buffer
+    // Store a 0 in the sharedArray buffer to indicate that the thread should wait.
     Atomics.store(sharedArray, 0, 0);
 
-    // Wait until the sharedArray buffer's first element is not 0.
+    // Wait until the sharedArray buffer's first element is not 0, i.e., the thread is notified by the algorithm interface.
     Atomics.wait(sharedArray, 0, 0);
 }
 
 /**
- * Waits, but only if the algorithm is not in a step and stepsToTake is
- * 0.
+ * Waits, but only if the algorithm is not in a step and stepDepth is 0,
+ * indicating all recursive calls have returned.
  */
 function waitIfNeeded() {
-    
     // Wait if we are not in a step
     if (stepDepth == 0) {
         wait();
