@@ -85,6 +85,12 @@ export default function CytoscapeComponent() {
         Cytoscape.style().resetToDefault(); // Reset style
         Cytoscape.style(CytoscapeInterface.getStyle(graph)).update(); // Update style
 
+        // If it's a tree, clear the background grid immediately
+        if (graph.type === "tree" && backgroundCanvas.current) {
+            const ctx = backgroundCanvas.current.getContext("2d");
+            ctx.clearRect(0, 0, backgroundCanvas.current.width, backgroundCanvas.current.height);
+        }
+
         // Define a function to handle window resize events
         const handleResize = () => {
             let newScalar = GraphInterface.getScalar(graph);
@@ -110,6 +116,11 @@ export default function CytoscapeComponent() {
     }, [graph, algorithmChangeManager]);
 
     useEffect(() => {
+        //If there is a tree, do not draw the grid
+        if ( graph.type == 'tree'){ 
+            return;
+        }
+        
         // Draw the background grid once and add an event listener to re-draw it when the viewport changes
         const graphScalar = GraphInterface.getScalar(graph);
         drawGrid(graphScalar.x, graphScalar.y);
