@@ -3,7 +3,8 @@ import GraphInterface from "../GraphInterface/GraphInterface"
 import LayeredGraph from "../../states/Graph/LayeredGraph";
 import Node from "../../states/Graph/GraphElement/Node";
 import StandardGraph from "../../states/Graph/StandardGraph";
-
+import Tree from "../../states/Graph/Tree";
+import Graph from "states/Graph/Graph";
 /**
  * FileParser is an interface for loading a graph representation from a file.
  * 
@@ -110,6 +111,24 @@ function isLayeredGraph(name, file) {
 }
 
 /**
+ * Helper method for determining whether a file is a tree or not.
+ * A file is a tree if it ends in the .tree extension (currently, may have easier specs in the future)
+ * @param {String} name The name of the graph file
+ * @returns True if the file is in the Tree format, false if not.
+ */
+function isTree(name) {
+    let isTree = false;
+
+    //Checks the file extension
+    if(name.endsWith('.tree')){
+        isTree = true;
+    }
+
+    //Returns if the graph file is a tree or not
+    return isTree;
+}
+
+/**
  * Checks if a string can be parsed into a number.
  * @author see: https://stackoverflow.com/a/175787
  * @param {String} str String to check
@@ -138,8 +157,9 @@ function loadGraph(name, file) {
     const lines = file.split("\n");
 
     // Initialize the proper graph type
-    const graph = isLayeredGraph(name, file)
-        ? new LayeredGraph(name)
+    // Can be either a tree, a layered graph, or a standard graph
+    const graph = isTree(name) ? new Tree(name) 
+        : isLayeredGraph(name, file) ? new LayeredGraph(name)
         : new StandardGraph(name);
 
     // Parse each line
@@ -188,6 +208,8 @@ function parseLine(graph, line) {
     let whitespaceRegex = /[ \t]+/
     const values = line.split(whitespaceRegex);
 
+    
+
     // Check which regex matches and send the values to be parsed as either a node or edge
     switch (true) {
         case commentRegex.test(line):
@@ -214,6 +236,33 @@ function parseLine(graph, line) {
  */
 function parseComment(graph, line) {
     graph.comments.add(line);
+}
+
+/**
+ * Parses a single line from a tree file. This should be simply two values.
+ * @param {Graph} graph The graph that is to be added to
+ * @param {Array} values The two ids of the nodes to add an edge between
+ * @todo add error checking either here or in addEdge and addNode
+ */
+function parseTreeLine(graph, values){
+    //Get necessary values to create the two nodes
+    let id1 = values[0];
+    let id2 = values[1];
+    //Attributes can be added later if necessary
+    let node1Attributes = {};
+    let node2Attributes = {};
+    let edgeAttributes = {};
+
+    //Adds both nodes to the graph if they do not already exist
+    if(!graph.nodes.has(id1)){
+        addNode(graph, 0, 0, id1, node1Attributes);
+    }
+    if(!graph.nodes.has(id2)){
+        addNode(graph, 0, 0, id2, node2Attributes);
+    }
+
+    //Adds an edge between the two nodes
+    addEdge(graph, id1, id2, edgeAttributes)
 }
 
 /**

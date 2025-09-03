@@ -63,6 +63,7 @@ export default function Graph() {
 
             // We have to wait for cytoscape to read graph changes, and add graph.
             if (isInit) setTimeout(() => Cytoscape.fit(Cytoscape.elements(), 100), 25);
+            
         }
 
         // Load a new algorithm
@@ -99,6 +100,10 @@ export default function Graph() {
         // Register the functions in shared worker
         SharedWorker.on("graph-init", data => onGraphLoad(data, true));
         SharedWorker.on("graph-rename", onGraphLoad);
+        //If the graph type is a tree, do the new layout
+        if(graph.type == 'tree'){
+            Cytoscape.layout({ name: 'dagre', fit: true, animate: false }).run();
+        }
         SharedWorker.on("algo-init", onAlgorithmLoad);
         return () => SharedWorker.remove(onGraphLoad, onAlgorithmLoad);
     }, [graph]);

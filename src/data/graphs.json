@@ -104,34 +104,39 @@
 		"content": "c DFA for strings that contain ba as a substring and do not end in ab\nc start state is 0, F = {4,6}\ng 7 14\n\nn 0 1 1 \nn 1 2 1 \nn 2 3 1 \nn 3 2 2 \nn 4 3 2 \nn 5 2 3 \nn 6 3 3 \ne 0 1 label:a\ne 0 3 label:b\ne 1 1 label:a\ne 1 2 label:b\ne 2 4 label:a\ne 2 3 label:b\ne 3 4 label:a\ne 3 3 label:b\ne 4 4 label:a\ne 4 5 label:b\ne 5 4 label:a\ne 5 6 label:b\ne 6 4 label:a\ne 6 6 label:b\n",
 		"description": " DFA for strings that contain ba as a substring and do not end in ab\n start state is 0, F = {4,6}"
 	},
-    {
-        "name": "0-template.sgf",
-        "content": "c This is a template for a layered graph.\nc The only difference from that of an ordinary graph is a required title line starting with 't';\nc  it has the form 't NAME [#_nodes #_edges #_layers]'\nt graph_name\n",
-        "description": " This is a template for a layered graph.\n The only difference from that of an ordinary graph is a required title line starting with 't';\n  it has the form 't NAME [#_nodes #_edges #_layers]'"
-    },
-    {
-        "name": "ex_10.sgf",
-        "content": "c A small two-layer example\nt ex_10 10 12 2\nn 0 0 0\nn 1 0 1\nn 2 0 2\nn 3 0 3\nn 4 0 4\nn 5 1 0\nn 6 1 1\nn 7 1 2\nn 8 1 3\nn 9 1 4\ne 0 5\ne 1 5\ne 3 5\ne 0 6\ne 1 6\ne 0 7\ne 3 7\ne 4 7\ne 2 8\ne 3 8\ne 4 8\ne 0 9\n",
-        "description": " A small two-layer example"
-    },
-    {
-        "name": "ex_20.sgf",
-        "content": "c A small 4 layer example\nt ex_20 20 36 4\nn 0 0 1\nn 1 0 0\nn 2 0 2\nn 3 0 3\nn 4 0 4\nn 5 1 1\nn 6 1 0\nn 7 1 4\nn 8 1 3\nn 9 1 2\nn 10 2 1\nn 11 2 4\nn 12 2 2\nn 13 2 0\nn 14 2 3\nn 15 3 1\nn 16 3 3\nn 17 3 0\nn 18 3 2\nn 19 3 4\ne 0 5\ne 1 5\ne 3 5\ne 0 6\ne 1 6\ne 0 7\ne 3 7\ne 4 7\ne 2 8\ne 3 8\ne 4 8\ne 0 9\ne 6 10\ne 8 10\ne 7 11\ne 8 11\ne 5 12\ne 9 12\ne 5 13\ne 5 14\ne 8 14\ne 9 14\ne 11 15\ne 12 15\ne 13 15\ne 14 15\ne 10 16\ne 11 16\ne 14 16\ne 13 17\ne 10 18\ne 11 18\ne 12 18\ne 14 18\ne 11 19\ne 12 19\n",
-        "description": " A small 4 layer example"
-    },
-    {
-        "name": "north42.32.sgf",
-        "content": "c One of hundreds of benchmark graphs used for comparing crossing minimization heuristics \nt north42.32_GKNV 42 64 6\nn 0 0 0\nn 1 0 1\nn 2 0 2\nn 3 1 0\nn 4 1 1\nn 5 1 2\nn 6 1 3\nn 7 1 4\nn 8 1 5\nn 9 1 6\nn 10 1 7\nn 11 1 8\nn 12 1 9\nn 13 1 10\nn 14 1 11\nn 15 2 0\nn 16 2 1\nn 17 2 2\nn 18 2 3\nn 19 2 4\nn 20 2 5\nn 21 2 6\nn 22 3 0\nn 23 3 1\nn 24 3 2\nn 25 3 3\nn 26 3 4\nn 27 3 5\nn 28 3 6\nn 29 3 7\nn 30 4 0\nn 31 4 1\nn 32 4 2\nn 33 4 3\nn 34 4 4\nn 35 4 5\nn 36 4 6\nn 37 4 7\nn 38 5 0\nn 39 5 1\nn 40 5 2\nn 41 5 3\ne 32 39\ne 26 30\ne 8 20\ne 5 21\ne 21 29\ne 23 37\ne 2 10\ne 1 6\ne 14 20\ne 7 16\ne 16 23\ne 2 5\ne 22 33\ne 2 12\ne 16 26\ne 18 25\ne 20 28\ne 37 40\ne 23 34\ne 27 37\ne 13 15\ne 1 14\ne 36 40\ne 34 38\ne 17 26\ne 25 36\ne 29 30\ne 15 27\ne 4 18\ne 30 39\ne 26 31\ne 15 22\ne 21 28\ne 0 4\ne 6 15\ne 12 19\ne 9 16\ne 17 24\ne 17 23\ne 25 35\ne 18 24\ne 20 29\ne 3 18\ne 1 8\ne 33 41\ne 29 31\ne 28 36\ne 0 3\ne 10 19\ne 1 13\ne 35 38\ne 31 41\ne 28 35\ne 0 7\ne 22 32\ne 19 22\ne 0 9\ne 19 27\ne 2 11\ne 17 25\ne 24 32\ne 27 34\ne 24 33\ne 11 21\n",
-        "description": " One of hundreds of benchmark graphs used for comparing crossing minimization heuristics"
-    },
-    {
-        "name": "n42-t48v150.sgf",
-        "content": "c A version of north42.32 with minimum total non-verticality,\nc i.e., edges deviate as little as possible from being vertical\nt  north42.32-total_48_vertical 42 64 6\nn  0 0 9\nn  1 0 2\nn  2 0 6\nn  3 1 11\nn  4 1 10\nn  5 1 6\nn  6 1 1\nn  7 1 9\nn  8 1 2\nn  9 1 8\nn  10 1 4\nn  11 1 7\nn  12 1 5\nn  13 1 0\nn  14 1 3\nn  15 2 2\nn  16 2 8\nn  17 2 7\nn  18 2 9\nn  19 2 3\nn  20 2 4\nn  21 2 6\nn  22 3 2\nn  23 3 8\nn  24 3 5\nn  25 3 9\nn  26 3 6\nn  27 3 3\nn  28 3 7\nn  29 3 4\nn  30 4 5\nn  31 4 4\nn  32 4 3\nn  33 4 2\nn  34 4 7\nn  35 4 9\nn  36 4 8\nn  37 4 6\nn  38 5 8\nn  39 5 4\nn  40 5 7\nn  41 5 3\ne  32 39\ne  26 30\ne  8 20\ne  5 21\ne  21 29\ne  23 37\ne  2 10\ne  1 6\ne  14 20\ne  7 16\ne  16 23\ne  2 5\ne  22 33\ne  2 12\ne  16 26\ne  18 25\ne  20 28\ne  37 40\ne  23 34\ne  27 37\ne  13 15\ne  1 14\ne  36 40\ne  34 38\ne  17 26\ne  25 36\ne  29 30\ne  15 27\ne  4 18\ne  30 39\ne  26 31\ne  15 22\ne  21 28\ne  0 4\ne  6 15\ne  12 19\ne  9 16\ne  17 24\ne  17 23\ne  25 35\ne  18 24\ne  20 29\ne  3 18\ne  1 8\ne  33 41\ne  29 31\ne  28 36\ne  0 3\ne  10 19\ne  1 13\ne  35 38\ne  31 41\ne  28 35\ne  0 7\ne  22 32\ne  19 22\ne  0 9\ne  19 27\ne  2 11\ne  17 25\ne  24 32\ne  27 34\ne  24 33\ne  11 21\n",
-        "description": " A version of north42.32 with minimum total non-verticality,\n i.e., edges deviate as little as possible from being vertical"
-    },
-    {
-        "name": "rome1178.29.sgf",
-        "content": "c Another layered version of a Rome graph, has 5 layers\nt rome1178.29_GKNV 33 34 5\n\nn 0 0 6 \nn 1 1 1 \nn 2 1 2 \nn 3 1 3 \nn 4 1 4 \nn 5 1 5 \nn 6 1 6 \nn 7 1 7 \nn 8 1 8 \nn 9 1 9 \nn 10 1 11 \nn 11 1 12 \nn 12 2 0 \nn 13 2 1 \nn 14 2 2 \nn 15 2 3 \nn 16 2 4 \nn 17 2 5 \nn 18 2 6 \nn 19 2 7 \nn 20 2 8 \nn 21 2 9 \nn 22 2 10 \nn 23 2 11 \nn 24 2 12 \nn 25 3 3 \nn 26 3 4 \nn 27 3 5 \nn 28 3 7 \nn 29 3 10 \nn 30 3 12 \nn 31 4 4 \nn 32 4 8 \ne 0 3 \ne 0 11 \ne 1 12 \ne 1 13 \ne 2 14 \ne 2 13 \ne 2 15 \ne 3 15 \ne 3 18 \ne 4 16 \ne 4 18 \ne 5 18 \ne 6 18 \ne 7 18 \ne 7 19 \ne 8 18 \ne 8 21 \ne 9 21 \ne 10 22 \ne 10 21 \ne 10 23 \ne 11 24 \ne 16 25 \ne 17 27 \ne 17 26 \ne 17 28 \ne 20 29 \ne 20 28 \ne 22 29 \ne 23 29 \ne 24 30 \ne 26 31 \ne 27 32 \ne 30 32 \n",
-        "description": " Another layered version of a Rome graph, has 5 layers"
-    }
+	{
+		"name": "0-template.sgf",
+		"content": "c This is a template for a layered graph.\nc The only difference from that of an ordinary graph is a required title line starting with 't';\nc  it has the form 't NAME [#_nodes #_edges #_layers]'\nt graph_name\n",
+		"description": " This is a template for a layered graph.\n The only difference from that of an ordinary graph is a required title line starting with 't';\n  it has the form 't NAME [#_nodes #_edges #_layers]'"
+	},
+	{
+		"name": "ex_10.sgf",
+		"content": "c A small two-layer example\nt ex_10 10 12 2\nn 0 0 0\nn 1 0 1\nn 2 0 2\nn 3 0 3\nn 4 0 4\nn 5 1 0\nn 6 1 1\nn 7 1 2\nn 8 1 3\nn 9 1 4\ne 0 5\ne 1 5\ne 3 5\ne 0 6\ne 1 6\ne 0 7\ne 3 7\ne 4 7\ne 2 8\ne 3 8\ne 4 8\ne 0 9\n",
+		"description": " A small two-layer example"
+	},
+	{
+		"name": "ex_20.sgf",
+		"content": "c A small 4 layer example\nt ex_20 20 36 4\nn 0 0 1\nn 1 0 0\nn 2 0 2\nn 3 0 3\nn 4 0 4\nn 5 1 1\nn 6 1 0\nn 7 1 4\nn 8 1 3\nn 9 1 2\nn 10 2 1\nn 11 2 4\nn 12 2 2\nn 13 2 0\nn 14 2 3\nn 15 3 1\nn 16 3 3\nn 17 3 0\nn 18 3 2\nn 19 3 4\ne 0 5\ne 1 5\ne 3 5\ne 0 6\ne 1 6\ne 0 7\ne 3 7\ne 4 7\ne 2 8\ne 3 8\ne 4 8\ne 0 9\ne 6 10\ne 8 10\ne 7 11\ne 8 11\ne 5 12\ne 9 12\ne 5 13\ne 5 14\ne 8 14\ne 9 14\ne 11 15\ne 12 15\ne 13 15\ne 14 15\ne 10 16\ne 11 16\ne 14 16\ne 13 17\ne 10 18\ne 11 18\ne 12 18\ne 14 18\ne 11 19\ne 12 19\n",
+		"description": " A small 4 layer example"
+	},
+	{
+		"name": "north42.32.sgf",
+		"content": "c One of hundreds of benchmark graphs used for comparing crossing minimization heuristics \nt north42.32_GKNV 42 64 6\nn 0 0 0\nn 1 0 1\nn 2 0 2\nn 3 1 0\nn 4 1 1\nn 5 1 2\nn 6 1 3\nn 7 1 4\nn 8 1 5\nn 9 1 6\nn 10 1 7\nn 11 1 8\nn 12 1 9\nn 13 1 10\nn 14 1 11\nn 15 2 0\nn 16 2 1\nn 17 2 2\nn 18 2 3\nn 19 2 4\nn 20 2 5\nn 21 2 6\nn 22 3 0\nn 23 3 1\nn 24 3 2\nn 25 3 3\nn 26 3 4\nn 27 3 5\nn 28 3 6\nn 29 3 7\nn 30 4 0\nn 31 4 1\nn 32 4 2\nn 33 4 3\nn 34 4 4\nn 35 4 5\nn 36 4 6\nn 37 4 7\nn 38 5 0\nn 39 5 1\nn 40 5 2\nn 41 5 3\ne 32 39\ne 26 30\ne 8 20\ne 5 21\ne 21 29\ne 23 37\ne 2 10\ne 1 6\ne 14 20\ne 7 16\ne 16 23\ne 2 5\ne 22 33\ne 2 12\ne 16 26\ne 18 25\ne 20 28\ne 37 40\ne 23 34\ne 27 37\ne 13 15\ne 1 14\ne 36 40\ne 34 38\ne 17 26\ne 25 36\ne 29 30\ne 15 27\ne 4 18\ne 30 39\ne 26 31\ne 15 22\ne 21 28\ne 0 4\ne 6 15\ne 12 19\ne 9 16\ne 17 24\ne 17 23\ne 25 35\ne 18 24\ne 20 29\ne 3 18\ne 1 8\ne 33 41\ne 29 31\ne 28 36\ne 0 3\ne 10 19\ne 1 13\ne 35 38\ne 31 41\ne 28 35\ne 0 7\ne 22 32\ne 19 22\ne 0 9\ne 19 27\ne 2 11\ne 17 25\ne 24 32\ne 27 34\ne 24 33\ne 11 21\n",
+		"description": " One of hundreds of benchmark graphs used for comparing crossing minimization heuristics"
+	},
+	{
+		"name": "n42-t48v150.sgf",
+		"content": "c A version of north42.32 with minimum total non-verticality,\nc i.e., edges deviate as little as possible from being vertical\nt  north42.32-total_48_vertical 42 64 6\nn  0 0 9\nn  1 0 2\nn  2 0 6\nn  3 1 11\nn  4 1 10\nn  5 1 6\nn  6 1 1\nn  7 1 9\nn  8 1 2\nn  9 1 8\nn  10 1 4\nn  11 1 7\nn  12 1 5\nn  13 1 0\nn  14 1 3\nn  15 2 2\nn  16 2 8\nn  17 2 7\nn  18 2 9\nn  19 2 3\nn  20 2 4\nn  21 2 6\nn  22 3 2\nn  23 3 8\nn  24 3 5\nn  25 3 9\nn  26 3 6\nn  27 3 3\nn  28 3 7\nn  29 3 4\nn  30 4 5\nn  31 4 4\nn  32 4 3\nn  33 4 2\nn  34 4 7\nn  35 4 9\nn  36 4 8\nn  37 4 6\nn  38 5 8\nn  39 5 4\nn  40 5 7\nn  41 5 3\ne  32 39\ne  26 30\ne  8 20\ne  5 21\ne  21 29\ne  23 37\ne  2 10\ne  1 6\ne  14 20\ne  7 16\ne  16 23\ne  2 5\ne  22 33\ne  2 12\ne  16 26\ne  18 25\ne  20 28\ne  37 40\ne  23 34\ne  27 37\ne  13 15\ne  1 14\ne  36 40\ne  34 38\ne  17 26\ne  25 36\ne  29 30\ne  15 27\ne  4 18\ne  30 39\ne  26 31\ne  15 22\ne  21 28\ne  0 4\ne  6 15\ne  12 19\ne  9 16\ne  17 24\ne  17 23\ne  25 35\ne  18 24\ne  20 29\ne  3 18\ne  1 8\ne  33 41\ne  29 31\ne  28 36\ne  0 3\ne  10 19\ne  1 13\ne  35 38\ne  31 41\ne  28 35\ne  0 7\ne  22 32\ne  19 22\ne  0 9\ne  19 27\ne  2 11\ne  17 25\ne  24 32\ne  27 34\ne  24 33\ne  11 21\n",
+		"description": " A version of north42.32 with minimum total non-verticality,\n i.e., edges deviate as little as possible from being vertical"
+	},
+	{
+		"name": "rome1178.29.sgf",
+		"content": "c Another layered version of a Rome graph, has 5 layers\nt rome1178.29_GKNV 33 34 5\n\nn 0 0 6 \nn 1 1 1 \nn 2 1 2 \nn 3 1 3 \nn 4 1 4 \nn 5 1 5 \nn 6 1 6 \nn 7 1 7 \nn 8 1 8 \nn 9 1 9 \nn 10 1 11 \nn 11 1 12 \nn 12 2 0 \nn 13 2 1 \nn 14 2 2 \nn 15 2 3 \nn 16 2 4 \nn 17 2 5 \nn 18 2 6 \nn 19 2 7 \nn 20 2 8 \nn 21 2 9 \nn 22 2 10 \nn 23 2 11 \nn 24 2 12 \nn 25 3 3 \nn 26 3 4 \nn 27 3 5 \nn 28 3 7 \nn 29 3 10 \nn 30 3 12 \nn 31 4 4 \nn 32 4 8 \ne 0 3 \ne 0 11 \ne 1 12 \ne 1 13 \ne 2 14 \ne 2 13 \ne 2 15 \ne 3 15 \ne 3 18 \ne 4 16 \ne 4 18 \ne 5 18 \ne 6 18 \ne 7 18 \ne 7 19 \ne 8 18 \ne 8 21 \ne 9 21 \ne 10 22 \ne 10 21 \ne 10 23 \ne 11 24 \ne 16 25 \ne 17 27 \ne 17 26 \ne 17 28 \ne 20 29 \ne 20 28 \ne 22 29 \ne 23 29 \ne 24 30 \ne 26 31 \ne 27 32 \ne 30 32 \n",
+		"description": " Another layered version of a Rome graph, has 5 layers"
+	},
+	{
+		"name": "example.tree",
+		"content": "1 2\n1 3\n2 4\n2 5\n3 6",
+		"description": ""
+	}
 ]

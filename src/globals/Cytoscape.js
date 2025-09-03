@@ -1,9 +1,11 @@
 import cytoscape from "cytoscape";
 import nodeHtmlLabel from "cytoscape-node-html-label";
 import coseBilkent from "cytoscape-cose-bilkent";
+import dagre from "cytoscape-dagre";
 
 /** Set up add-ons to cytoscape */
 cytoscape.use(coseBilkent);
+cytoscape.use(dagre)
 nodeHtmlLabel(cytoscape);
 
 /**
