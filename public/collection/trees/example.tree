@@ -1,5 +1,16 @@
-1 2
-1 3
-2 4
-2 5
-3 6
+c This is an example of a tree file
+c "n id x y" specifies a node should be created (x y is ignored)
+c "e id1 id2" specifies an edge should be created from id1 to id2  
+n 1 0 0
+n 2 0 0
+n 3 0 0
+n 4 0 0
+n 5 0 0
+n 6 0 0
+n 7 0 0
+e 1 2
+e 1 3
+e 2 4
+e 2 5
+e 3 6
+e 3 7

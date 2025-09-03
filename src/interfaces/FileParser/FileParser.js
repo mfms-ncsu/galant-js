@@ -117,15 +117,11 @@ function isLayeredGraph(name, file) {
  * @returns True if the file is in the Tree format, false if not.
  */
 function isTree(name) {
-    let isTree = false;
 
     //Checks the file extension
-    if(name.endsWith('.tree')){
-        isTree = true;
-    }
-
-    //Returns if the graph file is a tree or not
-    return isTree;
+    const values = name.split(".")
+    const extension = values[values.length - 1]
+    return extension.includes("tree")
 }
 
 /**
