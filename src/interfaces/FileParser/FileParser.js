@@ -208,15 +208,7 @@ function parseLine(graph, line) {
     let whitespaceRegex = /[ \t]+/
     const values = line.split(whitespaceRegex);
 
-    //Handles check to see if the graph is a tree
-    if(graph.type === "tree"){
-        //If the line was an empty line, ignore
-        if(line === ""){
-            return;
-        }
-        parseTreeLine(graph, values) 
-        return;
-    }
+    
 
     // Check which regex matches and send the values to be parsed as either a node or edge
     switch (true) {
