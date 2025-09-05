@@ -159,7 +159,17 @@ function loadGraph(name, file) {
         : new StandardGraph(name);
 
     // Parse each line
-    lines.forEach(line => { parseLine(graph, line) });
+    let edgeList = []
+    let edgeCount = 0
+    lines.forEach(line => { 
+        //Record response for edges
+        const response = parseLine(graph, line) 
+        //If the return existed, add [source, target] to edgeList
+        if(response){
+            edgeList[edgeCount] = response
+            edgeCount += 1
+        }
+    });
 
     // Reconcile the index and layer properties of each node if it's a LayeredGraph. This is necessary
     // because each node uses its x and y coordinate as its layer and index initially which is not accurate.
@@ -186,6 +196,27 @@ function loadGraph(name, file) {
         }
     }
 
+    //Handles determining how many hidden nodes we must add
+    if(graph.type == "tree"){
+        //Merges the list of edges, initialize max length
+        let pathList = edgeListMerger(edgeList)
+        let maxLength = -1
+        //Find the max path length
+        pathList.forEach((path) => {maxLength = path.length > maxLength ? path.length : maxLength}) 
+        //For each path, if it is smaller than the max length, add hidden nodes until it is proper size       
+        for(let i = 0; i < pathList.length; i++){
+            while(pathList[i].length < maxLength){
+                //Add new node
+                let id = addNode(graph, 0, 0, undefined, {hidden:"true"})
+                //Connect new node
+                addEdge(graph, pathList[i][pathList[i].length - 1], id)
+                //Add node to pathList
+                pathList[i].push(id)
+            }
+        }
+
+    }
+
     // Generate a scale for the graph based on the node positions
     graph.scalar = GraphInterface.getScalar(graph);
 
@@ -203,10 +234,10 @@ function parseLine(graph, line) {
     line = line.trim();
     let whitespaceRegex = /[ \t]+/
     const values = line.split(whitespaceRegex);
-
     
 
     // Check which regex matches and send the values to be parsed as either a node or edge
+
     switch (true) {
         case commentRegex.test(line):
             // Ignore comments
@@ -216,8 +247,8 @@ function parseLine(graph, line) {
             parseNode(graph, values);
             return;
         case edgeRegex.test(line):
-            parseEdge(graph, values);
-            return;
+            //Retrns the edges for use of trees
+            return parseEdge(graph, values);
         default:
             // If the line was not a node or an edge, throw an exception
             throw new Error("input line from file: \"" + line + "\" is not a valid node or edge.");
@@ -234,32 +265,6 @@ function parseComment(graph, line) {
     graph.comments.add(line);
 }
 
-/**
- * Parses a single line from a tree file. This should be simply two values.
- * @param {Graph} graph The graph that is to be added to
- * @param {Array} values The two ids of the nodes to add an edge between
- * @todo add error checking either here or in addEdge and addNode
- */
-function parseTreeLine(graph, values){
-    //Get necessary values to create the two nodes
-    let id1 = values[0];
-    let id2 = values[1];
-    //Attributes can be added later if necessary
-    let node1Attributes = {};
-    let node2Attributes = {};
-    let edgeAttributes = {};
-
-    //Adds both nodes to the graph if they do not already exist
-    if(!graph.nodes.has(id1)){
-        addNode(graph, 0, 0, id1, node1Attributes);
-    }
-    if(!graph.nodes.has(id2)){
-        addNode(graph, 0, 0, id2, node2Attributes);
-    }
-
-    //Adds an edge between the two nodes
-    addEdge(graph, id1, id2, edgeAttributes)
-}
 
 /**
  * Parses a node line and creates a new node object.
@@ -319,7 +324,8 @@ function addNode(graph, x, y, nodeId, attributes) {
     for (let name in attributes) {
         node.attributes.set(name, attributes[name]);
     }
-
+    //Returns the ID of the newly created node
+    return nodeId;
     // Get the smallest unused node id for automatic assigning
     function generateId(nodes) {
         let id = 0;
@@ -332,6 +338,7 @@ function addNode(graph, x, y, nodeId, attributes) {
  * Parses an edge line and creates a new edge object.
  * @param {Graph} graph Graph to modify
  * @param {Array} values Values to parse
+ * @returns {Array} [source, target] node IDs to be used in trees 
  */
 function parseEdge(graph, values) {
     // Get the necessary values to create an edge
@@ -354,6 +361,49 @@ function parseEdge(graph, values) {
 
     // Add the edge
     addEdge(graph, source, target, attributes);
+    //Return the [source, target] ids for use of trees
+    return ([source, target])
+}
+
+/**
+ * Merges all edges in a list of form:
+ * [[1, 2]    [[1, 2, 3]
+ *  [2, 3]     [1, 2, 4, 6]
+ *  [2, 4] ==> [1, 5]]
+ *  [1, 5]
+ *  [4, 6]]
+ * @param {Array[Array]} edgeList List of edges to be chained together 
+ * @returns The new array of full paths down a tree
+ */
+function edgeListMerger(edgeList){
+    //Variable to tell if there was a chain found or not
+    let chained = false;
+    //Select a base chain to build off of (e.g. [1, 2])
+    for(let i = 0; i < edgeList.length; i++){
+        //Check all chains to attach (e.g. [2, 3])
+        for(let j = 0; j < edgeList.length; j++){
+            //See if the chains fit ([1,2] pairs with [2,3])
+            if(edgeList[i][edgeList[i].length - 1] == edgeList[j][0]){
+                //Add new combined chain to edgeList ([1,2,3])
+                edgeList.push([...new Set([...edgeList[i], ...edgeList[j]])]);
+                //Remove 2nd chain piece ([2,3]) from edgeList
+                edgeList.splice(j, 1);
+                //We made a chain, so eventually we need to remove our base ([1,2])
+                //Reduce j since all elements shifted down.
+                chained = true
+                j--;
+            }
+        }
+        //If we created a chain, remove base link ([1,2]), set chained to false, and decrement i 
+        if(chained){
+            edgeList.splice(i, 1);
+            chained = false;
+            i--
+        }
+    }
+    //Returns the newly modified edgeList
+    return edgeList;
+    
 }
 
 /**
