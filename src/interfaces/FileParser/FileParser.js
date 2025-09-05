@@ -207,14 +207,13 @@ function loadGraph(name, file) {
         for(let i = 0; i < pathList.length; i++){
             while(pathList[i].length < maxLength){
                 //Add new node
-                let id = addNode(graph, 0, 0, undefined, {hidden:"true"})
+                let id = addNode(graph, 0, 0, undefined, {color:"red"})
                 //Connect new node
                 addEdge(graph, pathList[i][pathList[i].length - 1], id)
                 //Add node to pathList
                 pathList[i].push(id)
             }
         }
-
     }
 
     // Generate a scale for the graph based on the node positions
@@ -376,7 +375,7 @@ function parseEdge(graph, values) {
  * @returns The new array of full paths down a tree
  */
 function edgeListMerger(edgeList){
-    //Variable to tell if there was a chain found or not
+    //Variable to tell how many chains were made
     let chained = false;
     //Select a base chain to build off of (e.g. [1, 2])
     for(let i = 0; i < edgeList.length; i++){
@@ -390,7 +389,11 @@ function edgeListMerger(edgeList){
                 edgeList.splice(j, 1);
                 //We made a chain, so eventually we need to remove our base ([1,2])
                 //Reduce j since all elements shifted down.
-                chained = true
+                chained = true;
+                //If the shift will affect i, shift i as well
+                if(j < i){
+                    i--;
+                }
                 j--;
             }
         }
