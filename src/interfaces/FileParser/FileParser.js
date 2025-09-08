@@ -196,22 +196,40 @@ function loadGraph(name, file) {
         }
     }
 
-    //Handles determining how many hidden nodes we must add
+    //Adds hidden nodes to trees to ensure proper ordering
     if(graph.type == "tree"){
-        //Merges the list of edges, initialize max length
+
+        //Merges the list of edges, initializes a map of tree lengths
         let pathList = edgeListMerger(edgeList)
-        let maxLength = -1
-        //Find the max path length
-        pathList.forEach((path) => {maxLength = path.length > maxLength ? path.length : maxLength}) 
+        let forestHeights = {}
+        
+        //Find the max path length for each tree
+        pathList.forEach((path) => {
+
+            //If this is the first time encountering the root for this tree, initialize its height. 
+            // If not, store the max path length.
+            const pathRoot = path[0];
+            if(!(forestHeights[pathRoot])){
+                forestHeights[pathRoot] = path.length
+            }else{
+                forestHeights[pathRoot] = path.length > forestHeights[pathRoot] ? path.length : forestHeights[pathRoot];
+            }});
+
         //For each path, if it is smaller than the max length, add hidden nodes until it is proper size       
-        for(let i = 0; i < pathList.length; i++){
-            while(pathList[i].length < maxLength){
-                //Add new node
+        for(let pathIdx = 0; pathIdx < pathList.length; pathIdx++){
+            
+            //Initialize variables needed for hidden node additions
+            const path = pathList[pathIdx];
+            const pathRoot = path[0];
+            const pathEnd = path[path.length - 1];
+
+            //Add hidden nodes until this path reaches the proper height
+            while(path.length < forestHeights[pathRoot]){
+
+                //Create a new node, connect it to the path, and add it to the pathList
                 let id = addNode(graph, 0, 0, undefined, {color:"red"})
-                //Connect new node
-                addEdge(graph, pathList[i][pathList[i].length - 1], id)
-                //Add node to pathList
-                pathList[i].push(id)
+                addEdge(graph, pathEnd, id)
+                pathList[pathIdx].push(id)
             }
         }
     }
@@ -365,48 +383,68 @@ function parseEdge(graph, values) {
 }
 
 /**
- * Merges all edges in a list of form:
- * [[1, 2]    [[1, 2, 3]
- *  [2, 3]     [1, 2, 4, 6]
- *  [2, 4] ==> [1, 5]]
- *  [1, 5]
- *  [4, 6]]
- * @param {Array[Array]} edgeList List of edges to be chained together 
- * @returns The new array of full paths down a tree
+ * Takes a list of edges in an array and turns them into a complete list of paths down the tree(s).
+ * @param {Array[Array]} edgeArray Array of edges to be chained together in form [[source, target],...] 
+ * @returns The new array of paths down a tree 
  */
-function edgeListMerger(edgeList){
-    //Variable to tell how many chains were made
+function edgeListMerger(edgeArray){
+    //Initializes necessary values to determine which paths to merge
     let chained = false;
-    //Select a base chain to build off of (e.g. [1, 2])
-    for(let i = 0; i < edgeList.length; i++){
-        //Check all chains to attach (e.g. [2, 3])
-        for(let j = 0; j < edgeList.length; j++){
-            //See if the chains fit ([1,2] pairs with [2,3])
-            if(edgeList[i][edgeList[i].length - 1] == edgeList[j][0]){
-                //Add new combined chain to edgeList ([1,2,3])
-                edgeList.push([...new Set([...edgeList[i], ...edgeList[j]])]);
-                //Remove 2nd chain piece ([2,3]) from edgeList
-                edgeList.splice(j, 1);
-                //We made a chain, so eventually we need to remove our base ([1,2])
-                //Reduce j since all elements shifted down.
+    for(let basePathIndex = 0; basePathIndex < edgeArray.length; basePathIndex++){
+        for(let newPathIndex = 0; newPathIndex < edgeArray.length; newPathIndex++){
+
+            //Get the paths to be examined from the edgeArray
+            const basePath = edgeArray[basePathIndex]
+            const newPath = edgeArray[newPathIndex]
+
+            //Merge the paths if the end of the base path starts the new path
+            if(canMergePaths(basePath, newPath)){
+                const mergedPath = mergePaths(basePath, newPath)
                 chained = true;
-                //If the shift will affect i, shift i as well
-                if(j < i){
-                    i--;
+                
+                //Remove the newPath from our edgeArray and add the mergedPath
+                edgeArray.splice(newPathIndex, 1);
+                edgeArray.push(mergedPath);
+
+                //When removing from an array, the trailing elements shift down an index.
+                //If the basePathIndex was affected by this element shift, correct it 
+                if(newPathIndex < basePathIndex){
+                    basePathIndex--;
                 }
-                j--;
+                //The newPathIndex is always affected by the array's element shift upon deletion.
+                newPathIndex--;
             }
         }
-        //If we created a chain, remove base link ([1,2]), set chained to false, and decrement i 
+
+        //If we found elements to merge, we need to remove our basePath from the edgeArray
         if(chained){
-            edgeList.splice(i, 1);
+            edgeArray.splice(basePathIndex, 1);
             chained = false;
-            i--
+
+            //Account for the shift in array elements
+            basePathIndex--
         }
     }
-    //Returns the newly modified edgeList
-    return edgeList;
+    return edgeArray;
     
+    /**
+     * Determines if two paths can be merged together.
+     * @param {Array[Number]} basePath Any path of nodes.
+     * @param {Array[Number]} newPath The path of nodes we will attempt to stitch onto the end of the basePath.
+     * @returns True if basePath's ending is the beginning of newPath
+     */
+    function canMergePaths(basePath, newPath){
+        return basePath[basePath.length - 1] == newPath[0]
+    }
+
+    /**
+     * Combines two paths into one with no duplicates
+     * @param {Array[Number]} basePath Any path of nodes.
+     * @param {Array[Number]} newPath The array of nodes that will be added, in order, to the basePath.
+     */
+    function mergePaths(basePath, newPath){
+        return [...new Set([...basePath, ...newPath])];
+    }
 }
 
 /**
