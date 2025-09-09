@@ -31,6 +31,8 @@ Version 2.1
 (3) Enhancements have been added to a few of the algorithms
 
 ---------------------
+Features related to rooted tree algorithms released as version 3.0 by the Fall 2025 team of Garrett Brazawski, Elizabeth Conger, Bryan Fang, Andrew Parr, and Benjamin Warren
+
 Features and bug fixes implemented as version 2.0 by the Spring 2025 Teams of Heath Dyer, Jacob Friend, Rishi Gupta, Ethan Haske, Henry Morris, Ravi Pavuluri, Michael Richardson, Krisjan Smith, Jacob Usher, and Ziyu Wang are marked S25.
 
 Features and bug fixes implemented by the Fall 2024 Senior Design Team of Harshica Balu, Shlok Dave, Ethan Godwin, Andrew Lanning, and Somya Pandey are marked F24. The major accomplishment of this team was on the back end: the implementation of ***change records***, which make the code more transparent and allow separation of logical and physical representation of the graph.
