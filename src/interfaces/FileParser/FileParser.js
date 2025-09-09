@@ -213,7 +213,8 @@ function loadGraph(name, file) {
                 forestHeights[pathRoot] = path.length
             }else{
                 forestHeights[pathRoot] = path.length > forestHeights[pathRoot] ? path.length : forestHeights[pathRoot];
-            }});
+            }
+        });
 
         //For each path, if it is smaller than the max length, add hidden nodes until it is proper size       
         for(let pathIdx = 0; pathIdx < pathList.length; pathIdx++){
@@ -221,12 +222,12 @@ function loadGraph(name, file) {
             //Initialize variables needed for hidden node additions
             const path = pathList[pathIdx];
             const pathRoot = path[0];
-            const pathEnd = path[path.length - 1];
-
+            
             //Add hidden nodes until this path reaches the proper height
             while(path.length < forestHeights[pathRoot]){
-
+                
                 //Create a new node, connect it to the path, and add it to the pathList
+                const pathEnd = path[path.length - 1];
                 let id = addNode(graph, 0, 0, undefined, {color:"red"})
                 addEdge(graph, pathEnd, id)
                 pathList[pathIdx].push(id)
