@@ -3,7 +3,7 @@ import GraphInterface from "../GraphInterface/GraphInterface"
 import LayeredGraph from "../../states/Graph/LayeredGraph";
 import Node from "../../states/Graph/GraphElement/Node";
 import StandardGraph from "../../states/Graph/StandardGraph";
-import Tree from "../../states/Graph/Tree"
+import Tree from "../../states/Graph/Tree";
 import Graph from "states/Graph/Graph";
 //import { create, get } from "cypress/types/lodash";
 
@@ -25,11 +25,10 @@ import Graph from "states/Graph/Graph";
  * @returns True if the file is in the Tree format, false if not.
  */
 function isTree(name) {
-
     //Checks for a .tree extension
-    const values = name.split(".")
-    const extension = values[values.length - 1]
-    return extension.includes("tree")
+    const values = name.split(".");
+    const extension = values[values.length - 1];
+    return extension.includes("tree");
 }
 
 /**
@@ -39,98 +38,160 @@ function isTree(name) {
  */
 function getRootsAndLeaves(graph){
     //Initialize the roots and leaves storage
+    const roots = [];
+    const leaves = [];
 
     //Examine each node in the graph
+    for ( const [id, node] of graph.nodes ){
 
         //Initialize booleans for if it is a root and leaf
+        let isRoot = true;
+        let isLeaf = true;
 
         //Examine each edge coming into or out of the node
-
+        for ( const [id, edge] of node.edges) {
             //If the edge goes out, it has children and is not a leaf
+            if( edge.source == node.id ){
+                isLeaf = false;
+            }else{
             //Otherwise, it is not a root
-
+                isRoot = false;
+            }
+        }
         //Include the node in roots or leaves
+        if( isRoot ){
+            roots.push(node);
+            console.log("Root: " + node.id)
+        }
+        if( isLeaf ){
+            leaves.push(node)
+            console.log("Leaf: " + node.id)
+        }
+    }
 
     //Return roots and leaves
+    return [roots, leaves]
 }
 
 /**
  * Finds and stores the depth of each node in a given graph
  * @param {Graph} graph The graph to assign node depths to
- * @param {Map} nodeDepths A map holding the depth of every node
  * @param {Array} leaves The starting points to find depths of
  * @returns the maximum depth found among all nodes
  */
-function assignDepths(graph, nodeDepths, leaves){
+function assignDepths(graph, roots){
     //Initialize a variable to store the maximum depth
+    let maxDepth = -1;
 
-    //For each leaf node, set the heights of its entire path
+    //Compute the maximum depth of each subtree
+    for ( const root of roots ){
+        const depth = computeDepths(graph, root, 0);
 
-        //If the depth of the leaf is the largest we've seen, store it
-
-    //Return the maximum depth
-
+        //If this tree has the largest depth, store it
+        if( depth > maxDepth ){
+            maxDepth = depth;
+        }
+    }
     
+    //Return the maximum depth
+    console.log("Max depth: " + maxDepth);
+    return maxDepth;
 }
 
 /**
- * Gets the depth of a node and adds it to a given depth storage.
- * Sets the depth of any root node to be 1.
- * @param {Graph} graph The graph containing all of our nodes
- * @param {Map} nodeDepths The storage mechanism to hold all depths
- * @param {Node} node The node the user wishes to find the depth of
- * @returns The depth of the given node
+ * Assigns the correct depth to subtree_root and all of its descendants
+ * @param subtree_root the root of a subtree in the forest
+ * @param k the correct depth of subtree_root
+ * @return the maximum depth of any descendant of subtree_root
  */
-function getDepth(graph, nodeDepths, node){
-    //Gets the parent of the given node
-    const parent = getParent(graph, node);
-
-    //If a parent exists and we know its height, we are 1 deeper than the parent
-    if( parent && nodeDepths[parent.id] ){
-        const depth = nodeDepths[parent.id] + 1;
-        nodeDepths[node.id] = depth;
-        return depth
-        
-    //If there is a parent but we don't know its height, recur upwards
-    }else if( parent ){
-        const depth = getDepth(graph, parent) + 1;
-        nodeDepths[node.id] = depth; 
-        return depth
-
-    //If there is no parent, then this is a root node with depth 1
-    } else {
-        nodeDepths[node.id] = 1;
-        return 1
+function computeDepths(graph, subtree_root, k){
+    //Error checking for cycle
+    if(subtree_root.depth){
+        throw new Error("Node " + subtree_root.id + " has too many parents.");
+    }
+    
+    //Initialize necessary variables
+    const children = getChildren(graph, subtree_root);
+    let maxDepth = -1;
+    subtree_root.depth = k;
+    
+    //If this node has no children, it is a leaf, return k
+    if( children.length == 0 ){
+        return k;
     }
 
+    //Compute the depths of all children of this root
+    for( const child of children){
+        //Store maximum depth found
+        const childDepth = computeDepths(graph, child, k + 1);
+        maxDepth = childDepth > maxDepth ? childDepth : maxDepth;
+    }
+
+    //Return the maximum depth of children
+    return maxDepth;
+}
+
+/**
+ * Gets the children of a given node
+ * Possibly needs to move to GraphInterface or TreeInterface
+ * @param {Graph} graph 
+ * @param {Node} node 
+ * @returns The children of a given node
+ */
+function getChildren(graph, node){
+    //Initialize necessary variables
+    let children = [];
+
+    //Find children from edges
+    for( const [subjects, edge] of node.edges ){
+        //If the edge leads to a child, store child node
+        if( edge.source == node.id ){
+            children.push(graph.nodes.get(edge.target));
+        }
+    }
+
+   //Returns an array of child nodes 
+    return children;
 }
 
 /**
  * Gets the parent of a given node
+ * Possibly needs to move to GraphInterface or TreeInterface
  * @param {Graph} graph The graph containing our node and parent
  * @param {Node} node The node to find a parent of
  */
 function getParent(graph, node){
 
     //Find an edge that comes from a parent, and return the parent node
-    node.edges.forEach( (edge) => {
+    for( const [subjects, edge] of node.edges ){
         if( edge.target == node.id ){
             return graph.nodes[edge.source];
         }
-    })
+    }
 }
 
 /**
- * Adds hidden paths to all leaf nodes not already at the maximum depths
+ * Adds hidden nodes to all leaf nodes not already at the maximum depths
  * @param {Graph} graph Graph that stores all nodes
  * @param {Map} nodeDepths The current depth of every node
  * @param {Array} leaves An array of every leaf on our graph
  * @param {Number} maxDepth 
  */
-function addHiddenPaths(graph, nodeDepths, leaves, maxDepth){
+function addHiddenPaths(graph, leaves, maxDepth){
     //Add hidden nodes to each leaf until they are the proper height
+    for ( const leaf of leaves ){
 
-        //For this leaf node, add maxDepth - leaf depth nodes
+        //Add hidden nodes until they reach the maximum depth
+        let bottomNode = leaf;
+        while( bottomNode.depth < maxDepth ){
+
+            //Connect a new node and reassign the bottom most node
+            const newNode = addNode(graph, 0, 0, undefined, {color:"red"});
+            addEdge(graph, bottomNode.id, newNode.id);
+            newNode.depth = bottomNode.depth + 1;
+            bottomNode = newNode;
+        }
+    }
 }
 
 /**
@@ -140,9 +201,12 @@ function addHiddenPaths(graph, nodeDepths, leaves, maxDepth){
  */
 function addHiddenRoot(graph, roots){
     //Creates a hidden node to be the root
+    const hiddenRoot = addNode(graph, 0, 0, undefined, {color:"red"});
 
     //Connect the hidden root to each actual root of the forest
-
+    for( const root of roots ){
+        addEdge(graph, hiddenRoot.id, root.id);
+    }
 }
 
  /**
@@ -176,11 +240,6 @@ function isLayeredGraph(name, file) {
 }
 
 /**
- * @return true if the graph, based on file extension, is a tree
- * @param {String} name Name of the graph file
- */
-
-/**
  * Checks if a string can be parsed into a number.
  * @author see: https://stackoverflow.com/a/175787
  * @param {String} str String to check
@@ -211,7 +270,7 @@ function loadGraph(name, file) {
     if ( isLayeredGraph(name, file) ) {
         graph = new LayeredGraph(name) }
     else if ( isTree(name) ) {
-        graph = new Tree(name)
+        graph = new Tree(name);
     } else {
         graph = new StandardGraph(name);
     }
@@ -263,10 +322,9 @@ function createLayers(graph) {
  * @param {Graph} graph Graph to modify
  */
 function forceCorrectTreeLayout(graph) {
-    let nodeDepths = new Map(); // Map of node id -> depth
     const [roots, leaves] = getRootsAndLeaves(graph);
-    const maxDepth = assignDepths(graph, nodeDepths, leaves);
-    addHiddenPaths(graph, nodeDepths, leaves, maxDepth);
+    const maxDepth = assignDepths(graph, roots);
+    addHiddenPaths(graph, leaves, maxDepth);
     addHiddenRoot(graph, roots);
 }
 
@@ -282,7 +340,7 @@ function forceCorrectTreeLayout(graph) {
  */
 function parseAttributes(tokens, startingIndex) {
     //Initializes the attribute map
-    const attributes = {}
+    const attributes = {};
 
     //Assigns the weight if it exists
     if (isNumeric(tokens[startingIndex])) {
@@ -307,14 +365,15 @@ function parseAttributes(tokens, startingIndex) {
  * Parses the line to determine whether it is an edge or node line.
  * @param {Graph} graph Graph to modify
  * @param {String} line Line string
+ * @todo Fix whitespaceRegex. Can split on " " but doesn't account for tab
  */
 function parseLine(graph, line) {
     // Trim the line string to remove leading/trailing whitespace and split along spacez
     line = line.trim();
     if ( line.length === 0 ) return; // Ignore blank lines
     // Javascript must have a standard regex for whitespace
-    const whitespaceRegex = "/[ \t]+/"
-    const tokens = line.split(" ");
+    const whitespaceRegex = /[ \t]+/;
+    const tokens = line.split(whitespaceRegex);
 
     // Check the first token and send the tokens to be parsed as a node or edge as appropriate
     switch ( tokens[0] ) {
@@ -329,9 +388,9 @@ function parseLine(graph, line) {
             parseEdge(graph, tokens);
             return;
         case "t":
-            return
+            return;
         case "g":
-            return
+            return;
         default:
             // If the line starts with an unrecognized character, throw an error
             throw new Error("input line from file: \"" + line + "\" is not a valid node or edge.");
@@ -407,6 +466,8 @@ function addNode(graph, x, y, nodeId, attributes) {
     for (let name in attributes) {
         node.attributes.set(name, attributes[name]);
     }
+
+    return node;
 
     // Get the smallest unused node id for automatic assigning
     function generateId(nodes) {
