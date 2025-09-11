@@ -74,30 +74,32 @@ function assignDepths(graph, nodeDepths, leaves){
 }
 
 /**
- * Gets the depth of a node recursively, and adds it to a given depth storage.
+ * Gets the depth of a node and adds it to a given depth storage.
  * Sets the depth of any root node to be 1.
  * @param {Graph} graph The graph containing all of our nodes
  * @param {Map} nodeDepths The storage mechanism to hold all depths
  * @param {Node} node The node the user wishes to find the depth of
- * @returns 
+ * @returns The depth of the given node
  */
 function getDepth(graph, nodeDepths, node){
     //Gets the parent of the given node
     const parent = getParent(graph, node);
 
-    //If a parent exists and we know its height, grab the parents height
+    //If a parent exists and we know its height, we are 1 deeper than the parent
     if( parent && nodeDepths[parent.id] ){
         const depth = nodeDepths[parent.id] + 1;
-        nodeDepts[node.id] = depth;
+        nodeDepths[node.id] = depth;
         return depth
+        
     //If there is a parent but we don't know its height, recur upwards
     }else if( parent ){
         const depth = getDepth(graph, parent) + 1;
-        nodeDepts[node.id] = depth; 
+        nodeDepths[node.id] = depth; 
         return depth
+
     //If there is no parent, then this is a root node with depth 1
     } else {
-        nodeDepts[node.id] = 1;
+        nodeDepths[node.id] = 1;
         return 1
     }
 
@@ -261,11 +263,11 @@ function createLayers(graph) {
  * @param {Graph} graph Graph to modify
  */
 function forceCorrectTreeLayout(graph) {
-    // let nodeDepths = new Map(); // Map of node id -> depth
-    // const [roots, leaves] = getRootsAndLeaves(graph);
-    // const maxDepth = assignDepths(graph, nodeDepths, leaves);
-    // addHiddenPaths(graph, nodeDepths, leaves, maxDepth);
-    // addHiddenRoot(graph, roots);
+    let nodeDepths = new Map(); // Map of node id -> depth
+    const [roots, leaves] = getRootsAndLeaves(graph);
+    const maxDepth = assignDepths(graph, nodeDepths, leaves);
+    addHiddenPaths(graph, nodeDepths, leaves, maxDepth);
+    addHiddenRoot(graph, roots);
 }
 
 /**
@@ -298,7 +300,6 @@ function parseAttributes(tokens, startingIndex) {
     }
 
     //Returns the attribute map
-    console.log(attributes)
     return attributes
 }
 
