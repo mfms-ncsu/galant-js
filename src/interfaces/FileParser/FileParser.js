@@ -186,7 +186,7 @@ function addHiddenPaths(graph, leaves, maxDepth){
         while( bottomNode.depth < maxDepth ){
 
             //Connect a new node and reassign the bottom most node
-            const newNode = addNode(graph, 0, 0, undefined, {color:"red"});
+            const newNode = addNode(graph, 0, 0, undefined, {hidden:"true"});
             addEdge(graph, bottomNode.id, newNode.id);
             newNode.depth = bottomNode.depth + 1;
             bottomNode = newNode;
@@ -201,7 +201,7 @@ function addHiddenPaths(graph, leaves, maxDepth){
  */
 function addHiddenRoot(graph, roots){
     //Creates a hidden node to be the root
-    const hiddenRoot = addNode(graph, 0, 0, undefined, {color:"red"});
+    const hiddenRoot = addNode(graph, 0, 0, undefined, {hidden:"true"});
 
     //Connect the hidden root to each actual root of the forest
     for( const root of roots ){
@@ -344,8 +344,8 @@ function parseAttributes(tokens, startingIndex) {
 
     //Assigns the weight if it exists
     if (isNumeric(tokens[startingIndex])) {
-        attributes["weight"] = parseFloat(tokens[3]);
-        startingIndex++;
+        attributes["weight"] = parseFloat(tokens[startingIndex]);
+        startingIndex += 1;
     }
 
     //Adds each remaining attribute to the attribute map
@@ -365,7 +365,6 @@ function parseAttributes(tokens, startingIndex) {
  * Parses the line to determine whether it is an edge or node line.
  * @param {Graph} graph Graph to modify
  * @param {String} line Line string
- * @todo Fix whitespaceRegex. Can split on " " but doesn't account for tab
  */
 function parseLine(graph, line) {
     // Trim the line string to remove leading/trailing whitespace and split along spacez
