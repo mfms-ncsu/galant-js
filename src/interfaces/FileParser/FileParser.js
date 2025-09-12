@@ -100,30 +100,30 @@ function assignDepths(graph, roots){
 
 /**
  * Assigns the correct depth to subtree_root and all of its descendants
- * @param subtree_root the root of a subtree in the forest
- * @param k the correct depth of subtree_root
+ * @param subtreeRoot the root of a subtree in the forest
+ * @param rootDepth the correct depth of subtree_root
  * @return the maximum depth of any descendant of subtree_root
  */
-function computeDepths(graph, subtree_root, k){
+function computeDepths(graph, subtreeRoot, rootDepth){
     //Error checking for cycle
-    if(subtree_root.depth){
-        throw new Error("Node " + subtree_root.id + " has too many parents.");
+    if(subtreeRoot.depth){
+        throw new Error("Node " + subtreeRoot.id + " has too many parents.");
     }
     
     //Initialize necessary variables
-    const children = getChildren(graph, subtree_root);
+    const children = getChildren(graph, subtreeRoot);
     let maxDepth = -1;
-    subtree_root.depth = k;
+    subtreeRoot.depth = rootDepth;
     
     //If the node is a leaf return its depth
     if( children.length == 0 ){
-        return k;
+        return rootDepth;
     }
 
     //Compute the depths of all children of this root
     for( const child of children){
         //Store maximum depth found
-        const childDepth = computeDepths(graph, child, k + 1);
+        const childDepth = computeDepths(graph, child, rootDepth + 1);
         maxDepth = childDepth > maxDepth ? childDepth : maxDepth;
     }
 
