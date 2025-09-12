@@ -1,4 +1,5 @@
 c A hidden node should connect the roots of the forest (1 and 5)
+c Node 5 should also have 2 hidden nodes
 n 1 0 0
 n 2 0 0
 n 3 0 0
