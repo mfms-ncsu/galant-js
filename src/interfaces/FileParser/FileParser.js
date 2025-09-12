@@ -42,14 +42,14 @@ function getRootsAndLeaves(graph){
     const leaves = [];
 
     //Examine each node in the graph
-    for ( const [id, node] of graph.nodes ){
+    for ( const [nodeId, node] of graph.nodes ){
 
         //Initialize booleans for if it is a root and leaf
         let isRoot = true;
         let isLeaf = true;
 
         //Examine each edge coming into or out of the node
-        for ( const [id, edge] of node.edges) {
+        for ( const [edgeId, edge] of node.edges) {
             //If the edge goes out, it has children and is not a leaf
             if( edge.source == node.id ){
                 isLeaf = false;
@@ -115,7 +115,7 @@ function computeDepths(graph, subtree_root, k){
     let maxDepth = -1;
     subtree_root.depth = k;
     
-    //If this node has no children, it is a leaf, return k
+    //If the node is a leaf return its depth
     if( children.length == 0 ){
         return k;
     }
@@ -134,8 +134,8 @@ function computeDepths(graph, subtree_root, k){
 /**
  * Gets the children of a given node
  * Possibly needs to move to GraphInterface or TreeInterface
- * @param {Graph} graph 
- * @param {Node} node 
+ * @param {Graph} graph The graph that the given node exists in
+ * @param {Node} node The node to find children of
  * @returns The children of a given node
  */
 function getChildren(graph, node){
@@ -159,6 +159,7 @@ function getChildren(graph, node){
  * Possibly needs to move to GraphInterface or TreeInterface
  * @param {Graph} graph The graph containing our node and parent
  * @param {Node} node The node to find a parent of
+ * @returns The parent of the given node
  */
 function getParent(graph, node){
 
@@ -175,7 +176,7 @@ function getParent(graph, node){
  * @param {Graph} graph Graph that stores all nodes
  * @param {Map} nodeDepths The current depth of every node
  * @param {Array} leaves An array of every leaf on our graph
- * @param {Number} maxDepth 
+ * @param {Number} maxDepth Maximum depth of all trees
  */
 function addHiddenPaths(graph, leaves, maxDepth){
     //Add hidden nodes to each leaf until they are the proper height
@@ -196,8 +197,8 @@ function addHiddenPaths(graph, leaves, maxDepth){
 
 /**
  * Adds a single hidden root to ensure proper ordering of subtrees.
- * @param {Graph} graph 
- * @param {Array} roots 
+ * @param {Graph} graph Graph to add a hidden root to.
+ * @param {Array} roots The roots of the given graph.
  */
 function addHiddenRoot(graph, roots){
     //Creates a hidden node to be the root
@@ -292,6 +293,10 @@ function loadGraph(name, file) {
     return graph;
 }
 
+/**
+ * Creates the layers for a layered graph
+ * @param {Graph} graph The layered graph to make layers for
+ */
 function createLayers(graph) {
     // Build a map of layers (layer (int) -> list of nodes)
     const layers = new Map();
@@ -327,10 +332,6 @@ function forceCorrectTreeLayout(graph) {
     addHiddenPaths(graph, leaves, maxDepth);
     addHiddenRoot(graph, roots);
 }
-
-/**
- * Helper functions for parsing lines
- */
 
 /**
  * @return a list of attribute based on the line string and starting index
