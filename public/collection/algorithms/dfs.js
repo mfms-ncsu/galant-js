@@ -37,7 +37,7 @@ function visit(node) {
         label(node, discoveryTimes[node]);
     });
 
-     for ( const edge of outgoing(node) ) {
+    for ( const edge of outgoing(node) ) {
         if ( hasColor(edge) ) continue; // seen this edge from the other end (undirected)
            const nextNode = other(node, edge);
             if ( hasLabel(edge) ) {
