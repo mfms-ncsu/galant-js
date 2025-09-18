@@ -54,12 +54,10 @@ function search(node, target) {
 
   // Looks at the left branch if target is smaller
   if (target < node) {
-    color(getEdgeBetween(node, children[0]), "red");
     return search(children[0], target);
   }
 
   // Looks at the right branch if the target is bigger
-  color(getEdgeBetween(node, children[1]), "red");
   return search(children[1], target);
 }
 
