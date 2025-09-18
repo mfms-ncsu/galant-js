@@ -1540,15 +1540,19 @@ function startRecording(changeManager) {
 /**
  * Converts the graph to a string representation for exporting to a file.
  * @param {Graph} graph Graph on which to operate
+ * @param {String} algorithmName Name of current algorithm
  * @returns String representation of the current graph
  */
-function toString(graph) {
+function toString(graph, algorithmName = "No Algorithm Running") {
   let content = "";
 
   // Start this file with the header comments
   graph.comments.forEach((comment) => {
     content += `${comment}\n`;
   })
+
+  // Add a comment with the current algorithm 
+  content += `c Current Algorithm: ${algorithmName}\n\n`;
 
   // Loop over each node
   graph.nodes.forEach((node) => {

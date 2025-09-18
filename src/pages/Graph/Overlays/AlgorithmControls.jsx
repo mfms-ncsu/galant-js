@@ -35,7 +35,7 @@ export default function AlgorithmControls() {
                 ],
             });
             const writableStream = await fileHandle.createWritable();
-            const content = GraphInterface.toString(graph);
+            const content = GraphInterface.toString(graph, algorithm.name);
             await writableStream.write(content);
             await writableStream.close();
         } else {
@@ -64,7 +64,7 @@ export default function AlgorithmControls() {
             return; // Exit the function if the user cancelled
         }
 
-        const content = GraphInterface.toString(graph);
+        const content = GraphInterface.toString(graph, algorithm.name);
         const blob = new Blob([content], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
