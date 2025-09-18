@@ -100,9 +100,10 @@ export default function Graph() {
         // Register the functions in shared worker
         SharedWorker.on("graph-init", data => onGraphLoad(data, true));
         SharedWorker.on("graph-rename", onGraphLoad);
-        //If the graph type is a tree, do the new layout
+        // If the graph type is "tree", do a layout appropriate for trees - https://www.npmjs.com/package/cytoscape-dagre
+        // In other cases, layout depends on user-specified node positions; Cytoscape is called on only for auto-layout - see ControlSettingsPopover 
         if(graph.type == 'tree'){
-            Cytoscape.layout({ name: 'dagre', fit: true, animate: false }).run();
+            Cytoscape.layout({ name: 'dagre', fit: false }).run();
         }
         SharedWorker.on("algo-init", onAlgorithmLoad);
         return () => SharedWorker.remove(onGraphLoad, onAlgorithmLoad);
