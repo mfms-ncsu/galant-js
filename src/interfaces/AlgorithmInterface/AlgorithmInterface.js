@@ -201,6 +201,10 @@ function onMessage(algorithm, message) {
             [newGraph, newChangeManager] = GraphInterface.addNode(graph, changeManager, message.x, message.y);
             updateState(newGraph, newChangeManager);
             break;
+        case "addNodeId":
+            [newGraph, newChangeManager] = GraphInterface.addNode(graph, changeManager, message.x, message.y, message.id);
+            updateState(newGraph, newChangeManager);
+            break;
         case "addEdge":
             [newGraph, newChangeManager] = GraphInterface.addEdge(graph, changeManager, message.source, message.target);
             updateState(newGraph, newChangeManager);
