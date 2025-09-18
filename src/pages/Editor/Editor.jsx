@@ -50,7 +50,7 @@ export default function Editor({ editorType, tabsAtom }) {
 
     return (
         <div className="flex flex-col h-full">
-            <TabList tabs={tabs} setTabs={setTabs} examples={(editorType === "Algorithm") ? algorithms : graphs} acceptFileType={(editorType === "Algorithm") ? ".js" : ".txt, .gph, .sgf"} />
+            <TabList tabs={tabs} setTabs={setTabs} examples={(editorType === "Algorithm") ? algorithms : graphs} acceptFileType={(editorType === "Algorithm") ? ".js" : ".txt, .gph, .sgf, .tree"} />
             <InnerEditor tab={selectedTab} onChange={onEditorChange} />
             <Overlay tab={selectedTab} saved={saved} editorType={editorType} />
         </div>

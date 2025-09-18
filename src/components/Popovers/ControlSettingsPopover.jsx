@@ -26,8 +26,15 @@ export default function ControlSettingsPopover() {
     // Function to handle auto layout action
     function autoLayout() {
         // Disable for Layered Graphs
-        if (graph.type == "layered")
+        if (graph.type === "layered")
             return;
+
+        // If the graph type is "tree", do a layout appropriate for trees - https://www.npmjs.com/package/cytoscape-dagre
+        if (graph.type === "tree"){
+            Cytoscape.layout({name: 'dagre', fit: false}).run();
+            autoCamera();
+            return;
+        }
 
         const graphScalar = graph.scalar;
         const idealEdgeLength = Math.min(window.innerWidth / graphScalar.x, window.innerHeight / graphScalar.y);

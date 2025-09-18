@@ -308,6 +308,15 @@ function addNode(x, y) {
     return newNode;
 }
 
+// function addNodeIdAttrs(id, x, y, attrs) {
+//     if (stepDepth == 0) { postMessage({ action: "step" }) }
+//     let newNode;
+//     [graph, changeManager, newNode] = GraphInterface.addNode(graph, changeManager, x, y, id, attrs);
+//     postMessage({ action: "addNode", x: x, y: y, id:id});
+//     waitIfNeeded();
+//     return newNode;
+// }
+
 /**
  * Functions related to positions of nodes; shold probably moved to a separate section
  */
@@ -1004,6 +1013,16 @@ function applyNodePositions(savedPositions){
     postMessage({ action: "applyNodePositions",  savedPositions: savedPositions,});
     waitIfNeeded();
 }
+
+// function addNewNodeToTree(){
+//     const targetId = prompt("What is the ID of the new node?")
+//     const sourceId = prompt("What is the parent of the new node?")
+//     const attrs = prompt("What are the attributes of the new node?")
+//     addNodeIdAttrs(targetId, 0,0, attrs)
+    
+    
+//     addEdge(sourceId, targetId)
+// }
 
 
 /**************************************************************/
