@@ -1,9 +1,11 @@
-import produce, { enableMapSet } from "immer";
+import {produce, current, enableMapSet } from "immer";
 import ChangeObject from "states/ChangeManager/ChangeObject";
 import Graph from "states/Graph/Graph";
 import ChangeManager from "states/ChangeManager/ChangeManager";
 import Edge from "states/Graph/GraphElement/Edge";
 import Node from "states/Graph/GraphElement/Node";
+import TreeInterface from "./TreeInterface";
+import FileParser from "interfaces/FileParser/FileParser";
 import LayeredGraph from "states/Graph/LayeredGraph";
 
 /** Enable maps in immer */
@@ -367,7 +369,7 @@ function getIncomingEdges(graph, target) {
   }
 
   // Get all edges if undirected
-  if (!graph.isDirected) {
+  if (!graph.isDirected && graph.type != 'tree') {
     return getIncidentEdges(graph, target);
   }
 
@@ -559,7 +561,7 @@ function getOutgoingEdges(graph, source) {
   }
 
   // Get all edges if undirected
-  if (!graph.isDirected) {
+  if (!graph.isDirected && graph.type != 'tree') {
     return getIncidentEdges(graph, source);
   }
 
@@ -708,7 +710,6 @@ function getSource(graph, edge) {
 function addEdge(graph, changeManager, source, target, attributes) {
   // Error checking
   verifyNodes(graph, source, target, "create edge");
-
   const newGraph = produce(graph, (draft) => {
     // Create the edge object
     let edge = new Edge(source, target);
@@ -721,6 +722,11 @@ function addEdge(graph, changeManager, source, target, attributes) {
     // Add the edge to both the source and target's adjacency lists
     draft.nodes.get(source).edges.set(`${source},${target}`, edge);
     draft.nodes.get(target).edges.set(`${source},${target}`, edge);
+
+    // If we are creating an edge between two tree nodes, we need to remake the larger structure
+    if( draft.type == "tree" ){
+      TreeInterface.forceCorrectTreeLayout(draft);
+    }
   });
 
   // Add the change object to the changeManager
@@ -780,6 +786,11 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
     // Set the attributes
     for (let name in attributes) {
       node.attributes.set(name, attributes[name]);
+    }
+
+    // If we add this node to a tree, we need to remake the tree layout
+    if( draft.type == "tree" ){
+      TreeInterface.forceCorrectTreeLayout(draft);
     }
   });
 
