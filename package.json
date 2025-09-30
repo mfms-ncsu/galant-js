@@ -20,6 +20,7 @@
     "create-react-class": "^15.7.0",
     "cytoscape-cose-bilkent": "^3.0.0",
     "cytoscape-dagre": "^2.5.0",
+    "cytoscape-elk": "^2.3.0",
     "cytoscape-node-html-label": "^1.2.2",
     "fireworks-js": "^2.10.2",
     "help": "^3.0.2",

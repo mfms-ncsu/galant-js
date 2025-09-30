@@ -103,7 +103,8 @@ export default function Graph() {
         // If the graph type is "tree", do a layout appropriate for trees - https://www.npmjs.com/package/cytoscape-dagre
         // In other cases, layout depends on user-specified node positions; Cytoscape is called on only for auto-layout - see ControlSettingsPopover 
         if(graph.type == 'tree'){
-            Cytoscape.layout({ name: 'dagre', fit: false }).run();
+            Cytoscape.layout({ name: 'elk', fit: true, animate: false, 
+                elk: {"elk.algorithm": "layered", "elk.layered.considerModelOrder.strategy": "PREFER_NODES", 'elk.direction': 'DOWN', 'elk.edgeRouting': 'SPLINES'} }).run();
         }
         SharedWorker.on("algo-init", onAlgorithmLoad);
         return () => SharedWorker.remove(onGraphLoad, onAlgorithmLoad);
