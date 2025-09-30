@@ -26,7 +26,7 @@ step(() => {
 function getRoot() {
   for (const x of getNodes()) {
     if (inDegree(x) === 0) {
-      return x;
+      return outgoingNodes(x)[0];
     }
   }
 }
@@ -35,8 +35,26 @@ function getRoot() {
 const start = getRoot();
 
 // Recursivly goes through the tree
-function search(node, target) {
+function search(node, target, lastVisited) {
   if (node === undefined) {
+    display(`'${target}' not found`);
+    let createNode = promptBoolean(`Do you want to insert: '${target}'`);
+
+    if (createNode) {
+      step(() => {
+        addNodeIdAttrs(target, 0 ,0, undefined);
+        addEdge(lastVisited, target);
+      });
+      step(() => {
+        mark(target);
+        highlight(target);
+        label(target, "#" + visit++);
+      });
+
+      display(`Successully added: '${target}'`);
+      return node;
+    }
+    display(`Algorithm finished: '${target}' not found`);
     return node;
   }
 
@@ -54,16 +72,15 @@ function search(node, target) {
 
   // Looks at the left branch if target is smaller
   if (target < node) {
-    return search(children[0], target);
+    return search(children[0], target, node);
+    
   }
 
   // Looks at the right branch if the target is bigger
-  return search(children[1], target);
+  return search(children[1], target, node);
 }
 
 // Starts postOrder traversal on the given node
 if (search(start, target)) {
   display(`Algorithm finished: '${target}' successfully found`);
-} else {
-  display(`Algorithm finished: '${target}' not found`);
 }
