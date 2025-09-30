@@ -30,7 +30,7 @@ export default function ControlSettingsPopover() {
             return;
 
         if (graph.type === "tree"){
-            Cytoscape.layout({name: 'dagre', fit: true, animate: false}).run();
+            Cytoscape.layout({name: 'elk', fit: true, animate: false}).run();
             autoCamera();
             return;
         }
