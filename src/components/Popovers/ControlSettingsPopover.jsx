@@ -29,9 +29,8 @@ export default function ControlSettingsPopover() {
         if (graph.type === "layered")
             return;
 
-        // If the graph type is "tree", do a layout appropriate for trees - https://www.npmjs.com/package/cytoscape-dagre
         if (graph.type === "tree"){
-            Cytoscape.layout({name: 'dagre', fit: false}).run();
+            Cytoscape.layout({name: 'elk', fit: true, animate: false}).run();
             autoCamera();
             return;
         }

@@ -12,7 +12,7 @@ export default class Graph {
   isDirected = false;
   /** Name of the graph */
   name;
-  /** Map of nodes in the graph (NodeId -> Node) */
+  /** Map of nodes in the graph (NodeId -> Node)*/
   nodes;
   /** Node render size */
   nodeSize = 35;

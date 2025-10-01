@@ -1,36 +1,84 @@
 import Edge from "../../states/Graph/GraphElement/Edge";
-import GraphInterface from "../GraphInterface/GraphInterface";
-import TreeInterface from "interfaces/GraphInterface/TreeInterface";
+import GraphInterface from "../GraphInterface/GraphInterface"
 import LayeredGraph from "../../states/Graph/LayeredGraph";
 import Node from "../../states/Graph/GraphElement/Node";
 import StandardGraph from "../../states/Graph/StandardGraph";
 import Tree from "../../states/Graph/Tree";
 import Graph from "states/Graph/Graph";
-// import { create, get } from "cypress/types/lodash";
+/**
+ * FileParser is an interface for loading a graph representation from a file.
+ * 
+ * @author Henry Morris
+ * @author Jacob Usher
+ */
 
 /**
- * The comments below suggest a refactoring of the code to make it significantly easier to follow
- * Parts of the code that are fine as is are kept.
+ *********
+ * REGEX *
+ *********
  */
+
+    /*
+        Please don't remove the regex documentation! Regex is nearly
+        impossible to read, and if these ever need to be changed
+        or updated by future teams, anyone in the future will
+        probably have trouble understanding them without documentation.
+     */
+
+        /**
+         * @todo While these regular expressions are clever, they are a bad idea.
+         *      - they are difficult to read, and will be difficult to maintain
+         *      - they are not very flexible; they will make it hard to add new file formats
+         * They should be replaced with one token at a time processing of each line, which not only addresses the above issues, but also allows for more transparent error handling.
+         */
+
+    // Regex to match comments
+    const commentRegex = /^([gct].*)?$/;
+    /*
+        commentRegex documentation:
+
+        A comment is either:
+            - the letter g or c, followed by any amount of any characters
+            - An empty line
+
+    */
+
+
+    // Regexes to match simple node and edge lines
+    const nodeRegex = /^n[ \t]+\S+[ \t]+-?\d+.?\d*[ \t]+-?\d+.?\d*([ \t]+-?\d+.?\d*)?([ \t]+[^ \n\t:]+:[^ \n\t:]+)*$/;
+    /*
+        nodeRegex documentation:
+        
+        A line representing a node must have each of the following, separated by a space:
+            - The letter 'n' as the first letter
+            - An id (any amount of non-whitespace characters)
+            - An integer x coordinate
+            - An integer y coordinate
+            - Optionally, an integer weight (floating point numbers are allowed - check)
+            - Any amount of attributes. Attributes are specified as follows:
+                any amount of non-whitespace, non-colon characters, followed by a colon (no space),
+                followed by any amount of non-whitespace, non-colon characters.
+    */
+
+    const edgeRegex = /^e[ \t]+\S+[ \t]+\S+([ \t]+-?\d+.?\d*)?([ \t]+[^ \n\t:]+:[^ \n\t:]+)*$/;
+    /*
+        edgeRegex documentation:
+        
+        A line representing an edge must have each of the following, separated by a space:
+            - The letter 'e' as the first letter
+            - A source node id (any amount of non-whitespace characters)
+            - A target node id (any amount of non-whitespace characters)
+            - Optionally, an integer weight
+            - Any amount of attributes. Attributes are specified as follows:
+                any amount of non-whitespace, non-colon characters, followed by a colon (no space),
+                followed by any amount of non-whitespace, non-colon characters.
+    */
 
 /**
  ***********
  * HELPERS *
  ***********
  */
-
-/**
- * Helper method for determining whether a file is a tree or not.
- * A file is a tree if it ends in the .tree extension
- * @param {String} name The name of the graph file
- * @returns True if the file is in the Tree format, false if not.
- */
-function isTree(name) {
-    // Checks for a .tree extension
-    const values = name.split(".");
-    const extension = values[values.length - 1];
-    return extension.includes("tree");
-}
 
  /**
  * Helper method for determing the graph file format.
@@ -44,17 +92,17 @@ function isLayeredGraph(name, file) {
     let isLayeredGraph = false;
     const lines = file.split("\n");
     
-    // Check for the .sgf extension
+    //Check for the .sgf extension
     if ( name.endsWith('.sgf') ) {
         isLayeredGraph = true;
     }
 
-    // Check for a header or tag line beginning with 't'
+    //Check for a header or tag line beginning with 't'
     lines.forEach((line) => {
         line = line.trim();
-        const tokens = line.split(" ");
+        const values = line.split(" ");
 
-        if (tokens[0] === 't') {
+        if (values[0] === 't') {
             isLayeredGraph = true;
         };
     });
@@ -63,8 +111,22 @@ function isLayeredGraph(name, file) {
 }
 
 /**
+ * Helper method for determining whether a file is a tree or not.
+ * A file is a tree if it ends in the .tree extension (currently, may have easier specs in the future)
+ * @param {String} name The name of the graph file
+ * @returns True if the file is in the Tree format, false if not.
+ */
+function isTree(name) {
+
+    //Checks the file extension
+    const values = name.split(".")
+    const extension = values[values.length - 1]
+    return extension.includes("tree")
+}
+
+/**
  * Checks if a string can be parsed into a number.
- * @author see: https:// stackoverflow.com/a/175787
+ * @author see: https://stackoverflow.com/a/175787
  * @param {String} str String to check
  * @returns True if the string is numeric, false otherwise
  * @todo Allow for Infinity, NaN, and other special numeric values
@@ -73,6 +135,8 @@ function isNumeric(str) {
     if (typeof str !== "string") return false;
     return !Number.isNaN(Number(str)) && !Number.isNaN(parseFloat(str));
 }
+
+
 
 /**
  *************
@@ -89,86 +153,93 @@ function loadGraph(name, file) {
     const lines = file.split("\n");
 
     // Initialize the proper graph type
-    let graph = null;
-    if ( isLayeredGraph(name, file) ) {
-        graph = new LayeredGraph(name) }
-    else if ( isTree(name) ) {
-        graph = new Tree(name);
-    } else {
-        graph = new StandardGraph(name);
-    }
-    // Parse each line, ignoring comments and blank lines
-    // This part is the same for all graph types
-    lines.forEach(line => { parseLine(graph, line) });
+    // Can be either a tree, a layered graph, or a standard graph
+    const graph = isTree(name) ? new Tree(name) 
+        : isLayeredGraph(name, file) ? new LayeredGraph(name)
+        : new StandardGraph(name);
 
-    if ( graph.type === "layered" ) {
-        createLayers(graph);
-    }
-
-    if ( graph.type !== "tree") {
-        // Generate a scale for the graph based on the node positions
-        graph.scalar = GraphInterface.getScalar(graph);
-    }else{
-        TreeInterface.forceCorrectTreeLayout(graph)
-    }
-
-    return graph;
-}
-
-/**
- * Creates the layers for a layered graph
- * @param {Graph} graph The layered graph to make layers for
- */
-function createLayers(graph) {
-    // Build a map of layers (layer (int) -> list of nodes)
-    const layers = new Map();
-    graph.nodes.forEach((node) => {
-        if ( ! layers.has(node.layer) ) {
-            layers.set(node.layer, []);
+    // Parse each line
+    let edgeList = []
+    let edgeCount = 0
+    lines.forEach(line => { 
+        //Record response for edges
+        const response = parseLine(graph, line) 
+        //If the return existed, add [source, target] to edgeList
+        if(response){
+            edgeList[edgeCount] = response
+            edgeCount += 1
         }
-        layers.get(node.layer).push(node);
     });
 
-    // Calculate the smallest layer value to use as our offset (this will be layer 0)
-    const minLayer = Math.min(...Array.from(layers.keys()));
+    // Reconcile the index and layer properties of each node if it's a LayeredGraph. This is necessary
+    // because each node uses its x and y coordinate as its layer and index initially which is not accurate.
+    if (graph.type === "layered") {
+        // Build a map of layers (layer (int) -> list of nodes)
+        const layers = new Map();
+        graph.nodes.forEach((node) => {
+            if (!layers.has(node.layer)) {
+                layers.set(node.layer, []);
+            }
+            layers.get(node.layer).push(node);
+        });
 
-    // Iterate through each layer, sort its nodes by x position and update the node's layer and index properties accordingly
-    for (const [layer, nodes] of layers) {
-        const sortedNodes = nodes.sort((a, b) => a.position.x - b.position.x);
-        for ( const [idx, node] of sortedNodes.entries() ) {
-            node.layer = layer - minLayer;
-            node.index = idx;
-        }
-    }
-}
+        // Calculate the smallest layer value to use as our offset (this will be layer 0)
+        const minLayer = Math.min(...Array.from(layers.keys()));
 
-/**
- * @return a list of attribute based on the line string and starting index
- * Each atribute is a key:value pair separated by a colon
- * @param {Array} tokens A list of tokens from the line 
- * @param {Number} startingIndex Index at which to start parsing attributes
- */
-function parseAttributes(tokens, startingIndex) {
-    // Initializes the attribute map
-    const attributes = {};
-
-    // Assigns the weight if it exists
-    if ( isNumeric( tokens[startingIndex] ) ) {
-        attributes["weight"] = parseFloat(tokens[startingIndex]);
-        startingIndex += 1;
-    }
-
-    // Adds each remaining attribute to the attribute map
-    for ( let tokenIndex = startingIndex; tokenIndex < tokens.length; tokenIndex++ ) {
-        // Find and set the attribute
-        let pair = tokens[tokenIndex].trim().split(":");
-        if (pair.length === 2) {
-            attributes[pair[0]] = pair[1];
+        // Iterate through each layer, sort its nodes by x position and update the node's layer and index properties accordingly
+        for (const [layer, nodes] of layers) {
+            const sortedNodes = nodes.sort((a, b) => a.position.x - b.position.x);
+            for (const [idx, node] of sortedNodes.entries()) {
+                node.layer = layer - minLayer;
+                node.index = idx;
+            }
         }
     }
 
-    // Returns the attribute map
-    return attributes
+    //Adds hidden nodes to trees to ensure proper ordering
+    // if(graph.type == "tree"){
+
+    //     //Merges the list of edges, initializes a map of tree lengths
+    //     let pathList = edgeListMerger(edgeList)
+    //     let forestHeights = {}
+        
+    //     //Find the max path length for each tree
+    //     pathList.forEach((path) => {
+
+    //         //If this is the first time encountering the root for this tree, initialize its height. 
+    //         // If not, store the max path length.
+    //         const pathRoot = path[0];
+    //         if(!(forestHeights[pathRoot])){
+    //             forestHeights[pathRoot] = path.length
+    //         }else{
+    //             forestHeights[pathRoot] = path.length > forestHeights[pathRoot] ? path.length : forestHeights[pathRoot];
+    //         }
+    //     });
+
+    //     //For each path, if it is smaller than the max length, add hidden nodes until it is proper size       
+    //     for(let pathIdx = 0; pathIdx < pathList.length; pathIdx++){
+            
+    //         //Initialize variables needed for hidden node additions
+    //         const path = pathList[pathIdx];
+    //         const pathRoot = path[0];
+            
+    //         //Add hidden nodes until this path reaches the proper height
+    //         while(path.length < forestHeights[pathRoot]){
+                
+    //             //Create a new node, connect it to the path, and add it to the pathList
+    //             const pathEnd = path[path.length - 1];
+    //             let id = addNode(graph, 0, 0, undefined, {color:"red"})
+    //             addEdge(graph, pathEnd, id)
+    //             pathList[pathIdx].push(id)
+    //         }
+    //     }
+    // }
+
+    // Generate a scale for the graph based on the node positions
+    graph.scalar = GraphInterface.getScalar(graph);
+
+    // Return the new graph
+    return graph;
 }
 
 /**
@@ -179,29 +250,25 @@ function parseAttributes(tokens, startingIndex) {
 function parseLine(graph, line) {
     // Trim the line string to remove leading/trailing whitespace and split along spacez
     line = line.trim();
-    if ( line.length === 0 ) return; // Ignore blank lines
-    // Javascript must have a standard regex for whitespace
-    const whitespaceRegex = /[ \t]+/;
-    const tokens = line.split(whitespaceRegex);
+    let whitespaceRegex = /[ \t]+/
+    const values = line.split(whitespaceRegex);
+    
 
-    // Check the first token and send the tokens to be parsed as a node or edge as appropriate
-    switch ( tokens[0] ) {
-        case "c":
-            // Add comments to the graph's comments list
+    // Check which regex matches and send the values to be parsed as either a node or edge
+
+    switch (true) {
+        case commentRegex.test(line):
+            // Ignore comments
             parseComment(graph, line);
             return;
-        case "n":
-            parseNode(graph, tokens);
+        case nodeRegex.test(line):
+            parseNode(graph, values);
             return;
-        case "e":
-            parseEdge(graph, tokens);
-            return;
-        case "t":
-            return;
-        case "g":
-            return;
+        case edgeRegex.test(line):
+            //Retrns the edges for use of trees
+            return parseEdge(graph, values);
         default:
-            // If the line starts with an unrecognized character, throw an error
+            // If the line was not a node or an edge, throw an exception
             throw new Error("input line from file: \"" + line + "\" is not a valid node or edge.");
     }
 }
@@ -216,32 +283,32 @@ function parseComment(graph, line) {
     graph.comments.add(line);
 }
 
+
 /**
  * Parses a node line and creates a new node object.
  * @param {Graph} graph Graph to modify
- * @param {Array} tokens Values to parse
- * @todo instead of a list of tokens, start with the line string and parse attributes separately,
- *    checking for errors along the way
+ * @param {Array} values Values to parse
  */
-function parseNode(graph, tokens) {
-    // Get the necessary tokens to create a node
-    let id = tokens[1];
-    let x = parseFloat(tokens[2]), y = parseFloat(tokens[3]);
+function parseNode(graph, values) {
+    // Get the necessary values to create a node
+    let id = values[1];
+    let x = parseFloat(values[2]), y = parseFloat(values[3]);
+    let attributes = {};
     
-    // Get attributes from remaining tokens
-    const attributes = parseAttributes(tokens, 4);
+    // Get the weight, but only if it is a numeric value
+    if (isNumeric(values[4])) {
+        attributes["weight"] = parseFloat(values[4]);
+    }
 
-/**
- *   ******* OLD CODE ******* - move to parseAttributes()
-    // Loop over the rest of the tokens
-    for (let i = (attributes["weight"] === undefined) ? 4 : 5; i < tokens.length; i++) {
+    // Loop over the rest of the values
+    for (let i = (attributes["weight"] === undefined) ? 4 : 5; i < values.length; i++) {
         // Set the attribute
-        let pair = tokens[i].trim().split(":");
+        let pair = values[i].trim().split(":");
         if (pair.length === 2) {
             attributes[pair[0]] = pair[1];
         }
     }
-*/
+
     // Since the file contains node ids and attributes, pass them in as the last arguments
     addNode(graph, x, y, id, attributes);
 }
@@ -263,7 +330,7 @@ function addNode(graph, x, y, nodeId, attributes) {
     // If the nodeId argument is passed, use that, otherwise generate an id
     nodeId = nodeId || generateId(graph.nodes);
 
-    // TODO take a look at this
+    //TODO take a look at this
     // Create the node
     let node = graph.type === 'layered' 
         ? new Node(nodeId, y, x, x, y)
@@ -275,9 +342,8 @@ function addNode(graph, x, y, nodeId, attributes) {
     for (let name in attributes) {
         node.attributes.set(name, attributes[name]);
     }
-
-    return node;
-
+    //Returns the ID of the newly created node
+    return nodeId;
     // Get the smallest unused node id for automatic assigning
     function generateId(nodes) {
         let id = 0;
@@ -289,28 +355,97 @@ function addNode(graph, x, y, nodeId, attributes) {
 /**
  * Parses an edge line and creates a new edge object.
  * @param {Graph} graph Graph to modify
- * @param {Array} tokens Values to parse
+ * @param {Array} values Values to parse
+ * @returns {Array} [source, target] node IDs to be used in trees 
  */
-function parseEdge(graph, tokens) {
-    // Get the necessary tokens to create an edge
-    let source = tokens[1], target = tokens[2];
+function parseEdge(graph, values) {
+    // Get the necessary values to create an edge
+    let source = values[1], target = values[2];
+    let attributes = {};
     
-    // Get attributes from remaining tokens
-    const attributes = parseAttributes(tokens, 3);
-    
-/**
- *   ******* OLD CODE ******* - move to parseAttributes()
-    // Loop over the rest of the tokens
-    for (let i = (attributes["weight"] === undefined) ? 3 : 4; i < tokens.length; i++) {
+    // Get the weight, but only if it is a numeric value
+    if (isNumeric(values[3])) {
+        attributes["weight"] = parseFloat(values[3]);
+    }
+
+    // Loop over the rest of the values
+    for (let i = (attributes["weight"] === undefined) ? 3 : 4; i < values.length; i++) {
         // Set the attribute
-        let pair = tokens[i].trim().split(":");
+        let pair = values[i].trim().split(":");
         if (pair.length === 2) {
             attributes[pair[0]] = pair[1];
         }
     }
-*/
+
     // Add the edge
     addEdge(graph, source, target, attributes);
+    //Return the [source, target] ids for use of trees
+    return ([source, target])
+}
+
+/**
+ * Takes a list of edges in an array and turns them into a complete list of paths down the tree(s).
+ * @param {Array[Array]} edgeArray Array of edges to be chained together in form [[source, target],...] 
+ * @returns The new array of paths down a tree 
+ */
+function edgeListMerger(edgeArray){
+    //Initializes necessary values to determine which paths to merge
+    let chained = false;
+    for(let basePathIndex = 0; basePathIndex < edgeArray.length; basePathIndex++){
+        for(let newPathIndex = 0; newPathIndex < edgeArray.length; newPathIndex++){
+
+            //Get the paths to be examined from the edgeArray
+            const basePath = edgeArray[basePathIndex]
+            const newPath = edgeArray[newPathIndex]
+
+            //Merge the paths if the end of the base path starts the new path
+            if(canMergePaths(basePath, newPath)){
+                const mergedPath = mergePaths(basePath, newPath)
+                chained = true;
+                
+                //Remove the newPath from our edgeArray and add the mergedPath
+                edgeArray.splice(newPathIndex, 1);
+                edgeArray.push(mergedPath);
+
+                //When removing from an array, the trailing elements shift down an index.
+                //If the basePathIndex was affected by this element shift, correct it 
+                if(newPathIndex < basePathIndex){
+                    basePathIndex--;
+                }
+                //The newPathIndex is always affected by the array's element shift upon deletion.
+                newPathIndex--;
+            }
+        }
+
+        //If we found elements to merge, we need to remove our basePath from the edgeArray
+        if(chained){
+            edgeArray.splice(basePathIndex, 1);
+            chained = false;
+
+            //Account for the shift in array elements
+            basePathIndex--
+        }
+    }
+    return edgeArray;
+    
+    /**
+     * Determines if two paths can be merged together.
+     * @param {Array[Number]} basePath Any path of nodes.
+     * @param {Array[Number]} newPath The path of nodes we will attempt to stitch onto the end of the basePath.
+     * @returns True if basePath's ending is the beginning of newPath
+     */
+    function canMergePaths(basePath, newPath){
+        return basePath[basePath.length - 1] == newPath[0]
+    }
+
+    /**
+     * Combines two paths into one with no duplicates
+     * @param {Array[Number]} basePath Any path of nodes.
+     * @param {Array[Number]} newPath The array of nodes that will be added, in order, to the basePath.
+     */
+    function mergePaths(basePath, newPath){
+        return [...new Set([...basePath, ...newPath])];
+    }
 }
 
 /**
@@ -344,8 +479,6 @@ function addEdge(graph, source, target, attributes) {
 
 /** Export an object containing the interface */
 const FileParser = {
-    loadGraph,
-    addNode,
-    addEdge
+    loadGraph
 };
 export default FileParser;
