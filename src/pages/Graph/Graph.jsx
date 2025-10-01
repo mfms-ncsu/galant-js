@@ -102,7 +102,7 @@ export default function Graph() {
         SharedWorker.on("graph-rename", onGraphLoad);
         //If the graph type is a tree, do the new layout
         if(graph.type == 'tree'){
-            Cytoscape.layout({ name: 'elk', fit: true, animate: false, 
+            Cytoscape.layout({ name: 'elk', animate: false, fit: false,
                 elk: {"elk.algorithm": "layered", "elk.layered.considerModelOrder.strategy": "PREFER_NODES", 'elk.direction': 'DOWN', 'elk.edgeRouting': 'SPLINES'} }).run();
         }
         SharedWorker.on("algo-init", onAlgorithmLoad);
