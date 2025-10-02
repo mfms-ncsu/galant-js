@@ -100,8 +100,14 @@ export default function Graph() {
         // Register the functions in shared worker
         SharedWorker.on("graph-init", data => onGraphLoad(data, true));
         SharedWorker.on("graph-rename", onGraphLoad);
-        //If the graph type is a tree, do the new layout
+        // If the graph type is a tree, do the new layout
         if(graph.type == 'tree'){
+            // Important Notes:
+            // 1. Switched from dagre to Elkjs due to limited sorting functionality
+            // 2. "fit: false" prevents issues with resizing during algorithms
+            // 3. considerModelOrder allows us to use file-order for tree building and can be configured to use edge order or node order
+            //    - The default behavior optimizes trees based on sizing.
+            //    - Highly recommend reviewing documentation on Elkjs. 
             Cytoscape.layout({ name: 'elk', animate: false, fit: false,
                 elk: {"elk.algorithm": "layered", "elk.layered.considerModelOrder.strategy": "PREFER_NODES", 'elk.direction': 'DOWN', 'elk.edgeRouting': 'SPLINES'} }).run();
         }
