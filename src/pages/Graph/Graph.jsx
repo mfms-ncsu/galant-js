@@ -103,7 +103,13 @@ export default function Graph() {
         // If the graph type is "tree", do a layout appropriate for trees - https://www.npmjs.com/package/cytoscape-dagre
         // In other cases, layout depends on user-specified node positions; Cytoscape is called on only for auto-layout - see ControlSettingsPopover 
         if(graph.type == 'tree'){
-            Cytoscape.layout({ name: 'elk', fit: true, animate: false, 
+            // Important Notes:
+            // 1. Switched from dagre to Elkjs due to limited sorting functionality
+            // 2. "fit: false" prevents issues with resizing during algorithms
+            // 3. considerModelOrder allows us to use file-order for tree building and can be configured to use edge order or node order
+            //    - The default behavior optimizes trees based on sizing.
+            //    - Highly recommend reviewing documentation on Elkjs. 
+            Cytoscape.layout({ name: 'elk', animate: false, fit: false,
                 elk: {"elk.algorithm": "layered", "elk.layered.considerModelOrder.strategy": "PREFER_NODES", 'elk.direction': 'DOWN', 'elk.edgeRouting': 'SPLINES'} }).run();
         }
         SharedWorker.on("algo-init", onAlgorithmLoad);
