@@ -196,50 +196,7 @@ function loadGraph(name, file) {
         }
     }
 
-    //Adds hidden nodes to trees to ensure proper ordering
-    // if(graph.type == "tree"){
-
-    //     //Merges the list of edges, initializes a map of tree lengths
-    //     let pathList = edgeListMerger(edgeList)
-    //     let forestHeights = {}
-        
-    //     //Find the max path length for each tree
-    //     pathList.forEach((path) => {
-
-    //         //If this is the first time encountering the root for this tree, initialize its height. 
-    //         // If not, store the max path length.
-    //         const pathRoot = path[0];
-    //         if(!(forestHeights[pathRoot])){
-    //             forestHeights[pathRoot] = path.length
-    //         }else{
-    //             forestHeights[pathRoot] = path.length > forestHeights[pathRoot] ? path.length : forestHeights[pathRoot];
-    //         }
-    //     });
-
-    //     //For each path, if it is smaller than the max length, add hidden nodes until it is proper size       
-    //     for(let pathIdx = 0; pathIdx < pathList.length; pathIdx++){
-            
-    //         //Initialize variables needed for hidden node additions
-    //         const path = pathList[pathIdx];
-    //         const pathRoot = path[0];
-            
-    //         //Add hidden nodes until this path reaches the proper height
-    //         while(path.length < forestHeights[pathRoot]){
-                
-    //             //Create a new node, connect it to the path, and add it to the pathList
-    //             const pathEnd = path[path.length - 1];
-    //             let id = addNode(graph, 0, 0, undefined, {color:"red"})
-    //             addEdge(graph, pathEnd, id)
-    //             pathList[pathIdx].push(id)
-    //         }
-    //     }
-    // }
-
-    // Generate a scale for the graph based on the node positions
-    graph.scalar = GraphInterface.getScalar(graph);
-
-    // Return the new graph
-    return graph;
+    return graph
 }
 
 /**
