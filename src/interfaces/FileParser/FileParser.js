@@ -5,80 +5,210 @@ import Node from "../../states/Graph/GraphElement/Node";
 import StandardGraph from "../../states/Graph/StandardGraph";
 import Tree from "../../states/Graph/Tree";
 import Graph from "states/Graph/Graph";
-/**
- * FileParser is an interface for loading a graph representation from a file.
- * 
- * @author Henry Morris
- * @author Jacob Usher
- */
+// import { create, get } from "cypress/types/lodash";
 
 /**
- *********
- * REGEX *
- *********
+ * The comments below suggest a refactoring of the code to make it significantly easier to follow
+ * Parts of the code that are fine as is are kept.
  */
-
-    /*
-        Please don't remove the regex documentation! Regex is nearly
-        impossible to read, and if these ever need to be changed
-        or updated by future teams, anyone in the future will
-        probably have trouble understanding them without documentation.
-     */
-
-        /**
-         * @todo While these regular expressions are clever, they are a bad idea.
-         *      - they are difficult to read, and will be difficult to maintain
-         *      - they are not very flexible; they will make it hard to add new file formats
-         * They should be replaced with one token at a time processing of each line, which not only addresses the above issues, but also allows for more transparent error handling.
-         */
-
-    // Regex to match comments
-    const commentRegex = /^([gct].*)?$/;
-    /*
-        commentRegex documentation:
-
-        A comment is either:
-            - the letter g or c, followed by any amount of any characters
-            - An empty line
-
-    */
-
-
-    // Regexes to match simple node and edge lines
-    const nodeRegex = /^n[ \t]+\S+[ \t]+-?\d+.?\d*[ \t]+-?\d+.?\d*([ \t]+-?\d+.?\d*)?([ \t]+[^ \n\t:]+:[^ \n\t:]+)*$/;
-    /*
-        nodeRegex documentation:
-        
-        A line representing a node must have each of the following, separated by a space:
-            - The letter 'n' as the first letter
-            - An id (any amount of non-whitespace characters)
-            - An integer x coordinate
-            - An integer y coordinate
-            - Optionally, an integer weight (floating point numbers are allowed - check)
-            - Any amount of attributes. Attributes are specified as follows:
-                any amount of non-whitespace, non-colon characters, followed by a colon (no space),
-                followed by any amount of non-whitespace, non-colon characters.
-    */
-
-    const edgeRegex = /^e[ \t]+\S+[ \t]+\S+([ \t]+-?\d+.?\d*)?([ \t]+[^ \n\t:]+:[^ \n\t:]+)*$/;
-    /*
-        edgeRegex documentation:
-        
-        A line representing an edge must have each of the following, separated by a space:
-            - The letter 'e' as the first letter
-            - A source node id (any amount of non-whitespace characters)
-            - A target node id (any amount of non-whitespace characters)
-            - Optionally, an integer weight
-            - Any amount of attributes. Attributes are specified as follows:
-                any amount of non-whitespace, non-colon characters, followed by a colon (no space),
-                followed by any amount of non-whitespace, non-colon characters.
-    */
 
 /**
  ***********
  * HELPERS *
  ***********
  */
+
+/**
+ * Helper method for determining whether a file is a tree or not.
+ * A file is a tree if it ends in the .tree extension
+ * @param {String} name The name of the graph file
+ * @returns True if the file is in the Tree format, false if not.
+ */
+function isTree(name) {
+    // Checks for a .tree extension
+    const values = name.split(".");
+    const extension = values[values.length - 1];
+    return extension.includes("tree");
+}
+
+/**
+ * Finds the root nodes and leaf nodes for a given graph
+ * @param {Graph} graph The graph to examine
+ * @returns An array containing the roots at index 0 and the leaves at index 1
+ */
+function getRootsAndLeaves(graph){
+    // Initialize the roots and leaves storage
+    const roots = [];
+    const leaves = [];
+
+    // Examine each node in the graph
+    for ( const [nodeId, node] of graph.nodes ){
+
+        // Initialize booleans for if it is a root and leaf
+        let isRoot = true;
+        let isLeaf = true;
+
+        // Examine each edge coming into or out of the node
+        for ( const [edgeId, edge] of node.edges) {
+            // If the edge goes out, it has children and is not a leaf
+            if ( edge.source == node.id ){
+                isLeaf = false;
+            }else{
+            // Otherwise, it is not a root
+                isRoot = false;
+            }
+        }
+        // Include the node in roots or leaves
+        if ( isRoot ){
+            roots.push(node);
+            console.log("Root: " + node.id)
+        }
+        if ( isLeaf ){
+            leaves.push(node)
+            console.log("Leaf: " + node.id)
+        }
+    }
+
+    // Return roots and leaves
+    return [roots, leaves]
+}
+
+/**
+ * Finds and stores the depth of each node in a given graph
+ * @param {Graph} graph The graph to assign node depths to
+ * @param {Array} leaves The starting points to find depths of
+ * @returns the maximum depth found among all nodes
+ */
+function assignDepths(graph, roots){
+    // Initialize a variable to store the maximum depth
+    let maxDepth = -1;
+
+    // Compute the maximum depth of each subtree
+    for ( const root of roots ){
+        const depth = computeDepths(graph, root, 0);
+
+        // If this tree has the largest depth, store it
+        if ( depth > maxDepth ){
+            maxDepth = depth;
+        }
+    }
+    
+    // Return the maximum depth
+    console.log( "Max depth: " + maxDepth );
+    return maxDepth;
+}
+
+/**
+ * Assigns the correct depth to subtree_root and all of its descendants
+ * @param subtreeRoot the root of a subtree in the forest
+ * @param rootDepth the correct depth of subtree_root
+ * @return the maximum depth of any descendant of subtree_root
+ */
+function computeDepths(graph, subtreeRoot, rootDepth){
+    // Error checking for cycle
+    if (subtreeRoot.depth){
+        throw new Error( "Node " + subtreeRoot.id + " has too many parents." );
+    }
+    
+    // Initialize necessary variables
+    const children = getChildren(graph, subtreeRoot);
+    let maxDepth = -1;
+    subtreeRoot.depth = rootDepth;
+    
+    // If the node is a leaf return its depth
+    if ( children.length == 0 ){
+        return rootDepth;
+    }
+
+    // Compute the depths of all children of this root
+    for( const child of children ){
+        // Store maximum depth found
+        const childDepth = computeDepths(graph, child, rootDepth + 1);
+        maxDepth = childDepth > maxDepth ? childDepth : maxDepth;
+    }
+
+    // Return the maximum depth of children
+    return maxDepth;
+}
+
+/**
+ * Gets the children of a given node
+ * Possibly needs to move to GraphInterface or TreeInterface
+ * @param {Graph} graph The graph that the given node exists in
+ * @param {Node} node The node to find children of
+ * @returns The children of a given node
+ */
+function getChildren(graph, node){
+    // Initialize necessary variables
+    let children = [];
+
+    // Find children from edges
+    for( const [subjects, edge] of node.edges ){
+        // If the edge leads to a child, store child node
+        if ( edge.source == node.id ){
+            children.push(graph.nodes.get(edge.target));
+        }
+    }
+
+   // Returns an array of child nodes 
+    return children;
+}
+
+/**
+ * Gets the parent of a given node
+ * Possibly needs to move to GraphInterface or TreeInterface
+ * @param {Graph} graph The graph containing our node and parent
+ * @param {Node} node The node to find a parent of
+ * @returns The parent of the given node
+ */
+function getParent(graph, node){
+
+    // Find an edge that comes from a parent, and return the parent node
+    for( const [subjects, edge] of node.edges ){
+        if ( edge.target == node.id ){
+            return graph.nodes[edge.source];
+        }
+    }
+}
+
+/**
+ * Adds hidden nodes to all leaf nodes not already at the maximum depths
+ * @param {Graph} graph Graph that stores all nodes
+ * @param {Map} nodeDepths The current depth of every node
+ * @param {Array} leaves An array of every leaf on our graph
+ * @param {Number} maxDepth Maximum depth of all trees
+ */
+function addHiddenPaths(graph, leaves, maxDepth){
+    // Add hidden nodes to each leaf until they are the proper height
+    for ( const leaf of leaves ){
+
+        // Add hidden nodes until they reach the maximum depth
+        let bottomNode = leaf;
+        while( bottomNode.depth < maxDepth ){
+
+            // Connect a new node and reassign the bottom most node
+            const newNode = addNode(graph, 0, 0, undefined, {hidden:"true"});
+            addEdge(graph, bottomNode.id, newNode.id);
+            newNode.depth = bottomNode.depth + 1;
+            bottomNode = newNode;
+        }
+    }
+}
+
+/**
+ * Adds a single hidden root to ensure proper ordering of subtrees.
+ * @param {Graph} graph Graph to add a hidden root to.
+ * @param {Array} roots The roots of the given graph.
+ */
+function addHiddenRoot(graph, roots){
+    // Creates a hidden node to be the root
+    const hiddenRoot = addNode(graph, 0, 0, undefined, {hidden:"true"});
+
+    // Connect the hidden root to each actual root of the forest
+    for( const root of roots ){
+        addEdge(graph, hiddenRoot.id, root.id);
+    }
+}
 
  /**
  * Helper method for determing the graph file format.
@@ -92,17 +222,17 @@ function isLayeredGraph(name, file) {
     let isLayeredGraph = false;
     const lines = file.split("\n");
     
-    //Check for the .sgf extension
+    // Check for the .sgf extension
     if ( name.endsWith('.sgf') ) {
         isLayeredGraph = true;
     }
 
-    //Check for a header or tag line beginning with 't'
+    // Check for a header or tag line beginning with 't'
     lines.forEach((line) => {
         line = line.trim();
-        const values = line.split(" ");
+        const tokens = line.split(" ");
 
-        if (values[0] === 't') {
+        if (tokens[0] === 't') {
             isLayeredGraph = true;
         };
     });
@@ -111,22 +241,8 @@ function isLayeredGraph(name, file) {
 }
 
 /**
- * Helper method for determining whether a file is a tree or not.
- * A file is a tree if it ends in the .tree extension (currently, may have easier specs in the future)
- * @param {String} name The name of the graph file
- * @returns True if the file is in the Tree format, false if not.
- */
-function isTree(name) {
-
-    //Checks the file extension
-    const values = name.split(".")
-    const extension = values[values.length - 1]
-    return extension.includes("tree")
-}
-
-/**
  * Checks if a string can be parsed into a number.
- * @author see: https://stackoverflow.com/a/175787
+ * @author see: https:// stackoverflow.com/a/175787
  * @param {String} str String to check
  * @returns True if the string is numeric, false otherwise
  * @todo Allow for Infinity, NaN, and other special numeric values
@@ -135,8 +251,6 @@ function isNumeric(str) {
     if (typeof str !== "string") return false;
     return !Number.isNaN(Number(str)) && !Number.isNaN(parseFloat(str));
 }
-
-
 
 /**
  *************
@@ -153,50 +267,99 @@ function loadGraph(name, file) {
     const lines = file.split("\n");
 
     // Initialize the proper graph type
-    // Can be either a tree, a layered graph, or a standard graph
-    const graph = isTree(name) ? new Tree(name) 
-        : isLayeredGraph(name, file) ? new LayeredGraph(name)
-        : new StandardGraph(name);
+    let graph = null;
+    if ( isLayeredGraph(name, file) ) {
+        graph = new LayeredGraph(name) }
+    else if ( isTree(name) ) {
+        graph = new Tree(name);
+    } else {
+        graph = new StandardGraph(name);
+    }
+    // Parse each line, ignoring comments and blank lines
+    // This part is the same for all graph types
+    lines.forEach(line => { parseLine(graph, line) });
 
-    // Parse each line
-    let edgeList = []
-    let edgeCount = 0
-    lines.forEach(line => { 
-        //Record response for edges
-        const response = parseLine(graph, line) 
-        //If the return existed, add [source, target] to edgeList
-        if(response){
-            edgeList[edgeCount] = response
-            edgeCount += 1
+    if ( graph.type === "layered" ) {
+        createLayers(graph);
+    } else if ( graph.type === "tree" ) {
+        forceCorrectTreeLayout(graph);
+    }
+
+    if ( graph.type !== "tree") {
+        // Generate a scale for the graph based on the node positions
+        graph.scalar = GraphInterface.getScalar(graph);
+    }
+
+    return graph;
+}
+
+/**
+ * Creates the layers for a layered graph
+ * @param {Graph} graph The layered graph to make layers for
+ */
+function createLayers(graph) {
+    // Build a map of layers (layer (int) -> list of nodes)
+    const layers = new Map();
+    graph.nodes.forEach((node) => {
+        if ( ! layers.has(node.layer) ) {
+            layers.set(node.layer, []);
         }
+        layers.get(node.layer).push(node);
     });
 
-    // Reconcile the index and layer properties of each node if it's a LayeredGraph. This is necessary
-    // because each node uses its x and y coordinate as its layer and index initially which is not accurate.
-    if (graph.type === "layered") {
-        // Build a map of layers (layer (int) -> list of nodes)
-        const layers = new Map();
-        graph.nodes.forEach((node) => {
-            if (!layers.has(node.layer)) {
-                layers.set(node.layer, []);
-            }
-            layers.get(node.layer).push(node);
-        });
+    // Calculate the smallest layer value to use as our offset (this will be layer 0)
+    const minLayer = Math.min(...Array.from(layers.keys()));
 
-        // Calculate the smallest layer value to use as our offset (this will be layer 0)
-        const minLayer = Math.min(...Array.from(layers.keys()));
+    // Iterate through each layer, sort its nodes by x position and update the node's layer and index properties accordingly
+    for (const [layer, nodes] of layers) {
+        const sortedNodes = nodes.sort((a, b) => a.position.x - b.position.x);
+        for ( const [idx, node] of sortedNodes.entries() ) {
+            node.layer = layer - minLayer;
+            node.index = idx;
+        }
+    }
+}
 
-        // Iterate through each layer, sort its nodes by x position and update the node's layer and index properties accordingly
-        for (const [layer, nodes] of layers) {
-            const sortedNodes = nodes.sort((a, b) => a.position.x - b.position.x);
-            for (const [idx, node] of sortedNodes.entries()) {
-                node.layer = layer - minLayer;
-                node.index = idx;
-            }
+/**
+ * Adds invisible nodes and edges to force a correct tree layout:
+ * - all leaves are at the same depth; add a path of invisible nodes to each leaf until it is at the max depth
+ * - an invisible root node is added if there are multiple roots
+ * @param {Graph} graph Graph to modify
+ */
+function forceCorrectTreeLayout(graph) {
+    const [roots, leaves] = getRootsAndLeaves(graph);
+    const maxDepth = assignDepths(graph, roots);
+    addHiddenPaths(graph, leaves, maxDepth);
+    addHiddenRoot(graph, roots);
+}
+
+/**
+ * @return a list of attribute based on the line string and starting index
+ * Each atribute is a key:value pair separated by a colon
+ * @param {Array} tokens A list of tokens from the line 
+ * @param {Number} startingIndex Index at which to start parsing attributes
+ */
+function parseAttributes(tokens, startingIndex) {
+    // Initializes the attribute map
+    const attributes = {};
+
+    // Assigns the weight if it exists
+    if ( isNumeric( tokens[startingIndex] ) ) {
+        attributes["weight"] = parseFloat(tokens[startingIndex]);
+        startingIndex += 1;
+    }
+
+    // Adds each remaining attribute to the attribute map
+    for ( let tokenIndex = startingIndex; tokenIndex < tokens.length; tokenIndex++ ) {
+        // Find and set the attribute
+        let pair = tokens[tokenIndex].trim().split(":");
+        if (pair.length === 2) {
+            attributes[pair[0]] = pair[1];
         }
     }
 
-    return graph
+    // Returns the attribute map
+    return attributes
 }
 
 /**
@@ -207,25 +370,29 @@ function loadGraph(name, file) {
 function parseLine(graph, line) {
     // Trim the line string to remove leading/trailing whitespace and split along spacez
     line = line.trim();
-    let whitespaceRegex = /[ \t]+/
-    const values = line.split(whitespaceRegex);
-    
+    if ( line.length === 0 ) return; // Ignore blank lines
+    // Javascript must have a standard regex for whitespace
+    const whitespaceRegex = /[ \t]+/;
+    const tokens = line.split(whitespaceRegex);
 
-    // Check which regex matches and send the values to be parsed as either a node or edge
-
-    switch (true) {
-        case commentRegex.test(line):
-            // Ignore comments
+    // Check the first token and send the tokens to be parsed as a node or edge as appropriate
+    switch ( tokens[0] ) {
+        case "c":
+            // Add comments to the graph's comments list
             parseComment(graph, line);
             return;
-        case nodeRegex.test(line):
-            parseNode(graph, values);
+        case "n":
+            parseNode(graph, tokens);
             return;
-        case edgeRegex.test(line):
-            //Retrns the edges for use of trees
-            return parseEdge(graph, values);
+        case "e":
+            parseEdge(graph, tokens);
+            return;
+        case "t":
+            return;
+        case "g":
+            return;
         default:
-            // If the line was not a node or an edge, throw an exception
+            // If the line starts with an unrecognized character, throw an error
             throw new Error("input line from file: \"" + line + "\" is not a valid node or edge.");
     }
 }
@@ -240,32 +407,32 @@ function parseComment(graph, line) {
     graph.comments.add(line);
 }
 
-
 /**
  * Parses a node line and creates a new node object.
  * @param {Graph} graph Graph to modify
- * @param {Array} values Values to parse
+ * @param {Array} tokens Values to parse
+ * @todo instead of a list of tokens, start with the line string and parse attributes separately,
+ *    checking for errors along the way
  */
-function parseNode(graph, values) {
-    // Get the necessary values to create a node
-    let id = values[1];
-    let x = parseFloat(values[2]), y = parseFloat(values[3]);
-    let attributes = {};
+function parseNode(graph, tokens) {
+    // Get the necessary tokens to create a node
+    let id = tokens[1];
+    let x = parseFloat(tokens[2]), y = parseFloat(tokens[3]);
     
-    // Get the weight, but only if it is a numeric value
-    if (isNumeric(values[4])) {
-        attributes["weight"] = parseFloat(values[4]);
-    }
+    // Get attributes from remaining tokens
+    const attributes = parseAttributes(tokens, 4);
 
-    // Loop over the rest of the values
-    for (let i = (attributes["weight"] === undefined) ? 4 : 5; i < values.length; i++) {
+/**
+ *   ******* OLD CODE ******* - move to parseAttributes()
+    // Loop over the rest of the tokens
+    for (let i = (attributes["weight"] === undefined) ? 4 : 5; i < tokens.length; i++) {
         // Set the attribute
-        let pair = values[i].trim().split(":");
+        let pair = tokens[i].trim().split(":");
         if (pair.length === 2) {
             attributes[pair[0]] = pair[1];
         }
     }
-
+*/
     // Since the file contains node ids and attributes, pass them in as the last arguments
     addNode(graph, x, y, id, attributes);
 }
@@ -287,20 +454,29 @@ function addNode(graph, x, y, nodeId, attributes) {
     // If the nodeId argument is passed, use that, otherwise generate an id
     nodeId = nodeId || generateId(graph.nodes);
 
-    //TODO take a look at this
     // Create the node
-    let node = graph.type === 'layered' 
-        ? new Node(nodeId, y, x, x, y)
-        : new Node(nodeId, x, y);
-
+    // Two special cases:
+    // 1. Layered graphs store layer and index instead of x and y, which are y and x, respectively
+    // 2. Nodes in trees have undefined poisions
+    let node;
+    if ( graph.type === 'layered' ) {
+        node = new Node(nodeId, y, x, x, y)
+    }
+    else if ( graph.type === 'tree' ) {
+        node = new Node(nodeId, undefined, undefined);
+    }
+    else {
+        node = new Node(nodeId, x, y);
+    }
     graph.nodes.set(nodeId, node);
 
     // Set the attributes
     for (let name in attributes) {
         node.attributes.set(name, attributes[name]);
     }
-    //Returns the ID of the newly created node
-    return nodeId;
+
+    return node;
+
     // Get the smallest unused node id for automatic assigning
     function generateId(nodes) {
         let id = 0;
@@ -312,97 +488,28 @@ function addNode(graph, x, y, nodeId, attributes) {
 /**
  * Parses an edge line and creates a new edge object.
  * @param {Graph} graph Graph to modify
- * @param {Array} values Values to parse
- * @returns {Array} [source, target] node IDs to be used in trees 
+ * @param {Array} tokens Values to parse
  */
-function parseEdge(graph, values) {
-    // Get the necessary values to create an edge
-    let source = values[1], target = values[2];
-    let attributes = {};
+function parseEdge(graph, tokens) {
+    // Get the necessary tokens to create an edge
+    let source = tokens[1], target = tokens[2];
     
-    // Get the weight, but only if it is a numeric value
-    if (isNumeric(values[3])) {
-        attributes["weight"] = parseFloat(values[3]);
-    }
-
-    // Loop over the rest of the values
-    for (let i = (attributes["weight"] === undefined) ? 3 : 4; i < values.length; i++) {
+    // Get attributes from remaining tokens
+    const attributes = parseAttributes(tokens, 3);
+    
+/**
+ *   ******* OLD CODE ******* - move to parseAttributes()
+    // Loop over the rest of the tokens
+    for (let i = (attributes["weight"] === undefined) ? 3 : 4; i < tokens.length; i++) {
         // Set the attribute
-        let pair = values[i].trim().split(":");
+        let pair = tokens[i].trim().split(":");
         if (pair.length === 2) {
             attributes[pair[0]] = pair[1];
         }
     }
-
+*/
     // Add the edge
     addEdge(graph, source, target, attributes);
-    //Return the [source, target] ids for use of trees
-    return ([source, target])
-}
-
-/**
- * Takes a list of edges in an array and turns them into a complete list of paths down the tree(s).
- * @param {Array[Array]} edgeArray Array of edges to be chained together in form [[source, target],...] 
- * @returns The new array of paths down a tree 
- */
-function edgeListMerger(edgeArray){
-    //Initializes necessary values to determine which paths to merge
-    let chained = false;
-    for(let basePathIndex = 0; basePathIndex < edgeArray.length; basePathIndex++){
-        for(let newPathIndex = 0; newPathIndex < edgeArray.length; newPathIndex++){
-
-            //Get the paths to be examined from the edgeArray
-            const basePath = edgeArray[basePathIndex]
-            const newPath = edgeArray[newPathIndex]
-
-            //Merge the paths if the end of the base path starts the new path
-            if(canMergePaths(basePath, newPath)){
-                const mergedPath = mergePaths(basePath, newPath)
-                chained = true;
-                
-                //Remove the newPath from our edgeArray and add the mergedPath
-                edgeArray.splice(newPathIndex, 1);
-                edgeArray.push(mergedPath);
-
-                //When removing from an array, the trailing elements shift down an index.
-                //If the basePathIndex was affected by this element shift, correct it 
-                if(newPathIndex < basePathIndex){
-                    basePathIndex--;
-                }
-                //The newPathIndex is always affected by the array's element shift upon deletion.
-                newPathIndex--;
-            }
-        }
-
-        //If we found elements to merge, we need to remove our basePath from the edgeArray
-        if(chained){
-            edgeArray.splice(basePathIndex, 1);
-            chained = false;
-
-            //Account for the shift in array elements
-            basePathIndex--
-        }
-    }
-    return edgeArray;
-    
-    /**
-     * Determines if two paths can be merged together.
-     * @param {Array[Number]} basePath Any path of nodes.
-     * @param {Array[Number]} newPath The path of nodes we will attempt to stitch onto the end of the basePath.
-     * @returns True if basePath's ending is the beginning of newPath
-     */
-    function canMergePaths(basePath, newPath){
-        return basePath[basePath.length - 1] == newPath[0]
-    }
-
-    /**
-     * Combines two paths into one with no duplicates
-     * @param {Array[Number]} basePath Any path of nodes.
-     * @param {Array[Number]} newPath The array of nodes that will be added, in order, to the basePath.
-     */
-    function mergePaths(basePath, newPath){
-        return [...new Set([...basePath, ...newPath])];
-    }
 }
 
 /**
