@@ -31,7 +31,8 @@ export default function ControlSettingsPopover() {
 
         // If the graph type is "tree", do a layout appropriate for trees - https://www.npmjs.com/package/cytoscape-dagre
         if (graph.type === "tree"){
-            Cytoscape.layout({name: 'elk', fit: true, animate: false}).run();
+            Cytoscape.layout({ name: 'elk', animate: false, fit: false,
+                elk: {"elk.algorithm": "layered", "elk.layered.considerModelOrder.strategy": "PREFER_NODES", 'elk.direction': 'DOWN', 'elk.edgeRouting': 'SPLINES'} }).run();
             autoCamera();
             return;
         }

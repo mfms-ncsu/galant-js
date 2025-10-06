@@ -109,8 +109,18 @@ export default function Graph() {
             // 3. considerModelOrder allows us to use file-order for tree building and can be configured to use edge order or node order
             //    - The default behavior optimizes trees based on sizing.
             //    - Highly recommend reviewing documentation on Elkjs. 
-            Cytoscape.layout({ name: 'elk', animate: false, fit: false,
-                elk: {"elk.algorithm": "layered", "elk.layered.considerModelOrder.strategy": "PREFER_NODES", 'elk.direction': 'DOWN', 'elk.edgeRouting': 'SPLINES'} }).run();
+            // 4. Prevents cytoscape from rendering the container until the layout is finished running
+            const container = Cytoscape.container();
+            container.style.visibility = 'hidden';
+            const layout = Cytoscape.layout({ name: 'elk', animate: false, fit: false,
+                elk: {"elk.algorithm": "layered", "elk.layered.considerModelOrder.strategy": "PREFER_NODES", 'elk.direction': 'DOWN', 'elk.edgeRouting': 'SPLINES'} });
+            layout.run();
+
+            // Recenter and reveal only after layout finishes
+            Cytoscape.one('layoutstop', () => {
+                container.style.visibility = 'visible';
+                Cytoscape.fit(Cytoscape.elements(), 100);
+            });
         }
         SharedWorker.on("algo-init", onAlgorithmLoad);
         return () => SharedWorker.remove(onGraphLoad, onAlgorithmLoad);
