@@ -91,8 +91,10 @@ export default function AlgorithmControls() {
 
     // Function to handle pressing the forward button
     function frontButtonPress() {
+        console.log("Front button pressed");
         if (!algorithm || !AlgorithmInterface.canStepForward(algorithm)) return;
         AlgorithmInterface.stepForward(algorithm);
+        console.log("algorithm stepped forward", algorithm);
     } 
 
     // Function to handle pressing the backward button

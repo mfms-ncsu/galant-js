@@ -39,27 +39,28 @@ function verifyTree(graph){
  * - all leaves are at the same depth; add a path of invisible nodes to each leaf until it is at the max depth
  * - an invisible root node is added if there are multiple roots
  * @param {Graph} graph Graph to modify
+ * @deprecated This is no longer needed since we are using the elk layout for trees
  */
-function forceCorrectTreeLayout(graph) {
-    // Deletes hidden nodes from the current graph
-    deleteHiddenNodes(graph);
+// function forceCorrectTreeLayout(graph) {
+//     // Deletes hidden nodes from the current graph
+//     deleteHiddenNodes(graph);
 
-    // Verifies that the graph is a tree
-    if ( ! verifyTree(graph) ){
-        throw new Error("This graph is not a tree, but you are attempting to call a tree only method on it.");
-    }
+//     // Verifies that the graph is a tree
+//     if ( ! verifyTree(graph) ){
+//         throw new Error("This graph is not a tree, but you are attempting to call a tree only method on it.");
+//     }
 
-    // Finds the roots and leaves, then finds the longest depth
-    const [roots, leaves] = getRootsAndLeaves(graph);
-    const maxDepth = assignDepths(graph, roots);
+//     // Finds the roots and leaves, then finds the longest depth
+//     const [roots, leaves] = getRootsAndLeaves(graph);
+//     const maxDepth = assignDepths(graph, roots);
 
-    // Adds a hidden root and leaves to the graph to force layout consistency
-    addHiddenRoot(graph, roots);
-    addHiddenPaths(graph, leaves, maxDepth);
+//     // Adds a hidden root and leaves to the graph to force layout consistency
+//     addHiddenRoot(graph, roots);
+//     addHiddenPaths(graph, leaves, maxDepth);
 
-    // Error checking
-    console.log("Final graph with hidden nodes: ", graph)
-}
+//     // Error checking
+//     console.log("Final graph with hidden nodes: ", graph)
+// }
 
 /**
  * Finds the root nodes and leaf nodes for a given graph

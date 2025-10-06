@@ -36,42 +36,42 @@ function isTree(name) {
  * @param {Graph} graph The graph to examine
  * @returns An array containing the roots at index 0 and the leaves at index 1
  */
-function getRootsAndLeaves(graph){
-    // Initialize the roots and leaves storage
-    const roots = [];
-    const leaves = [];
+// function getRootsAndLeaves(graph){
+//     // Initialize the roots and leaves storage
+//     const roots = [];
+//     const leaves = [];
 
-    // Examine each node in the graph
-    for ( const [nodeId, node] of graph.nodes ){
+//     // Examine each node in the graph
+//     for ( const [nodeId, node] of graph.nodes ){
 
-        // Initialize booleans for if it is a root and leaf
-        let isRoot = true;
-        let isLeaf = true;
+//         // Initialize booleans for if it is a root and leaf
+//         let isRoot = true;
+//         let isLeaf = true;
 
-        // Examine each edge coming into or out of the node
-        for ( const [edgeId, edge] of node.edges) {
-            // If the edge goes out, it has children and is not a leaf
-            if ( edge.source == node.id ){
-                isLeaf = false;
-            }else{
-            // Otherwise, it is not a root
-                isRoot = false;
-            }
-        }
-        // Include the node in roots or leaves
-        if ( isRoot ){
-            roots.push(node);
-            console.log("Root: " + node.id)
-        }
-        if ( isLeaf ){
-            leaves.push(node)
-            console.log("Leaf: " + node.id)
-        }
-    }
+//         // Examine each edge coming into or out of the node
+//         for ( const [edgeId, edge] of node.edges) {
+//             // If the edge goes out, it has children and is not a leaf
+//             if ( edge.source == node.id ){
+//                 isLeaf = false;
+//             }else{
+//             // Otherwise, it is not a root
+//                 isRoot = false;
+//             }
+//         }
+//         // Include the node in roots or leaves
+//         if ( isRoot ){
+//             roots.push(node);
+//             console.log("Root: " + node.id)
+//         }
+//         if ( isLeaf ){
+//             leaves.push(node)
+//             console.log("Leaf: " + node.id)
+//         }
+//     }
 
-    // Return roots and leaves
-    return [roots, leaves]
-}
+//     // Return roots and leaves
+//     return [roots, leaves]
+// }
 
 /**
  * Finds and stores the depth of each node in a given graph
@@ -281,8 +281,6 @@ function loadGraph(name, file) {
 
     if ( graph.type === "layered" ) {
         createLayers(graph);
-    } else if ( graph.type === "tree" ) {
-        forceCorrectTreeLayout(graph);
     }
 
     if ( graph.type !== "tree") {
@@ -325,13 +323,14 @@ function createLayers(graph) {
  * - all leaves are at the same depth; add a path of invisible nodes to each leaf until it is at the max depth
  * - an invisible root node is added if there are multiple roots
  * @param {Graph} graph Graph to modify
+ * @deprecated This is no longer needed since we are using the elk layout for trees
  */
-function forceCorrectTreeLayout(graph) {
-    const [roots, leaves] = getRootsAndLeaves(graph);
-    const maxDepth = assignDepths(graph, roots);
-    addHiddenPaths(graph, leaves, maxDepth);
-    addHiddenRoot(graph, roots);
-}
+// function forceCorrectTreeLayout(graph) {
+//     const [roots, leaves] = getRootsAndLeaves(graph);
+//     const maxDepth = assignDepths(graph, roots);
+//     addHiddenPaths(graph, leaves, maxDepth);
+//     addHiddenRoot(graph, roots);
+// }
 
 /**
  * @return a list of attribute based on the line string and starting index
