@@ -100,12 +100,8 @@ export default function Graph() {
         // Register the functions in shared worker
         SharedWorker.on("graph-init", data => onGraphLoad(data, true));
         SharedWorker.on("graph-rename", onGraphLoad);
-<<<<<<< HEAD
-        // If the graph type is a tree, do the new layout
-=======
         // If the graph type is "tree", do a layout appropriate for trees - https://www.npmjs.com/package/cytoscape-dagre
         // In other cases, layout depends on user-specified node positions; Cytoscape is called on only for auto-layout - see ControlSettingsPopover 
->>>>>>> d01e7399d88849ee6db445d7842854483a09bdeb
         if(graph.type == 'tree'){
             // Important Notes:
             // 1. Switched from dagre to Elkjs due to limited sorting functionality
