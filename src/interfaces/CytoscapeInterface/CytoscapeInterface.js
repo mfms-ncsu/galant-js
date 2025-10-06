@@ -97,6 +97,7 @@ function parseEdge(graph, edge) {
  * @returns Cytoscape node element
  */
 function parseNode(graph, node) {
+    console.log("Parsing node:", node);
     // Start with what all nodes have in common
     let element = {
         group: "nodes",
@@ -104,12 +105,17 @@ function parseNode(graph, node) {
     }
 
     // Add the position if it exists
-    if ( node.position && node.position.x !== undefined && node.position.y !== undefined) {
+    if ( graph.type !== "tree" ) {
+    //  ( node.position !== undefined && node.position.x !== undefined && node.position.y !== undefined) {
         let scalar = graph.scalar;
         element.position = {
              x: scalar.x * node.position.x, // Scale the position
              y: scalar.y * node.position.y
         }
+    }
+    else {
+        // For trees, we let the layout engine handle the positions
+        element.position = undefined;
     }
 
     // Add attributes
@@ -123,6 +129,7 @@ function parseNode(graph, node) {
         }
     });
 
+    console.log("Parsed node:", element);
     return element;
 }
 

@@ -43,6 +43,7 @@ export default function Graph() {
 
         // Load a new graph
         function onGraphLoad(data, isInit) {
+            console.log("Loading new graph:", data.name, data.payload);
             if ( algorithmLoading ) {
                 algorithmLoading = false;
                 return;
@@ -68,6 +69,7 @@ export default function Graph() {
 
         // Load a new algorithm
         function onAlgorithmLoad(data) {
+            console.log("Loading new algorithm:", data.name, data.payload);
             algorithmLoading = true
             
             // Undo any changes the old algorithm made
@@ -102,7 +104,7 @@ export default function Graph() {
         SharedWorker.on("graph-rename", onGraphLoad);
         // If the graph type is "tree", do a layout appropriate for trees - https://www.npmjs.com/package/cytoscape-dagre
         // In other cases, layout depends on user-specified node positions; Cytoscape is called on only for auto-layout - see ControlSettingsPopover 
-        if(graph.type == 'tree'){
+        if(graph.type === 'tree'){
             // Important Notes:
             // 1. Switched from dagre to Elkjs due to limited sorting functionality
             // 2. "fit: false" prevents issues with resizing during algorithms

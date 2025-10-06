@@ -461,9 +461,10 @@ function addNode(graph, x, y, nodeId, attributes) {
     if ( graph.type === 'layered' ) {
         node = new Node(nodeId, y, x, x, y)
     }
-    else if ( graph.type === 'tree' ) {
-        node = new Node(nodeId, undefined, undefined);
-    }
+    // !!! this does not work because the x and y attributes are referenced somewhere !!!
+    // else if ( graph.type === 'tree' ) {
+    //     node = new Node(nodeId, undefined, undefined);
+    // }
     else {
         node = new Node(nodeId, x, y);
     }
