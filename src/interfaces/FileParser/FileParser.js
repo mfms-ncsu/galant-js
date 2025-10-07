@@ -5,7 +5,6 @@ import Node from "../../states/Graph/GraphElement/Node";
 import StandardGraph from "../../states/Graph/StandardGraph";
 import Tree from "../../states/Graph/Tree";
 import Graph from "states/Graph/Graph";
-// import { create, get } from "cypress/types/lodash";
 
 /**
  * The comments below suggest a refactoring of the code to make it significantly easier to follow
@@ -29,6 +28,51 @@ function isTree(name) {
     const values = name.split(".");
     const extension = values[values.length - 1];
     return extension.includes("tree");
+}
+
+/**
+ * @todo The following two functions should go into Thread.js.
+ * They are no longer needed here. 
+ */
+
+/**
+ * Gets the children of a given node
+ * Possibly needs to move to GraphInterface or TreeInterface
+ * @param {Graph} graph The graph that the given node exists in
+ * @param {Node} node The node to find children of
+ * @returns The children of a given node
+ */
+function getChildren(graph, node){
+    // Initialize necessary variables
+    let children = [];
+
+    // Find children from edges
+    for( const [subjects, edge] of node.edges ){
+        // If the edge leads to a child, store child node
+        if ( edge.source == node.id ){
+            children.push(graph.nodes.get(edge.target));
+        }
+    }
+
+   // Returns an array of child nodes 
+    return children;
+}
+
+/**
+ * Gets the parent of a given node
+ * Possibly needs to move to GraphInterface or TreeInterface
+ * @param {Graph} graph The graph containing our node and parent
+ * @param {Node} node The node to find a parent of
+ * @returns The parent of the given node
+ */
+function getParent(graph, node){
+
+    // Find an edge that comes from a parent, and return the parent node
+    for( const [subjects, edge] of node.edges ){
+        if ( edge.target == node.id ){
+            return graph.nodes[edge.source];
+        }
+    }
 }
 
  /**
@@ -129,7 +173,7 @@ function createLayers(graph) {
     // Calculate the smallest layer value to use as our offset (this will be layer 0)
     const minLayer = Math.min(...Array.from(layers.keys()));
 
-    // Iterate through each layer, sort its nodes by x position and update the node's layer and index properties accordingly
+    // Iterate through each layer, sort its nodes by x position and update the node's index property accordingly
     for (const [layer, nodes] of layers) {
         const sortedNodes = nodes.sort((a, b) => a.position.x - b.position.x);
         for ( const [idx, node] of sortedNodes.entries() ) {
@@ -149,7 +193,7 @@ function parseAttributes(tokens, startingIndex) {
     // Initializes the attribute map
     const attributes = {};
 
-    // Assigns the weight if it exists
+    // Assigns a weight to the node or edge if the first token is a number
     if ( isNumeric( tokens[startingIndex] ) ) {
         attributes["weight"] = parseFloat(tokens[startingIndex]);
         startingIndex += 1;
@@ -249,12 +293,20 @@ function addNode(graph, x, y, nodeId, attributes) {
     // If the nodeId argument is passed, use that, otherwise generate an id
     nodeId = nodeId || generateId(graph.nodes);
 
-    // TODO take a look at this
     // Create the node
-    let node = graph.type === 'layered' 
-        ? new Node(nodeId, y, x, x, y)
-        : new Node(nodeId, x, y);
-
+    // Two special cases:
+    // 1. Layered graphs store layer and index instead of x and y, which are y and x, respectively
+    // 2. Nodes in trees have undefined poisions
+    let node;
+    if ( graph.type === 'layered' ) {
+        node = new Node(nodeId, y, x, x, y)
+    }
+    else if ( graph.type === 'tree' ) {
+        node = new Node(nodeId, undefined, undefined);
+    }
+    else {
+        node = new Node(nodeId, x, y);
+    }
     graph.nodes.set(nodeId, node);
 
     // Set the attributes
@@ -284,17 +336,6 @@ function parseEdge(graph, tokens) {
     // Get attributes from remaining tokens
     const attributes = parseAttributes(tokens, 3);
     
-/**
- *   ******* OLD CODE ******* - move to parseAttributes()
-    // Loop over the rest of the tokens
-    for (let i = (attributes["weight"] === undefined) ? 3 : 4; i < tokens.length; i++) {
-        // Set the attribute
-        let pair = tokens[i].trim().split(":");
-        if (pair.length === 2) {
-            attributes[pair[0]] = pair[1];
-        }
-    }
-*/
     // Add the edge
     addEdge(graph, source, target, attributes);
 }
