@@ -636,6 +636,10 @@ function getScalar(graph) {
   };
     
   for (const node of graph.nodes.values()) {
+    // if any node does not have a position, return the default values
+    if ( node.position.x === undefined || node.position.y === undefined ) {
+      break;
+    }
     boundingBox.minX = Math.min(boundingBox.minX, node.position.x);
     boundingBox.minY = Math.min(boundingBox.minY, node.position.y);
     boundingBox.maxX = Math.max(boundingBox.maxX, node.position.x);
@@ -1577,13 +1581,17 @@ function toString(graph, algorithmName = "No Algorithm Running") {
         : "";
     
     // Add the node line
-    if (graph.type == "layered") {
+    if (graph.type === "layered") {
         // Add the node line
             content += `n ${node.id} ${node.layer
             .toFixed(4)
             .replace(/[.,]0000$/, "")} ${node.position.x
             .toFixed(4)
             .replace(/[.,]0000$/, "")}${weightString}${attributesString}\n`;
+    }
+    else if ( graph.type === "tree") {
+        // if graph is a tree, show that node coordinates are undefined
+        content += `n ${node.id} undefined undefined${weightString}${attributesString}\n`;
     }
     else {
         // Add the node line
