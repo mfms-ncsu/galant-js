@@ -5,7 +5,6 @@ import Node from "../../states/Graph/GraphElement/Node";
 import StandardGraph from "../../states/Graph/StandardGraph";
 import Tree from "../../states/Graph/Tree";
 import Graph from "states/Graph/Graph";
-// import { create, get } from "cypress/types/lodash";
 
 /**
  * The comments below suggest a refactoring of the code to make it significantly easier to follow
@@ -32,104 +31,9 @@ function isTree(name) {
 }
 
 /**
- * Finds the root nodes and leaf nodes for a given graph
- * @param {Graph} graph The graph to examine
- * @returns An array containing the roots at index 0 and the leaves at index 1
+ * @todo The following two functions should go into Thread.js.
+ * They are no longer needed here. 
  */
-function getRootsAndLeaves(graph){
-    // Initialize the roots and leaves storage
-    const roots = [];
-    const leaves = [];
-
-    // Examine each node in the graph
-    for ( const [nodeId, node] of graph.nodes ){
-
-        // Initialize booleans for if it is a root and leaf
-        let isRoot = true;
-        let isLeaf = true;
-
-        // Examine each edge coming into or out of the node
-        for ( const [edgeId, edge] of node.edges) {
-            // If the edge goes out, it has children and is not a leaf
-            if ( edge.source == node.id ){
-                isLeaf = false;
-            }else{
-            // Otherwise, it is not a root
-                isRoot = false;
-            }
-        }
-        // Include the node in roots or leaves
-        if ( isRoot ){
-            roots.push(node);
-            console.log("Root: " + node.id)
-        }
-        if ( isLeaf ){
-            leaves.push(node)
-            console.log("Leaf: " + node.id)
-        }
-    }
-
-    // Return roots and leaves
-    return [roots, leaves]
-}
-
-/**
- * Finds and stores the depth of each node in a given graph
- * @param {Graph} graph The graph to assign node depths to
- * @param {Array} leaves The starting points to find depths of
- * @returns the maximum depth found among all nodes
- */
-function assignDepths(graph, roots){
-    // Initialize a variable to store the maximum depth
-    let maxDepth = -1;
-
-    // Compute the maximum depth of each subtree
-    for ( const root of roots ){
-        const depth = computeDepths(graph, root, 0);
-
-        // If this tree has the largest depth, store it
-        if ( depth > maxDepth ){
-            maxDepth = depth;
-        }
-    }
-    
-    // Return the maximum depth
-    console.log( "Max depth: " + maxDepth );
-    return maxDepth;
-}
-
-/**
- * Assigns the correct depth to subtree_root and all of its descendants
- * @param subtreeRoot the root of a subtree in the forest
- * @param rootDepth the correct depth of subtree_root
- * @return the maximum depth of any descendant of subtree_root
- */
-function computeDepths(graph, subtreeRoot, rootDepth){
-    // Error checking for cycle
-    if (subtreeRoot.depth){
-        throw new Error( "Node " + subtreeRoot.id + " has too many parents." );
-    }
-    
-    // Initialize necessary variables
-    const children = getChildren(graph, subtreeRoot);
-    let maxDepth = -1;
-    subtreeRoot.depth = rootDepth;
-    
-    // If the node is a leaf return its depth
-    if ( children.length == 0 ){
-        return rootDepth;
-    }
-
-    // Compute the depths of all children of this root
-    for( const child of children ){
-        // Store maximum depth found
-        const childDepth = computeDepths(graph, child, rootDepth + 1);
-        maxDepth = childDepth > maxDepth ? childDepth : maxDepth;
-    }
-
-    // Return the maximum depth of children
-    return maxDepth;
-}
 
 /**
  * Gets the children of a given node
@@ -168,45 +72,6 @@ function getParent(graph, node){
         if ( edge.target == node.id ){
             return graph.nodes[edge.source];
         }
-    }
-}
-
-/**
- * Adds hidden nodes to all leaf nodes not already at the maximum depths
- * @param {Graph} graph Graph that stores all nodes
- * @param {Map} nodeDepths The current depth of every node
- * @param {Array} leaves An array of every leaf on our graph
- * @param {Number} maxDepth Maximum depth of all trees
- */
-function addHiddenPaths(graph, leaves, maxDepth){
-    // Add hidden nodes to each leaf until they are the proper height
-    for ( const leaf of leaves ){
-
-        // Add hidden nodes until they reach the maximum depth
-        let bottomNode = leaf;
-        while( bottomNode.depth < maxDepth ){
-
-            // Connect a new node and reassign the bottom most node
-            const newNode = addNode(graph, 0, 0, undefined, {hidden:"true"});
-            addEdge(graph, bottomNode.id, newNode.id);
-            newNode.depth = bottomNode.depth + 1;
-            bottomNode = newNode;
-        }
-    }
-}
-
-/**
- * Adds a single hidden root to ensure proper ordering of subtrees.
- * @param {Graph} graph Graph to add a hidden root to.
- * @param {Array} roots The roots of the given graph.
- */
-function addHiddenRoot(graph, roots){
-    // Creates a hidden node to be the root
-    const hiddenRoot = addNode(graph, 0, 0, undefined, {hidden:"true"});
-
-    // Connect the hidden root to each actual root of the forest
-    for( const root of roots ){
-        addEdge(graph, hiddenRoot.id, root.id);
     }
 }
 
@@ -281,8 +146,6 @@ function loadGraph(name, file) {
 
     if ( graph.type === "layered" ) {
         createLayers(graph);
-    } else if ( graph.type === "tree" ) {
-        forceCorrectTreeLayout(graph);
     }
 
     if ( graph.type !== "tree") {
@@ -310,7 +173,7 @@ function createLayers(graph) {
     // Calculate the smallest layer value to use as our offset (this will be layer 0)
     const minLayer = Math.min(...Array.from(layers.keys()));
 
-    // Iterate through each layer, sort its nodes by x position and update the node's layer and index properties accordingly
+    // Iterate through each layer, sort its nodes by x position and update the node's index property accordingly
     for (const [layer, nodes] of layers) {
         const sortedNodes = nodes.sort((a, b) => a.position.x - b.position.x);
         for ( const [idx, node] of sortedNodes.entries() ) {
@@ -318,19 +181,6 @@ function createLayers(graph) {
             node.index = idx;
         }
     }
-}
-
-/**
- * Adds invisible nodes and edges to force a correct tree layout:
- * - all leaves are at the same depth; add a path of invisible nodes to each leaf until it is at the max depth
- * - an invisible root node is added if there are multiple roots
- * @param {Graph} graph Graph to modify
- */
-function forceCorrectTreeLayout(graph) {
-    const [roots, leaves] = getRootsAndLeaves(graph);
-    const maxDepth = assignDepths(graph, roots);
-    addHiddenPaths(graph, leaves, maxDepth);
-    addHiddenRoot(graph, roots);
 }
 
 /**
@@ -343,7 +193,7 @@ function parseAttributes(tokens, startingIndex) {
     // Initializes the attribute map
     const attributes = {};
 
-    // Assigns the weight if it exists
+    // Assigns a weight to the node or edge if the first token is a number
     if ( isNumeric( tokens[startingIndex] ) ) {
         attributes["weight"] = parseFloat(tokens[startingIndex]);
         startingIndex += 1;
@@ -422,17 +272,6 @@ function parseNode(graph, tokens) {
     // Get attributes from remaining tokens
     const attributes = parseAttributes(tokens, 4);
 
-/**
- *   ******* OLD CODE ******* - move to parseAttributes()
-    // Loop over the rest of the tokens
-    for (let i = (attributes["weight"] === undefined) ? 4 : 5; i < tokens.length; i++) {
-        // Set the attribute
-        let pair = tokens[i].trim().split(":");
-        if (pair.length === 2) {
-            attributes[pair[0]] = pair[1];
-        }
-    }
-*/
     // Since the file contains node ids and attributes, pass them in as the last arguments
     addNode(graph, x, y, id, attributes);
 }
@@ -454,12 +293,20 @@ function addNode(graph, x, y, nodeId, attributes) {
     // If the nodeId argument is passed, use that, otherwise generate an id
     nodeId = nodeId || generateId(graph.nodes);
 
-    // TODO take a look at this
     // Create the node
-    let node = graph.type === 'layered' 
-        ? new Node(nodeId, y, x, x, y)
-        : new Node(nodeId, x, y);
-
+    // Two special cases:
+    // 1. Layered graphs store layer and index instead of x and y, which are y and x, respectively
+    // 2. Nodes in trees have undefined poisions
+    let node;
+    if ( graph.type === 'layered' ) {
+        node = new Node(nodeId, y, x, x, y)
+    }
+    else if ( graph.type === 'tree' ) {
+        node = new Node(nodeId, undefined, undefined);
+    }
+    else {
+        node = new Node(nodeId, x, y);
+    }
     graph.nodes.set(nodeId, node);
 
     // Set the attributes
@@ -489,17 +336,6 @@ function parseEdge(graph, tokens) {
     // Get attributes from remaining tokens
     const attributes = parseAttributes(tokens, 3);
     
-/**
- *   ******* OLD CODE ******* - move to parseAttributes()
-    // Loop over the rest of the tokens
-    for (let i = (attributes["weight"] === undefined) ? 3 : 4; i < tokens.length; i++) {
-        // Set the attribute
-        let pair = tokens[i].trim().split(":");
-        if (pair.length === 2) {
-            attributes[pair[0]] = pair[1];
-        }
-    }
-*/
     // Add the edge
     addEdge(graph, source, target, attributes);
 }
