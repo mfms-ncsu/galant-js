@@ -421,17 +421,6 @@ function parseNode(graph, tokens) {
     // Get attributes from remaining tokens
     const attributes = parseAttributes(tokens, 4);
 
-/**
- *   ******* OLD CODE ******* - move to parseAttributes()
-    // Loop over the rest of the tokens
-    for (let i = (attributes["weight"] === undefined) ? 4 : 5; i < tokens.length; i++) {
-        // Set the attribute
-        let pair = tokens[i].trim().split(":");
-        if (pair.length === 2) {
-            attributes[pair[0]] = pair[1];
-        }
-    }
-*/
     // Since the file contains node ids and attributes, pass them in as the last arguments
     addNode(graph, x, y, id, attributes);
 }
