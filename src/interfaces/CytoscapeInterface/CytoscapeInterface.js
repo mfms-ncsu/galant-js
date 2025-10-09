@@ -104,17 +104,16 @@ function parseNode(graph, node) {
         data: { id: node.id }
     }
 
-    // Add the position if it exists
-    if ( graph.type !== "tree" ) {
-    //  ( node.position !== undefined && node.position.x !== undefined && node.position.y !== undefined) {
+    if ( node.position !== undefined ) {
+        // if a position exists we need to scale it before displaying
         let scalar = graph.scalar;
         element.position = {
-             x: scalar.x * node.position.x, // Scale the position
+             x: scalar.x * node.position.x,
              y: scalar.y * node.position.y
         }
     }
     else {
-        // For trees, we let the layout engine handle the positions
+        // if it doesn't, we let the layout engine handle the display positions
         element.position = undefined;
     }
 

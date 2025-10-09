@@ -92,12 +92,20 @@ export default function CytoscapeComponent() {
         }
 
         // Define a function to handle window resize events
+        // - if it's a layered graph, we want x and y to scale independently
+        // - otherwise, we simply want to center the graph
         const handleResize = () => {
-            let newScalar = GraphInterface.getScalar(graph);
-            setGraph((prevGraph) => ({
-                ...prevGraph,
-                scalar: newScalar,
-            }));
+            if ( graph.type === "layered" ) {
+                let newScalar = GraphInterface.getScalar(graph);
+                setGraph((prevGraph) => ({
+                    ...prevGraph,
+                    scalar: newScalar,
+                }));
+            }
+            else {
+                // perform a fit with padding of 100px (autoCamera)
+                Cytoscape.fit(Cytoscape.elements(), 100);
+            }
         };
         window.onresize = handleResize;
         
