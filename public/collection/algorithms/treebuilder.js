@@ -47,33 +47,30 @@ function getRoot() {
 }
 
 function addNode(target, parent){
+  addNodeIdAttrs(target, 0, 0, target);
+
+  //If no root
   if (getRoot === undefined){
-    addNodeIdAttrs(target, 0 ,0, undefined);
+    display(`No root found, '${target}' added as root`);
+    return;
   }
-  // step(() => {
-  //   //Root case (handled right?)
-  //   if (target === undefined) {
-  //     display(`Adding '${target}' as root`);
-  //   } else {
-  //     addEdge(, target);
-  //   }
-  //   addNodeIdAttrs(target, 0 ,0, undefined);
-  //   addEdge(, target);
-  // });
-  // step(() => {
-  //   mark(target);
-  //   highlight(target);
-  //   label(target, "#" + visit++);
-  // });
-  // display(`Successully added: '${target}'`);
-  // return node;
+
+  //If root
+  addEdge(parent, target);
+  display(`Successully added: '${target}' as child of '${parent}'`);
 }
 
-function deleteNode(target){
-  //if a leaf (easy)
-
-  //use the right child as the successor if not a leaf
-}
+// function deleteNode(target){
+//   //if a leaf (easy)
+//   if (outgoingNodes(target).length == 0 ){
+//     deleteNode(target);
+//     display(`Successully deleted: '${target}'`);
+//     return;
+//   }
+  
+//   //use the right child as the successor if not a leaf
+  
+// }
 
 // Recursively finds target via inorder traversal and returns it (or undefined if not found)
 function search(node, target) {
@@ -117,7 +114,7 @@ while (!promptBoolean("Is the tree done?")){
       display(`Cannot add node '${weight}', it already exists`);
     } else {  //Node NOT found
       display(`'${weight}' NOT found, adding`);
-      // addNode(weight, parent);
+      addNode(weight, parent);
     }
 
   } else if (promptBoolean("Would you like to DELETE a node")){
@@ -125,7 +122,7 @@ while (!promptBoolean("Is the tree done?")){
     
     if (search(getRoot(), nodeId)){ //Node FOUND
       display(`'${nodeId}' FOUND, deleting`);
-      // deleteNode(nodeId);
+      deleteNode(nodeId);
     } else {  //Node NOT found
       display(`Could not find node '${nodeId}' to delete`);
     }
