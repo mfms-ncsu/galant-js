@@ -1,6 +1,6 @@
 /**
  * Treebuilder algorithm that prompts the user to add or remove nodes until user says to stop
- * Based on Bryan's Binary Search, peer programmed with Andrew
+ * Based on Bryan's Binary Search, inordertravseral, peer programmed with Andrew
  */
 
 
@@ -10,7 +10,7 @@
  * Q2 Do you want to add a node, yes = add, no = delete
  * Q3 If adding, what is the weight, if removing, what is the id (id is 1st/big #, weight is 4th/lil #)
  * Maybe need to do error checking (might be done already in thread.js)
- * If adding, Ask user for the edge (can become parent of root, or leaf child of any node, can't be parent of a node other than the root)
+ * If adding, Ask user for the parent (can become parent of root, or leaf child of any node, can't be parent of a node other than the root)
  * If deleting, use right successor (deleting root replaces root with right child, same for a parent node, leaf is easy)
  * Do add/delete, loop
  * 
@@ -22,26 +22,18 @@
  *      get data from user
  *      do the op
  */
+
 setDirected(true);
-let target;
 
-// Order that node has been visited
-let visit = 1;
-
-// Prompts the user for target node to search for
+// Clears everything to start
 step(() => {
   clearNodeMarks();
   clearNodeHighlights();
   clearNodeLabels();
   clearNodeWeights();
-
   clearEdgeHighlights();
   clearEdgeColors();
-
-  target = prompt("Enter new node weight:");
-  //display(`Searching for '${target}'`);
 });
-
 
 // Looks for the root node by looking for inDegree of 0
 function getRoot() {
@@ -50,75 +42,97 @@ function getRoot() {
       return x;
     }
   }
+  //no root
+  return undefined;
 }
 
-// Algorithm starts on root
-const start = getRoot();
-//^^happens once at the start
+function addNode(target, parent){
+  if (getRoot === undefined){
+    addNodeIdAttrs(target, 0 ,0, undefined);
+  }
+  // step(() => {
+  //   //Root case (handled right?)
+  //   if (target === undefined) {
+  //     display(`Adding '${target}' as root`);
+  //   } else {
+  //     addEdge(, target);
+  //   }
+  //   addNodeIdAttrs(target, 0 ,0, undefined);
+  //   addEdge(, target);
+  // });
+  // step(() => {
+  //   mark(target);
+  //   highlight(target);
+  //   label(target, "#" + visit++);
+  // });
+  // display(`Successully added: '${target}'`);
+  // return node;
+}
 
-// Recursivly goes through the tree
-function search(node, target, lastVisited) {
+function deleteNode(target){
+  //if a leaf (easy)
+
+  //use the right child as the successor if not a leaf
+}
+
+// Recursively finds target via inorder traversal and returns it (or undefined if not found)
+function search(node, target) {
+  //Search didn't find the target
   if (node === undefined) {
-    display(`'${target}' not found`);
-    let createNode = promptBoolean(`Do you want to insert: '${target}'`);
-
-    if (createNode) {
-      step(() => {
-        addNodeIdAttrs(target, 0 ,0, undefined);
-        addEdge(lastVisited, target);
-      });
-      step(() => {
-        mark(target);
-        highlight(target);
-        label(target, "#" + visit++);
-      });
-
-      display(`Successully added: '${target}'`);
-      return node;
-    }
-    display(`Algorithm finished: '${target}' not found`);
-    display(`'${target}' not found`);
-    createNode = promptBoolean(`Do you want to insert: '${target}'`);
-
-    if (createNode) {
-      addNodeIdAttrs(target, 0 ,0, undefined);
-      addEdge(lastVisited, target);
-
-      step(() => {
-        mark(target);
-        highlight(target);
-        label(target, "#" + visit++);
-      });
-
-      display(`Successully added: '${target}'`);
-      return node;
-    }
-    display(`Algorithm finished: '${target}' not found`);
-    return node;
+    return undefined;
   }
 
-  step(() => {
-    mark(node);
-    highlight(node);
-    label(node, "#" + visit++);
-  });
-
+  //Search found the target
   if (node === target) {
     return node;
   }
 
+  //keep looking
+  mark(node);
   const children = outgoingNodes(node);
 
-  // Looks at the left branch if target is smaller
-  if (target < node) {
-    return search(children[0], target, node);    
+  // First visit the left child
+  search(children[0], target);
+
+  // Finally visit the right child
+  search(children[1], target);
+}
+
+
+//Entry point
+while (!promptBoolean("Is the tree done?")){
+  //why is each of these a step in the algorithm???
+  // clearNodeMarks();
+  // clearNodeHighlights();
+  // clearNodeLabels();
+  // clearNodeWeights();
+  // clearEdgeHighlights();
+  // clearEdgeColors();
+
+  if (promptBoolean("Would you like to ADD a node")){
+    let weight = prompt("What is the weight of the new node");
+    let parent = prompt("What is the id of the parent node for the new node ('none' if the new node is the root)");
+    
+    if (search(getRoot(), weight)){ //Node FOUND
+      display(`Cannot add node '${weight}', it already exists`);
+    } else {  //Node NOT found
+      display(`'${weight}' NOT found, adding`);
+      // addNode(weight, parent);
+    }
+
+  } else if (promptBoolean("Would you like to DELETE a node")){
+    let nodeId = prompt("What is the id of the node you would like to delete");
+    
+    if (search(getRoot(), nodeId)){ //Node FOUND
+      display(`'${nodeId}' FOUND, deleting`);
+      // deleteNode(nodeId);
+    } else {  //Node NOT found
+      display(`Could not find node '${nodeId}' to delete`);
+    }
+  } else {
+    display("Only adding and deleting nodes is supported currently");
   }
-
-  // Looks at the right branch if the target is bigger
-  return search(children[1], target, node);
 }
 
-// Starts postOrder traversal on the given node
-if (search(start, target)) {
-  display(`Algorithm finished: '${target}' successfully found`);
-}
+display("The tree is done; the algorithm is finished");
+  
