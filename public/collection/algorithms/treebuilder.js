@@ -1,11 +1,8 @@
 /**
+ * SHOULD HAVE BEEN BINARYTREEBUILDER - SEE NEW FILE BINARYTREEBUILDER
  * Treebuilder algorithm that prompts the user to add or remove nodes until user says to stop
  * Based on Bryan's Binary Search, inordertravseral, peer programmed with Andrew
- */
-
-
-
-/**
+ * 
  * Q1 is the tree done, yes = stop
  * Q2 Do you want to add a node, yes = add, no = delete
  * Q3 If adding, what is the weight, if removing, what is the id (id is 1st/big #, weight is 4th/lil #)
