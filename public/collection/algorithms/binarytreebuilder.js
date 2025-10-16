@@ -61,18 +61,18 @@ function deleteNodeHelper(target, parent){
 
 // Recursivly goes through the tree to add the node
 function addNode(node, target, lastVisited) {
-  step(() => {
-    mark(node);
-    highlight(node);
-    label(node, "#" + visit++);
-  });
-
   if (node === undefined) {
     display(`'${target}' NOT found, adding`);
     //do the add
     addNodeHelper(target, lastVisited);
     return;
   }
+
+   step(() => {
+    mark(node);
+    highlight(node);
+    label(node, "#" + visit++);
+  });
 
   // Found the node we are trying to add, error
   if (node === target) {
@@ -83,25 +83,25 @@ function addNode(node, target, lastVisited) {
   // Recursive call
   const children = outgoingNodes(node);
   if (target < node) {
-    return addNode(children[0], target, lastVisited);    
+    return addNode(children[0], target, node);    
   } else {
-    return addNode(children[1], target, lastVisited);
+    return addNode(children[1], target, node);
   }
  
 }
 
 function deleteNode(node, target, lastVisited) {
-  step(() => {
-    mark(node);
-    highlight(node);
-    label(node, "#" + visit++);
-  });
-
   // Couldn't find node we are trying to delete, error
   if (node === undefined) {
     display(`Could not find node '${target}' to delete`);
     return;
   }
+
+  step(() => {
+    mark(node);
+    highlight(node);
+    label(node, "#" + visit++);
+  });
 
   if (node === target) {
     display(`'${target}' FOUND, deleting`);
@@ -113,9 +113,9 @@ function deleteNode(node, target, lastVisited) {
   // Recursive call
   const children = outgoingNodes(node);
   if (target < node) {
-    return deleteNode(children[0], target, lastVisited);    
+    return deleteNode(children[0], target, node);    
   } else {
-    return deleteNode(children[1], target, lastVisited);
+    return deleteNode(children[1], target, node);
   }
 }
 
@@ -133,10 +133,10 @@ while (!promptBoolean("Is the tree done?")){
 
   if (promptBoolean("Would you like to ADD a node")){
     let weight = prompt("What is the weight of the new node");
-    addNode(weight);
+    addNode(getRoot(), weight);
   } else if (promptBoolean("Would you like to DELETE a node")){
     let nodeId = prompt("What is the id of the node you would like to delete");
-    deleteNode(nodeId);
+    deleteNode(getRoot(), nodeId);
   } else {
     display("Only adding and deleting nodes is supported currently");
   }
