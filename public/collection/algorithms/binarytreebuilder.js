@@ -13,6 +13,9 @@
  * Loop
  */
 
+
+//CytoScapeInterface should handle dummy styling automatically in the future
+
 setDirected(true);
 let visit = 1;
 
@@ -27,9 +30,10 @@ function getRoot() {
 }
 
 //TODO: TEMP FIX. weight in thread.js is undefined, this is a NOT GOOD temp fix. Also breaks detecting adding duplicate nodes
-function weight(x){
-  return x;
-}
+// X MUST BE AN ID (STRING)
+// function weight(x){
+//   return x;
+// }
 
 function isLeaf(node) {
   return (outDegree(node) === 0);
@@ -52,28 +56,24 @@ function right(node){
 }
 
 function createDummy(){
-  const dummy = addNodeIdAttrs(0, 0, 0, 0);
+  const dummy = addNode(0,0)
   setShape(dummy, "square");
   color(dummy, "black");
-
-  //TODO: fix
-  // Cannot create property 'dummy' on string '0'
-  //dummy.dummy = true;
+  setSize(dummy, 20);
+  setAttribute(dummy, "dummy", true);
   return dummy;
 }
 
 function replaceDummy(parent, dummy, k, side) {
-  deleteNode(dummy); 
-  const newNode = addNodeIdAttrs(k, 0, 0, undefined);
-  setWeight(newNode, k);
-  addEdge(parent, newNode);
-
-  // add 2 dummy children
-  addEdge(newNode, createDummy());
-  addEdge(newNode, createDummy());
-
+  //DO not delete, just change to a normal node
+  setWeight(dummy, k);
+  setShape(dummy, "circle");
+  color(dummy, "white");
+  setSize(dummy, 35);
+  setAttribute(dummy, "dummy", false);
+  
   display(`Inserted '${k}' as ${side} child of '${weight(parent)}'`);
-  return newNode;
+  return dummy;
 }
 
 // A loaded tree does not have dummies. Should add them at the start.
@@ -82,19 +82,16 @@ function dummifyTree(node) {
   if (!node){
     return;
   } 
-
   // Skip if node is a dummy
-  if (node.dummy){
+  if (getAttribute(node, "dummy")){
     return;
   }
-
   // If leaf, add two dummies
   if (children(node).length === 0) {
     addEdge(node, createDummy());
     addEdge(node, createDummy());
     return;
   }
-
   // Otherwise, recursive call on each child
   dummifyTree(left(node));
   dummifyTree(right(node));
@@ -107,10 +104,9 @@ function addNodeBST(x, k) {
 
   // If empty, make new root
   if (x === undefined) {
-    const newNode = addNodeIdAttrs(k, 0, 0, undefined);
+    console.log("undefined root: ", getRoot());
+    const newNode = addNode(0,0)
     setWeight(newNode, k);
-    addEdge(newNode, createDummy());
-    addEdge(newNode, createDummy());
     display(`Created root '${k}'`);
     return;
   }
@@ -119,7 +115,7 @@ function addNodeBST(x, k) {
   step(() => {
     mark(x);
     highlight(x);
-    label(x, "#" + visit++);
+    //label(x, "#" + visit++);
   });
 
   // Found duplicate node
@@ -132,37 +128,41 @@ function addNodeBST(x, k) {
   // If leaf, attach two dummies (tree input will not contain dummies)
   // Do dummies count towards outgoing edges? How do I know if it is a leaf if it has dummy kids? 
   // How do I make sure there's only 1 layer of dummies? (adding too many already)
-  // if (isLeaf(x)) {
-  //   addEdge(x, createDummy());
-  //   addEdge(x, createDummy());
-  // }
+  if (isLeaf(x)) {
+    
+    addEdge(x, createDummy());
+    addEdge(x, createDummy());
+    if (k < weight(x)) {
+      replaceDummy(x, left(x), k, "left")
+    } else {
+      replaceDummy(x, right(x), k, "right")
+    } 
+  }
+
+  //check if leaf, is leaf, add 2 dummies, replace the correct one
+  //if not a leaf, check which child is a dummy (should only be 1), either recurse or replace
 
   // At the end of the tree or recursive call
   if (k < weight(x)) {
     const L = left(x);
-    if (L && L.dummy) { //end, replace dummy
+    if (L && getAttribute(L, "dummy")) { //end, replace dummy
       return replaceDummy(x, L, k, "left");
     } else {
       return addNodeBST(L, k);  //not end, recur
     }
   } else if (k > weight(x)) {
     const R = right(x);
-    if (R && R.dummy) { //end, replace dummy
+    if (R && getAttribute(R, "dummy")) { //end, replace dummy
       return replaceDummy(x, R, k, "right");
     } else {
       return addNodeBST(R, k);  //not end, recur
     }
   }
+  display("Error: BSTadd did not recur or add a node.");
 }
 
-// Entry point
-
-
-step(() => {
-  dummifyTree(getRoot());
-});
-
-while (!promptBoolean("Is the tree done?")){
+//!promptBoolean("Is the tree done?")
+while (true){
   step(() => {
     clearNodeMarks();
     clearNodeHighlights();
@@ -173,13 +173,9 @@ while (!promptBoolean("Is the tree done?")){
     visit = 1;
   });
 
-  let k = Number(prompt("What is the weight (key) of the new node?"));
-  if (isNaN(k)) {
-    display("Invalid input. Please enter a number.");
-  } else {
-    addNodeBST(getRoot(), k);
-  }
-
+  let k = promptNumber("What is the weight (key) of the new node?");
+  console.log("root: ", getRoot());
+  addNodeBST(getRoot(), k);
 }
 
 display("The tree is done; the algorithm is finished");
