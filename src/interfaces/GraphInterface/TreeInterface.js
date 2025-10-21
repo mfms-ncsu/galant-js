@@ -76,3 +76,15 @@ function getRoots(graph) {
 
   return roots;
 }
+
+/**
+ * Sorts the nodes of a tree by weight in ascending order.
+ * MAY NEED TO BE MODIFIED TO USE A DRAFT/IMMER ARCHETYPE
+ * @param {Graph} graph Graph to sort
+ */
+function sortByWeight(graph) {
+  // Turns the nodes map into an array, sorts it, then turns it back into a map
+  graph.nodes = new Map(
+    [...graph.nodes.entries()].sort((a, b) => a[1].attributes.get("weight") - b[1].attributes.get("weight")
+  ));
+}
