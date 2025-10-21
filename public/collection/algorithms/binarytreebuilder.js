@@ -15,10 +15,11 @@
 
 
 //CytoScapeInterface should handle dummy styling automatically in the future
+//TODO: for some reason the step after adding 2 dummies and before replacing one moves the camera, would like to skip that
 
 setDirected(true);
-let visit = 1;
 
+//-----------------TreeInterface will later replace these fns with their own, need them here for now-------------------
 // Looks for the root node by looking for inDegree of 0
 function getRoot() {
   for (const x of getNodes()) {
@@ -28,12 +29,6 @@ function getRoot() {
   }
   return undefined;
 }
-
-//TODO: TEMP FIX. weight in thread.js is undefined, this is a NOT GOOD temp fix. Also breaks detecting adding duplicate nodes
-// X MUST BE AN ID (STRING)
-// function weight(x){
-//   return x;
-// }
 
 function isLeaf(node) {
   return (outDegree(node) === 0);
@@ -55,6 +50,8 @@ function right(node){
   return children(node)[1];
 }
 
+
+//-----------------UNIQUE BST FNS-------------------
 function createDummy(){
   const dummy = addNode(0,0)
   setShape(dummy, "square");
@@ -64,20 +61,21 @@ function createDummy(){
   return dummy;
 }
 
-function replaceDummy(parent, dummy, k, side) {
-  //DO not delete, just change to a normal node
-  setWeight(dummy, k);
-  setShape(dummy, "circle");
-  color(dummy, "white");
-  setSize(dummy, 35);
-  setAttribute(dummy, "dummy", false);
-  
-  display(`Inserted '${k}' as ${side} child of '${weight(parent)}'`);
-  return dummy;
+//converts a dummy to a new node
+function convertDummy(parent, dummy, k, side) {
+  step(()=>{
+    setWeight(dummy, k);
+    setShape(dummy, "circle");
+    color(dummy, "white");
+    setSize(dummy, 35);
+    setAttribute(dummy, "dummy", false);
+    
+    display(`Inserted '${k}' as ${side} child of '${weight(parent)}'`);
+    return dummy;
+  });
 }
 
-// A loaded tree does not have dummies. Should add them at the start.
-// Uses up IDs. is that ok???
+// Not used now, may be useful later
 function dummifyTree(node) {
   if (!node){
     return;
@@ -99,23 +97,21 @@ function dummifyTree(node) {
 
 
 // Main adding logic
-// Uses same value k for id and weight
 function addNodeBST(x, k) {
 
   // If empty, make new root
   if (x === undefined) {
-    console.log("undefined root: ", getRoot());
     const newNode = addNode(0,0)
     setWeight(newNode, k);
     display(`Created root '${k}'`);
     return;
   }
 
-  // Show the step to the user
+  // Show the nodes being traced to the user
+  // For some reason only marking the root, so commented out for now
   step(() => {
-    mark(x);
+    //mark(x);
     highlight(x);
-    //label(x, "#" + visit++);
   });
 
   // Found duplicate node
@@ -124,36 +120,34 @@ function addNodeBST(x, k) {
     return;
   }
 
-  //TODO: fix infinite loop
-  // If leaf, attach two dummies (tree input will not contain dummies)
-  // Do dummies count towards outgoing edges? How do I know if it is a leaf if it has dummy kids? 
-  // How do I make sure there's only 1 layer of dummies? (adding too many already)
-  if (isLeaf(x)) {
-    
-    addEdge(x, createDummy());
-    addEdge(x, createDummy());
-    if (k < weight(x)) {
-      replaceDummy(x, left(x), k, "left")
-    } else {
-      replaceDummy(x, right(x), k, "right")
-    } 
+  // If a leaf, then add 2 dummy nodes
+  if (isLeaf(x)) {    
+    step(()=>{
+      addEdge(x, createDummy());
+      addEdge(x, createDummy());
+    });
+    step(()=>{
+      if (k < weight(x)) {
+        convertDummy(x, left(x), k, "left")
+      } else {
+        convertDummy(x, right(x), k, "right")
+      } 
+    });
+    return;
   }
-
-  //check if leaf, is leaf, add 2 dummies, replace the correct one
-  //if not a leaf, check which child is a dummy (should only be 1), either recurse or replace
 
   // At the end of the tree or recursive call
   if (k < weight(x)) {
     const L = left(x);
     if (L && getAttribute(L, "dummy")) { //end, replace dummy
-      return replaceDummy(x, L, k, "left");
+      return convertDummy(x, L, k, "left");
     } else {
       return addNodeBST(L, k);  //not end, recur
     }
   } else if (k > weight(x)) {
     const R = right(x);
     if (R && getAttribute(R, "dummy")) { //end, replace dummy
-      return replaceDummy(x, R, k, "right");
+      return convertDummy(x, R, k, "right");
     } else {
       return addNodeBST(R, k);  //not end, recur
     }
@@ -161,20 +155,18 @@ function addNodeBST(x, k) {
   display("Error: BSTadd did not recur or add a node.");
 }
 
+//Commented out for speed of debugging
 //!promptBoolean("Is the tree done?")
 while (true){
   step(() => {
     clearNodeMarks();
     clearNodeHighlights();
     clearNodeLabels();
-    //clearNodeWeights();
     clearEdgeHighlights();
     clearEdgeColors();
-    visit = 1;
   });
 
-  let k = promptNumber("What is the weight (key) of the new node?");
-  console.log("root: ", getRoot());
+  let k = promptNumber("What is the weight of the new node?");
   addNodeBST(getRoot(), k);
 }
 
