@@ -15,7 +15,9 @@
 
 
 //CytoScapeInterface should handle dummy styling automatically in the future
-//TODO: for some reason the step after adding 2 dummies and before replacing one moves the camera, would like to skip that
+//TODO: for some reason, the first add after loading moves the camera, would like to fix that
+//TODO: kind of works, really kind of doesn't. Has moved 2 from left child of 4 to right, and has added dummys when it shouldn't
+//and broken tree without deleting. Will look into further. 
 
 setDirected(true);
 
@@ -42,6 +44,12 @@ function children(node){
   return outgoingNodes(node);
 }
 
+//only 1 incoming node for each node, the parent (otherwise undefined if < (root) or > (cycle))
+function parent(node){
+  const incoming = incomingNodes(node);
+  return incoming.length == 1 ? incoming[0] : undefined;
+}
+
 function left(node){
   return children(node)[0];
 }
@@ -50,6 +58,24 @@ function right(node){
   return children(node)[1];
 }
 
+// Show the nodes being traced to the user
+function accentNode(x){
+  // For some reason only marking the root, so commented out for now
+  step(() => {
+    //mark(x);
+    highlight(x);
+  });
+}
+
+function cleanTree(){
+  step(() => {
+    clearNodeMarks();
+    clearNodeHighlights();
+    clearNodeLabels();
+    clearEdgeHighlights();
+    clearEdgeColors();
+  });
+}
 
 //-----------------UNIQUE BST FNS-------------------
 function createDummy(){
@@ -75,28 +101,7 @@ function convertDummy(parent, dummy, k, side) {
   });
 }
 
-// Not used now, may be useful later
-function dummifyTree(node) {
-  if (!node){
-    return;
-  } 
-  // Skip if node is a dummy
-  if (getAttribute(node, "dummy")){
-    return;
-  }
-  // If leaf, add two dummies
-  if (children(node).length === 0) {
-    addEdge(node, createDummy());
-    addEdge(node, createDummy());
-    return;
-  }
-  // Otherwise, recursive call on each child
-  dummifyTree(left(node));
-  dummifyTree(right(node));
-}
-
-
-// Main adding logic
+//-----------------ADD/DELETE-------------------
 function addNodeBST(x, k) {
 
   // If empty, make new root
@@ -107,12 +112,7 @@ function addNodeBST(x, k) {
     return;
   }
 
-  // Show the nodes being traced to the user
-  // For some reason only marking the root, so commented out for now
-  step(() => {
-    //mark(x);
-    highlight(x);
-  });
+  accentNode(x);
 
   // Found duplicate node
   if (k === weight(x)) {
@@ -155,19 +155,85 @@ function addNodeBST(x, k) {
   display("Error: BSTadd did not recur or add a node.");
 }
 
-//Commented out for speed of debugging
-//!promptBoolean("Is the tree done?")
-while (true){
-  step(() => {
-    clearNodeMarks();
-    clearNodeHighlights();
-    clearNodeLabels();
-    clearEdgeHighlights();
-    clearEdgeColors();
-  });
 
-  let k = promptNumber("What is the weight of the new node?");
-  addNodeBST(getRoot(), k);
+function deleteNodeHelper(p, x){
+  const k = weight(x);
+  if (p){
+    addEdge(p, createDummy());
+    deleteEdge(getEdgeBetween(p, x))
+  }
+  deleteNode(x);
+  display(`Successully deleted: '${k}'`);
+}
+
+function deleteNodeBST(x, k) {
+  // Couldn't find node we are trying to delete, error
+  //TODO: how many of these are actually needed?
+  if (x === undefined || getAttribute(x, "dummy") || (isLeaf(x) && k != weight(x))){
+    display(`Could not find node '${k}' to delete`);
+    return;
+  }
+
+  accentNode(x);
+
+  //Not a leaf, and not == k, keep searching
+  if (k < weight(x)) {
+    return deleteNodeBST(left(x), k);    
+  } else if (k > weight(x)) {
+    return deleteNodeBST(right(x), k);
+  }
+
+  //If we get here, k must equal weight(x???
+  display(`'${k}' FOUND, deleting`);
+
+  const p = parent(x);
+  const L = left(x);
+  const R = right(x);
+  const leftDum = L && getAttribute(L, "dummy");
+  const rightDum = R && getAttribute(R, "dummy");
+
+  //is a leaf, or functionally is one with 2 dummy children (all dummy)
+  if (isLeaf(x) || leftDum && rightDum){
+    deleteNodeHelper(p, x);
+    return;
+  }
+
+  //no dummy
+  if (!leftDum && !rightDum){
+    //two NON SENTINEL, hard
+    display(`Cannot delete: '${k}' yet, has 2 non-dummy children`);
+    return;
+  } 
+  
+  //1 of each
+  if (!rightDum){
+    if (p){
+      addEdge(p, R);
+      deleteEdge(getEdgeBetween(p, x))
+    }
+  } else {
+    if (p){
+      addEdge(p,L);
+      deleteEdge(getEdgeBetween(p, x))
+    }
+  }
+
+  deleteNode(x);
+  display(`Successully deleted: '${k}'`);
+}
+
+while (!promptBoolean("Is the tree done?")){
+  cleanTree();
+
+  if (promptBoolean("Would you like to ADD a node")){
+    const weight = promptNumber("What is the weight of the new node?");
+    addNodeBST(getRoot(), weight);
+  } else if (promptBoolean("Would you like to DELETE a node")){
+    const weight = prompt("What is the weight of the node to delete");    
+    deleteNodeBST(getRoot(), weight);  
+  } else {    
+    display("Only adding and deleting nodes is supported currently");  
+  }
 }
 
 display("The tree is done; the algorithm is finished");
