@@ -192,8 +192,10 @@ function deleteNodeBST(x, k) {
   const leftDum = L && getAttribute(L, "dummy");
   const rightDum = R && getAttribute(R, "dummy");
 
+  //should never have 2 dummy chilren
   //is a leaf, or functionally is one with 2 dummy children (all dummy)
-  if (isLeaf(x) || leftDum && rightDum){
+  if (isLeaf(x)){
+    //if sibling is a dummy, delete this and the sibling, otherwise turn this to a dummmy
     deleteNodeHelper(p, x);
     return;
   }
@@ -205,6 +207,13 @@ function deleteNodeBST(x, k) {
     return;
   } 
   
+  // add edge from parent of node k to the non-dummy child of node k
+  // may need a cytoscape thing that enforces node order (doesn't exist yet)
+  // Cytoscape may make this appear to not work right....
+
+  // issue comes from the dummy being created before the non-dummy subtree
+  // if right child is a dummy and left child isn't, bad time?, shifting weights may work
+  // but the other case should work fine
   //1 of each
   if (!rightDum){
     if (p){
