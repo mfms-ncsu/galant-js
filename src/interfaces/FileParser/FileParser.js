@@ -152,7 +152,7 @@ function loadGraph(name, file) {
         // Generate a scale for the graph based on the node positions
         graph.scalar = GraphInterface.getScalar(graph);
     }
-
+    
     return graph;
 }
 

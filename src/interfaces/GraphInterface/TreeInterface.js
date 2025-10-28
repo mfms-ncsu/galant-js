@@ -1,7 +1,5 @@
 import Tree from "states/Graph/Tree";
 import GraphInterface from "./GraphInterface";
-import ChangeManager from "states/ChangeManager/ChangeManager";
-import ChangeObject from "states/ChangeManager/ChangeObject";
 
 /**
  * Helper function to handle what to do when a graph
@@ -15,34 +13,37 @@ function isTree(graph) {
 }
 
 /**
- * Gets parents of target node
+ * Gets parent of target node
  * @param {Graph} graph Graph on which to operate
  * @param {String} target Node to check 
- * @returns Array of parent nodes
+ * @returns Parent nodes
  */
-function getParents(graph, target) {
+function getParent(graph, target) {
   isTree(graph);
 
-  // Throw an error if the node doesn't exist
   if ( !graph.nodes.has(target) ) {
     throw new Error(
-      "Cannot get parents of node " +
+      "Cannot get parent of node " +
         target +
         " because no node with this id exists in the graph"
     );
   }
 
-  let parents = [];
+  // Gets incoming nodes using GraphInterface implementation
+  const incoming = GraphInterface.getIncomingNodes(graph, target);
 
-  // Adds node to array if edge target is the target
-  graph.nodes.get(target).edges.forEach((edge) => {
-    if ( edge.target === target ) {
-      parents.push(edge.source);
-    }
-  });
-
-  return parents;
+  // For trees, there should be 0 or 1 incoming edge.
+  if ( incoming.length === 0 ) {
+    return undefined; // target is root
+  }
+  if ( incoming.length > 1 ) {
+    throw new Error(
+      "Node " + target + " has multiple parents: " + incoming.join(", ")
+    );
+  }
+  return incoming[0];
 }
+
 
 /**
  * Gets children of target node
@@ -53,25 +54,7 @@ function getParents(graph, target) {
 function getChildren(graph, source) {
   isTree(graph);
 
-  let children = [];
-
-  // Adds node if source of edge is the source node provided
-  if ( graph.nodes.has(source) ) {
-    graph.nodes.get(source).edges.forEach((edge) => {
-      if ( edge.source === source ) {
-        children.push(edge.target);
-      }
-    });
-
-    return children;
-  } else {
-    // If the node doesn't exist, throw an error
-    throw new Error(
-      "Cannot get the children of node " +
-        source +
-        " because no such node exists in the graph"
-    );
-  }
+  return GraphInterface.getOutgoingNodes(graph, source);
 }
 
 /**
@@ -85,9 +68,9 @@ function getRoots(graph) {
 
   let roots = [];
 
-  for (const currentNode of graph.nodes) {
-    if ( getParents(graph, currentNode).length === 0 ) {
-      roots.push(currentNode);
+  for ( const nodeId of graph.nodes.keys() ) {
+    if ( getParent(graph, nodeId === undefined) ) {
+      roots.push(nodeId);
     }
   }
 
@@ -102,11 +85,14 @@ function getRoots(graph) {
 function getRoot(graph) {
   isTree(graph);
 
-  for (const currentNode of graph.nodes) {
-    if ( getParents(graph, currentNode).length === 0 ) {
-      return currentNode;
+  // Return the (single) node with no parent
+  for ( const nodeId of graph.nodes.keys() ) {
+    if ( getParent(graph, nodeId) === undefined ) {
+      return nodeId;
     }
   }
+
+  return undefined;
 }
 
 /**
@@ -209,7 +195,7 @@ function getRight(graph, nodeId) {
 
 /** Export an object containing the interface */
 const TreeInterface = {
-  getParents,
+  getParent,
   getChildren,
   getRoots,
   getRoot,

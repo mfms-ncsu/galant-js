@@ -1585,6 +1585,16 @@ function toString(graph, algorithmName = "No Algorithm Running") {
             .toFixed(4)
             .replace(/[.,]0000$/, "")}${weightString}${attributesString}\n`;
     }
+     else if ( graph.type === "tree" ) {
+
+
+      // Add the node line (fixes undefined node defns problem)
+
+
+      content += `n ${node.id} ${0} ${0}${weightString}${attributesString}\n`;
+
+
+    } 
     else {
         // Add the node line
         content += `n ${node.id} ${node.position.x
