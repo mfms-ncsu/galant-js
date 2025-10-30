@@ -1064,6 +1064,21 @@ function getRight(nodeId) {
 }
 
 
+/** 
+ * Goes through the binary tree and adds dummy nodes to internal nodes with only one child
+ * @param {Graph} graph The binary tree graph to add dummy nodes to
+ * @param {String} attribute The attribute to assess dummy nodes by
+*/
+function addDummyNodes(attribute) {
+    // For each node
+        // If this node has only one child
+            // If the child is left, add a dummy right child
+            // If the child is right, add a dummy left child
+            // Attach dummy node to parent
+        
+}
+
+
 /**************************************************************/
 /*************** End of algorithm methods *********************/
 /**************************************************************/
