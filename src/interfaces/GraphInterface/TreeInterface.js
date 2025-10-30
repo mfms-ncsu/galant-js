@@ -69,7 +69,7 @@ function getRoots(graph) {
   let roots = [];
 
   for ( const nodeId of graph.nodes.keys() ) {
-    if ( getParent(graph, nodeId === undefined) ) {
+    if ( getParent(graph, nodeId) === undefined ) {
       roots.push(nodeId);
     }
   }
@@ -100,14 +100,14 @@ function getRoot(graph) {
  * MAY NEED TO BE MODIFIED TO USE A DRAFT/IMMER ARCHETYPE
  * @param {Graph} graph Graph to sort
  */
-function sortByWeight(graph) {
-  isTree(graph);
+// function sortByWeight(graph) {
+//   isTree(graph);
 
-  // Turns the nodes map into an array, sorts it, then turns it back into a map
-  graph.nodes = new Map(
-    [...graph.nodes.entries()].sort((a, b) => a[1].attributes.get("weight") - b[1].attributes.get("weight")
-  ));
-}
+//   // Turns the nodes map into an array, sorts it, then turns it back into a map
+//   graph.nodes = new Map(
+//     [...graph.nodes.entries()].sort((a, b) => a[1].attributes.get("weight") - b[1].attributes.get("weight")
+//   ));
+// }
 
 /**
  * Checks if the node is a leaf
@@ -128,7 +128,7 @@ function isLeaf(graph, nodeId) {
   }
 
   // Checks if node has any children
-  if ( getChildren(graph, graph.noded.get(nodeId)).length === 0 ) {
+  if ( getChildren(graph, nodeId).length === 0 ) {
     return true;
   }
 
@@ -160,6 +160,11 @@ function getLeft(graph, nodeId) {
       "Left child does not exist"
     );
   }
+  if ( GraphInterface.getNodeAttribute(graph, children[0], "dummy") === true ) {
+    throw new Error(
+      "Left child does not exist"
+    );
+  }
 
   return children[0];
 }
@@ -185,6 +190,11 @@ function getRight(graph, nodeId) {
   // Gets children and checks if a right child exists
   let children = getChildren(graph, nodeId);
   if ( children.length < 1 ) {
+    throw new Error(
+      "Right child does not exist"
+    );
+  }
+  if ( GraphInterface.getNodeAttribute(graph, children[1], "dummy") === true ) {
     throw new Error(
       "Right child does not exist"
     );
