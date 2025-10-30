@@ -1,5 +1,8 @@
 import Tree from "states/Graph/Tree";
 import GraphInterface from "./GraphInterface";
+import produce from "immer";
+import ChangeManager from "states/ChangeManager/ChangeManager";
+import ChangeObject from "states/ChangeManager/ChangeObject";
 
 /**
  * Helper function to handle what to do when a graph
@@ -10,6 +13,89 @@ function isTree(graph) {
   if ( !(graph.type === "tree") ) {
     throw new Error("Function can only be performed on trees.");
   }
+}
+
+/**
+ * Generates the next unique node id from the given list of nodes.
+ * @param {Node[]} nodes Array of nodes to check
+ * @returns New node id
+ */
+function generateId(nodes) {
+  let id = 0;
+  while (nodes.has(String(id))) id++;
+  return String(id);
+}
+
+/**
+ * Records a new change in the given change manager.
+ * @param {ChangeManager} changeManager Change manager to which to add
+ * @param {ChangeObject[]} change Changes to log
+ * @returns Updated change manager
+ */
+function recordChange(changeManager, change) {
+    
+    // If the change manager is not recording, save the change to the
+    // main list of changes
+    if (!changeManager.isRecording) {
+        return produce(changeManager, (draft) => {
+            // Remove all changes after the current index
+            draft.changes = draft.changes.slice(0, draft.index);
+
+            // Push the new change
+            draft.changes.push(change);
+
+            // Increment the index
+            draft.index++;
+        });
+    }
+    
+    // If the change manager is recording, save the change to the
+    // temporary list of changes, and return
+    return produce(changeManager, (draft) => {
+        
+        change.forEach( (changeObj) => {
+            draft.recordedChanges.push(changeObj);
+        });
+    });
+}
+
+function addBinaryNode(graph, changeManager, nodeId, attributes, leftChild) {
+  isTree(graph);
+
+  // If the nodeId argument is passed, use that, otherwise generate an id
+    nodeId = nodeId || generateId(graph.nodes);
+  
+    const newGraph = produce(graph, (draft) => {
+      // Create the node
+      let node = new Node(nodeId, undefined, undefined);
+
+      if ( leftChild ) {
+        draft.nodes = new Map([[nodeId, node], ...draft.nodes.entries()]);
+      }
+      else {
+        draft.nodes.set(nodeId, node);
+      }
+      // Set the attributes
+      for (let name in attributes) {
+        node.attributes.set(name, attributes[name]);
+      }
+    });
+  
+    // Add the change object to the changeManager
+    const newChangeManager = recordChange(changeManager, [
+      new ChangeObject("addNode", null, {
+        id: nodeId,
+        position: {
+          x: undefined,
+          y: undefined,
+        },
+        attributes: attributes
+      })
+    ]);
+  
+    // Return mutated graph and change manager to trigger re-render
+    // Add the node id as the third return value
+    return [newGraph, newChangeManager, nodeId];
 }
 
 /**
@@ -201,6 +287,54 @@ function getRight(graph, nodeId) {
   }
 
   return children[1];
+}
+
+/**
+ * Creates left child
+ * @param {Graph} graph Graph on which to operate
+ * @param {Graph} {ChangeManager} changeManager ChangeManager to use for storing changes
+ * @param {string} node Source node
+ * @param {float} childWeight Weight of the child node
+ */
+function addLeft(graph, changeManager, node, childWeight) {
+  isTree(graph);
+  let leftChild, dummy;
+
+  // Throw an error if the node doesn't exist
+  if ( !graph.nodes.has(node) ) {
+    throw new Error(
+      "Cannot create left child of node " +
+        node +
+        " because no node with this id exists in the graph"
+    );
+  }
+
+  // Case 1: Node has no children
+  if ( isLeaf(graph, node) ) {
+    [graph, changeManager, leftChild] = addBinaryNode(graph, changeManager, undefined, {"weight": childWeight}, true);
+    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, leftChild);
+
+    [graph, changeManager, dummy] = addBinaryNode(graph, changeManager, undefined, {"dummy": true});
+    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, dummy);
+
+    return [graph, changeManager, leftChild];
+  }
+  else {
+    let children = getChildren(graph, node);
+
+    if ( GraphInterface.getNodeAttribute(graph, children[1], "dummy") ) {
+      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, children[1], "dummy", false);
+      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, children[1], "weight", childWeight);
+
+      return [graph, changeManager, children[1]]
+    }
+  }
+
+  throw new Error(
+    "Cannot create left child of node " +
+      node +
+      " because left child already exists"
+  );
 }
 
 /** Export an object containing the interface */
