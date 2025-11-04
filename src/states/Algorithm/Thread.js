@@ -1063,6 +1063,20 @@ function getRight(nodeId) {
     return TreeInterface.getRight(graph, nodeId);
 }
 
+function addLeft(targetNode, childWeight) {
+    if (stepDepth === 0) { postMessage({ action: "step" }) };
+    [graph, changeManager] = TreeInterface.addLeft(graph, changeManager, targetNode, childWeight);
+    postMessage({ action: "addLeft", targetNode: targetNode, childWeight: childWeight});
+    waitIfNeeded();
+}
+
+function addRight(targetNode, childWeight) {
+    if (stepDepth === 0) { postMessage({ action: "step" }) };
+    [graph, changeManager] = TreeInterface.addRight(graph, changeManager, targetNode, childWeight);
+    postMessage({ action: "addRight", targetNode: targetNode, childWeight: childWeight});
+    waitIfNeeded();
+}
+
 
 /** 
  * Goes through the binary tree and adds dummy nodes to internal nodes with only one child

@@ -3,6 +3,7 @@ import GraphInterface from "./GraphInterface";
 import produce from "immer";
 import ChangeManager from "states/ChangeManager/ChangeManager";
 import ChangeObject from "states/ChangeManager/ChangeObject";
+import Node from "states/Graph/GraphElement/Node";
 
 /**
  * Helper function to handle what to do when a graph
@@ -17,6 +18,8 @@ function isTree(graph) {
 
 /**
  * Generates the next unique node id from the given list of nodes.
+ * Copied over from GraphInterface. This function is copied so the function
+ * remains usable without needing to export it from GraphInterface.
  * @param {Node[]} nodes Array of nodes to check
  * @returns New node id
  */
@@ -28,6 +31,8 @@ function generateId(nodes) {
 
 /**
  * Records a new change in the given change manager.
+ * Copied over from GraphInterface. This function is copied so the function
+ * remains usable without needing to export it from GraphInterface.
  * @param {ChangeManager} changeManager Change manager to which to add
  * @param {ChangeObject[]} change Changes to log
  * @returns Updated change manager
@@ -62,7 +67,7 @@ function recordChange(changeManager, change) {
 function addBinaryNode(graph, changeManager, nodeId, attributes, leftChild) {
   isTree(graph);
 
-  // If the nodeId argument is passed, use that, otherwise generate an id
+    // If the nodeId argument is passed, use that, otherwise generate an id
     nodeId = nodeId || generateId(graph.nodes);
   
     const newGraph = produce(graph, (draft) => {
@@ -319,21 +324,73 @@ function addLeft(graph, changeManager, node, childWeight) {
 
     return [graph, changeManager, leftChild];
   }
+  // Case 2: Node has a dummy left child
+  else {
+    let children = getChildren(graph, node);
+
+    if ( GraphInterface.getNodeAttribute(graph, children[0], "dummy") ) {
+      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[0], "dummy", false);
+      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[0], "weight", childWeight);
+
+      return [graph, changeManager, children[0]]
+    }
+  }
+
+  // Throws error if node already has a left child
+  throw new Error(
+    "Cannot create left child of node " +
+      node +
+      " because left child already exists"
+  );
+}
+
+/**
+ * Creates right child
+ * @param {Graph} graph Graph on which to operate
+ * @param {Graph} {ChangeManager} changeManager ChangeManager to use for storing changes
+ * @param {string} node Source node
+ * @param {float} childWeight Weight of the child node
+ */
+function addRight(graph, changeManager, node, childWeight) {
+  isTree(graph);
+  let rightChild, dummy;
+
+  // Throw an error if the node doesn't exist
+  if ( !graph.nodes.has(node) ) {
+    throw new Error(
+      "Cannot create right child of node " +
+        node +
+        " because no node with this id exists in the graph"
+    );
+  }
+
+  // Case 1: Node has no children
+  if ( isLeaf(graph, node) ) {
+    [graph, changeManager, dummy] = addBinaryNode(graph, changeManager, undefined, {"dummy": true});
+    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, dummy);
+
+    [graph, changeManager, rightChild] = addBinaryNode(graph, changeManager, undefined, {"weight": childWeight}, false);
+    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, rightChild);
+
+    return [graph, changeManager, rightChild];
+  }
+  // Case 2: Node has a dummy right child
   else {
     let children = getChildren(graph, node);
 
     if ( GraphInterface.getNodeAttribute(graph, children[1], "dummy") ) {
-      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, children[1], "dummy", false);
-      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, children[1], "weight", childWeight);
+      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[1], "dummy", false);
+      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[1], "weight", childWeight);
 
       return [graph, changeManager, children[1]]
     }
   }
 
+  // Throws error if node already has a right child
   throw new Error(
-    "Cannot create left child of node " +
+    "Cannot create right child of node " +
       node +
-      " because left child already exists"
+      " because right child already exists"
   );
 }
 
@@ -345,6 +402,8 @@ const TreeInterface = {
   getRoot,
   isLeaf,
   getLeft,
-  getRight
+  getRight,
+  addLeft,
+  addRight
 };
 export default TreeInterface; 
