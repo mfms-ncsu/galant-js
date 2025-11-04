@@ -48,7 +48,7 @@ function downloadTab(tab, type) {
     if (isAlgorithm && !tab.name.match(/\.js$/)) {
         name = name.replace(/\.[a-z]+$/).concat(".js")
     }
-    if (!isAlgorithm && !tab.name.match(/\.(?:gph|sgf)$/)) {
+    if (!isAlgorithm && !tab.name.match(/\.(?:gph|sgf|tree)$/)) {
         name = name.replace(/\.[a-z]+$/).concat(".gph")
     }
     const ext = name.match(/\.[a-zA-Z0-9]+$/);

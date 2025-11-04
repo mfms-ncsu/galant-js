@@ -1546,6 +1546,19 @@ function startRecording(changeManager) {
 function toString(graph, algorithmName = "No Algorithm Running") {
   let content = "";
 
+  // Possibly start with file identifier
+  if ( graph.type === 'tree' ) {
+    if ( graph.treeType === 'binary' ) {
+      // Binary Tree
+      content += "b ";
+    }else{
+      // Standard (rooted) Tree
+      content += "r ";
+    }
+    // Add the name of the graph
+    content += `${graph.name}\n`;
+  }
+
   // Start this file with the header comments
   graph.comments.forEach((comment) => {
     content += `${comment}\n`;

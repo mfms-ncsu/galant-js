@@ -1,0 +1,14 @@
+b Random binary search tree 4
+n 2 0 0 19
+n 1 0 0 25
+n 6 0 0 25
+n 5 0 0 31
+n 7 0 0 51
+n 3 0 0 54
+n 4 0 0 90
+e 2 1
+e 2 6
+e 6 5
+e 6 7
+e 5 3
+e 5 4
