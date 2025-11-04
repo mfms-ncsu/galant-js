@@ -78,6 +78,33 @@ function cleanTree(){
 }
 
 //-----------------UNIQUE BST FNS-------------------
+
+// Call this on the left child of the subtree root
+function findInOrderPredecessor(currentNode){
+  // While there is a real right child, go right
+  while( right(currentNode) && getAttribute(right(currentNode), "dummy") != true ){
+    
+    // If a real right child exists, recur
+    return findInOrderPredecessor(right(currentNode));
+  }
+
+  // If I have no real right child, I am the predecessor
+  display(`Found predecessor at '${currentNode}'`)
+  return currentNode
+}
+
+// Call this on the right child of the subtree rotty
+// function findInOrderSuccessor(currentNode){
+//   // While there is a real left child, go left
+//   while( left(currentNode) && getAttribute(left(currentNode), "dummy") != true ){
+    
+//     // If a real left child exists, recur
+//     return findInOrderSuccessor(left(currentNode));
+//   }
+//   display(`Found successor at '${currentNode}'`)
+//   return currentNode
+// }
+
 function createDummy(){
   const dummy = addNode(0,0)
   setShape(dummy, "square");
@@ -86,6 +113,10 @@ function createDummy(){
   setAttribute(dummy, "dummy", true);
   return dummy;
 }
+
+// function dummify(node){
+//   setAttribute( node, "dummy", true)
+// }
 
 //converts a dummy to a new node
 function convertDummy(parent, dummy, k, side) {
@@ -192,42 +223,66 @@ function deleteNodeBST(x, k) {
   const leftDum = L && getAttribute(L, "dummy");
   const rightDum = R && getAttribute(R, "dummy");
 
-  //should never have 2 dummy chilren
   //is a leaf, or functionally is one with 2 dummy children (all dummy)
-  if (isLeaf(x)){
-    //if sibling is a dummy, delete this and the sibling, otherwise turn this to a dummmy
+  if (isLeaf(x) || leftDum && rightDum){
     deleteNodeHelper(p, x);
     return;
   }
 
   //no dummy
   if (!leftDum && !rightDum){
-    //two NON SENTINEL, hard
-    display(`Cannot delete: '${k}' yet, has 2 non-dummy children`);
-    return;
-  } 
-  
-  // add edge from parent of node k to the non-dummy child of node k
-  // may need a cytoscape thing that enforces node order (doesn't exist yet)
-  // Cytoscape may make this appear to not work right....
+    // Find in-order predecessor
+    let predecessor = findInOrderPredecessor(L);
+    // Replace deleted node weight with in-order predecessor weight
+    let predWeight = weight(predecessor);
 
-  // issue comes from the dummy being created before the non-dummy subtree
-  // if right child is a dummy and left child isn't, bad time?, shifting weights may work
-  // but the other case should work fine
+    // Call delete on in-order predecessor
+    deleteNodeBST(x, predWeight);
+    setWeight(x, predWeight);
+  } 
   //1 of each
-  if (!rightDum){
-    if (p){
-      addEdge(p, R);
-      deleteEdge(getEdgeBetween(p, x))
+  else if (!rightDum){
+    if (p){      
+
+      // Replace this node's weight with its only child and store its children
+      setWeight(x, weight(R));
+      const newChildren = children(R);
+
+      // Delete both children
+      children(x).forEach( (child) => {
+          display(`Deleting edge between '${weight(x)}' and '${weight(child)}'`);
+          deleteEdge(getEdgeBetween(x, child));
+          deleteNode(child);
+      });
+
+      // Reattach new children
+      newChildren.forEach((child) => {
+          addEdge(x, child);
+      });
+      
     }
   } else {
     if (p){
-      addEdge(p,L);
-      deleteEdge(getEdgeBetween(p, x))
+
+      // Replace this node's weight with its only child and store its children
+      setWeight(x, weight(L));
+      let newChildren = children(L);
+
+      // Delete both children
+      children(x).forEach((child) => {
+        display(`Deleting edge between '${weight(x)}' and '${weight(child)}'`);
+        deleteEdge(getEdgeBetween(x, child));
+        deleteNode(child);
+      });
+
+      // Reattach new children
+      newChildren.forEach((child) => { 
+          addEdge(x, child);
+      });
     }
   }
 
-  deleteNode(x);
+  //deleteNode(x);
   display(`Successully deleted: '${k}'`);
 }
 
