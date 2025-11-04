@@ -1589,6 +1589,8 @@ function toString(graph, algorithmName = "No Algorithm Running") {
         ? ` ${node.attributes.get("weight")}`
         : "";
     
+        
+
     // Add the node line
     if (graph.type == "layered") {
         // Add the node line
@@ -1598,15 +1600,9 @@ function toString(graph, algorithmName = "No Algorithm Running") {
             .toFixed(4)
             .replace(/[.,]0000$/, "")}${weightString}${attributesString}\n`;
     }
-     else if ( graph.type === "tree" ) {
-
-
+    else if ( graph.type == "tree" ) {
       // Add the node line (fixes undefined node defns problem)
-
-
       content += `n ${node.id} ${0} ${0}${weightString}${attributesString}\n`;
-
-
     } 
     else {
         // Add the node line
