@@ -540,6 +540,65 @@ function restructure( node ) {
 // Tree Action Methods
 // *******************
 
+//-----------------UNIQUE BST FNS-------------------
+
+// Call this on the left child of the subtree root
+function findInOrderPredecessor(currentNode){
+  // While there is a real right child, go right
+  while( right(currentNode) && getAttribute(right(currentNode), "dummy") != true ){
+    
+    // If a real right child exists, recur
+    return findInOrderPredecessor(right(currentNode));
+  }
+
+  // If I have no real right child, I am the predecessor
+  display(`Found predecessor at '${currentNode}'`)
+  return currentNode
+}
+
+// Call this on the right child of the subtree rotty
+// function findInOrderSuccessor(currentNode){
+//   // While there is a real left child, go left
+//   while( left(currentNode) && getAttribute(left(currentNode), "dummy") != true ){
+    
+//     // If a real left child exists, recur
+//     return findInOrderSuccessor(left(currentNode));
+//   }
+//   display(`Found successor at '${currentNode}'`)
+//   return currentNode
+// }
+
+function createDummy(){
+  const dummy = addNode(0,0)
+  setShape(dummy, "square");
+  color(dummy, "black");
+  setSize(dummy, 20);
+  setAttribute(dummy, "dummy", true);
+  return dummy;
+}
+
+// function dummify(node){
+//   setAttribute( node, "dummy", true)
+// }
+
+//converts a dummy to a new node
+function convertDummy(parent, dummy, k, side) {
+  step(()=>{
+    setWeight(dummy, k);
+    setShape(dummy, "circle");
+    color(dummy, "white");
+    setSize(dummy, 35);
+    setAttribute(dummy, "dummy", false);
+    
+    display(`Inserted '${k}' as ${side} child of '${weight(parent)}'`);
+
+    // Red-Black Trees
+    actionOnInsert( dummy );
+
+    return dummy;
+  });
+}
+
 function addNodeBST(x, k) {
 
   // If empty, make new root
@@ -547,6 +606,10 @@ function addNodeBST(x, k) {
     const newNode = addNode(0,0)
     setWeight(newNode, k);
     display(`Created root '${k}'`);
+
+    // Red-Black Trees
+    actionOnInsert( newNode );
+
     return;
   }
 
@@ -571,6 +634,10 @@ function addNodeBST(x, k) {
         convertDummy(x, right(x), k, "right")
       } 
     });
+
+    // Red-Black Trees
+    actionOnInsert( x );
+
     return;
   }
 
@@ -641,10 +708,18 @@ function deleteNodeBST(x, k) {
       deleteNode(x);
       deleteNode(S);
       display(`Deleted leaf '${k}' and its dummy sibling`);
+
+      // Red-Black Trees
+      actionOnDelete( x );
+
       return;
     } else {
       deleteNodeHelper(p, x);
       display(`Successully deleted: '${k}'`);
+
+      // Red-Black Trees
+      actionOnDelete( x );
+
       return;
     }
   }
@@ -788,6 +863,9 @@ function actionOnInsert( node ) {
   if ( !isRoot( node ) ) {
     makeRed( node );
     resolveRed( node );
+  } else {
+    // If its a root node, make it black
+    makeBlack( node );
   }
 }
 
@@ -834,7 +912,7 @@ const promptString = "Red-Black Trees\n"
 //                    + "---------------\n";
 
 while ( true ) {
-  cleanTree();
+  //cleanTree();
 
   // // const weight = promptNumber( "What is the weight and operation (weight is a number, +/- for add/delete, ex. -5 or +3) (0 to stop)" );
   // const weight = promptNumber( promptString );
