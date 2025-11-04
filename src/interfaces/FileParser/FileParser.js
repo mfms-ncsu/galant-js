@@ -23,11 +23,27 @@ import Graph from "states/Graph/Graph";
  * @param {String} name The name of the graph file
  * @returns True if the file is in the Tree format, false if not.
  */
-function isTree(name) {
+function isTree(name, file) {
+    let isTree = false;
+    const lines = file.split("\n");
+
     // Checks for a .tree extension
     const values = name.split(".");
     const extension = values[values.length - 1];
-    return extension.includes("tree");
+    if( extension.includes("tree") ) {
+        isTree = true;
+    }
+
+    // Check for a header or tag line beginning with 'r' or 'b'
+    lines.forEach((line) => {
+        line = line.trim();
+        const tokens = line.split(" ");
+        if (tokens[0] === 'r' || tokens[0] === 'b') {
+            isTree = true;
+        };
+    });
+
+    return isTree;
 }
 
 /**
@@ -135,7 +151,7 @@ function loadGraph(name, file) {
     let graph = null;
     if ( isLayeredGraph(name, file) ) {
         graph = new LayeredGraph(name) }
-    else if ( isTree(name) ) {
+    else if ( isTree(name, file) ) {
         graph = new Tree(name);
     } else {
         graph = new StandardGraph(name);
@@ -152,7 +168,7 @@ function loadGraph(name, file) {
         // Generate a scale for the graph based on the node positions
         graph.scalar = GraphInterface.getScalar(graph);
     }
-
+    
     return graph;
 }
 
@@ -240,6 +256,11 @@ function parseLine(graph, line) {
         case "t":
             return;
         case "g":
+            return;
+        case "r":
+            return;
+        case "b":
+            graph.treeType = "binary";
             return;
         default:
             // If the line starts with an unrecognized character, throw an error

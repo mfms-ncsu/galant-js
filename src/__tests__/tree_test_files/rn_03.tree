@@ -1,0 +1,21 @@
+r Random Tree
+c a random tree with 10 nodes
+n 1 0 0
+n 2 0 0
+n 3 0 0
+n 4 0 0
+n 5 0 0
+n 6 0 0
+n 7 0 0
+n 8 0 0
+n 9 0 0
+n 10 0 0
+e 5 7 2
+e 1 8 3
+e 1 2 5
+e 4 10 6
+e 2 4 8
+e 3 9 15
+e 2 6 27
+e 1 5 34
+e 2 3 50

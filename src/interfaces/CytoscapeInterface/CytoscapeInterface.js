@@ -160,7 +160,7 @@ function getElements(graph) {
  * @returns Cytoscape stylesheet
  */
 function getStyle(graph) {
-    return [
+    const style =  [
         {
             "selector": "node",
             "style": {
@@ -301,6 +301,24 @@ function getStyle(graph) {
             }
         }
     ];
+
+    if ( graph.type === "tree" ) {
+        // Add tree specific styles
+        style.push(
+            {
+                "selector": "node[?dummy]",
+                "style": {
+                    "shape": "square",
+                    "backgroundColor": "#000000",
+                    "color": "#000000",
+                    "width": `${graph.nodeSize * 0.65}px`,
+                    "height": `${graph.nodeSize * 0.65}px`
+                }
+            }
+        );
+    }
+
+    return style
 }
 
 const CytoscapeInterface = {
