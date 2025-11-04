@@ -306,7 +306,7 @@ function getStyle(graph) {
         // Add tree specific styles
         style.push(
             {
-                "selector": "node[dummy = 'true']",
+                "selector": "node[?dummy]",
                 "style": {
                     "shape": "square",
                     "backgroundColor": "#000000",
