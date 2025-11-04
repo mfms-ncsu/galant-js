@@ -13,6 +13,7 @@
  * Loop
  */
 
+//THIS IS SOLELY MEANT TO CREATE FROM AN EMPTY TREE, OR LOAD A TREE CREATED FROM THIS ALGO
 
 //CytoScapeInterface should handle dummy styling automatically in the future
 //TODO: for some reason, the first add after loading moves the camera, would like to fix that
@@ -168,7 +169,6 @@ function deleteNodeHelper(p, x){
 
 function deleteNodeBST(x, k) {
   // Couldn't find node we are trying to delete, error
-  //TODO: how many of these are actually needed?
   if (x === undefined || getAttribute(x, "dummy") || (isLeaf(x) && k != weight(x))){
     display(`Could not find node '${k}' to delete`);
     return;
@@ -191,16 +191,28 @@ function deleteNodeBST(x, k) {
   const R = right(x);
   const leftDum = L && getAttribute(L, "dummy");
   const rightDum = R && getAttribute(R, "dummy");
+  let S = null;
+    if (p) {
+        S = left(p) === x ? right(p) : left(p);
+    }
+  const sibDum = S && getAttribute(S, "dummy");
 
-  //should never have 2 dummy chilren
-  //is a leaf, or functionally is one with 2 dummy children (all dummy)
+  //CASE 1: DELETE A LEAF
   if (isLeaf(x)){
     //if sibling is a dummy, delete this and the sibling, otherwise turn this to a dummmy
-    deleteNodeHelper(p, x);
-    return;
+    if (sibDum){
+      deleteNode(x);
+      deleteNode(S);
+      display(`Deleted leaf '${k}' and its dummy sibling`);
+      return;
+    } else {
+      deleteNodeHelper(p, x);
+      display(`Successully deleted: '${k}'`);
+      return;
+    }
   }
 
-  //no dummy
+  //CASE 2: DELETE WITH 2 CHILDREN
   if (!leftDum && !rightDum){
     //two NON SENTINEL, hard
     display(`Cannot delete: '${k}' yet, has 2 non-dummy children`);
@@ -215,6 +227,8 @@ function deleteNodeBST(x, k) {
   // if right child is a dummy and left child isn't, bad time?, shifting weights may work
   // but the other case should work fine
   //1 of each
+
+  //CASE 3: DELETE WITH 1 CHILD
   if (!rightDum){
     if (p){
       addEdge(p, R);
@@ -231,17 +245,18 @@ function deleteNodeBST(x, k) {
   display(`Successully deleted: '${k}'`);
 }
 
-while (!promptBoolean("Is the tree done?")){
+//TODO: this may cause issues if the loaded tree has weights <= 0, but is an easier UX
+let running = true;
+while (running){
   cleanTree();
+  const weight = promptNumber("What is the weight and operation (weight is a number, +/- for add/delete, ex. -5 or +3) (0 to stop)")
 
-  if (promptBoolean("Would you like to ADD a node")){
-    const weight = promptNumber("What is the weight of the new node?");
+  if (weight > 0){
     addNodeBST(getRoot(), weight);
-  } else if (promptBoolean("Would you like to DELETE a node")){
-    const weight = prompt("What is the weight of the node to delete");    
-    deleteNodeBST(getRoot(), weight);  
+  } else if (weight < 0){
+    deleteNodeBST(getRoot(), -weight);  
   } else {    
-    display("Only adding and deleting nodes is supported currently");  
+    running = false; 
   }
 }
 
