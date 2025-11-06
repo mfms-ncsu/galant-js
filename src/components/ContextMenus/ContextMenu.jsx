@@ -38,12 +38,8 @@ export default function ContextMenu() {
     // Update the edit history when a node is moved
     useEffect(() => {
         function onNodeMoved(event) {
+            // Get the node, its id, and position
             const node = event.target;
-            console.log("Node moved:", node, node.position);
-            // If the node has no position, do nothing
-            if ( node.position === undefined ) {
-                return;
-            }
             const id = node.id();
             const newPosition = node.position();
 
@@ -55,10 +51,6 @@ export default function ContextMenu() {
 
         let timeOut = null;
         function onPositionMoved(event) {
-            // the folowing prevents an error when user moves a node
-            // but the node still looks *like it's being moved*
-            if ( event.data === undefined || event.data.position === undefined ) return;
-            console.log("Node position changed:", event.data, event.data.position);
             if (timeOut) clearTimeout(timeOut);
             timeOut = setTimeout(() => onNodeMoved(event), 0);
         }

@@ -4,6 +4,7 @@ import Graph from "states/Graph/Graph";
 import ChangeManager from "states/ChangeManager/ChangeManager";
 import Edge from "states/Graph/GraphElement/Edge";
 import Node from "states/Graph/GraphElement/Node";
+import LayeredGraph from "states/Graph/LayeredGraph";
 
 /** Enable maps in immer */
 enableMapSet();
@@ -635,10 +636,6 @@ function getScalar(graph) {
   };
     
   for (const node of graph.nodes.values()) {
-    // if any node does not have a position, return the default values
-    if ( node.position.x === undefined || node.position.y === undefined ) {
-      break;
-    }
     boundingBox.minX = Math.min(boundingBox.minX, node.position.x);
     boundingBox.minY = Math.min(boundingBox.minY, node.position.y);
     boundingBox.maxX = Math.max(boundingBox.maxX, node.position.x);
@@ -1595,7 +1592,7 @@ function toString(graph, algorithmName = "No Algorithm Running") {
         
 
     // Add the node line
-    if (graph.type === "layered") {
+    if (graph.type == "layered") {
         // Add the node line
             content += `n ${node.id} ${node.layer
             .toFixed(4)

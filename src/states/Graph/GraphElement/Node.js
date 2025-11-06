@@ -33,15 +33,10 @@ export default class Node extends GraphElement {
         this.id = nodeId;
 
         // Create an object containing the xy-position
-        if ( x === undefined || y === undefined ) {
-            this.position = undefined
+        this.position = {
+            x: x,
+            y: y
         }
-        else {
-            this.position = {
-                x: x,
-                y: y
-            }
-        }   
 
         // Set the index and layer
         this.layer = layer;
