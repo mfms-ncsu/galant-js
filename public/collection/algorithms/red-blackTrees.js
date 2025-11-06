@@ -196,12 +196,107 @@ function makeBlack( node ) {
 /**
  * Set the color of the given position to be red (property = 1)
  * 
- * @param p the position for which to make red
+ * @param node the position for which to make red
  */
 function makeRed( node ) {
   // setAttribute( borderColor( "red" ) ) // Something like this
   color( node, "red" );
   return;
+}
+
+// Set the parentN as the parent of node
+function setParent( node, parentN ) {
+  // Remove incoming edges ( old parent ) from child ( node )
+  const parentEdge = incoming( node );
+  if ( parentEdge != null && parentEdge[ 0 ] != null ) {
+    deleteEdge( parentEdge[ 0 ] );
+  }
+
+  // Add new edge between node and parent
+  addEdge( parentN, node );
+}
+
+// Set the child as a left child of node
+function setLeft( node, child ) {
+  // Remove parent edge of child
+  // const parentEdge = getIncomingEdges( child );
+  // if ( parentEdge != null && parentEdge[ 0 ] != null ) {
+  //   deleteEdge( parentEdge[ 0 ] );
+  // }
+
+  // Grab child weight
+  const childWeight = weight( child );
+
+  // Grab left and right children of child
+  const leftC = left( child );
+  const rightC = right( child );
+
+  // Remove child ( and all edges associated );
+  deleteNode( child );
+
+  // Add the child as a left child of node
+  addLeft( node, childWeight );
+
+  // Add the old children back
+  // * Check if we need to recursion 
+  // if the left and right children dont 
+  // get put back problem ( if so, maybe 
+  // add a dummy if one of them dont exist ) *
+  if ( leftC ) {
+    addEdge( newChild, leftC );
+    //setLeft( newChild, leftC );
+  }
+
+  if ( rightC ) {
+    addEdge( newChild, rightC );
+    //setRight( newChild, rightC );
+  }
+}
+
+// Set the child as a right child of node
+function setRight( node, child ) {
+  // Remove parent edge of child
+  // const parentEdge = getIncomingEdges( child );
+  // if ( parentEdge != null && parentEdge[ 0 ] != null ) {
+  //   deleteEdge( parentEdge[ 0 ] );
+  // }
+
+  // Grab child weight
+  const childWeight = weight( child );
+
+  // Grab left and right children of child
+  const leftC = left( child );
+  const rightC = right( child );
+
+  // Remove child ( and all edges associated );
+  deleteNode( child );
+
+  // Add the child as a left child of node
+  addRight( node, childWeight );
+
+  // Add the old children back
+  // * Check if we need to recursion 
+  // if the left and right children dont 
+  // get put back problem ( if so, maybe 
+  // add a dummy if one of them dont exist ) *
+  if ( leftC ) {
+    addEdge( newChild, leftC );
+    //setLeft( newChild, leftC );
+  }
+
+  if ( rightC ) {
+    addEdge( newChild, rightC );
+    //setRight( newChild, rightC );
+  }
+}
+
+// Set this node as the root
+function setRoot( node ) {
+  // Remove incoming edges
+  const parentEdge = incoming( node );
+  if ( parentEdge != null && parentEdge[ 0 ] != null ) {
+    deleteEdge( parentEdge[ 0 ] );
+  }
 }
 
 /**
@@ -305,11 +400,11 @@ function remedyDoubleBlack( node ) {
  *                      (true) or not (false)
  */
 function relink( parentN,  child, makeLeftChild ) {
-  child.setParent( parentN );
+  setParent( child, parentN );
   if ( makeLeftChild ) {
-      parentN.setLeft( child );
+      setLeft( parentN, child );
   } else {
-      parentN.setRight( child );
+      setRight( parentN, child );
   }
 }
 
@@ -322,12 +417,12 @@ function relink( parentN,  child, makeLeftChild ) {
  */
 function rotate( node ) {
 
-  let parentN = node.getParent();
-  let grandparent = parentN.getParent();
+  let parentN = parent( node );
+  let grandparent = parent( parentN );
 
   if ( grandparent == null ) {
     setRoot( node );
-    node.setParent( null );
+    setParent( node, null );
   } else {
     if ( parentN == left( grandparent ) ) {
       relink( grandparent, node, true );
@@ -337,10 +432,10 @@ function rotate( node ) {
   }
 
   if ( node == left( parentN ) ) {
-    relink( parentN, node.getRight(), true );
+    relink( parentN, right( node ), true );
     relink( node, parentN, false );
   } else {
-    relink( parentN, node.getLeft(), false );
+    relink( parentN, left( node ), false );
     relink( node, parentN, true );
   }
 
