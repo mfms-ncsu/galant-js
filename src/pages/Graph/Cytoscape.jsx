@@ -80,10 +80,39 @@ export default function CytoscapeComponent() {
      * Create a function to call whenever cytoscape needs to be updated
      */
     useEffect(() => {
+        Cytoscape.startBatch(); //Pauses rendering
         Cytoscape.elements().remove();// Remove elements
         Cytoscape.add(CytoscapeInterface.getElements(graph)); // Get new elements
         Cytoscape.style().resetToDefault(); // Reset style
         Cytoscape.style(CytoscapeInterface.getStyle(graph)).update(); // Update style
+        Cytoscape.endBatch(); //Resumes rendering
+
+        // If the graph type is "tree", do a layout appropriate for trees - https://www.npmjs.com/package/cytoscape-dagre
+        // In other cases, layout depends on user-specified node positions; Cytoscape is called on only for auto-layout - see ControlSettingsPopover 
+        if ( graph.type == 'tree' ) {
+            // Important Notes:
+            // 1. Switched from dagre to Elkjs due to limited sorting functionality
+            // 2. "fit: false" prevents issues with resizing during algorithms
+            // 3. considerModelOrder allows us to use file-order for tree building and can be configured to use edge order or node order
+            //    - The default behavior optimizes trees based on sizing.
+            //    - Highly recommend reviewing documentation on Elkjs. 
+            // 4. Prevents cytoscape from rendering the container until the layout is finished running
+
+            // Pause redraws during layout
+            Cytoscape.startBatch(); 
+
+            // Define the ELK layout
+            const layout = Cytoscape.layout({ name: 'elk', animate: false, fit: false,
+                elk: {"elk.algorithm": "layered", "elk.layered.considerModelOrder.strategy": "PREFER_NODES", 'elk.direction': 'DOWN', 'elk.edgeRouting': 'SPLINES'} });
+            
+            // Run the layout and resume rendering on completion
+            layout.run();
+            
+            layout.once('layoutstop', () => {
+                Cytoscape.endBatch(); // resume redraws
+                Cytoscape.fit(Cytoscape.elements(), 100);
+            });
+        }
 
         // If it's a tree, clear the background grid immediately
         if (graph.type === "tree" && backgroundCanvas.current) {

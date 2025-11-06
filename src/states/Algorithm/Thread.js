@@ -2,7 +2,9 @@ import GraphInterface from 'interfaces/GraphInterface/GraphInterface';
 import FileParser from 'interfaces/FileParser/FileParser';
 import ChangeManager from 'states/ChangeManager/ChangeManager';
 import LayeredGraphInterface from 'interfaces/GraphInterface/LayeredGraphInterface';
+import TreeInterface from 'interfaces/GraphInterface/TreeInterface';
 import { RampRightOutlined } from '@mui/icons-material';
+import Tree from 'states/Graph/Tree';
 
 /**
  * Execution environment for algorithms. This file provides all necessary functions
@@ -308,14 +310,14 @@ function addNode(x, y) {
     return newNode;
 }
 
-// function addNodeIdAttrs(id, x, y, attrs) {
-//     if (stepDepth == 0) { postMessage({ action: "step" }) }
-//     let newNode;
-//     [graph, changeManager, newNode] = GraphInterface.addNode(graph, changeManager, x, y, id, attrs);
-//     postMessage({ action: "addNode", x: x, y: y, id:id});
-//     waitIfNeeded();
-//     return newNode;
-// }
+function addNodeIdAttrs(id, x, y, attrs) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    let newNode;
+    [graph, changeManager, newNode] = GraphInterface.addNode(graph, changeManager, x, y, id, attrs);
+    postMessage({ action: "addNode", x: x, y: y, id:id});
+    waitIfNeeded();
+    return newNode;
+}
 
 /**
  * Functions related to positions of nodes; shold probably moved to a separate section
@@ -1024,6 +1026,72 @@ function applyNodePositions(savedPositions){
 //     addEdge(sourceId, targetId)
 // }
 
+/*
+ * TREE ALGORITHMS
+ */
+
+/**
+ * Tree functions 
+ * @author Bryan Fang
+ */
+
+function getParent(nodeId) {
+    return TreeInterface.getParent(graph, nodeId);
+}
+
+function getChildren(nodeId) {
+    return TreeInterface.getChildren(graph, nodeId);
+}
+
+function getRoots() {
+    return TreeInterface.getRoots(graph);
+}
+
+function getRoot() {
+    return TreeInterface.getRoot(graph);
+}
+
+function isLeaf(nodeId) {
+    return TreeInterface.isLeaf(graph, nodeId);
+}
+
+function getLeft(nodeId) {
+    return TreeInterface.getLeft(graph, nodeId);
+}
+
+function getRight(nodeId) {
+    return TreeInterface.getRight(graph, nodeId);
+}
+
+function addLeft(targetNode, childWeight) {
+    if (stepDepth === 0) { postMessage({ action: "step" }) };
+    [graph, changeManager] = TreeInterface.addLeft(graph, changeManager, targetNode, childWeight);
+    postMessage({ action: "addLeft", targetNode: targetNode, childWeight: childWeight});
+    waitIfNeeded();
+}
+
+function addRight(targetNode, childWeight) {
+    if (stepDepth === 0) { postMessage({ action: "step" }) };
+    [graph, changeManager] = TreeInterface.addRight(graph, changeManager, targetNode, childWeight);
+    postMessage({ action: "addRight", targetNode: targetNode, childWeight: childWeight});
+    waitIfNeeded();
+}
+
+
+/** 
+ * Goes through the binary tree and adds dummy nodes to internal nodes with only one child
+ * @param {Graph} graph The binary tree graph to add dummy nodes to
+ * @param {String} attribute The attribute to assess dummy nodes by
+*/
+function addDummyNodes(attribute) {
+    // For each node
+        // If this node has only one child
+            // If the child is left, add a dummy right child
+            // If the child is right, add a dummy left child
+            // Attach dummy node to parent
+        
+}
+
 
 /**************************************************************/
 /*************** End of algorithm methods *********************/
@@ -1047,8 +1115,9 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
 
     } else if (message[0] === "graph/algorithm") {
         // Load the graph with isDirected flag
-        graph = FileParser.loadGraph("", message[1]);
+        graph = FileParser.loadGraph(message[4], message[1]);
         graph.isDirected = message[2];
+        console.log(message);
 
         // Make sure that the stepDepth variable is initialized
         stepDepth = 0;

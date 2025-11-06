@@ -26,11 +26,11 @@ export default function AlgorithmControls() {
     async function exportGraph() {
         if (window.showSaveFilePicker) {
             const fileHandle = await window.showSaveFilePicker({
-                suggestedName: 'graph.gph',
+                suggestedName: graph.name,
                 types: [
                     {
                         description: 'Graph Files',
-                        accept: {'text/plain': ['.gph']},
+                        accept: {'text/plain': ['.gph', '.tree']},
                     },
                 ],
             });

@@ -4,7 +4,6 @@ import Graph from "states/Graph/Graph";
 import ChangeManager from "states/ChangeManager/ChangeManager";
 import Edge from "states/Graph/GraphElement/Edge";
 import Node from "states/Graph/GraphElement/Node";
-import LayeredGraph from "states/Graph/LayeredGraph";
 
 /** Enable maps in immer */
 enableMapSet();
@@ -1550,6 +1549,19 @@ function startRecording(changeManager) {
 function toString(graph, algorithmName = "No Algorithm Running") {
   let content = "";
 
+  // Possibly start with file identifier
+  if ( graph.type === 'tree' ) {
+    if ( graph.treeType === 'binary' ) {
+      // Binary Tree
+      content += "b ";
+    }else{
+      // Standard (rooted) Tree
+      content += "r ";
+    }
+    // Add the name of the graph
+    content += `${graph.name}\n`;
+  }
+
   // Start this file with the header comments
   graph.comments.forEach((comment) => {
     content += `${comment}\n`;
@@ -1580,6 +1592,8 @@ function toString(graph, algorithmName = "No Algorithm Running") {
         ? ` ${node.attributes.get("weight")}`
         : "";
     
+        
+
     // Add the node line
     if (graph.type === "layered") {
         // Add the node line
@@ -1589,10 +1603,10 @@ function toString(graph, algorithmName = "No Algorithm Running") {
             .toFixed(4)
             .replace(/[.,]0000$/, "")}${weightString}${attributesString}\n`;
     }
-    else if ( graph.type === "tree") {
-        // if graph is a tree, show that node coordinates are undefined
-        content += `n ${node.id} undefined undefined${weightString}${attributesString}\n`;
-    }
+    else if ( graph.type == "tree" ) {
+      // Add the node line (fixes undefined node defns problem)
+      content += `n ${node.id} ${0} ${0}${weightString}${attributesString}\n`;
+    } 
     else {
         // Add the node line
         content += `n ${node.id} ${node.position.x

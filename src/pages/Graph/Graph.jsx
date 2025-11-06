@@ -43,7 +43,6 @@ export default function Graph() {
 
         // Load a new graph
         function onGraphLoad(data, isInit) {
-            console.log("Loading new graph:", data.name, data.payload);
             if ( algorithmLoading ) {
                 algorithmLoading = false;
                 return;
@@ -57,8 +56,10 @@ export default function Graph() {
 
             // Load the graph
             setGraph(FileParser.loadGraph(graphName, graphText));
-            // @todo should get rid of any messages from a running algorithm
             setUserChangeManager(new ChangeManager());
+
+            // !!! need to reset the edit change manager here !!!
+            // could actually reset both change managers
 
             // We have to wait for cytoscape to read graph changes, and add graph.
             if (isInit) setTimeout(() => Cytoscape.fit(Cytoscape.elements(), 100), 25);
@@ -67,7 +68,6 @@ export default function Graph() {
 
         // Load a new algorithm
         function onAlgorithmLoad(data) {
-            console.log("Loading new algorithm:", data.name, data.payload);
             algorithmLoading = true
             
             // Undo any changes the old algorithm made
@@ -102,26 +102,8 @@ export default function Graph() {
         SharedWorker.on("graph-rename", onGraphLoad);
         // If the graph type is "tree", do a layout appropriate for trees - https://www.npmjs.com/package/cytoscape-dagre
         // In other cases, layout depends on user-specified node positions; Cytoscape is called on only for auto-layout - see ControlSettingsPopover 
-        if ( graph.type == 'tree' ) {
-            // Important Notes:
-            // 1. Switched from dagre to Elkjs due to limited sorting functionality
-            // 2. "fit: false" prevents issues with resizing during algorithms
-            // 3. considerModelOrder allows us to use file-order for tree building and can be configured to use edge order or node order
-            //    - The default behavior optimizes trees based on sizing.
-            //    - Highly recommend reviewing documentation on Elkjs. 
-            // 4. Prevents cytoscape from rendering the container until the layout is finished running
-            const container = Cytoscape.container();
-            container.style.visibility = 'hidden';
-            const layout = Cytoscape.layout({ name: 'elk', animate: false, fit: false,
-                elk: {"elk.algorithm": "layered", "elk.layered.considerModelOrder.strategy": "PREFER_NODES", 'elk.direction': 'DOWN', 'elk.edgeRouting': 'SPLINES'} });
-            layout.run();
-
-            // Recenter and reveal only after layout finishes
-            Cytoscape.one('layoutstop', () => {
-                container.style.visibility = 'visible';
-                // auto camera centering
-                Cytoscape.fit(Cytoscape.elements(), 100);
-            })
+        if(graph.type == 'tree'){
+            Cytoscape.layout({ name: 'dagre', fit: false }).run();
         }
         SharedWorker.on("algo-init", onAlgorithmLoad);
         return () => SharedWorker.remove(onGraphLoad, onAlgorithmLoad);

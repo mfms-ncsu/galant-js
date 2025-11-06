@@ -1,354 +1,409 @@
-import Edge from "../../states/Graph/GraphElement/Edge";
-import Node from "../../states/Graph/GraphElement/Node";
+import Tree from "states/Graph/Tree";
 import GraphInterface from "./GraphInterface";
-/**
- * Currently, TreeInterface contains methods necessary to add
- * hidden nodes to trees. This file can contain any method or
- * interaction unique to tree type graphs. While most functions
- * can still be done through GraphInterface.js, there is some functionality
- * unique to trees that are best fit to only exist here.
- *
- * @author Andrew Parr
- */
+import produce from "immer";
+import ChangeManager from "states/ChangeManager/ChangeManager";
+import ChangeObject from "states/ChangeManager/ChangeObject";
+import Node from "states/Graph/GraphElement/Node";
 
 /**
- * Verifies that a given graph is a tree. Checks to see if there is a malformed graph.
- * @param {Graph} graph Graph verify tree type of
- * @returns false if it is not a tree, true if it is. If there is a malformed tree, throws an error.
+ * Helper function to handle what to do when a graph
+ * is not a tree.
+ * @param {Graph} graph Graph on which to operate
  */
-function verifyTree(graph){
-    // Checks the type of graph
-    if ( graph.type !== "tree" ){
-        return false;
-    }
-
-    // The graph is a tree, but may be misformatted
-    for ( const [nodeId, node] of graph.nodes ) {
-        console.log(getInDegree(graph, node));
-        if ( getInDegree(graph, node) > 1 ){
-            throw new Error( "Node " + node.id + " has too many parents.");
-        }
-    }
-
-    // No errors, return true
-    return true;
+function isTree(graph) {
+  if ( !(graph.type === "tree") ) {
+    throw new Error("Function can only be performed on trees.");
+  }
 }
 
 /**
- * Adds invisible nodes and edges to force a correct tree layout:
- * - all leaves are at the same depth; add a path of invisible nodes to each leaf until it is at the max depth
- * - an invisible root node is added if there are multiple roots
- * @param {Graph} graph Graph to modify
- * @deprecated This is no longer needed since we are using the elk layout for trees
+ * Generates the next unique node id from the given list of nodes.
+ * Copied over from GraphInterface. This function is copied so the function
+ * remains usable without needing to export it from GraphInterface.
+ * @param {Node[]} nodes Array of nodes to check
+ * @returns New node id
  */
-// function forceCorrectTreeLayout(graph) {
-//     // Deletes hidden nodes from the current graph
-//     deleteHiddenNodes(graph);
+function generateId(nodes) {
+  let id = 0;
+  while (nodes.has(String(id))) id++;
+  return String(id);
+}
 
-//     // Verifies that the graph is a tree
-//     if ( ! verifyTree(graph) ){
-//         throw new Error("This graph is not a tree, but you are attempting to call a tree only method on it.");
-//     }
+/**
+ * Records a new change in the given change manager.
+ * Copied over from GraphInterface. This function is copied so the function
+ * remains usable without needing to export it from GraphInterface.
+ * @param {ChangeManager} changeManager Change manager to which to add
+ * @param {ChangeObject[]} change Changes to log
+ * @returns Updated change manager
+ */
+function recordChange(changeManager, change) {
+    
+    // If the change manager is not recording, save the change to the
+    // main list of changes
+    if (!changeManager.isRecording) {
+        return produce(changeManager, (draft) => {
+            // Remove all changes after the current index
+            draft.changes = draft.changes.slice(0, draft.index);
 
-//     // Finds the roots and leaves, then finds the longest depth
-//     const [roots, leaves] = getRootsAndLeaves(graph);
-//     const maxDepth = assignDepths(graph, roots);
+            // Push the new change
+            draft.changes.push(change);
 
-//     // Adds a hidden root and leaves to the graph to force layout consistency
-//     addHiddenRoot(graph, roots);
-//     addHiddenPaths(graph, leaves, maxDepth);
+            // Increment the index
+            draft.index++;
+        });
+    }
+    
+    // If the change manager is recording, save the change to the
+    // temporary list of changes, and return
+    return produce(changeManager, (draft) => {
+        
+        change.forEach( (changeObj) => {
+            draft.recordedChanges.push(changeObj);
+        });
+    });
+}
 
-//     // Error checking
-//     console.log("Final graph with hidden nodes: ", graph)
+function addBinaryNode(graph, changeManager, nodeId, attributes, leftChild) {
+  isTree(graph);
+
+    // If the nodeId argument is passed, use that, otherwise generate an id
+    nodeId = nodeId || generateId(graph.nodes);
+  
+    const newGraph = produce(graph, (draft) => {
+      // Create the node
+      let node = new Node(nodeId, undefined, undefined);
+
+      if ( leftChild ) {
+        draft.nodes = new Map([[nodeId, node], ...draft.nodes.entries()]);
+      }
+      else {
+        draft.nodes.set(nodeId, node);
+      }
+      // Set the attributes
+      for (let name in attributes) {
+        node.attributes.set(name, attributes[name]);
+      }
+    });
+  
+    // Add the change object to the changeManager
+    const newChangeManager = recordChange(changeManager, [
+      new ChangeObject("addNode", null, {
+        id: nodeId,
+        position: {
+          x: undefined,
+          y: undefined,
+        },
+        attributes: attributes
+      })
+    ]);
+  
+    // Return mutated graph and change manager to trigger re-render
+    // Add the node id as the third return value
+    return [newGraph, newChangeManager, nodeId];
+}
+
+/**
+ * Gets parent of target node
+ * @param {Graph} graph Graph on which to operate
+ * @param {String} target Node to check 
+ * @returns Parent nodes
+ */
+function getParent(graph, target) {
+  isTree(graph);
+
+  if ( !graph.nodes.has(target) ) {
+    throw new Error(
+      "Cannot get parent of node " +
+        target +
+        " because no node with this id exists in the graph"
+    );
+  }
+
+  // Gets incoming nodes using GraphInterface implementation
+  const incoming = GraphInterface.getIncomingNodes(graph, target);
+
+  // For trees, there should be 0 or 1 incoming edge.
+  if ( incoming.length === 0 ) {
+    return undefined; // target is root
+  }
+  if ( incoming.length > 1 ) {
+    throw new Error(
+      "Node " + target + " has multiple parents: " + incoming.join(", ")
+    );
+  }
+  return incoming[0];
+}
+
+
+/**
+ * Gets children of target node
+ * @param {Graph} graph Graph on which to operate
+ * @param {String} target Node to check 
+ * @returns Array of children nodes
+ */
+function getChildren(graph, source) {
+  isTree(graph);
+
+  return GraphInterface.getOutgoingNodes(graph, source);
+}
+
+/**
+ * Get to roots of the tree (for forests)
+ * @param {Graph} graph Graph on which to operate
+ * @author Bryan Fang
+ * @returns Array of roots
+ */
+function getRoots(graph) {
+  isTree(graph);
+
+  let roots = [];
+
+  for ( const nodeId of graph.nodes.keys() ) {
+    if ( getParent(graph, nodeId) === undefined ) {
+      roots.push(nodeId);
+    }
+  }
+
+  return roots;
+}
+
+/**
+ * Get to root of the tree
+ * @param {Graph} graph Graph on which to operate
+ * @returns Root node
+ */
+function getRoot(graph) {
+  isTree(graph);
+
+  // Return the (single) node with no parent
+  for ( const nodeId of graph.nodes.keys() ) {
+    if ( getParent(graph, nodeId) === undefined ) {
+      return nodeId;
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * Sorts the nodes of a tree by weight in ascending order.
+ * MAY NEED TO BE MODIFIED TO USE A DRAFT/IMMER ARCHETYPE
+ * @param {Graph} graph Graph to sort
+ */
+// function sortByWeight(graph) {
+//   isTree(graph);
+
+//   // Turns the nodes map into an array, sorts it, then turns it back into a map
+//   graph.nodes = new Map(
+//     [...graph.nodes.entries()].sort((a, b) => a[1].attributes.get("weight") - b[1].attributes.get("weight")
+//   ));
 // }
 
 /**
- * Finds the root nodes and leaf nodes for a given graph
- * @param {Graph} graph The graph to examine
- * @returns An array containing the roots at index 0 and the leaves at index 1
+ * Checks if the node is a leaf
+ * @param {Graph} graph Graph on which to operate
+ * @param {string} nodeId Node to check
+ * @returns true if node is leaf else false
  */
-function getRootsAndLeaves(graph){
-    // Initialize the roots and leaves storage
-    const roots = [];
-    const leaves = [];
+function isLeaf(graph, nodeId) {
+  isTree(graph);
 
-    // Examine each node in the graph
-    for ( const [nodeId, node] of graph.nodes ){
+  // Throw an error if the node doesn't exist
+  if ( !graph.nodes.has(nodeId) ) {
+    throw new Error(
+      "Cannot check node " +
+        nodeId +
+        " because no node with this id exists in the graph"
+    );
+  }
 
-        // Initialize booleans for if it is a root and leaf
-        let isRoot = true;
-        let isLeaf = true;
+  // Checks if node has any children
+  if ( getChildren(graph, nodeId).length === 0 ) {
+    return true;
+  }
 
-        // Examine each edge coming into or out of the node
-        for ( const [edgeId, edge] of node.edges ) {
-            // If the edge goes out, it has children and is not a leaf
-            if ( edge.source === node.id ){
-                isLeaf = false;
-            } else {
-            // Otherwise, it is not a root
-                isRoot = false;
-            }
-        }
-        // Include the node in roots or leaves
-        if ( isRoot ){
-            roots.push(node);
-            console.log("Root: " + node.id);
-        }
-        if ( isLeaf ){
-            leaves.push(node);
-            console.log("Leaf: " + node.id);
-        }
-    }
-
-    // Return roots and leaves
-    return [roots, leaves];
+  return false;
 }
 
 /**
- * Finds and stores the depth of each node in a given graph
- * @param {Graph} graph The graph to assign node depths to
- * @param {Array} leaves The starting points to find depths of
- * @returns the maximum depth found among all nodes
+ * Gets the left child of the node
+ * @param {Graph} graph Graph on which to operate
+ * @param {string} nodeId Node to check
+ * @returns Left node
  */
-function assignDepths(graph, roots){
-    // If there are no roots, there is a cycle
-    if ( roots.length == 0 ){
-        throw new Error( "There is a cycle in your tree." );
-    }
+function getLeft(graph, nodeId) {
+  isTree(graph);
 
-    // Initialize a variable to store the maximum depth
-    let maxDepth = -1;
+  // Throw an error if the node doesn't exist
+  if ( !graph.nodes.has(nodeId) ) {
+    throw new Error(
+      "Cannot get left child of node " +
+        nodeId +
+        " because no node with this id exists in the graph"
+    );
+  }
 
-    // Compute the maximum depth of each subtree
-    for ( const root of roots ){
-        const depth = computeDepths(graph, root, 0);
+  // Gets children and checks if a left child exists
+  let children = getChildren(graph, nodeId);
+  if ( children.length === 0 ) {
+    throw new Error(
+      "Left child does not exist"
+    );
+  }
+  if ( GraphInterface.getNodeAttribute(graph, children[0], "dummy") === true ) {
+    throw new Error(
+      "Left child does not exist"
+    );
+  }
 
-        // If this tree has the largest depth, store it
-        if ( depth > maxDepth ){
-            maxDepth = depth;
-        }
-    }
-    
-    // Return the maximum depth
-    console.log( "Max depth: " + maxDepth );
-    return maxDepth;
+  return children[0];
 }
 
 /**
- * Assigns the correct depth to subtree_root and all of its descendants
- * @param subtreeRoot the root of a subtree in the forest
- * @param rootDepth the correct depth of subtree_root
- * @return the maximum depth of any descendant of subtree_root
+ * Gets the right child of the node
+ * @param {Graph} graph Graph on which to operate
+ * @param {string} nodeId Node to check
+ * @returns right node
  */
-function computeDepths(graph, subtreeRoot, rootDepth){
-    // Initialize necessary variables
-    const children = getChildren(graph, subtreeRoot);
-    let maxDepth = -1;
-    subtreeRoot.depth = rootDepth;
-    
-    // If the node is a leaf return its depth
-    if ( children.length == 0 ){
-        return rootDepth;
-    }
+function getRight(graph, nodeId) {
+  isTree(graph);
 
-    // Compute the depths of all children of this root
-    for( const child of children ){
-        // Store maximum depth found
-        const childDepth = computeDepths(graph, child, rootDepth + 1);
-        maxDepth = childDepth > maxDepth ? childDepth : maxDepth;
-    }
+  // Throw an error if the node doesn't exist
+  if ( !graph.nodes.has(nodeId) ) {
+    throw new Error(
+      "Cannot get right child of node " +
+        nodeId +
+        " because no node with this id exists in the graph"
+    );
+  }
 
-    // Return the maximum depth of children
-    return maxDepth;
+  // Gets children and checks if a right child exists
+  let children = getChildren(graph, nodeId);
+  if ( children.length < 1 ) {
+    throw new Error(
+      "Right child does not exist"
+    );
+  }
+  if ( GraphInterface.getNodeAttribute(graph, children[1], "dummy") === true ) {
+    throw new Error(
+      "Right child does not exist"
+    );
+  }
+
+  return children[1];
 }
 
 /**
- * Gets the children of a given node
- * Possibly needs to move to GraphInterface or TreeInterface
- * @param {Graph} graph The graph that the given node exists in
- * @param {Node} node The node to find children of
- * @returns The children of a given node
+ * Creates left child
+ * @param {Graph} graph Graph on which to operate
+ * @param {Graph} {ChangeManager} changeManager ChangeManager to use for storing changes
+ * @param {string} node Source node
+ * @param {float} childWeight Weight of the child node
  */
-function getChildren(graph, node){
-    // Initialize necessary variables
-    let children = [];
+function addLeft(graph, changeManager, node, childWeight) {
+  isTree(graph);
+  let leftChild, dummy;
 
-    // Find children from edges
-    for( const [subjects, edge] of node.edges ){
-        // If the edge leads to a child, store child node
-        if ( edge.source === node.id ){
-            children.push(graph.nodes.get(edge.target));
-        }
+  // Throw an error if the node doesn't exist
+  if ( !graph.nodes.has(node) ) {
+    throw new Error(
+      "Cannot create left child of node " +
+        node +
+        " because no node with this id exists in the graph"
+    );
+  }
+
+  // Case 1: Node has no children
+  if ( isLeaf(graph, node) ) {
+    [graph, changeManager, leftChild] = addBinaryNode(graph, changeManager, undefined, {"weight": childWeight}, true);
+    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, leftChild);
+
+    [graph, changeManager, dummy] = addBinaryNode(graph, changeManager, undefined, {"dummy": true});
+    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, dummy);
+
+    return [graph, changeManager, leftChild];
+  }
+  // Case 2: Node has a dummy left child
+  else {
+    let children = getChildren(graph, node);
+
+    if ( GraphInterface.getNodeAttribute(graph, children[0], "dummy") ) {
+      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[0], "dummy", false);
+      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[0], "weight", childWeight);
+
+      return [graph, changeManager, children[0]]
     }
+  }
 
-   // Returns an array of child nodes 
-    return children;
+  // Throws error if node already has a left child
+  throw new Error(
+    "Cannot create left child of node " +
+      node +
+      " because left child already exists"
+  );
 }
 
 /**
- * Gets the parent of a given node
- * Possibly needs to move to GraphInterface or TreeInterface
- * @param {Graph} graph The graph containing our node and parent
- * @param {Node} node The node to find a parent of
- * @returns The parent of the given node
+ * Creates right child
+ * @param {Graph} graph Graph on which to operate
+ * @param {Graph} {ChangeManager} changeManager ChangeManager to use for storing changes
+ * @param {string} node Source node
+ * @param {float} childWeight Weight of the child node
  */
-function getParent(graph, node){
-    // Find an edge that comes from a parent, and return the parent node
-    for( const [subjects, edge] of node.edges ){
-        if ( edge.target === node.id ){
-            return graph.nodes[edge.source];
-        }
+function addRight(graph, changeManager, node, childWeight) {
+  isTree(graph);
+  let rightChild, dummy;
+
+  // Throw an error if the node doesn't exist
+  if ( !graph.nodes.has(node) ) {
+    throw new Error(
+      "Cannot create right child of node " +
+        node +
+        " because no node with this id exists in the graph"
+    );
+  }
+
+  // Case 1: Node has no children
+  if ( isLeaf(graph, node) ) {
+    [graph, changeManager, dummy] = addBinaryNode(graph, changeManager, undefined, {"dummy": true});
+    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, dummy);
+
+    [graph, changeManager, rightChild] = addBinaryNode(graph, changeManager, undefined, {"weight": childWeight}, false);
+    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, rightChild);
+
+    return [graph, changeManager, rightChild];
+  }
+  // Case 2: Node has a dummy right child
+  else {
+    let children = getChildren(graph, node);
+
+    if ( GraphInterface.getNodeAttribute(graph, children[1], "dummy") ) {
+      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[1], "dummy", false);
+      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[1], "weight", childWeight);
+
+      return [graph, changeManager, children[1]]
     }
+  }
+
+  // Throws error if node already has a right child
+  throw new Error(
+    "Cannot create right child of node " +
+      node +
+      " because right child already exists"
+  );
 }
 
-/**
- * Adds hidden nodes to all leaf nodes not already at the maximum depths
- * @param {Graph} graph Graph that stores all nodes
- * @param {Map} nodeDepths The current depth of every node
- * @param {Array} leaves An array of every leaf on our graph
- * @param {Number} maxDepth Maximum depth of all trees
- */
-function addHiddenPaths(graph, leaves, maxDepth){
-    // Add hidden nodes to each leaf until they are the proper height
-    for ( const leaf of leaves ){
-
-        // Add hidden nodes until they reach the maximum depth
-        let bottomNode = leaf;
-        while( bottomNode.depth < maxDepth ){
-
-            // Connect a new node and reassign the bottom most node
-            const newNode = addHiddenNode(graph);
-            addEdge(graph, bottomNode.id, newNode.id);
-            newNode.depth = bottomNode.depth + 1;
-            bottomNode = newNode;
-        }
-    }
-}
-
-/**
- * Adds a single hidden root to ensure proper ordering of subtrees.
- * @param {Graph} graph Graph to add a hidden root to.
- * @param {Array} roots The roots of the given graph.
- */
-function addHiddenRoot(graph, roots){
-    // Creates a hidden node to be the root
-    const hiddenRoot = addHiddenNode(graph);
-
-    // Connect the hidden root to each actual root of the forest
-    for( const root of roots ){
-        addEdge(graph, hiddenRoot.id, root.id);
-    }
-}
-
-/**
- * Removes all the hidden nodes from the graph to ensure a clean slate exists
- * to reattach a hidden root and hidden leaves.
- * @param {Graph} graph the graph to remove hidden nodes from
- */
-function deleteHiddenNodes(graph){
-    // If a node is hidden, delete its edges and then itself
-    for (const [id, node] of graph.nodes) {
-
-        // Checks to see if the current node is hidden
-        if ( node.attributes && (node.attributes.get("hidden") === "true" || node.attributes.get("hidden") === true) ) {
-
-            // Delete each edge of the current hidden node
-            for (const [id, edge] of node.edges ) {
-                const source = edge.source;
-                const target = edge.target;
-                graph.nodes.get(source).edges.delete(`${source},${target}`);
-                graph.nodes.get(target).edges.delete(`${source},${target}`);
-            }
-        
-            // Delete the hidden node
-            graph.nodes.delete(node.id);
-        }
-    }
-
-    // Error checking
-    console.log("Graph with no hidden nodes: ", graph);
-}
-
-/**
- * Adds a new hidden node to the given graph. This node has a generated ID and
- * the hidden attribute set to 'true'
- * @param {Graph} graph Graph to which to add a hidden node to
- */
-function addHiddenNode(graph) {
-
-    // Generate an ID
-    const nodeId = generateId(graph.nodes);
-
-    // Create the node
-    let node = new Node(nodeId, 0, 0);
-    graph.nodes.set(nodeId, node);
-
-    // Set the attributes
-    node.attributes.set("hidden", true);
-    
-    // Return the node to caller
-    return node;
-
-    // Get the smallest unused node id for automatic assigning
-    // TODO possibly replace this with random string or a hash, we don't want IDs being eaten
-    function generateId(nodes) {
-        let id = 0;
-        while (nodes.has(String(id))) id++;
-        return String(id);
-    }
-}
-
-/**
- * Adds a new edge to the given graph.
- * @param {Graph} graph Graph to which to add
- * @param {String} source Source node
- * @param {String} target Target node
- * @param {Object} attributes Edge attributes
- */
-function addEdge(graph, source, target, attributes) {
-    // Error checking
-    if ( !graph.nodes.has(source) && !graph.nodes.has(target) )
-        throw new Error(`Cannot create edge because neither the source (${source}) nor the target (${target}) node exist in the graph`);
-    if ( !graph.nodes.has(source) )
-        throw new Error(`Cannot create edge because the source node (${source}) does not exist in the graph`);
-    if ( !graph.nodes.has(target) )
-        throw new Error(`Cannot create edge because the target node (${target}) does not exist in the graph`);
-
-    // Create the edge object
-    let edge = new Edge(source, target);
-
-    // Set the attributes
-    for (let name in attributes) {
-        edge.attributes.set(name, attributes[name]);
-    }
-
-    // Add the edge to both the source and target's adjacency lists
-    graph.nodes.get(source).edges.set(`${source},${target}`, edge);
-    graph.nodes.get(target).edges.set(`${source},${target}`, edge);
-}
-
-/**
- * Gets the in degree of a given node on a given graph.
- * @param {Graph} graph Graph of the node to get in degree of. 
- * @param {Node} node The node to get the in degree of.
- * @returns The number of edges with the node as a target
- */
-function getInDegree(graph, node){
-    return GraphInterface.getIncomingEdges(graph, node.id).length; 
-}
-
-/**
- * Gets the out degree of a given node on a given graph.
- * @param {Graph} graph Graph of the node tp get out degree of.
- * @param {Node} node The node to get the out degree of.
- * @returns The number of edges with the node as a source
- */
-function getOutDegree(graph, node){
-    return GraphInterface.getOutgoingEdges(graph, node.id).length; 
-}
-
+/** Export an object containing the interface */
 const TreeInterface = {
-    forceCorrectTreeLayout
+  getParent,
+  getChildren,
+  getRoots,
+  getRoot,
+  isLeaf,
+  getLeft,
+  getRight,
+  addLeft,
+  addRight
 };
-
-export default TreeInterface;
+export default TreeInterface; 
