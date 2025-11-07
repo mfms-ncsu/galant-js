@@ -1065,16 +1065,20 @@ function getRight(nodeId) {
 
 function addLeft(targetNode, childWeight) {
     if (stepDepth === 0) { postMessage({ action: "step" }) };
-    [graph, changeManager] = TreeInterface.addLeft(graph, changeManager, targetNode, childWeight);
+    let newNode;
+    [graph, changeManager, newNode] = TreeInterface.addLeft(graph, changeManager, targetNode, childWeight);
     postMessage({ action: "addLeft", targetNode: targetNode, childWeight: childWeight});
     waitIfNeeded();
+    return newNode;
 }
 
 function addRight(targetNode, childWeight) {
     if (stepDepth === 0) { postMessage({ action: "step" }) };
-    [graph, changeManager] = TreeInterface.addRight(graph, changeManager, targetNode, childWeight);
+    let newNode;
+    [graph, changeManager, newNode] = TreeInterface.addRight(graph, changeManager, targetNode, childWeight);
     postMessage({ action: "addRight", targetNode: targetNode, childWeight: childWeight});
     waitIfNeeded();
+    return newNode;
 }
 
 

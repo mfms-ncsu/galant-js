@@ -247,14 +247,7 @@ function getLeft(graph, nodeId) {
   // Gets children and checks if a left child exists
   let children = getChildren(graph, nodeId);
   if ( children.length === 0 ) {
-    throw new Error(
-      "Left child does not exist"
-    );
-  }
-  if ( GraphInterface.getNodeAttribute(graph, children[0], "dummy") === true ) {
-    throw new Error(
-      "Left child does not exist"
-    );
+    return undefined;
   }
 
   return children[0];
@@ -281,14 +274,7 @@ function getRight(graph, nodeId) {
   // Gets children and checks if a right child exists
   let children = getChildren(graph, nodeId);
   if ( children.length < 1 ) {
-    throw new Error(
-      "Right child does not exist"
-    );
-  }
-  if ( GraphInterface.getNodeAttribute(graph, children[1], "dummy") === true ) {
-    throw new Error(
-      "Right child does not exist"
-    );
+    return undefined;
   }
 
   return children[1];
