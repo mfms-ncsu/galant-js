@@ -3,6 +3,7 @@ import { algorithmChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import PromptInterface from "interfaces/PromptInterface/PromptInterface";
 import LayeredGraphInterface from "interfaces/GraphInterface/LayeredGraphInterface";
+import TreeInterface from "interfaces/GraphInterface/TreeInterface";
 
 /**
  * AlgorithmInterface contains functions to check and augment the algorithm.
@@ -295,6 +296,14 @@ function onMessage(algorithm, message) {
             break;
         case "applyNodePositions":
             [newGraph, newChangeManager] = LayeredGraphInterface.applyNodePositions(graph, changeManager, message.savedPositions);
+            updateState(newGraph, newChangeManager);
+            break;
+        case "addLeft":
+            [newGraph, newChangeManager] = TreeInterface.addLeft(graph, changeManager, message.targetNode, message.childWeight);
+            updateState(newGraph, newChangeManager);
+            break;
+        case "addRight":
+            [newGraph, newChangeManager] = TreeInterface.addRight(graph, changeManager, message.targetNode, message.childWeight);
             updateState(newGraph, newChangeManager);
             break;
         case "startRecording":

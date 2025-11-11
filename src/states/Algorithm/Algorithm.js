@@ -52,6 +52,6 @@ export default class Algorithm {
         let handleMessage = (message) => { AlgorithmInterface.onMessage(this, message.data) };
         this.worker.onmessage = handleMessage;
         this.worker.postMessage(["shared", this.array, this.flags]);
-        this.worker.postMessage(["graph/algorithm", GraphInterface.toString(graph), graph.isDirected, this.code]);
+        this.worker.postMessage(["graph/algorithm", GraphInterface.toString(graph), graph.isDirected, this.code, graph.name]);
     }
 }
