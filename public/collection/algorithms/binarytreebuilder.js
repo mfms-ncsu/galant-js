@@ -20,7 +20,7 @@
 //TODO: kind of works, really kind of doesn't. Has moved 2 from left child of 4 to right, and has added dummys when it shouldn't
 //and broken tree without deleting. Will look into further. 
 
-setDirected(true);
+
 
 //-----------------TreeInterface will later replace these fns with their own, need them here for now-------------------
 // Looks for the root node by looking for inDegree of 0
@@ -38,7 +38,7 @@ function cleanTree(){
   step(() => {
     clearNodeMarks();
     clearNodeHighlights();
-    clearNodeLabels();
+    //clearNodeLabels();
     clearEdgeHighlights();
     clearEdgeColors();
   });
@@ -82,6 +82,7 @@ function dummify( nodeId ){
 function undummify( nodeId, weight ){
   setAttribute(nodeId, "dummy", false);
   setAttribute(nodeId, "weight", weight);
+  display(`Successfully added node '${weight}'`)
   return nodeId;
 }
 
@@ -124,6 +125,7 @@ function addNodeBST(x, k) {
         addRight(x, k);
         dummify(addLeft(x, undefined));
       } 
+      display(`Successfully added node '${k}'`)
     });
     return;
   }
@@ -158,10 +160,12 @@ function deleteNodeHelper(p, x){
   display(`Successully deleted: '${k}'`);
 }
 
-function deleteNodeBST(x, k) {
+function deleteNodeBST(x, k, hideDisplay) {
   // Couldn't find node we are trying to delete, error
   if (x === undefined || getAttribute(x, "dummy") || (isLeaf(x) && k != weight(x))){
-    display(`Could not find node '${k}' to delete`);
+    if( !hideDisplay ){
+      display(`Could not find node '${k}' to delete`);
+    }
     return;
   }
 
@@ -169,13 +173,10 @@ function deleteNodeBST(x, k) {
 
   //Not a leaf, and not == k, keep searching
   if (k < weight(x)) {
-    return deleteNodeBST(getLeft(x), k);    
+    return deleteNodeBST(getLeft(x), k, hideDisplay);    
   } else if (k > weight(x)) {
-    return deleteNodeBST(getRight(x), k);
+    return deleteNodeBST(getRight(x), k, hideDisplay);
   }
-
-  //If we get here, k must equal weight(x???
-  display(`'${k}' FOUND, deleting`);
 
   const p = getParent(x);
   const L = getLeft(x);
@@ -194,26 +195,37 @@ function deleteNodeBST(x, k) {
     if (sibDum){
       deleteNode(x);
       deleteNode(S);
-      display(`Deleted leaf '${k}' and its dummy sibling`);
+      if( !hideDisplay ){
+        display(`Deleted leaf '${k}' and its dummy sibling`);
+      }
       return;
-    } else {
+    } else if( getRoot() != x ){
       dummify(x);
-      display(`Successully deleted: '${k}'`);
+      if( !hideDisplay ){
+        display(`Successully deleted: '${k}'`);
+      }
       return;
+    }else{
+      deleteNode(x);
+      if( !hideDisplay ){
+        display(`Successully deleted: '${k}'`);
+      }
     }
   }
 
   //CASE 2: DELETE WITH 2 CHILDREN
-  if (!leftDum && !rightDum){
+  else if (!leftDum && !rightDum){
     // Find in-order predecessor
     let predecessor = findInOrderPredecessor(L);
     // Replace deleted node weight with in-order predecessor weight
     step(() =>{
       let predWeight = weight(predecessor);
       // Call delete on in-order predecessor
-      deleteNodeBST(x, predWeight);
+      deleteNodeBST(x, predWeight, true);
       setWeight(x, predWeight);
-      display(`Successully deleted: '${k}'`)
+      if( !hideDisplay ){
+        display(`Successully deleted: '${k}'`)
+      }
     });
   } 
   //1 of each
@@ -228,7 +240,9 @@ function deleteNodeBST(x, k) {
 
       // Delete both children
       getChildren(x).forEach( (child) => {
-          display(`Deleting edge between '${weight(x)}' and '${weight(child)}'`);
+          if( !hideDisplay ){
+            display(`Deleting edge between '${weight(x)}' and '${weight(child)}'`);
+          }
           deleteEdge(getEdgeBetween(x, child));
           deleteNode(child);
       });
@@ -253,7 +267,9 @@ function deleteNodeBST(x, k) {
 
       // Delete both children
       getChildren(x).forEach((child) => {
-        display(`Deleting edge between '${weight(x)}' and '${weight(child)}'`);
+        if( !hideDisplay ){
+          display(`Deleting edge between '${weight(x)}' and '${weight(child)}'`);
+        }
         deleteEdge(getEdgeBetween(x, child));
         deleteNode(child);
       });
@@ -271,10 +287,13 @@ function deleteNodeBST(x, k) {
   }
 
   //deleteNode(x);
-  display(`Successully deleted: '${k}'`);
+  if( !hideDisplay ){
+    display(`Successully deleted: '${k}'`);
+  }
 }
 
 //TODO: this may cause issues if the loaded tree has weights <= 0, but is an easier UX
+setDirected(true);
 let running = true;
 while (running){
   cleanTree();
