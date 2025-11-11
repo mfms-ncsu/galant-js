@@ -302,10 +302,17 @@ function addLeft(graph, changeManager, node, childWeight) {
 
   // Case 1: Node has no children
   if ( isLeaf(graph, node) ) {
-    [graph, changeManager, leftChild] = addBinaryNode(graph, changeManager, undefined, {"weight": childWeight}, true);
+    [graph, changeManager, leftChild] = addBinaryNode(graph, changeManager, undefined, undefined, true);
+    [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, leftChild, "weight", childWeight);
+
+    // If it is a binary tree, hide the weight of the node
+    if ( graph.treeType == "binary" ){
+      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, leftChild, "weightHidden", true);
+    }
     [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, leftChild);
 
-    [graph, changeManager, dummy] = addBinaryNode(graph, changeManager, undefined, {"dummy": true});
+    [graph, changeManager, dummy] = addBinaryNode(graph, changeManager, undefined, undefined);
+    [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, dummy, "dummy", true);
     [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, dummy);
 
     return [graph, changeManager, leftChild];
@@ -317,6 +324,11 @@ function addLeft(graph, changeManager, node, childWeight) {
     if ( GraphInterface.getNodeAttribute(graph, children[0], "dummy") ) {
       [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[0], "dummy", false);
       [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[0], "weight", childWeight);
+      
+      // If it is a binary tree, hide the weight of the node
+      if ( graph.treeType == "binary" ){
+        [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[0], "weightHidden", true);
+      }
 
       return [graph, changeManager, children[0]]
     }
@@ -352,11 +364,18 @@ function addRight(graph, changeManager, node, childWeight) {
 
   // Case 1: Node has no children
   if ( isLeaf(graph, node) ) {
-    [graph, changeManager, dummy] = addBinaryNode(graph, changeManager, undefined, {"dummy": true});
+    [graph, changeManager, dummy] = addBinaryNode(graph, changeManager, undefined, undefined);
+    [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, dummy, "dummy", true);
     [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, dummy);
 
-    [graph, changeManager, rightChild] = addBinaryNode(graph, changeManager, undefined, {"weight": childWeight}, false);
+    [graph, changeManager, rightChild] = addBinaryNode(graph, changeManager, undefined, undefined, false);
+    [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, rightChild, "weight", childWeight);
     [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, rightChild);
+    
+    // If it is a binary tree, hide the weight of the node
+    if ( graph.treeType == "binary" ){
+      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, rightChild, "weightHidden", true);
+    }
 
     return [graph, changeManager, rightChild];
   }
@@ -367,6 +386,11 @@ function addRight(graph, changeManager, node, childWeight) {
     if ( GraphInterface.getNodeAttribute(graph, children[1], "dummy") ) {
       [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[1], "dummy", false);
       [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[1], "weight", childWeight);
+      
+      // If it is a binary tree, hide the weight of the node
+      if ( graph.treeType == "binary" ){
+        [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[1], "weightHidden", true);
+      }
 
       return [graph, changeManager, children[1]]
     }

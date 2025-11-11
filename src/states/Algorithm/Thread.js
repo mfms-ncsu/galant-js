@@ -307,6 +307,11 @@ function addNode(x, y) {
     [graph, changeManager, newNode] = GraphInterface.addNode(graph, changeManager, x, y);
     postMessage({ action: "addNode", x: x, y: y });
     waitIfNeeded();
+
+    // If adding to a binary tree, hide the node's weight
+    if( graph.treeType == "binary" ){
+        setAttribute(newNode, "weightHidden", true);
+    }
     return newNode;
 }
 
