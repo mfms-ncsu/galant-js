@@ -206,6 +206,7 @@ function makeRed( node ) {
 
 // Set the parentN as the parent of node
 function setParent( node, parentN ) {
+  display(`We now set the node ${parentN} as the parent of ${node}`);
   // Remove incoming edges ( old parent ) from child ( node )
   const parentEdge = incoming( node );
   if ( parentEdge != null && parentEdge[ 0 ] != null ) {
@@ -218,6 +219,7 @@ function setParent( node, parentN ) {
 
 // Set the child as a left child of node
 function setLeft( node, child ) {
+  display(`We now set the node ${child} as the left child of ${node}`);
   // Remove parent edge of child
   // const parentEdge = getIncomingEdges( child );
   // if ( parentEdge != null && parentEdge[ 0 ] != null ) {
@@ -255,6 +257,7 @@ function setLeft( node, child ) {
 
 // Set the child as a right child of node
 function setRight( node, child ) {
+  display(`We now set the node ${child} as the right child of ${node}`);
   // Remove parent edge of child
   // const parentEdge = getIncomingEdges( child );
   // if ( parentEdge != null && parentEdge[ 0 ] != null ) {
@@ -318,24 +321,31 @@ function resolveRed( node ) {
     let uncle = sibling( parentN );
     // CASE 1: the uncle (sibling of the parent) is black
     if ( isBlack( uncle ) ) {
+      display(`CASE 1: The uncle ${uncle} (sibling of the parent) is black`);
       // Restructure and re-color children
+      display(`So we preform trinode restructuring on the node, parent, and grandparent`);
       let middle = restructure( node );
+      display(`Then we make the middle node (new parent) black and the two children red`);
       makeBlack( middle );
       makeRed( left( middle ) );
       makeRed( right( middle ) );
     } else {
       // CASE 2: the uncle (sibling of the parent) is red
+      display(`CASE 2: The uncle ${uncle} (sibling of the parent) is red`);
+      display(`So we make the parent node ${parentN} and uncle ${uncle} black`);
       makeBlack( parentN );
       makeBlack( uncle );
       let grandparent = parent( parentN );
+      display(`Then if the grandparent ${grandparent} isn't a root, make it red...`);
       if ( !isRoot( grandparent ) ) {
         makeRed( grandparent );
+        display(`... and propogate the Red Property check up`);
         resolveRed( grandparent );
       }
     }
+  } else {
+    display(`We have a black parent so we satisfy the Red Property`)
   }
-
-  display(`We have a black parent so we satisfy the Red Property`)
 }
 
 /**
@@ -420,6 +430,8 @@ function rotate( node ) {
   let parentN = parent( node );
   let grandparent = parent( parentN );
 
+  display(`Rotate: We will rotate node ${node} around its parent ${parentN}...`);
+  display(`...and if needed, the grandparent will refer to node ${node} as its child`);
   if ( grandparent == null ) {
     setRoot( node );
     setParent( node, null );
@@ -457,10 +469,14 @@ function restructure( node ) {
   if ( (node == left( parentN ) && parentN == left( grandparent ) ) || 
       ( node == right( parentN ) && parentN == right( grandparent ) ) ) {
       // rotate the parent around the grandparent
+      display(`Restructure: If the parent ${parentN} is the same side child as node ${node} is to parent...`);
+      display(`...then we rotate the parent ${parentN} around the grandparent ${grandparent}`);
       rotate( parentN );
       return parentN;
   } else {
       // rotate the node around the parent twice
+      display(`Restructure: If the parent ${parentN} is not the same side child as node ${node} is to parent...`);
+      display(`...then we rotate the node ${node} around the parent ${parentN} twice`);
       rotate( node );
       rotate( node );
       return node;
