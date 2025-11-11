@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import TabInterface from "interfaces/TabInterface/TabInterface";
-import MonacoEditor, { useMonaco } from '@monaco-editor/react';
+import MonacoEditor from '@monaco-editor/react';
 import Overlay from "./Overlay";
 import TabList from "components/Tabs/TabList";
 import algorithms from 'data/algorithms.json';
 import graphs from 'data/graphs.json';
 import * as threadFunctions from 'states/Algorithm/Thread.js';
 
+/**
+ * Returns the monaco editor
+ */
 function InnerEditor({ tab, editorType, onChange }) {
     return (
         <MonacoEditor
@@ -19,6 +22,15 @@ function InnerEditor({ tab, editorType, onChange }) {
             beforeMount={(monaco) => {
                 monaco.languages.register({ id: "Algorithm-Language" });
 
+                //Trying to fix different file type issues
+                monaco.editor.onDidCreateModel((model) => {
+                    const path = model.uri.path;
+                    if (!path || path.endsWith(".js")) { // blank or .js files
+                        monaco.editor.setModelLanguage(model, "Algorithm-Language");
+                    }
+                });
+
+                //Gets functions from thread.js and converts to monaco suggestions
                 const suggestions = Object.keys(threadFunctions).map((name) => ({
                     label: name,
                     kind: monaco.languages.CompletionItemKind.Function,
@@ -27,6 +39,7 @@ function InnerEditor({ tab, editorType, onChange }) {
                     detail: "Thread function",
                 }));
 
+                //Register the custom language
                 monaco.languages.registerCompletionItemProvider("Algorithm-Language", {
                     triggerCharacters: [..."abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"],
                     provideCompletionItems() {
@@ -42,17 +55,27 @@ function InnerEditor({ tab, editorType, onChange }) {
     );
 }
 
+/**
+ * EditorGroup that defines the tabs list and monaco editor into a component
+ */
 export default function Editor({ editorType, tabsAtom }) {
-    const [tabs, setTabs] = useAtom(tabsAtom);
-    const selectedTab = TabInterface.getSelectedTab(tabs);
-    const [saved, setSaved] = useState(true);
+    const [tabs, setTabs] = useAtom(tabsAtom); // State for managing tabs
+    const selectedTab = TabInterface.getSelectedTab(tabs); // Get the currently selected tab
+    const [saved, setSaved] = useState(true); // State for tracking whether changes are saved
 
+    // Handler for editor content change
     function onEditorChange(value) {
+        // Update the content of the selected tab
         selectedTab.content = value;
+
+        // Update the tabs state to trigger re-render
         setTabs([...tabs]);
+
+        // Set saved to false
         setSaved(false);
     }
 
+    // Once tabs' value updates, set saved back to true
     useEffect(() => {
         setSaved(true);
     }, [tabs]);
