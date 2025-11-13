@@ -1327,4 +1327,15 @@ export {
     numberOfLayers,
     copyNodePositions,
     applyNodePositions,
+
+    // Tree Functions
+    getParent,
+    getChildren,
+    getRoots,
+    getRoot,
+    isLeaf, 
+    getLeft,
+    getRight,
+    addLeft,
+    addRight,
 };
