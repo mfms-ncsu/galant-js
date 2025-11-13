@@ -18,31 +18,32 @@ function InnerEditor({ tab, editorType, onChange }) {
             onChange={onChange}
             path={tab?.name}
             language={editorType === "Algorithm" ? "Algorithm-Language" : "markdown"}
-
             beforeMount={(monaco) => {
                 monaco.languages.register({ id: "Algorithm-Language" });
 
-                //Trying to fix different file type issues
-                monaco.editor.onDidCreateModel((model) => {
-                    const path = model.uri.path;
-                    if (!path || path.endsWith(".js")) { // blank or .js files
-                        monaco.editor.setModelLanguage(model, "Algorithm-Language");
-                    }
-                });
-
-                //Gets functions from thread.js and converts to monaco suggestions
-                const suggestions = Object.keys(threadFunctions).map((name) => ({
-                    label: name,
-                    kind: monaco.languages.CompletionItemKind.Function,
-                    insertText: `${name}()`,
-                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                    detail: "Thread function",
-                }));
-
-                //Register the custom language
+                // Register the custom language
                 monaco.languages.registerCompletionItemProvider("Algorithm-Language", {
                     triggerCharacters: [..."abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"],
-                    provideCompletionItems() {
+                    provideCompletionItems(model, position) {
+                        // Get the word at the current position
+                        const word = model.getWordUntilPosition(position);
+                        const range = {
+                            startLineNumber: position.lineNumber,
+                            endLineNumber: position.lineNumber,
+                            startColumn: word.startColumn,
+                            endColumn: word.endColumn
+                        };
+
+                        // Gets functions from thread.js and converts to monaco suggestions
+                        const suggestions = Object.keys(threadFunctions).map((name) => ({
+                            label: name,
+                            kind: monaco.languages.CompletionItemKind.Function,
+                            insertText: `${name}()`,
+                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                            detail: "Thread function",
+                            range: range
+                        }));
+
                         return { suggestions };
                     },
                 });
