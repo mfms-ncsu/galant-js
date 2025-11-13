@@ -757,6 +757,26 @@ function deleteNodeBST(x, k) {
 //     return p.getElement().getValue();
 // }
 
+/**
+ * To preserve the property of having all sentinel leaves, expandLeaf converts a
+ * sentinel leaf into a position with an entry, then adds 2 new sentinel
+ * children to the position
+ * 
+ * @param dum     the position in the tree to update to store the provided entry
+ * @param weight the entry to store in the provided position of the tree
+ */
+function expandLeaf( dum, weight ) {
+    // This method is used to add dummy/sentinel left and right children as leaves
+
+    // initially, dum is a dummy/sentinel node,
+    // so replace the null entry with the new actual entry
+    let newNode = set( dum, weight );
+
+    // Then add new dummy/sentinel children
+    addLeft( newNode, createDummy() );
+    addRight( newNode, createDummy() );
+}
+
 // /**
 //  * This will be the method where we change/create nodes
 //  */
