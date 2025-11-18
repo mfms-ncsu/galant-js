@@ -250,11 +250,11 @@ function getStyle(graph) {
                 "backgroundColor": "data(color)"
             }
         },
-        // Display the weight inside the node only if it is a binary tree
+        // Displays either the weight or id as the node label
         { 
             "selector": "node[id]",
             "style": {
-                "label": graph.treeType == "binary" ? "data(weight)" : "data(id)"
+                "label": graph.weightsInside ? "data(weight)" : "data(id)"
             }
         },
         {

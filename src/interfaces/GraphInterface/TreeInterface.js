@@ -372,8 +372,8 @@ function addRight(graph, changeManager, node, childWeight) {
     [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, rightChild, "weight", childWeight);
     [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, rightChild);
     
-    // If it is a binary tree, hide the weight of the node
-    if ( graph.treeType == "binary" ){
+    // Checks if the graph is set to have weights display inside the node
+    if ( graph.weightsInside ){
       [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, rightChild, "weightHidden", true);
     }
 
@@ -387,8 +387,8 @@ function addRight(graph, changeManager, node, childWeight) {
       [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[1], "dummy", false);
       [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[1], "weight", childWeight);
       
-      // If it is a binary tree, hide the weight of the node
-      if ( graph.treeType == "binary" ){
+      // Checks if the graph is set to have weights display inside the node
+      if ( graph.weightsInside ){
         [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[1], "weightHidden", true);
       }
 

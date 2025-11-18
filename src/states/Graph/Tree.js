@@ -8,9 +8,15 @@ export default class Tree extends Graph {
 
     /**
      * Can be a genral rooted tree or a binary tree.
-     * Binary trees display the weights inside of their nodes.
+     * Currently no difference in behavior between the two, other than acting as keywords for the file parser.
      */
     treeType = "rooted";
+
+    /**
+     * Option to have the weights of nodes display as the labels
+     * instead of boxes above nodes.
+     */
+    weightsInside = false;
 
     constructor(name) {
         super(name, "tree");

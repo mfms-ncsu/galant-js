@@ -1086,6 +1086,35 @@ function addRight(targetNode, childWeight) {
     return newNode;
 }
 
+/**
+ * This is more complicated than it would first appear due to how the graphs are stored.
+ * The showNodeWeights variable does not work from our testing (displaying or hiding the weight boxes universally at render time),
+ * so the current approach uses a graph variable and when creating nodes, hides their weight box individually. This is not a good
+ * solution because it is overhead at every step, and is decentralized so to turn it off, we would have to go back to every node
+ * and set the show weight to true. However it seems like the only option from where we stand without a large refactor of multiple 
+ * cytoscape files, and we are not sure if it is even possible to do it this preferred 'centralized' way.
+ * 
+ * -----What we've tried-----
+ * Setting graph.showNodeWeights doesn't actually work as intended. 
+ * Even on main, the weights would not hide during the algorithm using the NodeSettingsPopover.
+ * We believe this is because there is a disconnect somewhere between the graph that is altered by the algorithm and the graph that is rendered (unsure).
+ * We can still see this some times when debugging, as if we ask it to print the graph inside of Cytoscape.jsx, we see 2 statements.
+ * --one saying Tree <Graph>  
+ * --one saying StandardGraph <Graph> 
+ * From all of this, we think that without further investigation on how to keep these two graphs fully synchronized, the best solution is
+ * hiding the weight on each individual node.
+ *  
+ * -----Possible solution-----
+ * Call hideAllNodeWeights() immediately
+ * Set graph.weightsInside to true with a GraphInterface method
+ * -- Need to make a new one, can copy code from GraphInterface.setShowNodeWeights()
+ * Inside of TreeInterface.addLeft() and TreeInterface.addRight(), there is logic that looks at graph.weightsInside
+ * and if true then it hides the new node's weight
+ */
+function weightsInside() {
+    
+}
+
 
 /** 
  * Goes through the binary tree and adds dummy nodes to internal nodes with only one child
