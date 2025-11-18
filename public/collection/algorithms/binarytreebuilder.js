@@ -20,44 +20,10 @@
 //TODO: kind of works, really kind of doesn't. Has moved 2 from left child of 4 to right, and has added dummys when it shouldn't
 //and broken tree without deleting. Will look into further. 
 
-setDirected(true);
+
 
 //-----------------TreeInterface will later replace these fns with their own, need them here for now-------------------
 // Looks for the root node by looking for inDegree of 0
-function getRoot() {
-  for (const x of getNodes()) {
-    if (inDegree(x) === 0) {
-      return x;
-    }
-  }
-  return undefined;
-}
-
-function isLeaf(node) {
-  return (outDegree(node) === 0);
-}
-
-function isRoot(node) {
-  return (inDegree(node) === 0);
-}
-
-function children(node){
-  return outgoingNodes(node);
-}
-
-//only 1 incoming node for each node, the parent (otherwise undefined if < (root) or > (cycle))
-function parent(node){
-  const incoming = incomingNodes(node);
-  return incoming.length == 1 ? incoming[0] : undefined;
-}
-
-function left(node){
-  return children(node)[0];
-}
-
-function right(node){
-  return children(node)[1];
-}
 
 // Show the nodes being traced to the user
 function accentNode(x){
@@ -72,7 +38,7 @@ function cleanTree(){
   step(() => {
     clearNodeMarks();
     clearNodeHighlights();
-    clearNodeLabels();
+    //clearNodeLabels();
     clearEdgeHighlights();
     clearEdgeColors();
   });
@@ -83,14 +49,15 @@ function cleanTree(){
 // Call this on the left child of the subtree root
 function findInOrderPredecessor(currentNode){
   // While there is a real right child, go right
-  while( right(currentNode) && getAttribute(right(currentNode), "dummy") != true ){
+  mark(currentNode)
+  while( getRight(currentNode) && getAttribute(getRight(currentNode), "dummy") != true ){
     
     // If a real right child exists, recur
-    return findInOrderPredecessor(right(currentNode));
+    return findInOrderPredecessor(getRight(currentNode));
   }
 
   // If I have no real right child, I am the predecessor
-  display(`Found predecessor at '${currentNode}'`)
+  display(`Found predecessor at '${weight(currentNode)}'`)
   return currentNode
 }
 
@@ -106,11 +73,21 @@ function findInOrderPredecessor(currentNode){
 //   return currentNode
 // }
 
+function dummify( nodeId ){
+  setAttribute(nodeId, "dummy", true);
+  setAttribute(nodeId, "weight", undefined);
+  return nodeId;
+}
+
+function undummify( nodeId, weight ){
+  setAttribute(nodeId, "dummy", false);
+  setAttribute(nodeId, "weight", weight);
+  display(`Successfully added node '${weight}'`)
+  return nodeId;
+}
+
 function createDummy(){
   const dummy = addNode(0,0)
-  setShape(dummy, "square");
-  color(dummy, "black");
-  setSize(dummy, 20);
   setAttribute(dummy, "dummy", true);
   return dummy;
 }
@@ -118,20 +95,6 @@ function createDummy(){
 // function dummify(node){
 //   setAttribute( node, "dummy", true)
 // }
-
-//converts a dummy to a new node
-function convertDummy(parent, dummy, k, side) {
-  step(()=>{
-    setWeight(dummy, k);
-    setShape(dummy, "circle");
-    color(dummy, "white");
-    setSize(dummy, 35);
-    setAttribute(dummy, "dummy", false);
-    
-    display(`Inserted '${k}' as ${side} child of '${weight(parent)}'`);
-    return dummy;
-  });
-}
 
 //-----------------ADD/DELETE-------------------
 function addNodeBST(x, k) {
@@ -155,31 +118,30 @@ function addNodeBST(x, k) {
   // If a leaf, then add 2 dummy nodes
   if (isLeaf(x)) {    
     step(()=>{
-      addEdge(x, createDummy());
-      addEdge(x, createDummy());
-    });
-    step(()=>{
       if (k < weight(x)) {
-        convertDummy(x, left(x), k, "left")
+        addLeft( x, k);
+        dummify(addRight(x, undefined));
       } else {
-        convertDummy(x, right(x), k, "right")
+        addRight(x, k);
+        dummify(addLeft(x, undefined));
       } 
+      display(`Successfully added node '${k}'`)
     });
     return;
   }
 
   // At the end of the tree or recursive call
   if (k < weight(x)) {
-    const L = left(x);
+    const L = getLeft(x);
     if (L && getAttribute(L, "dummy")) { //end, replace dummy
-      return convertDummy(x, L, k, "left");
+      return undummify(L, k);
     } else {
       return addNodeBST(L, k);  //not end, recur
     }
   } else if (k > weight(x)) {
-    const R = right(x);
+    const R = getRight(x);
     if (R && getAttribute(R, "dummy")) { //end, replace dummy
-      return convertDummy(x, R, k, "right");
+      return undummify(R, k);
     } else {
       return addNodeBST(R, k);  //not end, recur
     }
@@ -198,10 +160,12 @@ function deleteNodeHelper(p, x){
   display(`Successully deleted: '${k}'`);
 }
 
-function deleteNodeBST(x, k) {
+function deleteNodeBST(x, k, hideDisplay) {
   // Couldn't find node we are trying to delete, error
   if (x === undefined || getAttribute(x, "dummy") || (isLeaf(x) && k != weight(x))){
-    display(`Could not find node '${k}' to delete`);
+    if( !hideDisplay ){
+      display(`Could not find node '${k}' to delete`);
+    }
     return;
   }
 
@@ -209,22 +173,19 @@ function deleteNodeBST(x, k) {
 
   //Not a leaf, and not == k, keep searching
   if (k < weight(x)) {
-    return deleteNodeBST(left(x), k);    
+    return deleteNodeBST(getLeft(x), k, hideDisplay);    
   } else if (k > weight(x)) {
-    return deleteNodeBST(right(x), k);
+    return deleteNodeBST(getRight(x), k, hideDisplay);
   }
 
-  //If we get here, k must equal weight(x???
-  display(`'${k}' FOUND, deleting`);
-
-  const p = parent(x);
-  const L = left(x);
-  const R = right(x);
+  const p = getParent(x);
+  const L = getLeft(x);
+  const R = getRight(x);
   const leftDum = L && getAttribute(L, "dummy");
   const rightDum = R && getAttribute(R, "dummy");
   let S = null;
     if (p) {
-        S = left(p) === x ? right(p) : left(p);
+        S = getLeft(p) === x ? getRight(p) : getLeft(p);
     }
   const sibDum = S && getAttribute(S, "dummy");
 
@@ -234,25 +195,38 @@ function deleteNodeBST(x, k) {
     if (sibDum){
       deleteNode(x);
       deleteNode(S);
-      display(`Deleted leaf '${k}' and its dummy sibling`);
+      if( !hideDisplay ){
+        display(`Deleted leaf '${k}' and its dummy sibling`);
+      }
       return;
-    } else {
-      deleteNodeHelper(p, x);
-      display(`Successully deleted: '${k}'`);
+    } else if( getRoot() != x ){
+      dummify(x);
+      if( !hideDisplay ){
+        display(`Successully deleted: '${k}'`);
+      }
       return;
+    }else{
+      deleteNode(x);
+      if( !hideDisplay ){
+        display(`Successully deleted: '${k}'`);
+      }
     }
   }
 
   //CASE 2: DELETE WITH 2 CHILDREN
-  if (!leftDum && !rightDum){
+  else if (!leftDum && !rightDum){
     // Find in-order predecessor
     let predecessor = findInOrderPredecessor(L);
     // Replace deleted node weight with in-order predecessor weight
-    let predWeight = weight(predecessor);
-
-    // Call delete on in-order predecessor
-    deleteNodeBST(x, predWeight);
-    setWeight(x, predWeight);
+    step(() =>{
+      let predWeight = weight(predecessor);
+      // Call delete on in-order predecessor
+      deleteNodeBST(x, predWeight, true);
+      setWeight(x, predWeight);
+      if( !hideDisplay ){
+        display(`Successully deleted: '${k}'`)
+      }
+    });
   } 
   //1 of each
 
@@ -261,13 +235,14 @@ function deleteNodeBST(x, k) {
     if (p){      
 
       // Replace this node's weight with its only child and store its children
-      setWeight(x, weight(R));
-      const newChildren = children(R);
+      const newWeight = weight(R);
+      const newChildren = getChildren(R);
 
       // Delete both children
-      children(x).forEach( (child) => {
-          display(`Deleting edge between '${weight(x)}' and '${weight(child)}'`);
-          deleteEdge(getEdgeBetween(x, child));
+      getChildren(x).forEach( (child) => {
+          if( !hideDisplay ){
+            display(`Deleting edge between '${weight(x)}' and '${weight(child)}'`);
+          }
           deleteNode(child);
       });
 
@@ -275,19 +250,25 @@ function deleteNodeBST(x, k) {
       newChildren.forEach((child) => {
           addEdge(x, child);
       });
-      
+      setWeight(x, newWeight);
+    }else{
+      step(() => {
+        deleteNode(L);
+        deleteNode(x);
+      });
     }
   } else {
     if (p){
 
       // Replace this node's weight with its only child and store its children
-      setWeight(x, weight(L));
-      let newChildren = children(L);
-
+      
+      let newChildren = getChildren(L);
+      const newWeight = weight(L)
       // Delete both children
-      children(x).forEach((child) => {
-        display(`Deleting edge between '${weight(x)}' and '${weight(child)}'`);
-        deleteEdge(getEdgeBetween(x, child));
+      getChildren(x).forEach((child) => {
+        if( !hideDisplay ){
+          display(`Deleting edge between '${weight(x)}' and '${weight(child)}'`);
+        }
         deleteNode(child);
       });
 
@@ -295,14 +276,23 @@ function deleteNodeBST(x, k) {
       newChildren.forEach((child) => { 
           addEdge(x, child);
       });
+      setWeight(x, newWeight);
+    }else{
+      step(() => {
+        deleteNode(R);
+        deleteNode(x);
+      });
     }
   }
 
   //deleteNode(x);
-  display(`Successully deleted: '${k}'`);
+  if( !hideDisplay ){
+    display(`Successully deleted: '${k}'`);
+  }
 }
 
 //TODO: this may cause issues if the loaded tree has weights <= 0, but is an easier UX
+setDirected(true);
 let running = true;
 while (running){
   cleanTree();

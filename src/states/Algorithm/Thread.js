@@ -307,6 +307,11 @@ function addNode(x, y) {
     [graph, changeManager, newNode] = GraphInterface.addNode(graph, changeManager, x, y);
     postMessage({ action: "addNode", x: x, y: y });
     waitIfNeeded();
+
+    // If adding to a binary tree, hide the node's weight
+    if( graph.treeType == "binary" ){
+        setAttribute(newNode, "weightHidden", true);
+    }
     return newNode;
 }
 
@@ -1065,16 +1070,20 @@ function getRight(nodeId) {
 
 function addLeft(targetNode, childWeight) {
     if (stepDepth === 0) { postMessage({ action: "step" }) };
-    [graph, changeManager] = TreeInterface.addLeft(graph, changeManager, targetNode, childWeight);
+    let newNode;
+    [graph, changeManager, newNode] = TreeInterface.addLeft(graph, changeManager, targetNode, childWeight);
     postMessage({ action: "addLeft", targetNode: targetNode, childWeight: childWeight});
     waitIfNeeded();
+    return newNode;
 }
 
 function addRight(targetNode, childWeight) {
     if (stepDepth === 0) { postMessage({ action: "step" }) };
-    [graph, changeManager] = TreeInterface.addRight(graph, changeManager, targetNode, childWeight);
+    let newNode;
+    [graph, changeManager, newNode] = TreeInterface.addRight(graph, changeManager, targetNode, childWeight);
     postMessage({ action: "addRight", targetNode: targetNode, childWeight: childWeight});
     waitIfNeeded();
+    return newNode;
 }
 
 
