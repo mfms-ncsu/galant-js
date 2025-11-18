@@ -250,11 +250,10 @@ function getStyle(graph) {
                 "backgroundColor": "data(color)"
             }
         },
-        // Displays either the weight or id as the node label
         { 
             "selector": "node[id]",
             "style": {
-                "label": graph.weightsInside ? "data(weight)" : "data(id)"
+                "label": "data(id)"
             }
         },
         {
