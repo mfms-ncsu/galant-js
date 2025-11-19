@@ -193,11 +193,14 @@ function deleteNodeBST(x, k, hideDisplay) {
     if (p){      
 
       // Replace this node's weight with its only child and store its children
-      setWeight(x, weight(R));
+      const newWeight = weight(R);
       const newChildren = getChildren(R);
 
       // Delete both children
       getChildren(x).forEach( (child) => {
+          if( !hideDisplay ){
+            display(`Deleting edge between '${weight(x)}' and '${weight(child)}'`);
+          }
           deleteNode(child);
       });
 
@@ -205,7 +208,7 @@ function deleteNodeBST(x, k, hideDisplay) {
       newChildren.forEach((child) => {
           addEdge(x, child);
       });
-      
+      setWeight(x, newWeight);
     }else{
       step(() => {
         deleteNode(L);
@@ -216,11 +219,14 @@ function deleteNodeBST(x, k, hideDisplay) {
     if (p){
 
       // Replace this node's weight with its only child and store its children
-      setWeight(x, weight(L));
+      
       let newChildren = getChildren(L);
-      step(() => {
+      const newWeight = weight(L)
       // Delete both children
       getChildren(x).forEach((child) => {
+        if( !hideDisplay ){
+          display(`Deleting edge between '${weight(x)}' and '${weight(child)}'`);
+        }
         deleteNode(child);
       });
       });
@@ -230,7 +236,7 @@ function deleteNodeBST(x, k, hideDisplay) {
       newChildren.forEach((child) => { 
           addEdge(x, child);
       });
-      });
+      setWeight(x, newWeight);
     }else{
       step(() => {
         deleteNode(R);

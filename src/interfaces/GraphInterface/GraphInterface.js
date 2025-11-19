@@ -860,6 +860,12 @@ function deleteNode(graph, changeManager, nodeId) {
     );
   }
 
+  // Need to check if it is a left node before the edge from the parent is deleted
+  // Checks to see if the graph is a tree and if the node is the left node of the parent
+  const parentId = getIncomingNodes(graph, nodeId)[0];
+  const isLeft = parentId != undefined ? getOutgoingNodes(graph, parentId)[0] == nodeId : false;
+  const deletingLeft = graph.type == "tree" && isLeft;
+
   // Keep an array of ChangeObjects for the delete step
   const changeObjects = [];
 
@@ -899,10 +905,12 @@ function deleteNode(graph, changeManager, nodeId) {
   });
 
   // Create a ChangeObject for the deleted node
+  // If we are deleting the left node of a tree, then send the "deleteLeft" message instead of "deleteNode"
   const node = graph.nodes.get(nodeId);
-  changeObjects.push(
+  if( deletingLeft ){
+    changeObjects.push(
     new ChangeObject(
-      "deleteNode",
+      "deleteLeft",
       {
         id: node.id,
         position: node.position,
@@ -911,6 +919,19 @@ function deleteNode(graph, changeManager, nodeId) {
       null
     )
   );
+  }else{
+    changeObjects.push(
+      new ChangeObject(
+        "deleteNode",
+        {
+          id: node.id,
+          position: node.position,
+          attributes: node.attributes,
+        },
+        null
+      )
+    );
+  }
 
   // Add the change objects to the changeManager
   const newChangeManager = recordChange(changeManager, changeObjects);
@@ -974,6 +995,9 @@ function redo(graph, changeManager) {
             );
             break;
           case "deleteNode":
+            draft.nodes.delete(change.previous.id);
+            break;
+          case "deleteLeft":
             draft.nodes.delete(change.previous.id);
             break;
           case "addEdge":
@@ -1733,6 +1757,19 @@ function undo(graph, changeManager) {
                 change.previous.attribute.name,
                 change.previous.attribute.value
               );
+            break;
+          case "deleteLeft":
+            const newNode = new Node(
+                change.previous.id,
+                change.previous.position.x,
+                change.previous.position.y
+              )
+            // Places the new node before of all other nodes.
+            draft.nodes = new Map([[change.previous.id, newNode], ...draft.nodes.entries()]); 
+            let leftNode = draft.nodes.get(change.previous.id);
+            change.previous.attributes.forEach((value, key) => {
+              leftNode.attributes.set(key, value);
+            });
             break;
         }
       });
