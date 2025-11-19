@@ -173,8 +173,10 @@ function deleteNodeBST(x, k, hideDisplay) {
 
   //CASE 2: DELETE WITH 2 CHILDREN
   else if (!leftDum && !rightDum){
+
     // Find in-order predecessor
     let predecessor = findInOrderPredecessor(L);
+
     // Replace deleted node weight with in-order predecessor weight
     step(() =>{
       let predWeight = weight(predecessor);
@@ -186,29 +188,29 @@ function deleteNodeBST(x, k, hideDisplay) {
       }
     });
   } 
-  //1 of each
 
   //CASE 3: DELETE WITH 1 CHILD
   else if (!rightDum){
     if (p){      
 
       // Replace this node's weight with its only child and store its children
-      const newWeight = weight(R);
+      setWeight(x, weight(R));
       const newChildren = getChildren(R);
 
       // Delete both children
-      getChildren(x).forEach( (child) => {
-          if( !hideDisplay ){
-            display(`Deleting edge between '${weight(x)}' and '${weight(child)}'`);
-          }
-          deleteNode(child);
+      step(() => {
+        getChildren(x).forEach( (child) => {
+            deleteNode(child);
+        });
       });
 
       // Reattach new children
-      newChildren.forEach((child) => {
-          addEdge(x, child);
+      step(() => {
+        newChildren.forEach((child) => {
+            addEdge(x, child);
+        });
       });
-      setWeight(x, newWeight);
+      
     }else{
       step(() => {
         deleteNode(L);
@@ -219,24 +221,21 @@ function deleteNodeBST(x, k, hideDisplay) {
     if (p){
 
       // Replace this node's weight with its only child and store its children
-      
+      setWeight(x, weight(L));
       let newChildren = getChildren(L);
-      const newWeight = weight(L)
       // Delete both children
-      getChildren(x).forEach((child) => {
-        if( !hideDisplay ){
-          display(`Deleting edge between '${weight(x)}' and '${weight(child)}'`);
-        }
-        deleteNode(child);
-      });
+      step(() => {
+        getChildren(x).forEach((child) => {
+          deleteNode(child);
+        });
       });
 
-      step(() => {
       // Reattach new children
-      newChildren.forEach((child) => { 
+      step(() => {
+        newChildren.forEach((child) => { 
           addEdge(x, child);
+        });
       });
-      setWeight(x, newWeight);
     }else{
       step(() => {
         deleteNode(R);
@@ -245,13 +244,12 @@ function deleteNodeBST(x, k, hideDisplay) {
     }
   }
 
-  //deleteNode(x);
   if( !hideDisplay ){
     display(`Successully deleted: '${k}'`);
   }
 }
 
-//TODO: this may cause issues if the loaded tree has weights <= 0, but is an easier UX
+// Cannot store values <= 0
 setDirected(true);
 let running = true;
 while (running){
