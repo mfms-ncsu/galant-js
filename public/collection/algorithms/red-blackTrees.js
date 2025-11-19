@@ -13,6 +13,8 @@
  * Loop
  */
 
+const { getNodeText } = require("@testing-library/react");
+
 
 //CytoScapeInterface should handle dummy styling automatically in the future
 
@@ -189,6 +191,8 @@ function isRed( node ) {
  */
 function makeBlack( node ) {
   // setAttribute( borderColor( "black" ) ) // Something like this
+  // setBorderWidth( node, 50 );
+  // setAttribute( node, "borderColor", "black" );
   color( node, "black" );
   return;
 }
