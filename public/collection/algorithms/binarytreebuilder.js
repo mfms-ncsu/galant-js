@@ -1,3 +1,11 @@
+/**
+* Allows the user to create a BST just with prompting.
+* They will be prompted to enter a number -->
+*    - If the number is positive, it is added to the tree
+*    - If the number is negative, it is deleted from the tree
+*    - If the number is 0, the algorithm stops
+*/
+
 
 // Show the nodes being traced to the user
 function accentNode(x){
@@ -194,7 +202,7 @@ function deleteNodeBST(x, k, hideDisplay) {
     if (p){      
 
       // Replace this node's weight with its only child and store its children
-      const newWeight = weight(R);
+      setWeight(x, weight(R));
       const newChildren = getChildren(R);
 
       // Delete both children
@@ -210,7 +218,7 @@ function deleteNodeBST(x, k, hideDisplay) {
             addEdge(x, child);
         });
       });
-      setWeight(x, newWeight);
+      
     }else{
       step(() => {
         deleteNode(L);
@@ -221,7 +229,7 @@ function deleteNodeBST(x, k, hideDisplay) {
     if (p){
 
       // Replace this node's weight with its only child and store its children
-      
+      setWeight(x, weight(L));
       let newChildren = getChildren(L);
       // Delete both children
       step(() => {
