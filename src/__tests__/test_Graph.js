@@ -557,7 +557,7 @@ describe("Graph tests", () => {
      */
      test("Testing GraphInterface.toString method", () => {
        const content = GraphInterface.toString(graph);
-       const expected = "n 0 0 0 \nn 1 1 0 \nn 2 1 1 \nn 3 0 1 \ne 0 1 \ne 0 2 \ne 0 3 \ne 1 2 \ne 1 3 \ne 2 3 \n"
+       const expected = "c Current Algorithm: No Algorithm Running\n\nn 0 0 0 \nn 1 1 0 \nn 2 1 1 \nn 3 0 1 \ne 0 1 \ne 0 2 \ne 0 3 \ne 1 2 \ne 1 3 \ne 2 3 \n"
        expect((content)).toEqual(expected);
        
 
