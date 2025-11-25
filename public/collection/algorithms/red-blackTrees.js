@@ -1043,9 +1043,9 @@ function rotateRL( node, parentN, grandparent ) {
   }
 
   // Add all the edges back ( relink )
-  relink( grandparent, grandparentLeft, true, grandparentLeftWeight, grandparentLeftColor );
-  relink( newNode, nodeLeft, true, nodeLeftWeight, nodeLeftColor );
-  relink( newParent, parentRight, false, parentRightWeight, parentRightColor );
+  relink( grandparent, grandparentLeft, true, grandparentChildOtherIsDummy, grandparentLeftWeight, grandparentLeftColor );
+  relink( newNode, nodeLeft, true, nodeChildOtherIsDummy,nodeLeftWeight, nodeLeftColor );
+  relink( newParent, parentRight, false, parentChildOtherIsDummy, parentRightWeight, parentRightColor );
 
   // Check for no children off of nodeRight
   if ( nodeRightLeft != undefined && nodeRightRight != undefined ) {
