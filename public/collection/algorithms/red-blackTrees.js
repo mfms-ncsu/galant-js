@@ -1,19 +1,12 @@
 /**
- * BinaryTreeBuilder algorithm that prompts the user to add or remove nodes until user says to stop
- * Based on Bryan's Binary Search, peer programmed with Andrew
+ * Red-Black TreeBuilder algorithm that prompts the user to add or remove nodes until user says to stop
+ * Created by Garrett Brazawski ( gmbrazaw@ncsu.edu )
  * 
- * Q1 is the tree done, yes = stop
- * Q2 Do you want to add a node, yes = add
- * Q3 Do you want to delete a node, yes = delete
- * Q4 If adding, what is the weight, if removing, what is the id (id is 1st/big #, weight is 4th/lil #)
- * Maybe need to do error checking (might be done already in thread.js)
- * If adding, get the parent via binary tree search (adding the first node/root may be a special case)
- * If deleting, use right successor (leaf is easy, handle cases for deleteing a parent, root may be a special case)
- * Do add/delete
- * Loop
+ * The user will be asked to give a positive integer to put in the tree.
+ * This will create a new node with that weight and update the tree.
+ * If the user puts in a negative integer, the program will try and 
+ * remove the node with the positive value of that weight.
  */
-
-// const { getNodeText } = require("@testing-library/react");
 
 
 //CytoScapeInterface should handle dummy styling automatically in the future
@@ -21,13 +14,7 @@
 setDirected(true);
 let visit = 1;
 
-//TODO: TEMP FIX. weight in thread.js is undefined, this is a NOT GOOD temp fix. Also breaks detecting adding duplicate nodes
-// X MUST BE AN ID (STRING)
-// function weight(x){
-//   return x;
-// }
-
-//-----------------TreeInterface will later replace these fns with their own, need them here for now-------------------
+// TreeInterface will later replace these fns with their own, need them here for now
 // Looks for the root node by looking for inDegree of 0
 function getRoot() {
   for (const x of getNodes()) {
@@ -62,10 +49,14 @@ function parent(node){
 }
 
 function left(node){
+  // const w = weight( node );
+  // return weight(getChildren(node)[0]) < w ? getChildren(node)[0] : getChildren(node)[1]
   return children(node)[0];
 }
 
 function right(node){
+  // const w = weight( node );
+  // return weight(getChildren(node)[0]) > w ? getChildren(node)[0] : getChildren(node)[1]
   return children(node)[1];
 }
 
@@ -107,6 +98,13 @@ function createDummy(){
   return dummy;
 }
 
+// Will make a node a dummy
+function dummify( nodeId ){
+  setAttribute(nodeId, "dummy", true);
+  setAttribute(nodeId, "weight", undefined);
+  return nodeId;
+}
+
 function replaceDummy(parent, dummy, k, side) {
   //DO not delete, just change to a normal node
   setWeight(dummy, k);
@@ -119,25 +117,28 @@ function replaceDummy(parent, dummy, k, side) {
   return dummy;
 }
 
-// A loaded tree does not have dummies. Should add them at the start.
-// Uses up IDs. is that ok???
-function dummifyTree(node) {
-  if (!node){
-    return;
-  } 
-  // Skip if node is a dummy
-  if (getAttribute(node, "dummy")){
-    return;
-  }
-  // If leaf, add two dummies
-  if (children(node).length === 0) {
-    addEdge(node, createDummy());
-    addEdge(node, createDummy());
-    return;
-  }
-  // Otherwise, recursive call on each child
-  dummifyTree(left(node));
-  dummifyTree(right(node));
+/**
+ * This function will add a node with the given weight 
+ * to the node, but will remove the dummy it makes
+ * @param {*} node the parent node
+ * @param {*} w the new node weight
+ */
+function addLeftNoDummy( node, w ) {
+  const newNode = addLeft( node, w );
+  deleteNode( right( node ) );
+  return newNode;
+}
+
+/**
+ * This function will add a node with the given weight 
+ * to the node, but will remove the dummy it makes
+ * @param {*} node the parent node
+ * @param {*} w the new node weight
+ */
+function addRightNoDummy( node, w ) {
+  const newNode = addRight( node, w );
+  deleteNode( left( node ) );
+  return newNode;
 }
 
 //!promptBoolean("Is the tree done?")
@@ -351,23 +352,708 @@ function setRoot( node, shouldRemove ) {
 /**
  * Relink two positions to create a parent-child relationship
  * 
- * @param parentN        the position that will become the parent of the child
+ * @param parentN       the position that will become the parent of the child
  * @param child         the position that will be come a child of the parent
  * @param makeLeftChild indicates whether the child should be a left child
  *                      (true) or not (false)
+ * @param dummy         if the child should be a dummy
+ * @param w             the weight of the child
+ * @param color         the color of the child
  */
-function relink( parentN,  child, makeLeftChild ) {
-  // makeLeftChild was used earlier but rotate 
-  // was updated to fit left and right edge adding
-  // still convinent to see when in rotate()
-  // addEdge( parentN, child );
+function relink( parentN, child, makeLeftChild, dummy, w, color ) {
+  // Check if the node is a dummy, if it is we dont have to change it
+  if ( dummy ) {
+    // Remove the child
+    deleteNode( child );
 
-  // setParent( child, parentN );
-  if ( makeLeftChild ) {
-    return setLeft( parentN, child );
+    return;
   } else {
-    return setRight( parentN, child );
+    // Grab the new other node
+    let node = undefined;
+
+    if ( makeLeftChild ) {
+      // Grab the left child to change
+      node = left( parentN );
+    } else {
+      // Grab the right child to change
+      node = right( parentN );
+    }
+
+    // Grab the children of the old node
+    const childLeft = left( child );
+    const childRight = right( child );
+
+    // Undummify
+    setAttribute( node, 'dummy', false );
+    setBorderWidth( node, 5 );
+    setWeight( node, w );
+    setAttribute( node, 'borderColor', color );
+
+    // Remove the child
+    deleteNode( child );
+
+    // Add old children back onto new node
+    if ( childLeft != undefined && childRight != undefined ) {
+      addEdge( node, childLeft );
+      addEdge( node, childRight );
+    }
   }
+}
+
+// /**
+//  * Helper to rotate, rotates if grandparent dosent 
+//  * exist and node is parents left child
+//  * @param {*} node node we are rotating around the parent
+//  * @param {*} parentN parent of node
+//  */
+// function rotateL( node, parentN ) {
+//   // Assuming all arent null
+//   // Grab all nodes involved
+//   let parentLeft = left( parentN );
+//   let parentRight = right( parentN );
+//   let nodeLeft = left( node );
+//   let nodeRight = right( node );
+
+//   // For this rotate, we grab nodeRight's children ( since we delete nodeRight )
+//   let nodeRightLeft = left( nodeRight );
+//   let nodeRightRight = right( nodeRight );
+
+//   // Grab other node child weight and color
+//   let nodeChildOtherIsDummy = getAttribute( nodeLeft, "dummy" );
+//   const nodeLeftWeight = weight( nodeLeft );
+//   const nodeLeftColor = getAttribute( nodeLeft, 'borderColor' );
+
+//   // Grab other parent child weight and color
+//   let parentChildOtherIsDummy = getAttribute( parentRight, "dummy" );
+//   const parentRightWeight = weight( parentRight );
+//   const parentRightColor = getAttribute( parentRight, 'borderColor' );
+
+//   // Remove nodeRight
+//   let nodeChildIsDummy = getAttribute( nodeRight, "dummy" );
+//   const nodeRightWeight = weight( nodeRight );
+//   const nodeRightColor = getAttribute( nodeRight, 'borderColor' );
+//   deleteNode( nodeRight );
+
+//   // Grab and remove any updated edges
+//   deleteEdge( getEdgeBetween( node, nodeLeft ) );
+//   deleteEdge( getEdgeBetween( parentN, parentRight ) );
+
+//   // DONT Remove node ( it will become the root )
+//   // const nodeWeight = weight( node );
+//   // const nodeColor = getAttribute( node, 'borderColor' );
+//   // deleteNode( node );
+
+//   // Remove parent
+//   const parentWeight = weight( parentN );
+//   const parentColor = getAttribute( parentN, 'borderColor' );
+//   deleteNode( parentN );
+
+//   // Make node the root
+//   // let newNode = addNode( 0, 0 );
+//   // setWeight( newNode, nodeWeight );
+//   // setAttribute( newNode, 'borderColor', nodeColor );
+
+//   // Add parent back onto node
+//   let newParent = addRight( node, parentWeight );
+//   setAttribute( newParent, 'borderColor', parentColor );
+
+//   // Add nodeRight back onto parent
+//   let newNodeRight = addLeft( newParent, nodeRightWeight );
+//   if ( nodeChildIsDummy ) {
+//     dummify( newNodeRight );
+//   } else {
+//     setAttribute( newNodeRight, 'borderColor', nodeRightColor );
+//   }
+
+//   // Add all the edges back ( relink )
+//   relink( node, nodeLeft, true, nodeChildOtherIsDummy, nodeLeftWeight, nodeLeftColor );
+//   relink( newParent, parentRight, false, parentChildOtherIsDummy, parentRightWeight, parentRightColor );
+
+//   // Check for no children off of nodeRight
+//   if ( nodeRightLeft != undefined && nodeRightRight != undefined ) {
+//     addEdge( newNodeRight, nodeRightLeft );
+//     addEdge( newNodeRight, nodeRightRight );
+//   }
+
+//   return node;
+// }
+
+/**
+ * Helper to rotate, rotates if grandparent dosent 
+ * exist and node is parents left child
+ * @param {*} node node we are rotating around the parent
+ * @param {*} parentN parent of node
+ */
+function rotateL( node, parentN ) {
+  // Assuming all arent null
+  // Grab all nodes involved
+  let parentLeft = left( parentN );
+  let parentRight = right( parentN );
+  let nodeLeft = left( node );
+  let nodeRight = right( node );
+
+  // For this rotate, we grab nodeRight's children ( since we delete nodeRight )
+  let nodeRightLeft = left( nodeRight );
+  let nodeRightRight = right( nodeRight );
+
+  // Grab other node child weight and color
+  let nodeChildOtherIsDummy = getAttribute( nodeLeft, "dummy" );
+  const nodeLeftWeight = weight( nodeLeft );
+  const nodeLeftColor = getAttribute( nodeLeft, 'borderColor' );
+
+  // Grab other parent child weight and color
+  let parentChildOtherIsDummy = getAttribute( parentRight, "dummy" );
+  const parentRightWeight = weight( parentRight );
+  const parentRightColor = getAttribute( parentRight, 'borderColor' );
+
+  // Remove nodeRight
+  let nodeChildIsDummy = getAttribute( nodeRight, "dummy" );
+  const nodeRightWeight = weight( nodeRight );
+  const nodeRightColor = getAttribute( nodeRight, 'borderColor' );
+  deleteNode( nodeRight );
+
+  // Grab and remove any updated edges
+  deleteEdge( getEdgeBetween( node, nodeLeft ) );
+  deleteEdge( getEdgeBetween( parentN, parentRight ) );
+
+  // Remove node ( it will become the root )
+  const nodeWeight = weight( node );
+  const nodeColor = getAttribute( node, 'borderColor' );
+  deleteNode( node );
+
+  // Remove parent
+  const parentWeight = weight( parentN );
+  const parentColor = getAttribute( parentN, 'borderColor' );
+  deleteNode( parentN );
+
+  // Make node the root
+  let newNode = addNode( 0, 0 );
+  setWeight( newNode, nodeWeight );
+  setAttribute( newNode, 'borderColor', nodeColor );
+
+  // Add parent back onto node
+  let newParent = addRight( newNode, parentWeight );
+  setAttribute( newParent, 'borderColor', parentColor );
+
+  // Add nodeRight back onto parent
+  let newNodeRight = addLeft( newParent, nodeRightWeight );
+  if ( nodeChildIsDummy ) {
+    dummify( newNodeRight );
+  } else {
+    setAttribute( newNodeRight, 'borderColor', nodeRightColor );
+  }
+
+  // Add all the edges back ( relink )
+  relink( newNode, nodeLeft, true, nodeChildOtherIsDummy, nodeLeftWeight, nodeLeftColor );
+  relink( newParent, parentRight, false, parentChildOtherIsDummy, parentRightWeight, parentRightColor );
+
+  // Check for no children off of nodeRight
+  if ( nodeRightLeft != undefined && nodeRightRight != undefined ) {
+    addEdge( newNodeRight, nodeRightLeft );
+    addEdge( newNodeRight, nodeRightRight );
+  }
+
+  return newNode;
+}
+
+// /**
+//  * Helper to rotate, rotates if grandparent dosent 
+//  * exist and node is parents right child
+//  * @param {*} node node we are rotating around the parent
+//  * @param {*} parentN parent of node
+//  */
+// function rotateR( node, parentN ) {
+//   // Assuming all arent null
+//   // Grab all nodes involved
+//   let parentLeft = left( parentN );
+//   let parentRight = right( parentN );
+//   let nodeLeft = left( node );
+//   let nodeRight = right( node );
+
+//   // For this rotate, we grab nodeLeft's children ( since we delete nodeLeft )
+//   let nodeLeftLeft = left( nodeLeft );
+//   let nodeLeftRight = right( nodeLeft );
+
+//   // Grab other node child weight and color
+//   let nodeChildOtherIsDummy = getAttribute( nodeRight, "dummy" );
+//   const nodeRightWeight = weight( nodeRight );
+//   const nodeRightColor = getAttribute( nodeRight, 'borderColor' );
+
+//   // Grab other parent child weight and color
+//   let parentChildOtherIsDummy = getAttribute( parentLeft, "dummy" );
+//   const parentLeftWeight = weight( parentLeft );
+//   const parentLeftColor = getAttribute( parentLeft, 'borderColor' );
+
+//   // Remove nodeLeft
+//   let nodeChildIsDummy = getAttribute( nodeLeft, "dummy" );
+//   const nodeLeftWeight = weight( nodeLeft );
+//   const nodeLeftColor = getAttribute( nodeLeft, 'borderColor' );
+//   deleteNode( nodeLeft );
+
+//   // Grab and remove any updated edges
+//   deleteEdge( getEdgeBetween( node, nodeRight ) );
+//   deleteEdge( getEdgeBetween( parentN, parentLeft ) );
+
+//   // DONT Remove node ( it will become the root )
+//   // const nodeWeight = weight( node );
+//   // const nodeColor = getAttribute( node, 'borderColor' );
+//   // deleteNode( node );
+
+//   // Remove parent
+//   const parentWeight = weight( parentN );
+//   const parentColor = getAttribute( parentN, 'borderColor' );
+//   deleteNode( parentN );
+
+//   // Make node the root
+//   // let newNode = addNode( 0, 0 );
+//   // setWeight( newNode, nodeWeight );
+//   // setAttribute( newNode, 'borderColor', nodeColor );
+
+//   // Add parent back onto node
+//   let newParent = addLeft( node, parentWeight );
+//   setAttribute( newParent, 'borderColor', parentColor );
+
+//   // Add nodeLeft back onto parent
+//   let newNodeLeft = addRight( newParent, nodeLeftWeight );
+//   if ( nodeChildIsDummy ) {
+//     dummify( newNodeLeft );
+//   } else {
+//     setAttribute( newNodeLeft, 'borderColor', nodeLeftColor );
+//   }
+
+//   // Add all the edges back ( relink )
+//   relink( node, nodeRight, false, nodeChildOtherIsDummy, nodeRightWeight, nodeRightColor );
+//   relink( newParent, parentLeft, true, parentChildOtherIsDummy, parentLeftWeight, parentLeftColor );
+
+//   // Check for no children off of nodeLeft
+//   if ( nodeLeftLeft != undefined && nodeLeftRight != undefined ) {
+//     addEdge( newNodeLeft, nodeLeftLeft );
+//     addEdge( newNodeLeft, nodeLeftRight );
+//   }
+
+//   return node;
+// }
+
+/**
+ * Helper to rotate, rotates if grandparent dosent 
+ * exist and node is parents right child
+ * @param {*} node node we are rotating around the parent
+ * @param {*} parentN parent of node
+ */
+function rotateR( node, parentN ) {
+  // Assuming all arent null
+  // Grab all nodes involved
+  let parentLeft = left( parentN );
+  let parentRight = right( parentN );
+  let nodeLeft = left( node );
+  let nodeRight = right( node );
+
+  // For this rotate, we grab nodeLeft's children ( since we delete nodeLeft )
+  let nodeLeftLeft = left( nodeLeft );
+  let nodeLeftRight = right( nodeLeft );
+
+  // Grab other node child weight and color
+  let nodeChildOtherIsDummy = getAttribute( nodeRight, "dummy" );
+  const nodeRightWeight = weight( nodeRight );
+  const nodeRightColor = getAttribute( nodeRight, 'borderColor' );
+
+  // Grab other parent child weight and color
+  let parentChildOtherIsDummy = getAttribute( parentLeft, "dummy" );
+  const parentLeftWeight = weight( parentLeft );
+  const parentLeftColor = getAttribute( parentLeft, 'borderColor' );
+
+  // Remove nodeLeft
+  let nodeChildIsDummy = getAttribute( nodeLeft, "dummy" );
+  const nodeLeftWeight = weight( nodeLeft );
+  const nodeLeftColor = getAttribute( nodeLeft, 'borderColor' );
+  deleteNode( nodeLeft );
+
+  // Grab and remove any updated edges
+  deleteEdge( getEdgeBetween( node, nodeRight ) );
+  deleteEdge( getEdgeBetween( parentN, parentLeft ) );
+
+  // Remove node ( it will become the root )
+  const nodeWeight = weight( node );
+  const nodeColor = getAttribute( node, 'borderColor' );
+  deleteNode( node );
+
+  // Remove parent
+  const parentWeight = weight( parentN );
+  const parentColor = getAttribute( parentN, 'borderColor' );
+  deleteNode( parentN );
+
+  // Make node the root
+  let newNode = addNode( 0, 0 );
+  setWeight( newNode, nodeWeight );
+  setAttribute( newNode, 'borderColor', nodeColor );
+
+  // Add parent back onto node
+  let newParent = addLeft( newNode, parentWeight );
+  setAttribute( newParent, 'borderColor', parentColor );
+
+  // Add nodeLeft back onto parent
+  let newNodeLeft = addRight( newParent, nodeLeftWeight );
+  if ( nodeChildIsDummy ) {
+    dummify( newNodeLeft );
+  } else {
+    setAttribute( newNodeLeft, 'borderColor', nodeLeftColor );
+  }
+
+  // Add all the edges back ( relink )
+  relink( newNode, nodeRight, false, nodeChildOtherIsDummy, nodeRightWeight, nodeRightColor );
+  relink( newParent, parentLeft, true, parentChildOtherIsDummy, parentLeftWeight, parentLeftColor );
+
+  // Check for no children off of nodeLeft
+  if ( nodeLeftLeft != undefined && nodeLeftRight != undefined ) {
+    addEdge( newNodeLeft, nodeLeftLeft );
+    addEdge( newNodeLeft, nodeLeftRight );
+  }
+
+  return newNode;
+}
+
+/**
+ * Helper to rotate, rotates if node layout is left -> left
+ * @param {*} node node we are rotating around the parent
+ * @param {*} parentN parent of node
+ * @param {*} grandparent grandparent of node ( parent of parentN )
+ */
+function rotateLL( node, parentN, grandparent ) {
+  // Assuming all arent null
+  // Grab all nodes involved
+  let grandparentLeft = left( grandparent );
+  let grandparentRight = right( grandparent );
+  let parentLeft = left( parentN );
+  let parentRight = right( parentN );
+  let nodeLeft = left( node );
+  let nodeRight = right( node );
+
+  // For this rotate, we grab nodeRight's children ( since we delete nodeRight )
+  let nodeRightLeft = left( nodeRight );
+  let nodeRightRight = right( nodeRight );
+
+  // Grab other node child weight and color
+  let nodeChildOtherIsDummy = getAttribute( nodeLeft, "dummy" );
+  const nodeLeftWeight = weight( nodeLeft );
+  const nodeLeftColor = getAttribute( nodeLeft, 'borderColor' );
+
+  // Grab other parent child weight and color
+  let parentChildOtherIsDummy = getAttribute( parentRight, "dummy" );
+  const parentRightWeight = weight( parentRight );
+  const parentRightColor = getAttribute( parentRight, 'borderColor' );
+
+  // Grab other grandparent child weight and color
+  let grandparentChildOtherIsDummy = getAttribute( grandparentRight, "dummy" );
+  const grandparentRightWeight = weight( grandparentRight );
+  const grandparentRightColor = getAttribute( grandparentRight, 'borderColor' );
+
+  // Remove nodeRight
+  let nodeChildIsDummy = getAttribute( nodeRight, "dummy" );
+  const nodeRightWeight = weight( nodeRight );
+  const nodeRightColor = getAttribute( nodeRight, 'borderColor' );
+  deleteNode( nodeRight );
+
+  // Grab and remove any updated edges
+  deleteEdge( getEdgeBetween( node, nodeLeft ) );
+  deleteEdge( getEdgeBetween( parentN, parentRight ) );
+  deleteEdge( getEdgeBetween( grandparent, grandparentRight ) );
+
+  // Remove node
+  const nodeWeight = weight( node );
+  const nodeColor = getAttribute( node, 'borderColor' );
+  deleteNode( node );
+
+  // Remove parent
+  const parentWeight = weight( parentN );
+  const parentColor = getAttribute( parentN, 'borderColor' );
+  deleteNode( parentN );
+
+  // Add node back onto grandparent
+  let newNode = addLeft( grandparent, nodeWeight );
+  setAttribute( newNode, 'borderColor', nodeColor );
+
+  // Add parent back onto node
+  let newParent = addRight( newNode, parentWeight );
+  setAttribute( newParent, 'borderColor', parentColor );
+
+  // Add nodeRight back onto parent
+  let newNodeRight = addLeft( newParent, nodeRightWeight );
+  if ( nodeChildIsDummy ) {
+    dummify( newNodeRight );
+  } else {
+    setAttribute( newNodeRight, 'borderColor', nodeRightColor );
+  }
+
+  // Add all the edges back ( relink )
+  relink( grandparent, grandparentRight, false, grandparentChildOtherIsDummy, grandparentRightWeight, grandparentRightColor );
+  relink( newNode, nodeLeft, true, nodeChildOtherIsDummy, nodeLeftWeight, nodeLeftColor );
+  relink( newParent, parentRight, false, parentChildOtherIsDummy, parentRightWeight, parentRightColor );
+
+  // Check for no children off of nodeRight
+  if ( nodeRightLeft != undefined && nodeRightRight != undefined ) {
+    addEdge( newNodeRight, nodeRightLeft );
+    addEdge( newNodeRight, nodeRightRight );
+  }
+
+  return newNode;
+}
+
+/**
+ * Helper to rotate, rotates if node layout is right -> right
+ * @param {*} node node we are rotating around the parent
+ * @param {*} parentN parent of node
+ * @param {*} grandparent grandparent of node ( parent of parentN )
+ */
+function rotateRR( node, parentN, grandparent ) {
+  // Assuming all arent null
+  // Grab all nodes involved
+  let grandparentLeft = left( grandparent );
+  let grandparentRight = right( grandparent );
+  let parentLeft = left( parentN );
+  let parentRight = right( parentN );
+  let nodeLeft = left( node );
+  let nodeRight = right( node );
+
+  // For this rotate, we grab nodeLeft's children ( since we delete nodeLeft )
+  let nodeLeftLeft = left( nodeLeft );
+  let nodeLeftRight = right( nodeLeft );
+
+  // Grab other node child weight and color
+  let nodeChildOtherIsDummy = getAttribute( nodeRight, "dummy" );
+  const nodeRightWeight = weight( nodeRight );
+  const nodeRightColor = getAttribute( nodeRight, 'borderColor' );
+
+  // Grab other parent child weight and color
+  let parentChildOtherIsDummy = getAttribute( parentLeft, "dummy" );
+  const parentLeftWeight = weight( parentLeft );
+  const parentLeftColor = getAttribute( parentLeft, 'borderColor' );
+
+  // Grab other grandparent child weight and color
+  let grandparentChildOtherIsDummy = getAttribute( grandparentLeft, "dummy" );
+  const grandparentLeftWeight = weight( grandparentLeft );
+  const grandparentLeftColor = getAttribute( grandparentLeft, 'borderColor' );
+
+  // Remove nodeLeft
+  let nodeChildIsDummy = getAttribute( nodeLeft, "dummy" );
+  const nodeLeftWeight = weight( nodeLeft );
+  const nodeLeftColor = getAttribute( nodeLeft, 'borderColor' );
+  deleteNode( nodeLeft );
+
+  // Grab and remove any updated edges
+  deleteEdge( getEdgeBetween( node, nodeRight ) );
+  deleteEdge( getEdgeBetween( parentN, parentLeft ) );
+  deleteEdge( getEdgeBetween( grandparent, grandparentLeft ) );
+
+  // Remove node
+  const nodeWeight = weight( node );
+  const nodeColor = getAttribute( node, 'borderColor' );
+  deleteNode( node );
+
+  // Remove parent
+  const parentWeight = weight( parentN );
+  const parentColor = getAttribute( parentN, 'borderColor' );
+  deleteNode( parentN );
+
+  // Add node back onto grandparent
+  let newNode = addRight( grandparent, nodeWeight );
+  setAttribute( newNode, 'borderColor', nodeColor );
+
+  // Add parent back onto node
+  let newParent = addLeft( newNode, parentWeight );
+  setAttribute( newParent, 'borderColor', parentColor );
+
+  // Add nodeLeft back onto parent
+  let newNodeLeft = addRight( newParent, nodeLeftWeight );
+  if ( nodeChildIsDummy ) {
+    dummify( newNodeLeft );
+  } else {
+    setAttribute( newNodeLeft, 'borderColor', nodeLeftColor );
+  }
+
+  // Add all the edges back ( relink )
+  relink( grandparent, grandparentLeft, true, grandparentChildOtherIsDummy, grandparentLeftWeight, grandparentLeftColor );
+  relink( newNode, nodeRight, false, nodeChildOtherIsDummy, nodeRightWeight, nodeRightColor );
+  relink( newParent, parentLeft, true, parentChildOtherIsDummy, parentLeftWeight, parentLeftColor );
+
+  // Check for no children off of nodeLeft
+  if ( nodeLeftLeft != undefined && nodeLeftRight != undefined ) {
+    addEdge( newNodeLeft, nodeLeftLeft );
+    addEdge( newNodeLeft, nodeLeftRight );
+  }
+
+  return newNode;
+}
+
+/**
+ * Helper to rotate, rotates if node layout is left -> right
+ * @param {*} node node we are rotating around the parent
+ * @param {*} parentN parent of node
+ * @param {*} grandparent grandparent of node ( parent of parentN )
+ */
+function rotateLR( node, parentN, grandparent ) {
+  // Assuming all arent null
+  // Grab all nodes involved
+  let grandparentLeft = left( grandparent );
+  let grandparentRight = right( grandparent );
+  let parentLeft = left( parentN );
+  let parentRight = right( parentN );
+  let nodeLeft = left( node );
+  let nodeRight = right( node );
+
+  // For this rotate, we grab nodeLeft's children ( since we delete nodeLeft )
+  let nodeLeftLeft = left( nodeLeft );
+  let nodeLeftRight = right( nodeLeft );
+
+  // Grab other node child weight and color
+  let nodeChildOtherIsDummy = getAttribute( nodeRight, "dummy" );
+  const nodeRightWeight = weight( nodeRight );
+  const nodeRightColor = getAttribute( nodeRight, 'borderColor' );
+
+  // Grab other parent child weight and color
+  let parentChildOtherIsDummy = getAttribute( parentLeft, "dummy" );
+  const parentLeftWeight = weight( parentLeft );
+  const parentLeftColor = getAttribute( parentLeft, 'borderColor' );
+
+  // Grab other grandparent child weight and color
+  let grandparentChildOtherIsDummy = getAttribute( grandparentRight, "dummy" );
+  const grandparentRightWeight = weight( grandparentRight );
+  const grandparentRightColor = getAttribute( grandparentRight, 'borderColor' );
+  
+  // Remove nodeLeft
+  let nodeChildIsDummy = getAttribute( nodeLeft, "dummy" );
+  const nodeLeftWeight = weight( nodeLeft );
+  const nodeLeftColor = getAttribute( nodeLeft, 'borderColor' );
+  deleteNode( nodeLeft );
+
+  // Grab and remove any updated edges
+  deleteEdge( getEdgeBetween( node, nodeRight ) );
+  deleteEdge( getEdgeBetween( parentN, parentLeft ) );
+  deleteEdge( getEdgeBetween( grandparent, grandparentRight ) );
+
+  // Remove node
+  const nodeWeight = weight( node );
+  const nodeColor = getAttribute( node, 'borderColor' );
+  deleteNode( node );
+
+  // Remove parent
+  const parentWeight = weight( parentN );
+  const parentColor = getAttribute( parentN, 'borderColor' );
+  deleteNode( parentN );
+
+  // Add node back onto grandparent
+  let newNode = addLeft( grandparent, nodeWeight );
+  setAttribute( newNode, 'borderColor', nodeColor );
+
+  // Add parent back onto node
+  let newParent = addLeft( newNode, parentWeight );
+  setAttribute( newParent, 'borderColor', parentColor );
+
+  // Add nodeLeft back onto parent
+  let newNodeLeft = addRight( newParent, nodeLeftWeight );
+  if ( nodeChildIsDummy ) {
+    dummify( newNodeLeft );
+  } else {
+    setAttribute( newNodeLeft, 'borderColor', nodeLeftColor );
+  }
+
+  // Add all the edges back ( relink )
+  relink( grandparent, grandparentRight, false, grandparentChildOtherIsDummy, grandparentRightWeight, grandparentRightColor );
+  relink( newNode, nodeRight, false, nodeChildOtherIsDummy, nodeRightWeight, nodeRightColor );
+  relink( newParent, parentLeft, true, parentChildOtherIsDummy, parentLeftWeight, parentLeftColor );
+
+  // Check for no children off of nodeLeft
+  if ( nodeLeftLeft != undefined && nodeLeftRight != undefined ) {
+    addEdge( newNodeLeft, nodeLeftLeft );
+    addEdge( newNodeLeft, nodeLeftRight );
+  }
+
+  return newNode;
+}
+
+/**
+ * Helper to rotate, rotates if node layout is right -> left
+ * @param {*} node node we are rotating around the parent
+ * @param {*} parentN parent of node
+ * @param {*} grandparent grandparent of node ( parent of parentN )
+ */
+function rotateRL( node, parentN, grandparent ) {
+  // Assuming all arent null
+  // Grab all nodes involved
+  let grandparentLeft = left( grandparent );
+  let grandparentRight = right( grandparent );
+  let parentLeft = left( parentN );
+  let parentRight = right( parentN );
+  let nodeLeft = left( node );
+  let nodeRight = right( node );
+
+  // For this rotate, we grab nodeRight's children ( since we delete nodeRight )
+  let nodeRightLeft = left( nodeRight );
+  let nodeRightRight = right( nodeRight );
+
+  // Grab other node child weight and color
+  let nodeChildOtherIsDummy = getAttribute( nodeLeft, "dummy" );
+  const nodeLeftWeight = weight( nodeLeft );
+  const nodeLeftColor = getAttribute( nodeLeft, 'borderColor' );
+
+  // Grab other parent child weight and color
+  let parentChildOtherIsDummy = getAttribute( parentRight, "dummy" );
+  const parentRightWeight = weight( parentRight );
+  const parentRightColor = getAttribute( parentRight, 'borderColor' );
+
+  // Grab other grandparent child weight and color
+  let grandparentChildOtherIsDummy = getAttribute( grandparentLeft, "dummy" );
+  const grandparentLeftWeight = weight( grandparentLeft );
+  const grandparentLeftColor = getAttribute( grandparentLeft, 'borderColor' );
+
+  // Remove nodeRight
+  let nodeChildIsDummy = getAttribute( nodeRight, "dummy" );
+  const nodeRightWeight = weight( nodeRight );
+  const nodeRightColor = getAttribute( nodeRight, 'borderColor' );
+  deleteNode( nodeRight );
+
+  // Grab and remove any updated edges
+  deleteEdge( getEdgeBetween( node, nodeLeft ) );
+  deleteEdge( getEdgeBetween( parentN, parentRight ) );
+  deleteEdge( getEdgeBetween( grandparent, grandparentLeft ) );
+
+  // Remove node
+  const nodeWeight = weight( node );
+  const nodeColor = getAttribute( node, 'borderColor' );
+  deleteNode( node );
+
+  // Remove parent
+  const parentWeight = weight( parentN );
+  const parentColor = getAttribute( parentN, 'borderColor' );
+  deleteNode( parentN );
+
+  // Add node back onto grandparent
+  let newNode = addRight( grandparent, nodeWeight );
+  setAttribute( newNode, 'borderColor', nodeColor );
+
+  // Add parent back onto node
+  let newParent = addRight( newNode, parentWeight );
+  setAttribute( newParent, 'borderColor', parentColor );
+
+  // Add nodeRight back onto parent
+  let newNodeRight = addLeft( newParent, nodeRightWeight );
+  if ( nodeChildIsDummy ) {
+    dummify( newNodeRight );
+  } else {
+    setAttribute( newNodeRight, 'borderColor', nodeRightColor );
+  }
+
+  // Add all the edges back ( relink )
+  relink( grandparent, grandparentLeft, true, grandparentLeftWeight, grandparentLeftColor );
+  relink( newNode, nodeLeft, true, nodeLeftWeight, nodeLeftColor );
+  relink( newParent, parentRight, false, parentRightWeight, parentRightColor );
+
+  // Check for no children off of nodeRight
+  if ( nodeRightLeft != undefined && nodeRightRight != undefined ) {
+    addEdge( newNodeRight, nodeRightLeft );
+    addEdge( newNodeRight, nodeRightRight );
+  }
+
+  return newNode;
 }
 
 /**
@@ -376,6 +1062,7 @@ function relink( parentN,  child, makeLeftChild ) {
  * must be updated to indicate its parent is now its child
  * 
  * @param node the position to rotate around its parent
+ * @returns the updated node ID
  */
 function rotate( node ) {
 
@@ -384,6 +1071,9 @@ function rotate( node ) {
 
   display(`Rotate: We will rotate node '${node}' around its parent '${parentN}'...`);
   // display(`...and if needed, the grandparent will refer to node '${node}' as its child`);
+
+  // Will be used to update the node IDs that were updated
+  let newNodeId = undefined;
 
   step(() => {
 
@@ -396,81 +1086,43 @@ function rotate( node ) {
     let nodeLeft = left( node );
     let nodeRight = right( node );
 
-
-    let grandparentLeftEdge = null;
-    let grandparentRightEdge = null;
-    // const parentParentEdge = getEdgeBetween( grandparent, parentN );
-    const parentLeftEdge = getEdgeBetween( parentN, parentLeft );
-    const parentRightEdge = getEdgeBetween( parentN, parentRight );
-    // const nodeParentEdge = getEdgeBetween( parentN, node );
-    const nodeLeftEdge = getEdgeBetween( node, nodeLeft );
-    const nodeRightEdge = getEdgeBetween( node, nodeRight );
-
     if ( grandparent != undefined ) {
       // Update the children
       grandparentLeft = left( grandparent );
       grandparentRight = right( grandparent );
-
-      // Update edges
-      grandparentLeftEdge = getEdgeBetween( grandparent, grandparentLeft );
-      grandparentRightEdge = getEdgeBetween( grandparent, grandparentRight );
     }
 
-
     // Now check and rotate nodes
-    if ( grandparent === undefined ) { // Check NULL
-      setRoot( node, false );
-      setParent( node, null );
-    } else {
-      if ( parentN === left( grandparent ) ) {
-        // Here we have to delete both left and 
-        // right edges and put them back into order
-        // deleteEdge( grandparentRightEdge );
-        // deleteEdge( grandparentLeftEdge );
-
-        relink( grandparent, node, true );
-        relink( grandparent, grandparentRight, false );
-        // relink( grandparent, node, true );
+    if ( grandparent === undefined ) {
+      if ( node === parentLeft ) {
+        // Preform a Left rotate ( make node the root )
+        newNodeId = rotateL( node, parentN );
       } else {
-        // We can reattach node without grandparents left child
-        // deleteEdge( grandparentRightEdge );
-
-        relink( grandparent, grandparentLeft, true );
-        relink( grandparent, node, false );
+        // Preform a Right rotate ( make node the root )
+        newNodeId = rotateR( node, parentN );
+      }
+    } else if ( parentN === grandparentLeft ) {
+      if ( node === parentLeft ) {
+        // Preform a Left -> Left rotate
+        newNodeId = rotateLL( node, parentN, grandparent );
+      } else {
+        // Preform a Left -> Right rotate
+        newNodeId = rotateLR( node, parentN, grandparent );
+      }
+    }
+    else {
+      if ( node === parentLeft ) {
+        // Preform a Right -> Left rotate
+        newNodeId = rotateRL( node, parentN, grandparent );
+      } else {
+        // Preform a Right -> Right rotate
+        newNodeId = rotateRR( node, parentN, grandparent );
       }
     }
 
-    if ( node === parentLeft ) {
-      // Delete all edges involved
-      // deleteEdge( parentLeftEdge );
-      // deleteEdge( parentRightEdge );
-
-      // deleteEdge( nodeRightEdge );
-
-      // And add all edges back left to right, top to bottom, for each node
-      // Make sure to check for left edges first then right
-      relink( node, parentN, false );
-
-      relink( parentN, nodeRight, true );
-      relink( parentN, parentRight, false );
-      // relink( parentN, nodeRight, true );
-    } else {
-      // Delete all edges involved
-      // deleteEdge( parentRightEdge );
-
-      // deleteEdge( nodeLeftEdge );
-      // deleteEdge( nodeRightEdge );
-
-      // And add all edges back left to right, top to bottom, for each node
-      // Make sure to check for left edges first then right
-      relink( node, parentN, true );
-      relink( node, nodeRight, false );
-      // relink( node, parentN, true );
-
-      relink( parentN, nodeLeft, false );
-    }
-
   });
+
+  return newNodeId;
 
 }
 
@@ -492,15 +1144,15 @@ function restructure( node ) {
       // rotate the parent around the grandparent
       display(`Restructure: If the parent ('${parentN}') is the same side child as node ('${node}') is to parent...`);
       display(`...then we rotate the parent ('${parentN}') around the grandparent ('${grandparent}')`);
-      rotate( parentN );
-      return parentN;
+      const newParentID = rotate( parentN );
+      return newParentID;
   } else {
       // rotate the node around the parent twice
       display(`Restructure: If the parent ('${parentN}') is not the same side child as node ('${node}') is to parent...`);
       display(`...then we rotate the node ('${node}') around the parent ('${parentN}') twice`);
-      rotate( node );
-      rotate( node );
-      return node;
+      const newNodeID = rotate( node );
+      const newNodeID2 = rotate( newNodeID );
+      return newNodeID2;
   }
 }
 
@@ -562,7 +1214,7 @@ function resolveRed( node ) {
  */
 function remedyDoubleBlack( node ) {
 
-  let parent = parent( node );
+  let parentN = parent( node );
   let sibling = sibling( node );
   
   if ( isBlack( sibling ) ) {
@@ -575,8 +1227,11 @@ function remedyDoubleBlack( node ) {
         temp = right( sibling );
       }
 
+      // Updated for restructure
+      const isRedParent = isRed( parentN );
+
       let middle = restructure( temp );
-      if ( isRed( parent ) ) {
+      if ( isRedParent ) {
         makeRed( middle );
       } else {
         makeBlack( middle );
@@ -586,18 +1241,32 @@ function remedyDoubleBlack( node ) {
     } else {
       // CASE 2: recoloring
       makeRed( sibling );
-      if ( isRed( parent ) ) {
-        makeBlack( parent );
-      } else if ( !isRoot( parent ) ) {
-        remedyDoubleBlack( parent );
+      if ( isRed( parentN ) ) {
+        makeBlack( parentN );
+      } else if ( !isRoot( parentN ) ) {
+        remedyDoubleBlack( parentN );
       }
     }
   } else {
     // CASE 3: Rotate
-    rotate( sibling );
+    // Need to check for updated node after rotate
+    // So change colors before we rotate to make things easier
     makeBlack( sibling );
-    makeRed( parent );
-    remedyDoubleBlack( node );
+    makeRed( parentN );
+
+    let isSiblingLeftChild = ( sibling === left( parentN ) );
+    let newSibling = rotate( sibling );
+    let newNode = undefined;
+
+    // Grab new node after rotate
+    if ( isSiblingLeftChild ) {
+      newNode = right( right( newSibling ) );
+    } else {
+      newNode = left( left( newSibling ) );
+    }
+
+    // Update with new node
+    remedyDoubleBlack( newNode );
   }
 
 
@@ -629,15 +1298,6 @@ function findInOrderSuccessor(currentNode){
   }
   display(`Found successor at '${currentNode}'`)
   return currentNode
-}
-
-function createDummy(){
-  const dummy = addNode(0,0)
-  setShape(dummy, "square");
-  color(dummy, "black");
-  setSize(dummy, 20);
-  setAttribute(dummy, "dummy", true);
-  return dummy;
 }
 
 // Show the nodes being traced to the user
@@ -676,12 +1336,14 @@ function expandLeaf( dum, weight ) {
 
     display(`Add sentinel leafs to keep Leaf Property!`);
     // Then add new dummy/sentinel children
-    // addLeft( newNode, createDummy() );
-    // addRight( newNode, createDummy() );
-    step(()=>{
-      addEdge( newNode, createDummy() );
-      addEdge( newNode, createDummy() );
+    // step(()=>{
+    //   dummify( addLeft( newNode, undefined ) );
+    //   dummify( addRight( newNode, undefined ) );
+    // });
+    step(() =>{
+      dummify( addLeft( newNode, undefined ) );
     });
+    
 }
 
 /**
@@ -905,28 +1567,30 @@ function unDummy( dummy, weight ) {
   });
 }
 
-function lookUp( root, w ) {
-  // Check for undefined node/root
-  if ( root === undefined || root === null ) {
+function lookUp( node, w ) {
+  // Check for undefined node
+  if ( node === undefined || node === null ) {
     return undefined;
   }
 
-  if ( weight( root ) === undefined ) {
+  display(`Weight of '${node}': '${weight( node )}'`);
+
+  if ( weight( node ) === undefined ) {
     // It is a dummy we can change ( leaf )
-    return root;
-  } else if ( weight( root ) > w ) {
+    return node;
+  } else if ( weight( node ) > w ) {
     // Check leftChild
-    // display(`Left child of '${root}' being checked!`);
-    return lookUp( getLeft( root ), w );
-  } else if ( weight( root ) < w ) {
+    // display(`Left child of '${node}' being checked!`);
+    return lookUp( getLeft( node ), w );
+  } else if ( weight( node ) < w ) {
     // Check rightChild
-    // display(`Right child of '${root}' being checked!`);
-    return lookUp( getRight( root ), w );
+    // display(`Right child of '${node}' being checked!`);
+    return lookUp( getRight( node ), w );
   } else {
     // They have the same weight!
-    // display(`Node with weight '${weight}' already exists!`);
+    // display(`Node with weight '${w}' already exists!`);
     // Give the node with this weight
-    return root;
+    return node;
   }
 }
 
@@ -972,22 +1636,20 @@ function actionOnAccess( node ) {
     // Do nothing for BST
 }
 
-const promptString = "Red-Black Trees\n"
-                     + "---------------\n"
-                     + "Choices:\n"
-                     + "0 - End Program\n"
-                     + "1 - Find Node\n"
-                     + "2 - Add Node\n"
-                     + "3 - Remove Node\n"
-                     + "---------------";
+// const promptString = "Red-Black Trees\n"
+//                      + "---------------\n"
+//                      + "Choices:\n"
+//                      + "0 - End Program\n"
+//                      + "1 - Find Node\n"
+//                      + "2 - Add Node\n"
+//                      + "3 - Remove Node\n"
+//                      + "---------------";
 
-// const promptString = "Red-Black Trees\n" 
-//                    + "---------------\n"
-//                    + "Input the weight with its operation:\n"
-//                    + "\'+\'w - Add node with weight \'w\'\n"
-//                    + "\'-\'w - Delete node with weight \'w\'\n"
-//                    + "0 - Exit Program\n"
-//                    + "---------------\n";
+const promptString = "Red-Black Trees: \n"
+                   + "Input the weight with its operation where \n"
+                   + "\'+\'w - Adds a node with the weight \'w\' and \n"
+                   + "\'-\'w - Delete a node with the weight \'w\' and then \n"
+                   + "0 - Exits the program \n";
 
 while ( true ) {
   cleanTree();
@@ -1006,36 +1668,21 @@ while ( true ) {
   Look to add maybe a -weight for delete and a weight for either finding it 
   (if it exists) or adding the new weight if it is not found
   */
-  const choice = promptNumber( promptString );
+  const inWeight = promptNumber( promptString );
 
-  if ( choice == 1 ) {
-
-    const inWeight = promptNumber( "What is the weight of the node we are finding?" );
-
-  } else if ( choice == 2 ) {
-
-    const inWeight = promptNumber( "What is the weight of the new node?" );
-    // // let node = addNodeBST( getRoot(), weight );
-
-    // // Red-Black Trees
-    // if ( node ) {
-    //   display( `Check rules after addition of node '${node}'` );
-    //   actionOnInsert( node );
-    // }
+  if ( inWeight > 0 ) {
 
     put( inWeight );
     display(`Successfully updated the tree with a new node with the weight '${inWeight}'!`);
 
-  } else if ( choice == 3 ) {
-
-    const inWeight = prompt( "What is the weight of the node we are deleting" );    
-    // deleteNodeBST( getRoot(), weight );
-    const oldWeight = remove( inWeight );
+  } else if ( inWeight < 0 ) {
+    
+    const oldWeight = remove( -inWeight );
     if ( oldWeight != undefined ) {
       display(`Successfully updated the tree without the removed node with the weight '${oldWeight}'!`);
     }
 
-  } else if ( choice == 0 ) {
+  } else if ( inWeight == 0 ) {
 
     break;
 
