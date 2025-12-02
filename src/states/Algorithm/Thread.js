@@ -58,7 +58,7 @@ function wait() {
  * 0.
  */
 function waitIfNeeded() {
-    
+
     // Wait if we are not in a step
     if (stepDepth == 0) {
         wait();
@@ -68,7 +68,7 @@ function waitIfNeeded() {
 /**
  * Tells the thread to wait after running a step.
  */
-function step(code=null) {
+function step(code = null) {
 
     // If there is no code in this step, an error must have happened
     if (code === null || code === undefined) {
@@ -78,7 +78,7 @@ function step(code=null) {
     // Tell the ChangeManager to start recording our changes, but only
     // if we are not in debug mode
     if (flags[0] == 0) {
-        
+
         // Are we the lowest level of step? If so, start and end the
         // recording. If not, we shouldn't start a recording, because
         // only the lowest level should be recording.
@@ -86,7 +86,7 @@ function step(code=null) {
 
         // Start recording, so that a single change record is made
         if (lowestLayer) {
-            postMessage({action: "startRecording"});
+            postMessage({ action: "startRecording" });
         }
 
         // Increment the stepDepth counter so that we know when to end
@@ -95,20 +95,20 @@ function step(code=null) {
 
         // Execute the code in this step
         code();
-        
+
         // End the recording of the steps
         if (lowestLayer) {
-            postMessage({action: "endRecording"});
+            postMessage({ action: "endRecording" });
         }
 
         // Decrement the stepDepth counter and wait if the
         // step is finished
-        
+
         stepDepth--;
         waitIfNeeded();
     }
     else {
-        
+
         // If we are in debug mode, then just execute the code as if
         // there is no step
         code();
@@ -125,13 +125,13 @@ function step(code=null) {
  * @param {string} error The error message to display if input is invalid
  * @returns {string} The user input
  */
-function prompt(message, error="") {
+function prompt(message, error = "") {
     if (message === null || message === "") {
         message = "Prompt";
     }
 
     // Post the message and wait for the thread to resume
-    postMessage({action: "prompt", content: [message, error]});
+    postMessage({ action: "prompt", content: [message, error] });
     wait();
 
     // Get the result from the shared array
@@ -155,7 +155,7 @@ function promptFrom(message, list, error) {
     if (error === null) error = "Error: Must enter a value from " + list;
 
     let promptResult = prompt(message);
-    while(!list.includes(promptResult)) {
+    while (!list.includes(promptResult)) {
         promptResult = prompt(message, error);
     }
     return promptResult;
@@ -179,7 +179,7 @@ function setAttribute(id, name, value) {
         let source = split[0], target = split[1];
         [graph, changeManager] = GraphInterface.setEdgeAttribute(graph, changeManager, source, target, name, value);
         postMessage({ action: "setEdgeAttribute", source: source, target: target, name: name, value: value });
-    
+
     } else {
         // Handle node attribute
         [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, id, name, value);
@@ -307,6 +307,7 @@ function addNode(x, y) {
     [graph, changeManager, newNode] = GraphInterface.addNode(graph, changeManager, x, y);
     postMessage({ action: "addNode", x: x, y: y });
     waitIfNeeded();
+
     return newNode;
 }
 
@@ -564,7 +565,7 @@ function isHidden(id) {
 }
 
 function hideNode(node) {
-    setAttribute(node, "hidden", true); 
+    setAttribute(node, "hidden", true);
 }
 
 function showNode(node) {
@@ -608,7 +609,7 @@ function showAllNodeLabels() {
  */
 
 function hideEdge(edge) {
-    setAttribute(edge, "hidden", true); 
+    setAttribute(edge, "hidden", true);
 }
 
 function showEdge(edge) {
@@ -676,7 +677,7 @@ function clearNodeShapes() {
  * NODE NORDER WIDTH
  */
 
-function borderWidth(id){
+function borderWidth(id) {
     return getAttribute(id, "borderWidth");
 }
 
@@ -833,7 +834,7 @@ function promptEdge(message) {
         // Add the reversed edges
         edges = edges.concat([...reversedEdges.keys()]);
     }
-    
+
     let promptResult = promptFrom(message, edges, "Error: Must enter a valid Edge ID in source,target format. The valid edges are: " + edges.join(" "));
     return reversedEdges.get(promptResult) || promptResult; // Check if the edge is reversed or not
 }
@@ -865,78 +866,78 @@ function isCrossed(e, f) {
 
 function crossings(e) {
     return LayeredGraphInterface.crossings(graph, e);
-} 
+}
 
 function totalCrossings() {
     return LayeredGraphInterface.totalCrossings(graph);
-} 
+}
 
 function bottleneckCrossings() {
     return LayeredGraphInterface.bottleneckCrossings(graph);
-} 
+}
 
 function nonVerticality(e) {
     return LayeredGraphInterface.nonVerticality(graph, e);
-} 
+}
 
 function totalNonVerticality() {
     return LayeredGraphInterface.totalNonVerticality(graph);
-} 
+}
 
 function bottleneckVerticality() {
     return LayeredGraphInterface.bottleneckVerticality(graph);
-} 
+}
 
 function setLayerProperty(layer, attribute, value) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.setLayerProperty(graph, changeManager, layer, attribute, value);
-    postMessage({ 
+    postMessage({
         action: "setLayerProperty",
         layer: layer,
         attribute: attribute,
         value: value,
     });
     waitIfNeeded();
-} 
+}
 
 function setChannelProperty(channel, attribute, value) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.setChannelProperty(graph, changeManager, channel, attribute, value);
-    postMessage({ 
+    postMessage({
         action: "setChannelProperty",
         channel: channel,
         attribute: attribute,
         value: value,
     });
     waitIfNeeded();
-} 
+}
 
 function setWeightsUp(layer, type) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.setWeightsUp(graph, changeManager, layer, type);
-    postMessage({ 
+    postMessage({
         action: "setWeightsUp",
         layer: layer,
         type: type,
     });
     waitIfNeeded();
-} 
+}
 
 function setWeightsDown(layer, type) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.setWeightsDown(graph, changeManager, layer, type);
-    postMessage({ 
+    postMessage({
         action: "setWeightsDown",
         layer: layer,
         type: type,
     });
     waitIfNeeded();
-} 
+}
 
 function setWeightsBoth(layer, type) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.setWeightsBoth(graph, changeManager, layer, type);
-    postMessage({ 
+    postMessage({
         action: "setWeightsBoth",
         layer: layer,
         type: type,
@@ -947,7 +948,7 @@ function setWeightsBoth(layer, type) {
 function setWeights(layer, type) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.setWeights(graph, changeManager, layer, type);
-    postMessage({ 
+    postMessage({
         action: "setWeights",
         layer: layer,
         type: type,
@@ -958,61 +959,61 @@ function setWeights(layer, type) {
 function sortByWeight(layer) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.sortByWeight(graph, changeManager, layer);
-    postMessage({ 
+    postMessage({
         action: "sortByWeight",
         layer: layer,
     });
     waitIfNeeded();
-} 
+}
 
 function swap(x, y) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.swap(graph, changeManager, x, y);
-    postMessage({ 
+    postMessage({
         action: "swap",
         x: x,
         y: y
     });
     waitIfNeeded();
-} 
+}
 
 function nodesOnLayer(layer) {
     return LayeredGraphInterface.nodesOnLayer(graph, layer);
-} 
+}
 
 function evenlySpacedLayout() {
     if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.evenlySpacedLayout(graph, changeManager);
-    postMessage({ action: "evenlySpacedLayout",  });
+    postMessage({ action: "evenlySpacedLayout", });
     waitIfNeeded();
 }
 
 function showPositions(layer) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.showPositions(graph, changeManager, layer);
-    postMessage({ action: "showPositions",  layer: layer,});
+    postMessage({ action: "showPositions", layer: layer, });
     waitIfNeeded();
 }
 
 function showIndexes(layer) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.showIndexes(graph, changeManager, layer);
-    postMessage({ action: "showIndexes",  layer: layer,});
+    postMessage({ action: "showIndexes", layer: layer, });
     waitIfNeeded();
 }
 
 function numberOfLayers() {
     return LayeredGraphInterface.numberOfLayers(graph);
-} 
+}
 
 function copyNodePositions() {
     return LayeredGraphInterface.copyNodePositions(graph);
 }
 
-function applyNodePositions(savedPositions){
+function applyNodePositions(savedPositions) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.applyNodePositions(graph, changeManager, savedPositions);
-    postMessage({ action: "applyNodePositions",  savedPositions: savedPositions,});
+    postMessage({ action: "applyNodePositions", savedPositions: savedPositions, });
     waitIfNeeded();
 }
 
@@ -1021,8 +1022,8 @@ function applyNodePositions(savedPositions){
 //     const sourceId = prompt("What is the parent of the new node?")
 //     const attrs = prompt("What are the attributes of the new node?")
 //     addNodeIdAttrs(targetId, 0,0, attrs)
-    
-    
+
+
 //     addEdge(sourceId, targetId)
 // }
 
@@ -1065,16 +1066,49 @@ function getRight(nodeId) {
 
 function addLeft(targetNode, childWeight) {
     if (stepDepth === 0) { postMessage({ action: "step" }) };
-    [graph, changeManager] = TreeInterface.addLeft(graph, changeManager, targetNode, childWeight);
+    let newNode;
+    [graph, changeManager, newNode] = TreeInterface.addLeft(graph, changeManager, targetNode, childWeight);
     postMessage({ action: "addLeft", targetNode: targetNode, childWeight: childWeight});
     waitIfNeeded();
+    return newNode;
 }
 
 function addRight(targetNode, childWeight) {
     if (stepDepth === 0) { postMessage({ action: "step" }) };
-    [graph, changeManager] = TreeInterface.addRight(graph, changeManager, targetNode, childWeight);
+    let newNode;
+    [graph, changeManager, newNode] = TreeInterface.addRight(graph, changeManager, targetNode, childWeight);
     postMessage({ action: "addRight", targetNode: targetNode, childWeight: childWeight});
     waitIfNeeded();
+    return newNode;
+}
+
+/**
+ * This is more complicated than it would first appear due to how the graphs are stored.
+ * The showNodeWeights variable does not work from our testing (displaying or hiding the weight boxes universally at render time),
+ * so the current approach uses a graph variable and when creating nodes, hides their weight box individually. This is not a good
+ * solution because it is overhead at every step, and is decentralized so to turn it off, we would have to go back to every node
+ * and set the show weight to true. However it seems like the only option from where we stand without a large refactor of multiple 
+ * cytoscape files, and we are not sure if it is even possible to do it this preferred 'centralized' way.
+ * 
+ * -----What we've tried-----
+ * Setting graph.showNodeWeights doesn't actually work as intended. 
+ * Even on main, the weights would not hide during the algorithm using the NodeSettingsPopover.
+ * We believe this is because there is a disconnect somewhere between the graph that is altered by the algorithm and the graph that is rendered (unsure).
+ * We can still see this some times when debugging, as if we ask it to print the graph inside of Cytoscape.jsx, we see 2 statements.
+ * --one saying Tree <Graph>  
+ * --one saying StandardGraph <Graph> 
+ * From all of this, we think that without further investigation on how to keep these two graphs fully synchronized, the best solution is
+ * hiding the weight on each individual node.
+ *  
+ * -----Possible solution-----
+ * Call hideAllNodeWeights() immediately
+ * Set graph.weightsInside to true with a GraphInterface method
+ * -- Need to make a new one, can copy code from GraphInterface.setShowNodeWeights()
+ * Inside of TreeInterface.addLeft() and TreeInterface.addRight(), there is logic that looks at graph.weightsInside
+ * and if true then it hides the new node's weight
+ */
+function weightsInside() {
+    
 }
 
 
@@ -1107,7 +1141,7 @@ function addDummyNodes(attribute) {
  * @param {Array} message Array containing a message type and message content
  */
 self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
-    
+
     message = message.data;
     if (message[0] === "shared") {
         sharedArray = message[1];
@@ -1130,12 +1164,212 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
             // Start running the algorithm
             eval(message[3]); /* eslint-disable-line no-eval */
             // End recording of the last step
-            postMessage({action: "complete"});
+            postMessage({ action: "complete" });
 
         } catch (error) {
             // if there's an error, send a message with the error
-            postMessage({action: "error", error: error});
+            postMessage({ action: "error", error: error });
             throw error
         }
     }
 }
+
+// Update this for auto completion
+export {
+    // Core control functions
+    wait,
+    waitIfNeeded,
+    step,
+    
+    // Prompt functions
+    prompt,
+    promptFrom,
+    promptBoolean,
+    promptInteger,
+    promptNumber,
+    promptNode,
+    promptNodeFrom,
+    promptEdge,
+    promptEdgeFrom,
+    
+    // Attribute functions
+    setAttribute,
+    setAttributeAll,
+    getAttribute,
+    
+    // Display functions
+    display,
+    print,
+    setDirected,
+    
+    // List getters
+    getNodes,
+    getNumberOfNodes,
+    getEdges,
+    getNumberOfEdges,
+    
+    // Source and target
+    source,
+    target,
+    getEdgeBetween,
+    other,
+    
+    // Graph editing
+    addNode,
+    addEdge,
+    deleteNode,
+    deleteEdge,
+    
+    // Position functions
+    getPosition,
+    getX,
+    getY,
+    setPosition,
+    incrementPosition,
+    
+    // Adjacencies
+    incident,
+    incoming,
+    outgoing,
+    adjacentNodes,
+    incomingNodes,
+    outgoingNodes,
+    degree,
+    inDegree,
+    outDegree,
+    visibleNeighbors,
+    
+    // Marks
+    mark,
+    unmark,
+    marked,
+    clearNodeMarks,
+    
+    // Highlights
+    highlight,
+    unhighlight,
+    highlighted,
+    clearNodeHighlights,
+    clearEdgeHighlights,
+    
+    // Colors
+    color,
+    uncolor,
+    getColor,
+    hasColor,
+    clearNodeColors,
+    clearEdgeColors,
+    
+    // Labels
+    label,
+    unlabel,
+    getLabel,
+    hasLabel,
+    clearNodeLabels,
+    clearEdgeLabels,
+    
+    // Weights
+    setWeight,
+    clearWeight,
+    weight,
+    hideWeight,
+    showWeight,
+    hasWeight,
+    clearNodeWeights,
+    clearEdgeWeights,
+    
+    // Hide/Show node properties
+    isHidden,
+    hideNode,
+    showNode,
+    hideNodeWeight,
+    hideAllNodeWeights,
+    showNodeWeight,
+    showAllNodeWeights,
+    hideNodeLabel,
+    hideAllNodeLabels,
+    showNodeLabel,
+    showAllNodeLabels,
+    
+    // Hide/Show edge properties
+    hideEdge,
+    showEdge,
+    hideEdgeWeight,
+    hideAllEdgeWeights,
+    showEdgeWeight,
+    showAllEdgeWeights,
+    hideEdgeLabel,
+    hideAllEdgeLabels,
+    showEdgeLabel,
+    showAllEdgeLabels,
+    
+    // Node shape
+    shape,
+    setShape,
+    clearShape,
+    hasShape,
+    clearNodeShapes,
+    
+    // Node border width
+    borderWidth,
+    setBorderWidth,
+    clearBorderWidth,
+    hasBorderWidth,
+    clearNodeBorderWidths,
+    
+    // Node shading
+    backgroundOpacity,
+    setBackgroundOpacity,
+    clearBackgroundOpacity,
+    hasBackgroundOpacity,
+    clearNodeBackgroundOpacities,
+    
+    // Node size
+    size,
+    setSize,
+    clearSize,
+    hasSize,
+    clearNodeSizes,
+    
+    // Edge width
+    edgeWidth,
+    setEdgeWidth,
+    clearEdgeWidth,
+    hasEdgeWidth,
+    clearEdgeWidths,
+    
+    // Layered graph functions
+    isCrossed,
+    crossings,
+    totalCrossings,
+    bottleneckCrossings,
+    nonVerticality,
+    totalNonVerticality,
+    bottleneckVerticality,
+    setLayerProperty,
+    setChannelProperty,
+    setWeightsUp,
+    setWeightsDown,
+    setWeightsBoth,
+    setWeights,
+    sortByWeight,
+    swap,
+    nodesOnLayer,
+    evenlySpacedLayout,
+    showPositions,
+    showIndexes,
+    numberOfLayers,
+    copyNodePositions,
+    applyNodePositions,
+
+    // Tree Functions
+    getParent,
+    getChildren,
+    getRoots,
+    getRoot,
+    isLeaf, 
+    getLeft,
+    getRight,
+    addLeft,
+    addRight,
+};

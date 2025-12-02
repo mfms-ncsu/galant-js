@@ -250,7 +250,7 @@ function getStyle(graph) {
                 "backgroundColor": "data(color)"
             }
         },
-        {
+        { 
             "selector": "node[id]",
             "style": {
                 "label": "data(id)"

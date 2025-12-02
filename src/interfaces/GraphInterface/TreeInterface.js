@@ -247,14 +247,7 @@ function getLeft(graph, nodeId) {
   // Gets children and checks if a left child exists
   let children = getChildren(graph, nodeId);
   if ( children.length === 0 ) {
-    throw new Error(
-      "Left child does not exist"
-    );
-  }
-  if ( GraphInterface.getNodeAttribute(graph, children[0], "dummy") === true ) {
-    throw new Error(
-      "Left child does not exist"
-    );
+    return undefined;
   }
 
   return children[0];
@@ -281,14 +274,7 @@ function getRight(graph, nodeId) {
   // Gets children and checks if a right child exists
   let children = getChildren(graph, nodeId);
   if ( children.length < 1 ) {
-    throw new Error(
-      "Right child does not exist"
-    );
-  }
-  if ( GraphInterface.getNodeAttribute(graph, children[1], "dummy") === true ) {
-    throw new Error(
-      "Right child does not exist"
-    );
+    return undefined;
   }
 
   return children[1];
@@ -316,10 +302,12 @@ function addLeft(graph, changeManager, node, childWeight) {
 
   // Case 1: Node has no children
   if ( isLeaf(graph, node) ) {
-    [graph, changeManager, leftChild] = addBinaryNode(graph, changeManager, undefined, {"weight": childWeight}, true);
+    [graph, changeManager, leftChild] = addBinaryNode(graph, changeManager, undefined, undefined, true);
+    [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, leftChild, "weight", childWeight);
     [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, leftChild);
 
-    [graph, changeManager, dummy] = addBinaryNode(graph, changeManager, undefined, {"dummy": true});
+    [graph, changeManager, dummy] = addBinaryNode(graph, changeManager, undefined, undefined);
+    [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, dummy, "dummy", true);
     [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, dummy);
 
     return [graph, changeManager, leftChild];
@@ -366,10 +354,12 @@ function addRight(graph, changeManager, node, childWeight) {
 
   // Case 1: Node has no children
   if ( isLeaf(graph, node) ) {
-    [graph, changeManager, dummy] = addBinaryNode(graph, changeManager, undefined, {"dummy": true});
+    [graph, changeManager, dummy] = addBinaryNode(graph, changeManager, undefined, undefined);
+    [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, dummy, "dummy", true);
     [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, dummy);
 
-    [graph, changeManager, rightChild] = addBinaryNode(graph, changeManager, undefined, {"weight": childWeight}, false);
+    [graph, changeManager, rightChild] = addBinaryNode(graph, changeManager, undefined, undefined, false);
+    [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, rightChild, "weight", childWeight);
     [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, rightChild);
 
     return [graph, changeManager, rightChild];
