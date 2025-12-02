@@ -106,9 +106,9 @@ describe("Tree Tests", () => {
         [tree, changeManager, nodeSingle] = GraphInterface.addNode(tree, changeManager, nodeSingle, 0, 0, {weight: 10});
 
         expect(TreeInterface.getLeft(tree, node2)).toBe(node1);
-        expect(() => {TreeInterface.getLeft(tree, nodeSingle)}).toThrowError("Left child does not exist");
-        expect(() => {TreeInterface.getLeft(tree, node1)}).toThrowError("Left child does not exist");
-        expect(() => {TreeInterface.getLeft(tree, node4)}).toThrowError("Left child does not exist");
+        expect(TreeInterface.getLeft(tree, nodeSingle)).toBe(undefined);
+        expect(TreeInterface.getLeft(tree, node1)).toBe(undefined);
+        expect(TreeInterface.getLeft(tree, node4)).toBe(undefined);
         node5 = "5";
         expect(() => {TreeInterface.getLeft(tree, node5)}).toThrowError("Cannot get left child of node 5 because no node with this id exists in the graph");
     });
@@ -129,8 +129,8 @@ describe("Tree Tests", () => {
 
         expect(TreeInterface.getRight(tree, node2)).toBe(node3);
         expect(TreeInterface.getRight(tree, node3)).toBe(right2);
-        expect(() => {TreeInterface.getRight(tree, nodeSingle)}).toThrowError("Right child does not exist");
-        expect(() => {TreeInterface.getRight(tree, node4)}).toThrowError("Right child does not exist");
+        expect(TreeInterface.getRight(tree, nodeSingle)).toBe(undefined);
+        expect(TreeInterface.getRight(tree, node4)).toBe(undefined);
         let node10 = "10";
         expect(() => {TreeInterface.getRight(tree, node10)}).toThrowError("Cannot get right child of node 10 because no node with this id exists in the graph");
     });
