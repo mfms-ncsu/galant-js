@@ -41,41 +41,14 @@ function numChildren( node ) {
   return outDegree( node );
 }
 
-//only 1 incoming node for each node, the parent (otherwise undefined if < (root) or > (cycle))
-function parent(node){
-  const incoming = incomingNodes(node);
-  //display( `Parent: '${incoming[0]}'` );
-  return incoming.length == 1 ? incoming[0] : undefined;
-}
-
-function left(node){
-  // const w = weight( node );
-  // return weight(getChildren(node)[0]) < w ? getChildren(node)[0] : getChildren(node)[1]
-  return children(node)[0];
-}
-
-function right(node){
-  // const w = weight( node );
-  // return weight(getChildren(node)[0]) > w ? getChildren(node)[0] : getChildren(node)[1]
-  return children(node)[1];
-}
 
 function getSibling( node ) {
-  const p = parent( node );
+  const p = getParent( node );
 
   // If the left child of the parent is the node, return the right child 
   // of the parent which would be the sibling of node
   // else return the left child which would be node's sibling
-  return left( p ) == node ? right( p ) : left( p );
-}
-
-// Show the nodes being traced to the user
-function accentNode(x){
-  // For some reason only marking the root, so commented out for now
-  step(() => {
-    //mark(x);
-    highlight(x);
-  });
+  return getLeft( p ) === node ? getRight( p ) : getLeft( p );
 }
 
 function cleanTree(){
@@ -95,8 +68,8 @@ function dummify( nodeId ){
     setAttribute(nodeId, "dummy", true);
     setAttribute(nodeId, "weight", undefined);
     setAttribute(nodeId, "borderColor", "#AAAAAA");
-    if (numChildren( nodeId ) > 0){
-      for (const child of children( nodeId )){
+    if ( numChildren( nodeId ) > 0 ){
+      for ( const child of children( nodeId ) ) {
         deleteNode(child);
       }
     }
@@ -124,7 +97,7 @@ function replaceDummy(parent, dummy, k, side) {
  */
 function addRightNoDummy( node, w ) {
   const newNode = addRight( node, w );
-  deleteNode( left( node ) );
+  deleteNode( getLeft( node ) );
   return newNode;
 }
 
@@ -251,8 +224,8 @@ function setLeft( node, child ) {
   const colorAttribute = getAttribute( child, 'borderColor' );
 
   // Grab left and right children of child
-  const leftC = left( child );
-  const rightC = right( child );
+  const leftC = getLeft( child );
+  const rightC = getRight( child );
 
   // Remove child ( and all edges associated );
   deleteNode( child );
@@ -290,8 +263,8 @@ function setRight( node, child ) {
   const colorAttribute = getAttribute( child, 'borderColor' );
 
   // Grab left and right children of child
-  const leftC = left( child );
-  const rightC = right( child );
+  const leftC = getLeft( child );
+  const rightC = getRight( child );
 
   // Remove child ( and all edges associated );
   deleteNode( child );
@@ -360,15 +333,15 @@ function relink( parentN, child, makeLeftChild, dummy, w, color ) {
 
     if ( makeLeftChild ) {
       // Grab the left child to change
-      node = left( parentN );
+      node = getLeft( parentN );
     } else {
       // Grab the right child to change
-      node = right( parentN );
+      node = getRight( parentN );
     }
 
     // Grab the children of the old node
-    const childLeft = left( child );
-    const childRight = right( child );
+    const childLeft = getLeft( child );
+    const childRight = getRight( child );
 
     // Undummify
     setAttribute( node, 'dummy', false );
@@ -396,14 +369,14 @@ function relink( parentN, child, makeLeftChild, dummy, w, color ) {
 // function rotateL( node, parentN ) {
 //   // Assuming all arent null
 //   // Grab all nodes involved
-//   let parentLeft = left( parentN );
-//   let parentRight = right( parentN );
-//   let nodeLeft = left( node );
-//   let nodeRight = right( node );
+//   let parentLeft = getLeft( parentN );
+//   let parentRight = getRight( parentN );
+//   let nodeLeft = getLeft( node );
+//   let nodeRight = getRight( node );
 
 //   // For this rotate, we grab nodeRight's children ( since we delete nodeRight )
-//   let nodeRightLeft = left( nodeRight );
-//   let nodeRightRight = right( nodeRight );
+//   let nodeRightLeft = getLeft( nodeRight );
+//   let nodeRightRight = getRight( nodeRight );
 
 //   // Grab other node child weight and color
 //   let nodeChildOtherIsDummy = getAttribute( nodeLeft, "dummy" );
@@ -466,7 +439,7 @@ function relink( parentN, child, makeLeftChild, dummy, w, color ) {
 // }
 
 /**
- * Helper to rotate, rotates if grandparent dosent 
+ * Helper to rotate, rotates if grandparent doesn't 
  * exist and node is parents left child
  * @param {*} node node we are rotating around the parent
  * @param {*} parentN parent of node
@@ -474,14 +447,14 @@ function relink( parentN, child, makeLeftChild, dummy, w, color ) {
 function rotateL( node, parentN ) {
   // Assuming all arent null
   // Grab all nodes involved
-  let parentLeft = left( parentN );
-  let parentRight = right( parentN );
-  let nodeLeft = left( node );
-  let nodeRight = right( node );
+  let parentLeft = getLeft( parentN );
+  let parentRight = getRight( parentN );
+  let nodeLeft = getLeft( node );
+  let nodeRight = getRight( node );
 
   // For this rotate, we grab nodeRight's children ( since we delete nodeRight )
-  let nodeRightLeft = left( nodeRight );
-  let nodeRightRight = right( nodeRight );
+  let nodeRightLeft = getLeft( nodeRight );
+  let nodeRightRight = getRight( nodeRight );
 
   // Grab other node child weight and color
   let nodeChildOtherIsDummy = getAttribute( nodeLeft, "dummy" );
@@ -548,14 +521,14 @@ function rotateL( node, parentN ) {
 // function rotateR( node, parentN ) {
 //   // Assuming all arent null
 //   // Grab all nodes involved
-//   let parentLeft = left( parentN );
-//   let parentRight = right( parentN );
-//   let nodeLeft = left( node );
-//   let nodeRight = right( node );
+//   let parentLeft = getLeft( parentN );
+//   let parentRight = getRight( parentN );
+//   let nodeLeft = getLeft( node );
+//   let nodeRight = getRight( node );
 
 //   // For this rotate, we grab nodeLeft's children ( since we delete nodeLeft )
-//   let nodeLeftLeft = left( nodeLeft );
-//   let nodeLeftRight = right( nodeLeft );
+//   let nodeLeftLeft = getLeft( nodeLeft );
+//   let nodeLeftRight = getRight( nodeLeft );
 
 //   // Grab other node child weight and color
 //   let nodeChildOtherIsDummy = getAttribute( nodeRight, "dummy" );
@@ -618,7 +591,7 @@ function rotateL( node, parentN ) {
 // }
 
 /**
- * Helper to rotate, rotates if grandparent dosent 
+ * Helper to rotate, rotates if grandparent doesn't 
  * exist and node is parents right child
  * @param {*} node node we are rotating around the parent
  * @param {*} parentN parent of node
@@ -626,14 +599,14 @@ function rotateL( node, parentN ) {
 function rotateR( node, parentN ) {
   // Assuming all arent null
   // Grab all nodes involved
-  let parentLeft = left( parentN );
-  let parentRight = right( parentN );
-  let nodeLeft = left( node );
-  let nodeRight = right( node );
+  let parentLeft = getLeft( parentN );
+  let parentRight = getRight( parentN );
+  let nodeLeft = getLeft( node );
+  let nodeRight = getRight( node );
 
   // For this rotate, we grab nodeLeft's children ( since we delete nodeLeft )
-  let nodeLeftLeft = left( nodeLeft );
-  let nodeLeftRight = right( nodeLeft );
+  let nodeLeftLeft = getLeft( nodeLeft );
+  let nodeLeftRight = getRight( nodeLeft );
 
   // Grab other node child weight and color
   let nodeChildOtherIsDummy = getAttribute( nodeRight, "dummy" );
@@ -700,16 +673,16 @@ function rotateR( node, parentN ) {
 function rotateLL( node, parentN, grandparent ) {
   // Assuming all arent null
   // Grab all nodes involved
-  let grandparentLeft = left( grandparent );
-  let grandparentRight = right( grandparent );
-  let parentLeft = left( parentN );
-  let parentRight = right( parentN );
-  let nodeLeft = left( node );
-  let nodeRight = right( node );
+  let grandparentLeft = getLeft( grandparent );
+  let grandparentRight = getRight( grandparent );
+  let parentLeft = getLeft( parentN );
+  let parentRight = getRight( parentN );
+  let nodeLeft = getLeft( node );
+  let nodeRight = getRight( node );
 
   // For this rotate, we grab nodeRight's children ( since we delete nodeRight )
-  let nodeRightLeft = left( nodeRight );
-  let nodeRightRight = right( nodeRight );
+  let nodeRightLeft = getLeft( nodeRight );
+  let nodeRightRight = getRight( nodeRight );
 
   // Grab other node child weight and color
   let nodeChildOtherIsDummy = getAttribute( nodeLeft, "dummy" );
@@ -784,16 +757,16 @@ function rotateLL( node, parentN, grandparent ) {
 function rotateRR( node, parentN, grandparent ) {
   // Assuming all arent null
   // Grab all nodes involved
-  let grandparentLeft = left( grandparent );
-  let grandparentRight = right( grandparent );
-  let parentLeft = left( parentN );
-  let parentRight = right( parentN );
-  let nodeLeft = left( node );
-  let nodeRight = right( node );
+  let grandparentLeft = getLeft( grandparent );
+  let grandparentRight = getRight( grandparent );
+  let parentLeft = getLeft( parentN );
+  let parentRight = getRight( parentN );
+  let nodeLeft = getLeft( node );
+  let nodeRight = getRight( node );
 
   // For this rotate, we grab nodeLeft's children ( since we delete nodeLeft )
-  let nodeLeftLeft = left( nodeLeft );
-  let nodeLeftRight = right( nodeLeft );
+  let nodeLeftLeft = getLeft( nodeLeft );
+  let nodeLeftRight = getRight( nodeLeft );
 
   // Grab other node child weight and color
   let nodeChildOtherIsDummy = getAttribute( nodeRight, "dummy" );
@@ -868,16 +841,16 @@ function rotateRR( node, parentN, grandparent ) {
 function rotateLR( node, parentN, grandparent ) {
   // Assuming all arent null
   // Grab all nodes involved
-  let grandparentLeft = left( grandparent );
-  let grandparentRight = right( grandparent );
-  let parentLeft = left( parentN );
-  let parentRight = right( parentN );
-  let nodeLeft = left( node );
-  let nodeRight = right( node );
+  let grandparentLeft = getLeft( grandparent );
+  let grandparentRight = getRight( grandparent );
+  let parentLeft = getLeft( parentN );
+  let parentRight = getRight( parentN );
+  let nodeLeft = getLeft( node );
+  let nodeRight = getRight( node );
 
   // For this rotate, we grab nodeLeft's children ( since we delete nodeLeft )
-  let nodeLeftLeft = left( nodeLeft );
-  let nodeLeftRight = right( nodeLeft );
+  let nodeLeftLeft = getLeft( nodeLeft );
+  let nodeLeftRight = getRight( nodeLeft );
 
   // Grab other node child weight and color
   let nodeChildOtherIsDummy = getAttribute( nodeRight, "dummy" );
@@ -952,16 +925,16 @@ function rotateLR( node, parentN, grandparent ) {
 function rotateRL( node, parentN, grandparent ) {
   // Assuming all arent null
   // Grab all nodes involved
-  let grandparentLeft = left( grandparent );
-  let grandparentRight = right( grandparent );
-  let parentLeft = left( parentN );
-  let parentRight = right( parentN );
-  let nodeLeft = left( node );
-  let nodeRight = right( node );
+  let grandparentLeft = getLeft( grandparent );
+  let grandparentRight = getRight( grandparent );
+  let parentLeft = getLeft( parentN );
+  let parentRight = getRight( parentN );
+  let nodeLeft = getLeft( node );
+  let nodeRight = getRight( node );
 
   // For this rotate, we grab nodeRight's children ( since we delete nodeRight )
-  let nodeRightLeft = left( nodeRight );
-  let nodeRightRight = right( nodeRight );
+  let nodeRightLeft = getLeft( nodeRight );
+  let nodeRightRight = getRight( nodeRight );
 
   // Grab other node child weight and color
   let nodeChildOtherIsDummy = getAttribute( nodeLeft, "dummy" );
@@ -1039,11 +1012,10 @@ function rotateRL( node, parentN, grandparent ) {
  */
 function rotate( node ) {
 
-  let parentN = parent( node );
-  let grandparent = parent( parentN );
+  let parentN = getParent( node );
+  let grandparent = getParent( parentN );
 
   display(`Rotate: We will rotate node '${node}' around its parent '${parentN}'...`);
-  // display(`...and if needed, the grandparent will refer to node '${node}' as its child`);
 
   // Will be used to update the node IDs that were updated
   let newNodeId = undefined;
@@ -1051,18 +1023,18 @@ function rotate( node ) {
   step(() => {
 
     // Get all nodes involved
-    //let grandparentParent = parent( grandparent );
+    //let grandparentParent = getParent( grandparent );
     let grandparentLeft = null;
     let grandparentRight = null;
-    let parentLeft = left( parentN );
-    let parentRight = right( parentN );
-    let nodeLeft = left( node );
-    let nodeRight = right( node );
+    let parentLeft = getLeft( parentN );
+    let parentRight = getRight( parentN );
+    let nodeLeft = getLeft( node );
+    let nodeRight = getRight( node );
 
     if ( grandparent != undefined ) {
       // Update the children
-      grandparentLeft = left( grandparent );
-      grandparentRight = right( grandparent );
+      grandparentLeft = getLeft( grandparent );
+      grandparentRight = getRight( grandparent );
     }
 
     // Now check and rotate nodes
@@ -1108,11 +1080,11 @@ function rotate( node ) {
  */
 function restructure( node ) {
 
-  let parentN = parent( node );
-  let grandparent = parent( parentN );
+  let parentN = getParent( node );
+  let grandparent = getParent( parentN );
 
-  if ( (node === left( parentN ) && parentN === left( grandparent ) ) || 
-      ( node === right( parentN ) && parentN === right( grandparent ) ) ) {
+  if ( (node === getLeft( parentN ) && parentN === getLeft( grandparent ) ) || 
+      ( node === getRight( parentN ) && parentN === getRight( grandparent ) ) ) {
       // rotate the parent around the grandparent
       display(`Restructure: If the parent ('${parentN}') is the same side child as node ('${node}') is to parent...`);
       display(`...then we rotate the parent ('${parentN}') around the grandparent ('${grandparent}')`);
@@ -1142,7 +1114,7 @@ function resolveRed( node ) {
 
   display(`We check the Red Property`)
 
-  let parentN = parent( node );
+  let parentN = getParent( node );
 
   if ( isRed( parentN ) ) {
 
@@ -1157,15 +1129,15 @@ function resolveRed( node ) {
       let middle = restructure( node );
       display(`Then we make the middle node (new parent) black and the two children red`);
       makeBlack( middle );
-      makeRed( left( middle ) );
-      makeRed( right( middle ) );
+      makeRed( getLeft( middle ) );
+      makeRed( getRight( middle ) );
     } else {
       // CASE 2: the uncle (sibling of the parent) is red
       display(`CASE 2: The uncle ('${uncle}') (sibling of the parent) is red`);
       display(`So we make the parent node ('${parentN}') and uncle ('${uncle}') black`);
       makeBlack( parentN );
       makeBlack( uncle );
-      let grandparent = parent( parentN );
+      let grandparent = getParent( parentN );
       display(`Then if the grandparent ('${grandparent}') isn't a root, make it red...`);
       if ( !isRoot( grandparent ) ) {
         makeRed( grandparent );
@@ -1186,17 +1158,17 @@ function resolveRed( node ) {
  */
 function remedyDoubleBlack( node ) {
 
-  let parentN = parent( node );
+  let parentN = getParent( node );
   let sibling = getSibling( node );
   
   if ( isBlack( sibling ) ) {
     // CASE 1: trinode restructuring
-    if ( isRed( left( sibling ) ) || isRed( right( sibling ) ) ) {
+    if ( isRed( getLeft( sibling ) ) || isRed( getRight( sibling ) ) ) {
       let temp = null;
-      if ( isRed( left( sibling ) ) ) {
-        temp = left( sibling );
+      if ( isRed( getLeft( sibling ) ) ) {
+        temp = getLeft( sibling );
       } else {
-        temp = right( sibling );
+        temp = getRight( sibling );
       }
 
       // Updated for restructure
@@ -1208,8 +1180,8 @@ function remedyDoubleBlack( node ) {
       } else {
         makeBlack( middle );
       }
-      makeBlack( left( middle ) );
-      makeBlack( right( middle ) );
+      makeBlack( getLeft( middle ) );
+      makeBlack( getRight( middle ) );
     } else {
       // CASE 2: recoloring
       makeRed( sibling );
@@ -1226,15 +1198,15 @@ function remedyDoubleBlack( node ) {
     makeBlack( sibling );
     makeRed( parentN );
 
-    let isSiblingLeftChild = ( sibling === left( parentN ) );
+    let isSiblingLeftChild = ( sibling === getLeft( parentN ) );
     let newSibling = rotate( sibling );
     let newNode = undefined;
 
     // Grab new node after rotate
     if ( isSiblingLeftChild ) {
-      newNode = right( right( newSibling ) );
+      newNode = getRight( getRight( newSibling ) );
     } else {
-      newNode = left( left( newSibling ) );
+      newNode = getLeft( getLeft( newSibling ) );
     }
 
     // Update with new node
@@ -1247,38 +1219,15 @@ function remedyDoubleBlack( node ) {
 //-----------------UNIQUE BST FNS-------------------
 
 // Call this on the left child of the subtree root
-function findInOrderPredecessor(currentNode){
-  // While there is a real right child, go right
-  while( right(currentNode) && getAttribute(right(currentNode), "dummy") != true ){
-    
-    // If a real right child exists, recur
-    return findInOrderPredecessor(right(currentNode));
+function findInOrderPredecessor(currentNode) {
+  mark(currentNode)
+  if ( getAttribute(getRight(currentNode), "dummy") ) {
+    display(`No real right child, so predecessor is '${weight(currentNode)}'`)
+    return currentNode
   }
-
-  // If I have no real right child, I am the predecessor
-  display(`Found predecessor at '${currentNode}'`)
-  return currentNode
-}
-
-// Call this on the right child of the subtree rotty
-function findInOrderSuccessor(currentNode){
-  // While there is a real left child, go left
-  while( left(currentNode) && getAttribute(left(currentNode), "dummy") != true ){
-    
-    // If a real left child exists, recur
-    return findInOrderSuccessor(left(currentNode));
-  }
-  display(`Found successor at '${currentNode}'`)
-  return currentNode
-}
-
-// Show the nodes being traced to the user
-function accentNode(x){
-  // For some reason only marking the root, so commented out for now
-  step(() => {
-    //mark(x);
-    highlight(x);
-  });
+  // If a real right child exists, recur
+  unmark(currentNode)
+  return findInOrderPredecessor(getRight(currentNode));
 }
 
 // @Override
@@ -1306,7 +1255,7 @@ function expandLeaf( dum, weight ) {
     // so replace the null entry with the new actual entry
     let newNode = set( dum, weight );
 
-    display(`Add sentinel leafs to keep Leaf Property!`);
+    display(`Add sentinel leaves to keep Leaf Property!`);
     // Then add new dummy/sentinel children
     // step(()=>{
     //   dummify( addLeft( newNode, undefined ) );
@@ -1337,9 +1286,6 @@ function put( w ) {
       setWeight( newN, w );
       display(`Created root '${w}'`);
       expandLeaf( newN, w);
-
-      // display(`SWAP!`);
-      // swapID( newN, w );
 
       display( `Check rules after addition of node '${newN}'` );
       actionOnInsert( newN );
@@ -1372,58 +1318,52 @@ function put( w ) {
     }
 }
 
-// Call this on the right child of the subtree root
-function findInOrderPredecessor(currentNode){
-  // While there is a real right child, go right
-  mark(currentNode)
-  while( getRight(currentNode) && getAttribute(getRight(currentNode), "dummy") != true ){
-    
-    // If a real right child exists, recur
-    return findInOrderPredecessor(getRight(currentNode));
-  }
-
-  // If I have no real right child, I am the predecessor
-  display(`Found predecessor at '${weight(currentNode)}'`)
-  return currentNode
+/**
+ * Helper to replace a node's weight with that of its in-order predecessor
+ * @param {*} node node whose weight will be replaced
+ */
+function replaceWithInOrderPredecessor(node) {
+  display(`Node with weight ${weight(node)} has two real children: remove its in-order predecessor`);
+  const predecessor = findInOrderPredecessor(getLeft(node));
+  const newWeight = weight(predecessor);
+  // find and remove the predecessor -- its weight will replace node's weight
+  remove(predecessor);
+  step(() => {
+    display(`Replace weight of "deleted" node with predecessor weight ${newWeight}`);
+    setWeight(node, newWeight);
+  });
 }
 
-function remove(w) {
-    //-----------------------------------------------------------
-    // CASE 0: Look up the node (exists or dummy)
-    //-----------------------------------------------------------
-    const node = lookUp( getRoot(), w );
-    if( node == null || ( getAttribute(node, "dummy") === true ) ){
-      display(`Node with weight '${w}' does not exist!`);
-      return;
-    }
-
+/**
+ * Removes the given node from the tree
+ * Called after looking up the node to remove
+ * 
+ * @param node the node to remove
+ */
+function remove(node) {
     //-----------------------------------------------------------
     // CASE 1: Removing the ROOT of the tree
     //-----------------------------------------------------------
     // Subcase 1a: root has no children 
     // Subcase 1b: root has one red child
     // Subcase 1c: root has two children
-    if(node === getRoot()){
+    if ( node === getRoot() ) {
       // If root has no children
-      if( getAttribute(left(node), "dummy") && getAttribute(right(node), "dummy") ){
+      if ( getAttribute(getLeft(node), "dummy") && getAttribute(getRight(node), "dummy") ) {
         dummify(node);
-      // If the root has a real left child
-      }else if( !getAttribute(left(node), "dummy") && getAttribute(right(node), "dummy") ){
-        setAttribute(left(node), "borderColor", "black");
-        deleteNode(right(node));
+      // Root has real left child only: delete root and promote left child
+      } else if ( ! getAttribute(getLeft(node), "dummy") && getAttribute(getRight(node), "dummy") ) {
+        setAttribute(getLeft(node), "borderColor", "black");
+        deleteNode(getRight(node));
         deleteNode(node);
-      // If the root has a real right child
-      }else if( getAttribute(left(node), "dummy") && !getAttribute(right(node), "dummy") ){
-        setAttribute(right(node), "borderColor", "black");
-        deleteNode(left(node));
+      // Root has real right child only: delete root and promote right child
+      } else if ( getAttribute(getLeft(node), "dummy") && ! getAttribute(getRight(node), "dummy") ) {
+        setAttribute(getRight(node), "borderColor", "black");
+        deleteNode(getLeft(node));
         deleteNode(node);
       // If the root has two real children
-      }else{
-        const predecessor = findInOrderPredecessor( left( node ) );
-        const newWeight = weight( predecessor );
-        const oldWeight = weight( node );
-        remove( newWeight );
-        setWeight( lookUp( getRoot(), oldWeight ), newWeight );
+      } else {
+        replaceWithInOrderPredecessor(node);
       }
       return;
     }
@@ -1432,11 +1372,8 @@ function remove(w) {
     // CASE 2: Node has TWO REAL CHILDREN (both non-dummy)
     //-----------------------------------------------------------
     // Copy in order predecessor's weight into node, then remove predecessor
-    if( !getAttribute(left(node), "dummy") && !getAttribute(right(node), "dummy") ){
-      const predecessor = findInOrderPredecessor( left( node ) );
-      const newWeight = weight( predecessor );
-      remove( newWeight );
-      setWeight( node, newWeight );
+    if ( ! getAttribute(getLeft(node), "dummy" ) && ! getAttribute(getRight(node), "dummy") ) {
+      replaceWithInOrderPredecessor(node);
       return;
     }
 
@@ -1444,7 +1381,8 @@ function remove(w) {
     // CASE 3: Removing a RED LEAF node
     //-----------------------------------------------------------
     // Dummify the node, deleting its dummy children
-    if( getAttribute(node, "borderColor") === "red" && getAttribute(left(node), "dummy") && getAttribute(right(node), "dummy") ){
+    if( getAttribute(node, "borderColor") === "red" && getAttribute(getLeft(node), "dummy") && getAttribute(getRight(node), "dummy") ) {
+      display(`node with weight ${weight(node)} is a leaf, so make it a dummy node`);
       dummify(node);
       return;
     }
@@ -1453,17 +1391,17 @@ function remove(w) {
     // CASE 4: Removing a BLACK node with ONE RED CHILD
     //-----------------------------------------------------------
     // Replace node with child, recolor child BLACK
-    if( getAttribute(node, "borderColor") === "black" ){
+    if( getAttribute(node, "borderColor") === "black" ) {
       let child = null;
       // Determine which child is red
-      if( !getAttribute(left(node), "dummy") && getAttribute(left(node), "borderColor") === "red" ){
-        child = left(node);
-      }else if( !getAttribute(right(node), "dummy") && getAttribute(right(node), "borderColor") === "red" ){
-        child = right(node);
+      if( !getAttribute(getLeft(node), "dummy") && getAttribute(getLeft(node), "borderColor") === "red" ){
+        child = getLeft(node);
+      } else if ( ! getAttribute(getRight(node), "dummy") && getAttribute(getRight(node), "borderColor") === "red" ){
+        child = getRight(node);
       }
 
       // If the node has a single real child that is red
-      if( child != null ){
+      if ( child != null ) {
         setWeight(node, weight(child));
         dummify(child);
         return;
@@ -1475,9 +1413,9 @@ function remove(w) {
     // CASE 5: Removing a BLACK node with ONE BLACK CHILD (dummy or real)
     //-----------------------------------------------------------
     // If the node is black and has a single black child
-    if( getAttribute(node, "borderColor") === "black" && children(node).length == 1 && getAttribute(children(node)[0], "borderColor") === "black" ){
+    if( getAttribute(node, "borderColor") === "black" && children(node).length === 1 && getAttribute(children(node)[0], "borderColor") === "black" ) {
       const child = children(node)[0];
-      relink(parent(node), children(node)[0], left(parent(node)) === node, false, weight(children(node)[0]), "black");
+      relink(getParent(node), children(node)[0], getLeft(getParent(node)) === node, false, weight(children(node)[0]), "black");
       remedyDoubleBlack( child );
       return;
     }
@@ -1486,11 +1424,25 @@ function remove(w) {
     // CASE 6: Removing a BLACK LEAF (dummy sibling situation)
     //-----------------------------------------------------------
     // If the node is black and has two dummy children
-    if( getAttribute(node, "borderColor") === "black" && getAttribute(left(node), "dummy") && getAttribute(right(node), "dummy") ){
+    if( getAttribute(node, "borderColor") === "black" && getAttribute(getLeft(node), "dummy") && getAttribute(getRight(node), "dummy") ){
       dummify(node);
       remedyDoubleBlack( node );
       return;
     }
+}
+
+/**
+ * Deletes the node with the given weight from the tree
+ * 
+ * @param weight the weight of the node to delete
+ */
+function deleteWeight(weight) {
+  const node = lookUp(getRoot(), weight);
+  if( node == null || ( getAttribute(node, "dummy") === true ) ){
+    display(`Node with weight '${weight}' does not exist!`);
+    return;
+  }
+  remove(node);
 }
 
 // Will update the node with new weight
@@ -1498,7 +1450,7 @@ function set( node, newWeight ) {
   const oldValue = weight( node ); // If dummy it should be null/undefined
 
   if ( oldValue === undefined ) {
-    display(`Replace sentinel leaf with new node!`);
+    display(`Replace sentinel leaf with new node`);
     unDummy( node, newWeight );
   } else {
     setWeight( node, newWeight );
@@ -1525,23 +1477,22 @@ function lookUp( node, w ) {
     return undefined;
   }
 
-  display(`Weight of '${node}': '${weight( node )}'`);
-
   if ( weight( node ) === undefined ) {
-    // It is a dummy we can change ( leaf )
+    // this is a dummy/sentinel node
+    display(`Reached a sentinel leaf; node with weight ${w} does not exist`);
     return node;
-  } else if ( weight( node ) > w ) {
-    // Check leftChild
-    // display(`Left child of '${node}' being checked!`);
+  }
+  step(() => {
+    mark(node);
+    display(`Comparing with node of weight ${weight( node )}`);
+  });
+  unmark(node);
+  if ( weight( node ) > w ) {
     return lookUp( getLeft( node ), w );
   } else if ( weight( node ) < w ) {
-    // Check rightChild
-    // display(`Right child of '${node}' being checked!`);
     return lookUp( getRight( node ), w );
   } else {
-    // They have the same weight!
-    // display(`Node with weight '${w}' already exists!`);
-    // Give the node with this weight
+    display(`Found node with weight ${w}`);
     return node;
   }
 }
@@ -1552,13 +1503,12 @@ function lookUp( node, w ) {
  * position is red and has a red parent)
  */
 function actionOnInsert( node ) {
-  if ( !isRoot( node ) ) {
+  if ( ! isRoot( node ) ) {
     display(`Make new nodes red`)
     makeRed( node );
     resolveRed( node );
   } else {
-    display(`If its a root node, make it black`)
-    // If its a root node, make it black
+    display(`If its the root node, make it black`)
     makeBlack( node );
   }
 }
@@ -1573,7 +1523,7 @@ function actionOnDelete( node ) {
     makeBlack( node );
   } else if ( !isRoot( node ) ) {
     let sib = getSibling( node );
-    if ( isInternal( sib ) && ( isBlack( sib ) || isInternal( left( sib ) ) ) ) {
+    if ( isInternal( sib ) && ( isBlack( sib ) || isInternal( getLeft( sib ) ) ) ) {
       remedyDoubleBlack( node );
     }
   }
@@ -1623,25 +1573,18 @@ while ( true ) {
   const inWeight = promptNumber( promptString );
 
   if ( inWeight > 0 ) {
-
     put( inWeight );
     display(`Successfully updated the tree with a new node with the weight '${inWeight}'!`);
-
   } else if ( inWeight < 0 ) {
-    
-    const oldWeight = remove( -inWeight );
+    const oldWeight = deleteWeight(-inWeight);
     if ( oldWeight != undefined ) {
       display(`Successfully updated the tree without the removed node with the weight '${oldWeight}'!`);
     }
-
   } else if ( inWeight == 0 ) {
-
+    // stop algorithm if user inputs 0
     break;
-
   } else {  
-
     display( "That is not a valid selection!" );
-
   }
 }
 
