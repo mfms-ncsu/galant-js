@@ -36,11 +36,9 @@ function lineUpNodes(nodeList) {
     let level = 0; let index = 0
     step(() => {
         for ( const node of nodeIds ) {
-    //      to avoid multiple steps, we need to do this "manually"
-    //        placeNode(node, level, index, "white", "circle")
             setPosition(node, HORIZONTAL_GAP * index, 2 * level * VERTICAL_GAP)
             color(node, "white")
-            setShape(node, "circle")
+            setShape(node, "ellipse")
             index++;
         }
     })
@@ -48,7 +46,6 @@ function lineUpNodes(nodeList) {
 
 function placeNode(node, level, index, desiredColor, shape) {
     step(()=> {
-//        display(`-> placeNode: ${node}, ${level}, ${index}`)
         setPosition(node, HORIZONTAL_GAP * index, 2 * level * VERTICAL_GAP)
         color(node, desiredColor)
         setShape(node, shape)
@@ -95,7 +92,7 @@ function quicksort(list, left, right, depth) {
     for ( const node of list ) {
         if ( weight(node) < weight(pivot) ) {
             less.push(node)
-            placeNode(node, depth, lessEnd, "red", "trapezoid")
+            placeNode(node, depth, lessEnd, "red", "diamond")
             lessEnd++
         }
         else if ( weight(node) > weight(pivot) ) {

@@ -43,7 +43,6 @@ export default function Graph() {
 
         // Load a new graph
         function onGraphLoad(data, isInit) {
-            console.log("Loading new graph:", data.name, data.payload);
             if ( algorithmLoading ) {
                 algorithmLoading = false;
                 return;
@@ -67,7 +66,6 @@ export default function Graph() {
 
         // Load a new algorithm
         function onAlgorithmLoad(data) {
-            console.log("Loading new algorithm:", data.name, data.payload);
             algorithmLoading = true
             
             // Undo any changes the old algorithm made

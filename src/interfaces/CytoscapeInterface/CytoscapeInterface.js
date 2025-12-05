@@ -1,5 +1,4 @@
 import GraphInterface from "../GraphInterface/GraphInterface"
-import Graph from "../../states/Graph/Graph"
 
 /**
  * CytoscapeInterface returns the graph represented in cytoscape 
@@ -165,7 +164,7 @@ function getStyle(graph) {
             "selector": "node",
             "style": {
                 "width": `${graph.nodeSize}px`,
-                "height": `${graph.nodeSize}px`,
+//                "height": `${graph.nodeSize}px`,
                 "backgroundColor": "#FFFFFF",
                 "color": "#000000",
                 "borderWidth": `${graph.nodeSize / 10}px`,
@@ -250,16 +249,22 @@ function getStyle(graph) {
                 "backgroundColor": "data(color)"
             }
         },
-        { 
+        {
             "selector": "node[id]",
-            "style": {
+                "style": {
                 "label": "data(id)"
+            }
+        },
+        {
+            "selector": "node[weightInNode]",
+            "style": {
+                "label": "data(weight)"
             }
         },
         {
             "selector": "node[shape]",
             "style": {
-                "shape": "data(shape)"
+                "shape": "data(shape)" ? "data(shape)" : "ellipse"
             }
         },
         {
@@ -309,10 +314,13 @@ function getStyle(graph) {
                 "selector": "node[?dummy]",
                 "style": {
                     "shape": "square",
-                    "backgroundColor": "#000000",
-                    "color": "#000000",
-                    "width": `${graph.nodeSize * 0.65}px`,
-                    "height": `${graph.nodeSize * 0.65}px`
+                    "backgroundColor": "black",
+                    "label": "",
+                    "color": "black",
+                    "borderColor": "gray",
+                    "borderWidth": `${graph.nodeSize / 25}px`,
+                    "width": `${graph.nodeSize * 0.4}px`,
+                    "height": `${graph.nodeSize * 0.4}px`
                 }
             }
         );

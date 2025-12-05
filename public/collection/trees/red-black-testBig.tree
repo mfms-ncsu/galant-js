@@ -7,7 +7,7 @@ n 14 0 0 dummy:true labelHidden:true
 n 0 0 0 1 borderWidth:5 borderColor:black labelHidden:true
 n 11 0 0 dummy:true labelHidden:true
 n 4 0 0 dummy:true labelHidden:true
-n 3 0 0 7 borderWidth:5 color:white shape:circle size:35 labelHidden:true borderColor:red
+n 3 0 0 7 borderWidth:5 color:white shape:ellipse size:35 labelHidden:true borderColor:red
 n 1 0 0 6 borderWidth:5 borderColor:black labelHidden:true
 n 6 0 0 dummy:true labelHidden:true
 n 5 0 0 dummy:true labelHidden:true

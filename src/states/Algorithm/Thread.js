@@ -126,6 +126,7 @@ function step(code = null) {
  * @returns {string} The user input
  */
 function prompt(message, error = "") {
+    console.log("Prompting with message: " + message + " and error: " + error);
     if (message === null || message === "") {
         message = "Prompt";
     }
