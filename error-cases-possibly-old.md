@@ -1,5 +1,7 @@
 # The following currently do not work as desired, can be test cases as well
 
+*this may be old information*
+
 ## Autolayout
 
 In the following sequence, moving the node destroys the effect of the auto-layout.
