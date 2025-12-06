@@ -441,12 +441,12 @@ function rotateLL( node, parentN, grandparent ) {
 function rotateRR( node, parentN, grandparent ) {
   // Assuming all arent null
   // Grab all nodes involved
-  let grandparentLeft = getLeft( grandparent );
-  let grandparentRight = getRight( grandparent );
-  let parentLeft = getLeft( parentN );
-  let parentRight = getRight( parentN );
-  let nodeLeft = getLeft( node );
-  let nodeRight = getRight( node );
+  let grandparentLeft = getLeft(grandparent);
+  let grandparentRight = getRight(grandparent);
+  let parentLeft = getLeft(parentN);
+  let parentRight = getRight(parentN);
+  let nodeLeft = getLeft(node);
+  let nodeRight = getRight(node);
 
   // For this rotate, we grab nodeLeft's children ( since we delete nodeLeft )
   let nodeLeftLeft = getLeft( nodeLeft );
@@ -694,12 +694,12 @@ function rotateRL( node, parentN, grandparent ) {
  * @param node the position to rotate around its parent
  * @returns the updated node ID
  */
-function rotate( node ) {
+function rotate(node) {
 
-  let parentN = getParent( node );
-  let grandparent = getParent( parentN );
+  let parentN = getParent(node);
+  let grandparent = getParent(parentN);
 
-  display(`Rotate: We will rotate node '${node}' around its parent '${parentN}'...`);
+  display(`Rotate node with weight ${weight(node)} around its parent`);
 
   // Will be used to update the node IDs that were updated
   let newNodeId = undefined;
@@ -777,29 +777,19 @@ function restructure( node ) {
     mark(grandparent);
   });
 
-  if ( (node === getLeft( parentN ) && parentN === getLeft( grandparent ) ) || 
-      ( node === getRight( parentN ) && parentN === getRight( grandparent ) ) ) {
+  if ((node === getLeft(parentN) && parentN === getLeft(grandparent) ) || 
+    (node === getRight(parentN) && parentN === getRight(grandparent) ) ) {
       // rotate the parent around the grandparent
-      display(`Restructure: If the parent ('${parentN}') is the same side child as node ('${node}') is to parent...`);
-      display(`...then we rotate the parent ('${parentN}') around the grandparent ('${grandparent}')`);
-      const newParentID = rotate( parentN );
-      // step(() => {
-      //   unmark(node);
-      //   unmark(parentN);
-      //   unmark(grandparent);
-      // });
-      return newParentID;
+      display(`if parent (weight ${weight(parentN)}) is the same side child as node (weight ${weight(node)}) is to parent...`);
+      display(`...then we rotate the parent around the grandparent (weight ${weight(grandparent)})`);
+    const newParentID = rotate(parentN);
+    return newParentID;
   } else {
       // rotate the node around the parent twice
       display(`Restructure: If the parent ('${parentN}') is not the same side child as node ('${node}') is to parent...`);
       display(`...then we rotate the node ('${node}') around the parent ('${parentN}') twice`);
-      const newNodeID = rotate( node );
-      const newNodeID2 = rotate( newNodeID );
-      // step(() => {
-      //   unmark(node);
-      //   unmark(parentN);
-      //   unmark(grandparent);
-      // });
+    const newNodeID = rotate(node);
+    const newNodeID2 = rotate(newNodeID);
       return newNodeID2;
   }
 }
@@ -816,41 +806,41 @@ function restructure( node ) {
  */
 function resolveRed( node ) {
 
-  display(`We check the Red Property`)
+  display(`We check the red property`)
 
-  let parentN = getParent( node );
+  let parentN = getParent(node);
 
-  if ( isRed( parentN ) ) {
+  if (isRed(parentN) ) {
 
-    display(`We violate the Red Property with a red parent!`)
+    display(`We violate the red property with a red parent`)
 
-    let uncle = getSibling( parentN );
-    // CASE 1: the uncle (sibling of the parent) is black
-    if ( isBlack( uncle ) ) {
-      display(`CASE 1: The uncle ('${uncle}') (sibling of the parent) is black`);
+    let uncle = getSibling(parentN);
+    // Case 1: the uncle (sibling of the parent) is black
+    if (isBlack(uncle) ) {
+      display(`Case 1: The uncle (sibling of the parent) is black`);
       // Restructure and re-color children
       display(`So we preform trinode restructuring on the node, parent, and grandparent`);
-      let middle = restructure( node );
+      let middle = restructure(node);
       display(`Then we make the middle node (new parent) black and the two children red`);
-      makeBlack( middle );
-      makeRed( getLeft( middle ) );
-      makeRed( getRight( middle ) );
+      makeBlack(middle);
+      makeRed(getLeft(middle));
+      makeRed(getRight(middle));
     } else {
-      // CASE 2: the uncle (sibling of the parent) is red
-      display(`CASE 2: The uncle ('${uncle}') (sibling of the parent) is red`);
-      display(`So we make the parent node ('${parentN}') and uncle ('${uncle}') black`);
-      makeBlack( parentN );
-      makeBlack( uncle );
-      let grandparent = getParent( parentN );
-      display(`Then if the grandparent ('${grandparent}') isn't a root, make it red...`);
-      if ( !isRoot( grandparent ) ) {
-        makeRed( grandparent );
-        display(`... and propogate the Red Property check up`);
-        resolveRed( grandparent );
+      // Case 2: the uncle (sibling of the parent) is red
+      display(`Case 2: The uncle (sibling of the parent, weight ${weight(uncle)}) is red`);
+      display(`So we make the parent node (weight ${weight(parentN)}) and uncle (${weight(uncle)}) black`);
+      makeBlack(parentN);
+      makeBlack(uncle);
+      let grandparent = getParent(parentN);
+      display(`If the grandparent (weight '${weight(grandparent)}') isn't a root, make it red ...`);
+      if (!isRoot(grandparent) ) {
+        makeRed(grandparent);
+        display(`... and propogate the red property check up`);
+        resolveRed(grandparent);
       }
     }
   } else {
-    display(`We have a black parent so we satisfy the Red Property`)
+    display(`We have a black parent so we satisfy the red roperty`)
   }
 }
 
@@ -866,8 +856,8 @@ function remedyDoubleBlack( node ) {
   let sibling = getSibling( node );
   
   if ( isBlack( sibling ) ) {
-    // CASE 1: trinode restructuring
-    if ( isRed( getLeft( sibling ) ) || isRed( getRight( sibling ) ) ) {
+    // Case 1: trinode restructuring
+    if ( isRed(getLeft(sibling)) || isRed(getRight(sibling)) ) {
       let temp = null;
       if ( isRed( getLeft( sibling ) ) ) {
         temp = getLeft( sibling );
@@ -887,7 +877,7 @@ function remedyDoubleBlack( node ) {
       makeBlack( getLeft( middle ) );
       makeBlack( getRight( middle ) );
     } else {
-      // CASE 2: recoloring
+      // Case 2: recoloring
       makeRed( sibling );
       if ( isRed( parentN ) ) {
         makeBlack( parentN );
@@ -896,28 +886,26 @@ function remedyDoubleBlack( node ) {
       }
     }
   } else {
-    // CASE 3: Rotate
+    // Case 3: Rotate
     // Need to check for updated node after rotate
     // So change colors before we rotate to make things easier
-    makeBlack( sibling );
-    makeRed( parentN );
+    makeBlack(sibling);
+    makeRed(parentN);
 
-    let isSiblingLeftChild = ( sibling === getLeft( parentN ) );
-    let newSibling = rotate( sibling );
+    let isSiblingLeftChild = (sibling === getLeft(parentN));
+    let newSibling = rotate(sibling);
     let newNode = undefined;
 
     // Grab new node after rotate
     if ( isSiblingLeftChild ) {
-      newNode = getRight( getRight( newSibling ) );
+      newNode = getRight(getRight(newSibling));
     } else {
-      newNode = getLeft( getLeft( newSibling ) );
+      newNode = getLeft(getLeft(newSibling));
     }
 
     // Update with new node
-    remedyDoubleBlack( newNode );
+    remedyDoubleBlack(newNode);
   }
-
-
 }
 
 //-----------------UNIQUE BST FNS-------------------
@@ -948,7 +936,7 @@ function expandLeaf(sentinel, weight) {
     // so replace the null entry with the new actual entry
   let newNode = set(sentinel, weight);
   step(() =>{
-    display(`Add sentinel leaves to keep Leaf Property!`);
+    display(`Add sentinel leaves to keep Leaf Property`);
     dummify(addLeft( newNode, undefined ));
   });
 }
@@ -963,10 +951,10 @@ function put(w) {
     const newNode = lookUp(getRoot(), w);
 
     // if there is no root, add one
-    if ( newNode === undefined ) {
+    if ( newNode === null ) {
       // Add root
       const newN = addNodeInsideWeight(w);
-      display(`Created root ${w}`);
+      display(`Created root with weight ${w}`);
       expandLeaf(newN, w);
       actionOnInsert(newN);
       return true;
@@ -975,7 +963,7 @@ function put(w) {
     // Check for same weight
     if ( weight(newNode) === w ) {
       // Display error
-      display(`Node with weight ${w} already exists!`);
+      display(`Node with weight ${w} already exists`);
       return false;
     }
 
@@ -985,7 +973,7 @@ function put(w) {
       actionOnInsert(newNode);
       return true;
     } else {
-      display(`ERROR, SHOULDNT REACH!`);
+      display(`ERROR, SHOULDNT REACH`);
       return null;
     }
 }
@@ -1014,7 +1002,7 @@ function replaceWithInOrderPredecessor(node) {
  */
 function remove(node) {
     //-----------------------------------------------------------
-    // CASE 1: Removing the ROOT of the tree
+    // Case 1: Removing the ROOT of the tree
     //-----------------------------------------------------------
     // Subcase 1a: root has no children 
     // Subcase 1b: root has one red child
@@ -1041,7 +1029,7 @@ function remove(node) {
     }
 
     //-----------------------------------------------------------
-    // CASE 2: Node has TWO REAL CHILDREN (both non-dummy)
+    //  Case 2: Node has TWO REAL CHILDREN (both non-dummy)
     //-----------------------------------------------------------
     // Copy in order predecessor's weight into node, then remove predecessor
     if ( ! getAttribute(getLeft(node), "dummy" ) && ! getAttribute(getRight(node), "dummy") ) {
@@ -1050,23 +1038,23 @@ function remove(node) {
     }
 
     //-----------------------------------------------------------
-    // CASE 3: Removing a RED LEAF node
+    // Case 3: Removing a RED LEAF node
     //-----------------------------------------------------------
     // Dummify the node, deleting its dummy children
-    if( getAttribute(node, "borderColor") === "red" && getAttribute(getLeft(node), "dummy") && getAttribute(getRight(node), "dummy") ) {
+    if ( getAttribute(node, "borderColor") === "red" && getAttribute(getLeft(node), "dummy") && getAttribute(getRight(node), "dummy") ) {
       display(`node with weight ${weight(node)} is a leaf, so make it a dummy node`);
       dummify(node);
       return;
     }
 
     //-----------------------------------------------------------
-    // CASE 4: Removing a BLACK node with ONE RED CHILD
+    // Case 4: Removing a BLACK node with ONE RED CHILD
     //-----------------------------------------------------------
     // Replace node with child, recolor child BLACK
-    if( getAttribute(node, "borderColor") === "black" ) {
+    if ( getAttribute(node, "borderColor") === "black" ) {
       let child = null;
       // Determine which child is red
-      if( !getAttribute(getLeft(node), "dummy") && getAttribute(getLeft(node), "borderColor") === "red" ){
+      if ( !getAttribute(getLeft(node), "dummy") && getAttribute(getLeft(node), "borderColor") === "red" ){
         child = getLeft(node);
       } else if ( ! getAttribute(getRight(node), "dummy") && getAttribute(getRight(node), "borderColor") === "red" ){
         child = getRight(node);
@@ -1082,10 +1070,10 @@ function remove(node) {
 
 
     //-----------------------------------------------------------
-    // CASE 5: Removing a BLACK node with ONE BLACK CHILD (dummy or real)
+    // Case 5: Removing a BLACK node with ONE BLACK CHILD (dummy or real)
     //-----------------------------------------------------------
     // If the node is black and has a single black child
-    if( getAttribute(node, "borderColor") === "black" && numChildren(node) === 1 && getAttribute(getLeft(node), "borderColor") === "black" ) {
+    if ( getAttribute(node, "borderColor") === "black" && numChildren(node) === 1 && getAttribute(getLeft(node), "borderColor") === "black" ) {
       const child = getLeft(node);
       relink(getParent(node), getLeft(node), getLeft(getParent(node)) === node, false, weight(getLeft(node), "black"));
       remedyDoubleBlack( child );
@@ -1093,10 +1081,10 @@ function remove(node) {
     }
 
     //-----------------------------------------------------------
-    // CASE 6: Removing a BLACK LEAF (dummy sibling situation)
+    // Case 6: Removing a BLACK LEAF (dummy sibling situation)
     //-----------------------------------------------------------
     // If the node is black and has two dummy children
-    if( getAttribute(node, "borderColor") === "black" && getAttribute(getLeft(node), "dummy") && getAttribute(getRight(node), "dummy") ){
+    if ( getAttribute(node, "borderColor") === "black" && getAttribute(getLeft(node), "dummy") && getAttribute(getRight(node), "dummy") ){
       dummify(node);
       remedyDoubleBlack( node );
       return;
@@ -1111,31 +1099,39 @@ function remove(node) {
  */
 function deleteWeight(weight) {
   const node = lookUp(getRoot(), weight);
-  if( node == null || ( getAttribute(node, "dummy") === true ) ){
-    display(`Node with weight ${weight} does not exist!`);
+  if ( node === null || ( getAttribute(node, "dummy") === true ) ){
+    display(`Node with weight ${weight} does not exist`);
     return false;
   }
   remove(node);
   return true
 }
 
-// Will update the node with new weight
-function set( node, newWeight ) {
-  const oldValue = weight( node ); // If dummy it should be null/undefined
+/**
+ * Gives the node a new weight, if the node is a dummy/sentinel, it is replaced with a real node
+ * @param {*} node node to set weight for
+ * @param {*} newWeight new weight to set
+ */
+function set(node, newWeight ) {
+  const oldValue = weight(node ); // If dummy it should be null/undefined
 
   if ( oldValue === undefined ) {
     display(`Replace sentinel leaf with new node`);
-    unDummy( node, newWeight );
+    unDummy(node, newWeight );
   } else {
-    setWeight( node, newWeight );
+    setWeight(node, newWeight );
   }
 
   // return oldValue;
   return node;
 }
 
-function unDummy( dummy, weight ) {
-  //DO not delete, just change to a normal node
+/**
+ * Helper to convert a dummy/sentinel node into a real node with given weight
+ * @param {*} dummy dummy/sentinel node
+ * @param {*} weight weight to set for new real node
+ */
+function unDummy(dummy, weight ) {
   step(() => {
     setWeight(dummy, weight);
     uncolor(dummy);
@@ -1143,20 +1139,27 @@ function unDummy( dummy, weight ) {
   });
 }
 
+/**
+ * Finds a node with the given weight, starting from the given node
+ * 
+ * @param node the node to start the search from
+ * @param w    the weight to search for
+ * @returns the node with the given weight, or null if not found
+ */
 function lookUp(node, w) {
   // Check for undefined node
   if ( node === undefined || node === null ) {
-    return undefined;
+    return null;
   }
 
-  if ( getAttribute( node, "dummy")) {
+  if ( getAttribute(node, "dummy")) {
     // this is a dummy/sentinel node
     display(`Reached a sentinel leaf; node with weight ${w} does not exist`);
     return node;
   }
   step(() => {
     mark(node);
-    display(`Comparing with node of weight ${weight( node )}`);
+    display(`Comparing with node of weight ${weight(node)}`);
   });
   unmark(node);
   if ( weight(node) > w ) {
@@ -1179,36 +1182,11 @@ function actionOnInsert(node) {
   if ( ! isRoot(node) ) {
     display(`Make new non-root nodes red`)
     makeRed(node);
-    resolveRed( node );
+    resolveRed(node);
   } else {
     display(`If it's the root node, make it black`)
     makeBlack(node);
   }
-}
-
-/**
- * For a RedBlack tree, we must check that the removed position
- * has not created a double-black condition (i.e., a situation in which the
- * black-depth property of the tree is violated)
- */
-function actionOnDelete( node ) {
-  if ( isRed( node ) ) {
-    makeBlack( node );
-  } else if ( !isRoot( node ) ) {
-    let sib = getSibling( node );
-    if ( isInternal( sib ) && ( isBlack( sib ) || isInternal( getLeft( sib ) ) ) ) {
-      remedyDoubleBlack( node );
-    }
-  }
-}
-
-/**
- * A method hook that is executed whenever a tree position is accessed
- * 
- * @param node node that should be acted upon
- */
-function actionOnAccess( node ) {
-    // Do nothing for BST
 }
 
 // for some reason the new lines don't work in prompt
@@ -1232,7 +1210,8 @@ while ( true ) {
       display(`Successfully added a new node whose weight is ${inWeight}`);
     }
   } else if ( inWeight < 0 ) {
-    if ( deleteWeight(-inWeight) ) {
+    const oldWeight = -inWeight;
+    if ( deleteWeight(oldWeight) ) {
       display(`Successfully removed the node whose weight is ${oldWeight}`);
     }
   } else if ( inWeight == 0 ) {

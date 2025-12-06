@@ -907,19 +907,19 @@ function deleteNode(graph, changeManager, nodeId) {
   // Create a ChangeObject for the deleted node
   // If we are deleting the left node of a tree, then send the "deleteLeft" message instead of "deleteNode"
   const node = graph.nodes.get(nodeId);
-  if( deletingLeft ){
+  if (deletingLeft) {
     changeObjects.push(
-    new ChangeObject(
-      "deleteLeft",
-      {
-        id: node.id,
-        position: node.position,
-        attributes: node.attributes,
-      },
-      null
-    )
-  );
-  }else{
+      new ChangeObject(
+        "deleteLeft",
+        {
+          id: node.id,
+          position: node.position,
+          attributes: node.attributes,
+        },
+        null
+      )
+    );
+  } else {
     changeObjects.push(
       new ChangeObject(
         "deleteNode",
@@ -948,7 +948,7 @@ function deleteNode(graph, changeManager, nodeId) {
  */
 function endRecording(changeManager) {
   // If we are not recording, then we cannot stop recording.
-  if (!changeManager.isRecording) {
+  if (! changeManager.isRecording ) {
     throw new Error(
       "Cannot stop recording because this ChangeManager has not started recording"
     );
