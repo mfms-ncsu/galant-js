@@ -83,28 +83,6 @@ function dummify( nodeId ) {
   return nodeId;
 }
 
-function replaceDummy(parent, dummy, k, side) {
-  //DO not delete, just change to a normal node
-  setWeight(dummy, k);
-  color(dummy, "white");
-  setSize(dummy, 35);
-  setAttribute(dummy, "dummy", false);
-  display(`Inserted '${k}' as ${side} child of '${weight(parent)}'`);
-  return dummy;
-}
-
-/**
- * This function will add a node with the given weight 
- * to the node, but will remove the dummy it makes
- * @param {*} node the parent node
- * @param {*} w the new node weight
- */
-function addRightNoDummy( node, w ) {
-  const newNode = addRightInsideWeight( node, w );
-  deleteNode( getLeft( node ) );
-  return newNode;
-}
-
 // **********************
 // RED BLACK TREE METHODS
 // **********************
@@ -175,124 +153,23 @@ function makeRed( node ) {
   return;
 }
 
-// Set the parentN as the parent of node
-function setParent( node, parentN ) {
-  // Check null
-  if ( parentN === null ) {
-    // Do nothing
-    return;
-  }
-
-  display(`We now set the node '${parentN}' as the parent of '${node}'`);
-  // Remove incoming edges ( old parent ) from child ( node )
-  const parentEdge = incoming( node );
-  if ( parentEdge != null && parentEdge[ 0 ] != null ) {
-    deleteEdge( parentEdge[ 0 ] );
-  }
-
-  // Add new edge between node and parent
-  addEdge( parentN, node );
-}
-
-// Set the child as a left child of node
-function setLeft( node, child ) {
-  display(`We now set the node ('${child}') as the left child of '${node}'`);
-
-  // Grab child weight
-  const childWeight = weight( child );
-  const colorAttribute = getAttribute( child, 'borderColor' );
-
-  // Grab left and right children of child
-  const leftC = getLeft( child );
-  const rightC = getRight( child );
-
-  // Remove child ( and all edges associated );
-  deleteNode( child );
-
-  // Add the child as a left child of node
-  const newChild = addLeftInsideWeight( node, childWeight );
-  // Add the old color back to the node
-  setAttribute( newChild, 'borderColor', colorAttribute );
-
-  // Add the old children back
-  // * Check if we need to recursion 
-  // if the left and right children dont 
-  // get put back problem ( if so, maybe 
-  // add a dummy if one of them dont exist ) *
-  if ( leftC ) {
-    addEdge( newChild, leftC );
-    //setLeft( newChild, leftC );
-  }
-
-  if ( rightC ) {
-    addEdge( newChild, rightC );
-    //setRight( newChild, rightC );
-  }
-
-  // This will help update relinking
-  return newChild;
-}
-
-// Set the child as a right child of node
-function setRight( node, child ) {
-  display(`We now set the node ('${child}') as the right child of '${node}'`);
-
-  // Grab child weight
-  const childWeight = weight( child );
-  const colorAttribute = getAttribute( child, 'borderColor' );
-
-  // Grab left and right children of child
-  const leftC = getLeft( child );
-  const rightC = getRight( child );
-
-  // Remove child ( and all edges associated );
-  deleteNode( child );
-
-  // Add the child as a right child of node
-  const newChild = addRightInsideWeight( node, childWeight );
-  // Add the old color back to the node
-  setAttribute( newChild, 'borderColor', colorAttribute );
-
-  // Add the old children back
-  // * Check if we need to recursion 
-  // if the left and right children dont 
-  // get put back problem ( if so, maybe 
-  // add a dummy if one of them dont exist ) *
-  if ( leftC ) {
-    addEdge( newChild, leftC );
-    //setLeft( newChild, leftC );
-  }
-
-  if ( rightC ) {
-    addEdge( newChild, rightC );
-    //setRight( newChild, rightC );
-  }
-
-  // This will help update relinking
-  return newChild;
-}
-
-// *****************************
-// BalanceableBinaryTree Methods
-// *****************************
-
 /**
- * Relink two positions to create a parent-child relationship
+ * Relink two nodes to create a parent-child relationship
  * 
- * @param parentN       the position that will become the parent of the child
- * @param child         the position that will be come a child of the parent
- * @param makeLeftChild indicates whether the child should be a left child
+ * @param parentN       the node that will become the parent
+ * @param child         the current left or right child node to be relinked
+ * @param makeLeftChild indicates whether the new child should be a left child
  *                      (true) or not (false)
- * @param dummy         if the child should be a dummy
+ * @param dummy         true if the child should be a dummy
  * @param w             the weight of the child
  * @param color         the color of the child
  */
-function relink( parentN, child, makeLeftChild, dummy, w, color ) {
-  // Check if the node is a dummy, if it is we dont have to change it
+function relink(parentN, child, makeLeftChild, dummy, w, color) {
+  // Check if the child should be a dummy; if so, just remove it 
   if ( dummy ) {
     // Remove the child
-    deleteNode( child );
-    display(`Removed dummy node during relink operation.`);
+    deleteNode(child);
+    display(`Removed dummy node during relink operation`);
     return;
   } else {
     // Grab the new other node
@@ -300,29 +177,29 @@ function relink( parentN, child, makeLeftChild, dummy, w, color ) {
 
     if ( makeLeftChild ) {
       // Grab the left child to change
-      node = getLeft( parentN );
+      node = getLeft(parentN);
     } else {
       // Grab the right child to change
-      node = getRight( parentN );
+      node = getRight(parentN);
     }
 
-    // Grab the children of the old node
-    const childLeft = getLeft( child );
-    const childRight = getRight( child );
+    // Grab the grandchildren of the parent to be
+    const childLeft = getLeft(child);
+    const childRight = getRight(child);
 
     // Undummify
-    setAttribute( node, 'dummy', false );
-    setBorderWidth( node, 5 );
-    setWeight( node, w );
-    setAttribute( node, 'borderColor', color );
+    setAttribute(node, 'dummy', false);
+    highlight(node);
+    setWeight(node, w);
+    setAttribute(node, 'borderColor', color);
 
-    // Remove the child
-    deleteNode( child );
+    // Remove the child - the grandchildren will be added as chikdren of the new node
+    deleteNode(child);
 
-    // Add old children back onto new node
+    // Add grandchildren back onto new node
     if ( childLeft != undefined && childRight != undefined ) {
-      addEdge( node, childLeft );
-      addEdge( node, childRight );
+      addEdge(node, childLeft);
+      addEdge(node, childRight);
     }
   }
 }
@@ -333,10 +210,9 @@ function relink( parentN, child, makeLeftChild, dummy, w, color ) {
  * @param {*} node node we are rotating around the parent
  * @param {*} parentN parent of node
  */
-function rotateL( node, parentN ) {
-  // Assuming all arent null
-  // Grab all nodes involved
-  let parentLeft = getLeft( parentN );
+function rotateL(node, parentN) {
+  // Assuming all aren't null
+  // Grab all nodes involved; don't need the left child
   let parentRight = getRight( parentN );
   let nodeLeft = getLeft( node );
   let nodeRight = getRight( node );
@@ -408,9 +284,8 @@ function rotateL( node, parentN ) {
  */
 function rotateR( node, parentN ) {
   // Assuming all arent null
-  // Grab all nodes involved
+  // Grab all nodes involved: dont' need the right child
   let parentLeft = getLeft( parentN );
-  let parentRight = getRight( parentN );
   let nodeLeft = getLeft( node );
   let nodeRight = getRight( node );
 
@@ -1061,66 +936,57 @@ function findInOrderPredecessor(currentNode) {
 
 /**
  * To preserve the property of having all sentinel leaves, expandLeaf converts a
- * sentinel leaf into a position with an entry, then adds 2 new sentinel
+ * sentinel leaf into a position with an entry, then adds two new sentinel
  * children to the position
  * 
- * @param dum     the position in the tree to update to store the provided entry
- * @param weight the entry to store in the provided position of the tree
+ * @param sentinel the dummy node to be replaced
+ * @param weight   the weight of the replacement node
  */
-function expandLeaf( dum, weight ) {
+function expandLeaf(sentinel, weight) {
     // This method is used to add dummy/sentinel left and right children as leaves
     // initially, dum is a dummy/sentinel node,
     // so replace the null entry with the new actual entry
-    let newNode = set( dum, weight );
-
+  let newNode = set(sentinel, weight);
+  step(() =>{
     display(`Add sentinel leaves to keep Leaf Property!`);
-    step(() =>{
-      dummify( addLeft( newNode, undefined ) );
-    });
-    
+    dummify(addLeft( newNode, undefined ));
+  });
 }
 
 /**
- * This will be the method where we change/create nodes
+ * Adds a new node with the given weight to the tree
+ * 
+ * @param w the weight of the new node
+ * @returns true if the node was added, false if a node with the same weight exists
  */
-function put( w ) {
-    const newNode = lookUp( getRoot(), w );
+function put(w) {
+    const newNode = lookUp(getRoot(), w);
 
     // if there is no root, add one
     if ( newNode === undefined ) {
       // Add root
       const newN = addNodeInsideWeight(w);
-      display(`Created root '${w}'`);
-      expandLeaf( newN, w);
-
-      display( `Check rules after addition of node '${newN}'` );
-      actionOnInsert( newN );
-      return newN;
+      display(`Created root ${w}`);
+      expandLeaf(newN, w);
+      actionOnInsert(newN);
+      return true;
     }
 
     // Check for same weight
-    if ( weight( newNode ) === w ) {
+    if ( weight(newNode) === w ) {
       // Display error
-      display(`Node with weight '${w}' already exists!`);
-      return null;
+      display(`Node with weight ${w} already exists!`);
+      return false;
     }
 
-    // If the last node visited is a dummy/sentinel node
-    if ( isLeaf( newNode ) ) {
-      expandLeaf( newNode, w);
-
-      // actionOnInsert is a "hook" for our AVL, Splay, and Red-Black Trees to use
-      display( `Check rules after addition of node '${newNode}'` );
-      actionOnInsert( newNode );
-      return undefined;
+    // If the last node visited is a dummy/sentinel node, replace it
+    if ( isLeaf(newNode) ) {
+      expandLeaf(newNode, w);
+      actionOnInsert(newNode);
+      return true;
     } else {
       display(`ERROR, SHOULDNT REACH!`);
-      // This is for if we are updating a weight for a node which we dont need to do
-      const ogWeight = weight( newNode );
-      set( newNode, w);
-      // actionOnAccess is a "hook" for our AVL, Splay, and Red-Black Trees to use
-      actionOnAccess( newNode );
-      return ogWeight;
+      return null;
     }
 }
 
@@ -1241,14 +1107,16 @@ function remove(node) {
  * Deletes the node with the given weight from the tree
  * 
  * @param weight the weight of the node to delete
+ * @returns true if deletion was successful, false otherwise
  */
 function deleteWeight(weight) {
   const node = lookUp(getRoot(), weight);
   if( node == null || ( getAttribute(node, "dummy") === true ) ){
-    display(`Node with weight '${weight}' does not exist!`);
-    return;
+    display(`Node with weight ${weight} does not exist!`);
+    return false;
   }
   remove(node);
+  return true
 }
 
 // Will update the node with new weight
@@ -1302,18 +1170,19 @@ function lookUp(node, w) {
 }
 
 /**
- * For a RedBlack tree, we must check that the newly inserted
+ * For a red/black tree, any newly inserted node is made red unless it is the
+ * root node. After insertion, we must check that the newly created tree
  * position has not created a double-red condition (i.e., the newly created
  * position is red and has a red parent)
  */
-function actionOnInsert( node ) {
-  if ( ! isRoot( node ) ) {
-    display(`Make new nodes red`)
-    makeRed( node );
+function actionOnInsert(node) {
+  if ( ! isRoot(node) ) {
+    display(`Make new non-root nodes red`)
+    makeRed(node);
     resolveRed( node );
   } else {
-    display(`If its the root node, make it black`)
-    makeBlack( node );
+    display(`If it's the root node, make it black`)
+    makeBlack(node);
   }
 }
 
@@ -1359,11 +1228,11 @@ while ( true ) {
   const inWeight = promptNumber(promptString);
 
   if ( inWeight > 0 ) {
-    put( inWeight );
-    display(`Successfully added a new node whose weight is ${inWeight}`);
+    if ( put(inWeight) ) {
+      display(`Successfully added a new node whose weight is ${inWeight}`);
+    }
   } else if ( inWeight < 0 ) {
-    const oldWeight = deleteWeight(-inWeight);
-    if ( oldWeight != undefined ) {
+    if ( deleteWeight(-inWeight) ) {
       display(`Successfully removed the node whose weight is ${oldWeight}`);
     }
   } else if ( inWeight == 0 ) {

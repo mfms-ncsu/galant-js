@@ -163,7 +163,10 @@ function getStyle(graph) {
         {
             "selector": "node",
             "style": {
-                "width": `${graph.nodeSize}px`,
+                "width": "label",
+                "height": "label",
+                "padding": `${graph.nodeSize / 4}px`,
+//                "width": `${graph.nodeSize}px`,
 //                "height": `${graph.nodeSize}px`,
                 "backgroundColor": "#FFFFFF",
                 "color": "#000000",
@@ -319,8 +322,8 @@ function getStyle(graph) {
                     "color": "black",
                     "borderColor": "gray",
                     "borderWidth": `${graph.nodeSize / 25}px`,
-                    "width": `${graph.nodeSize * 0.4}px`,
-                    "height": `${graph.nodeSize * 0.4}px`
+                    "width": `${graph.nodeSize / 20}px`,
+                    "height": `${graph.nodeSize / 20}px`
                 }
             }
         );
