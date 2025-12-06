@@ -166,8 +166,6 @@ function getStyle(graph) {
                 "width": "label",
                 "height": "label",
                 "padding": `${graph.nodeSize / 4}px`,
-//                "width": `${graph.nodeSize}px`,
-//                "height": `${graph.nodeSize}px`,
                 "backgroundColor": "#FFFFFF",
                 "color": "#000000",
                 "borderWidth": `${graph.nodeSize / 10}px`,
