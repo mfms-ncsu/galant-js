@@ -4,17 +4,17 @@ c Current Algorithm: red-blackTrees.js
 c Current Algorithm: red-blackTrees.js
 
 n 14 0 0 dummy:true labelHidden:true
-n 0 0 0 1 borderColor:black labelHidden:true highlighted:true
+n 0 0 0 1 borderWidth:5 borderColor:black labelHidden:true
 n 11 0 0 dummy:true labelHidden:true
 n 4 0 0 dummy:true labelHidden:true
-n 3 0 0 7 labelHidden:true borderColor:red highlighted:true
-n 1 0 0 6 borderColor:black labelHidden:true highlighted:true
+n 3 0 0 7 borderWidth:5 color:white labelHidden:true borderColor:red
+n 1 0 0 6 borderWidth:5 borderColor:black labelHidden:true
 n 6 0 0 dummy:true labelHidden:true
 n 5 0 0 dummy:true labelHidden:true
 n 12 0 0 dummy:true labelHidden:true
-n 8 0 0 8 borderColor:black labelHidden:true highlighted:true
-n 10 0 0 0.5 borderColor:red labelHidden:true highlighted:true
-n 13 0 0 5 borderColor:red labelHidden:true highlighted:true
+n 8 0 0 8 borderWidth:5 borderColor:black labelHidden:true
+n 10 0 0 0.5 borderWidth:5 borderColor:red labelHidden:true
+n 13 0 0 5 borderWidth:5 borderColor:red labelHidden:true
 n 15 0 0 dummy:true labelHidden:true
 e 0 10 
 e 0 13 
