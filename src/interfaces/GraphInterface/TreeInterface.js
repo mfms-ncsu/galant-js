@@ -64,19 +64,6 @@ function recordChange(changeManager, change) {
     });
 }
 
-/**
- * adds a node with the given id and attributes as either a left child or a right child
- * this is called in a context where the parent node is already known and the edges are added outside this function
- * see @addLeft and @addRight for usage
- * the primary purpose is to ensure that a left child is added to the front of the nodes map and a right child is added to the end
- * so that the nodes will be displayed in the correct order
- * @param {Graph} graph Graph on which to operate
- * @param {ChangeManager} changeManager ChangeManager to use for storing changes
- * @param {string} nodeId Id of the node to add, or undefined to generate a new id
- * @param {Object} attributes Attributes to set on the node
- * @param {boolean} leftChild If true, identifies the node as a left child, otherwise as a right child
- * @returns [newGraph, newChangeManager, nodeId] The mutated graph, change manager, and the id of the new node
- */
 function addBinaryNode(graph, changeManager, nodeId, attributes, leftChild) {
   isTree(graph);
 
@@ -87,11 +74,9 @@ function addBinaryNode(graph, changeManager, nodeId, attributes, leftChild) {
       // Create the node
       let node = new Node(nodeId, undefined, undefined);
 
-      // if it's a left child, add it to the front of the nodes map
       if ( leftChild ) {
         draft.nodes = new Map([[nodeId, node], ...draft.nodes.entries()]);
       }
-      // otherwise (right child) simply add it: it will appear at the rear
       else {
         draft.nodes.set(nodeId, node);
       }
@@ -296,11 +281,6 @@ function getRight(graph, nodeId) {
 }
 
 /**
- * @todo need functions makeLeftChild and makeRightChild for situations where
- * both the node and the child already exist
- */
-
-/**
  * Creates left child
  * @param {Graph} graph Graph on which to operate
  * @param {Graph} {ChangeManager} changeManager ChangeManager to use for storing changes
@@ -312,7 +292,7 @@ function addLeft(graph, changeManager, node, childWeight) {
   let leftChild, dummy;
 
   // Throw an error if the node doesn't exist
-  if ( ! graph.nodes.has(node) ) {
+  if ( !graph.nodes.has(node) ) {
     throw new Error(
       "Cannot create left child of node " +
         node +
