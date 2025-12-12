@@ -6,4 +6,6 @@ What follows is a sequence of tests for trees and related algorithms. They shoul
 
 ## Binary search trees
 
+### Insertion
+
 ## Red/black trees
