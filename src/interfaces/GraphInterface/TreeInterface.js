@@ -296,9 +296,80 @@ function getRight(graph, nodeId) {
 }
 
 /**
- * @todo need functions makeLeftChild and makeRightChild for situations where
- * both the node and the child already exist
+ * Sets the left child of the node
+ * @param {Graph} graph Graph on which to operate
+ * @param {string} nodeId Node to check
+ * @param {string} leftChildId Left child node to set
+ * Assumes that the edge from nodeId to leftChildId is not already present
+ * and that both the nodeId and leftChildId exist in the graph
+ * @todo Add ChangeManager functionality -- see addBinaryNode for reference
  */
+function setLeft(graph, nodeId, leftChildId) {
+  isTree(graph);
+
+  // Throw an error if the node doesn't exist
+  if ( ! graph.nodes.has(nodeId) ) {
+    throw new Error(
+      "Cannot set left child of node " +
+        nodeId +
+        " because no node with this id exists in the graph"
+    );
+  }
+
+  // Throw an error if the left child doesn't exist
+  if ( ! graph.nodes.has(leftChildId) ) {
+    throw new Error(
+      "Cannot set " + leftChildId +
+        " as left childbecause no node with this id exists in the graph"
+    );
+  }
+
+  // add an edge from nodeId to leftChildId
+  GraphInterface.addEdge(graph, null, nodeId, leftChildId);
+
+  // put the left child at the front of the nodes map
+  let leftChild = graph.nodes.get(leftChildId);
+  graph.nodes.delete(leftChildId);
+  graph.nodes = new Map([[leftChildId, leftChild], ...graph.nodes.entries()]);
+}
+
+/**
+ * Sets the right child of the node
+ * @param {Graph} graph Graph on which to operate
+ * @param {string} nodeId Node to check
+ * @param {string} rightChildId Right child node to set
+ * Assumes that the edge from nodeId to rightChildId is not already present
+ * and that both the nodeId and rightChildId exist in the graph
+ * @todo Add ChangeManager functionality -- see addBinaryNode for reference
+ */
+function setRight(graph, nodeId, rightChildId) {
+  isTree(graph);
+
+  // Throw an error if the node doesn't exist
+  if ( !graph.nodes.has(nodeId) ) {
+    throw new Error(
+      "Cannot set right child of node " +
+        nodeId +
+        " because no node with this id exists in the graph"
+    );
+  }
+
+  // Throw an error if the left child doesn't exist
+  if ( ! graph.nodes.has(rightChildId) ) {
+    throw new Error(
+      "Cannot set " + rightChildId +
+        " as right childbecause no node with this id exists in the graph"
+    );
+  }
+
+  // add an edge from nodeId to rightChildId
+  GraphInterface.addEdge(graph, null, nodeId, rightChildId);
+
+  // put the right child at the end of the nodes map
+  let rightChild = graph.nodes.get(rightChildId);
+  graph.nodes.delete(rightChildId);
+  graph.nodes.set(rightChildId, rightChild);
+}
 
 /**
  * Creates left child
