@@ -9,6 +9,14 @@
  * remove the node with the positive value of that weight.
  */
 
+/**
+ * @todo
+ * !!! There is an issue when 12 is added in the sequence 4, 7, 12
+ *       - the root disappears after the rotation
+ *       - subsequent insertions report that the a node with the given weight already exists
+ * !!!
+ */
+
 setDirected(true);
 
 // this should be added to Thread.js and TreeInterface.js
