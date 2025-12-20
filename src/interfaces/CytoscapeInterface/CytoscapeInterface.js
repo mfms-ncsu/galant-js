@@ -163,8 +163,8 @@ function getStyle(graph) {
         {
             "selector": "node",
             "style": {
-                // "width": "label",
-                // "height": "label",
+                "width": "label",
+                "height": "label",
                 "padding": `${graph.nodeSize / 4}px`,
                 "backgroundColor": "#FFFFFF",
                 "color": "#000000",
@@ -286,13 +286,13 @@ function getStyle(graph) {
                 "backgroundOpacity": "data(backgroundOpacity)"
             }
         },
-        // {
-        //     "selector": "node[size]",
-        //     "style": {
-        //         "width": "data(size)",
-        //         "height": "data(size)"
-        //     }
-        // },
+        {
+            "selector": "node[size]",
+            "style": {
+                "width": "data(size)",
+                "height": "data(size)"
+            }
+        },
         {
             "selector": "edge[width]",
             "style": {
