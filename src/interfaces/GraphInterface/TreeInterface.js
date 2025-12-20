@@ -127,7 +127,7 @@ function addBinaryNode(graph, changeManager, nodeId, attributes, leftChild) {
 function getParent(graph, target) {
   isTree(graph);
 
-  if ( !graph.nodes.has(target) ) {
+  if ( ! graph.nodes.has(target) ) {
     throw new Error(
       "Cannot get parent of node " +
         target +
@@ -251,7 +251,7 @@ function getLeft(graph, nodeId) {
   isTree(graph);
 
   // Throw an error if the node doesn't exist
-  if ( !graph.nodes.has(nodeId) ) {
+  if ( ! graph.nodes.has(nodeId) ) {
     throw new Error(
       "Cannot get left child of node " +
         nodeId +
@@ -346,7 +346,7 @@ function setRight(graph, nodeId, rightChildId) {
   isTree(graph);
 
   // Throw an error if the node doesn't exist
-  if ( !graph.nodes.has(nodeId) ) {
+  if ( ! graph.nodes.has(nodeId) ) {
     throw new Error(
       "Cannot set right child of node " +
         nodeId +
@@ -435,7 +435,7 @@ function addRight(graph, changeManager, node, childWeight) {
   let rightChild, dummy;
 
   // Throw an error if the node doesn't exist
-  if ( !graph.nodes.has(node) ) {
+  if ( ! graph.nodes.has(node) ) {
     throw new Error(
       "Cannot create right child of node " +
         node +

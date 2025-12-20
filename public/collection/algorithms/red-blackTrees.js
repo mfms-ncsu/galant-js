@@ -189,7 +189,9 @@ function makeRed( node ) {
  * @param color         the color of the child
  */
 function relink(parentN, child, makeLeftChild, dummy, w, color) {
-  // Check if the child should be a dummy; if so, just remove it 
+  // Check if the child should be a dummy; if so, just remove it
+  console.log(`Relinking node with weight ${weight(child)} to parent with weight ${weight(parentN)}`);
+  console.log(`makeLeftChild is ${makeLeftChild}, dummy is ${dummy}, weight is ${w}, color is ${color}`);
   if ( dummy ) {
     // Remove the child
     deleteNode(child);
@@ -217,7 +219,7 @@ function relink(parentN, child, makeLeftChild, dummy, w, color) {
     setWeight(node, w);
     setAttribute(node, 'borderColor', color);
 
-    // Remove the child - the grandchildren will be added as chikdren of the new node
+    // Remove the child - the grandchildren will be added as children of the new node
     deleteNode(child);
 
     // Add grandchildren back onto new node
@@ -302,18 +304,18 @@ function rotateL(node, parentN) {
 
 /**
  * Helper to rotate, rotates if grandparent doesn't 
- * exist and node is parents right child
+ * exist and node is parent's right child
  * @param {*} node node we are rotating around the parent
  * @param {*} parentN parent of node
  */
 function rotateR(node, parentN) {
   // Assuming all arent null
-  // Grab all nodes involved: dont' need the right child
+  // Grab all nodes involved: don't need the right child
   let parentLeft = getLeft(parentN);
   let nodeLeft = getLeft(node);
   let nodeRight = getRight(node);
 
-  // For this rotate, we grab nodeLeft's children ( since we delete nodeLeft )
+  // For this rotate, we grab nodeLeft's children (since we delete nodeLeft) ??
   let nodeLeftLeft = getLeft(nodeLeft);
   let nodeLeftRight = getRight(nodeLeft);
 
@@ -350,6 +352,7 @@ function rotateR(node, parentN) {
   // Make original parent left child of new root
   let newParent = addLeftInsideWeight(newNode, parentWeight);
   setAttribute(newParent, 'borderColor', parentColor);
+  display(`New parent is ${weight(newParent)}`);
 
   // Make original left child the right child of new root
   let newNodeLeft = addRightInsideWeight(newParent, nodeLeftWeight);
@@ -360,13 +363,13 @@ function rotateR(node, parentN) {
   }
 
   // Add all the edges back ( relink )
-  relink( newNode, nodeRight, false, nodeChildOtherIsDummy, nodeRightWeight, nodeRightColor );
-  relink( newParent, parentLeft, true, parentChildOtherIsDummy, parentLeftWeight, parentLeftColor );
+  relink(newNode, nodeRight, false, nodeChildOtherIsDummy, nodeRightWeight, nodeRightColor);
+  relink(newParent, parentLeft, true, parentChildOtherIsDummy, parentLeftWeight, parentLeftColor);
 
   // Check for no children off of nodeLeft
   if ( nodeLeftLeft != undefined && nodeLeftRight != undefined ) {
-    addEdge( newNodeLeft, nodeLeftLeft );
-    addEdge( newNodeLeft, nodeLeftRight );
+    addEdge(newNodeLeft, nodeLeftLeft);
+    addEdge(newNodeLeft, nodeLeftRight);
   }
 
   return newNode;
@@ -731,25 +734,25 @@ function rotate(node) {
     //let grandparentParent = getParent( grandparent );
     let grandparentLeft = null;
     let grandparentRight = null;
-    let parentLeft = getLeft( parentN );
-    let parentRight = getRight( parentN );
-    let nodeLeft = getLeft( node );
-    let nodeRight = getRight( node );
+    let parentLeft = getLeft(parentN);
+    let parentRight = getRight(parentN);
+    let nodeLeft = getLeft(node);
+    let nodeRight = getRight(node);
 
     if ( grandparent != undefined ) {
       // Update the children
-      grandparentLeft = getLeft( grandparent );
-      grandparentRight = getRight( grandparent );
+      grandparentLeft = getLeft(grandparent);
+      grandparentRight = getRight(grandparent);
     }
 
     // Now check and rotate nodes
     if ( grandparent === undefined ) {
       if ( node === parentLeft ) {
         // Preform a Left rotate ( make node the root )
-        newNodeId = rotateL( node, parentN );
+        newNodeId = rotateL(node, parentN);
       } else {
         // Preform a Right rotate ( make node the root )
-        newNodeId = rotateR( node, parentN );
+        newNodeId = rotateR(node, parentN);
       }
     } else if ( parentN === grandparentLeft ) {
       if ( node === parentLeft ) {
@@ -781,10 +784,10 @@ function rotate(node) {
  *          parent y, and its grandparent z
  * @return the position at its final, rotated position
  */
-function restructure( node ) {
+function restructure(node) {
 
-  let parentN = getParent( node );
-  let grandparent = getParent( parentN );
+  let parentN = getParent(node);
+  let grandparent = getParent(parentN);
 
   step(() => {
     // for some reason only the grandparent gets marked
@@ -796,11 +799,11 @@ function restructure( node ) {
     mark(grandparent);
   });
 
-  if ((node === getLeft(parentN) && parentN === getLeft(grandparent) ) || 
-    (node === getRight(parentN) && parentN === getRight(grandparent) ) ) {
-      // rotate the parent around the grandparent
-      display(`if parent (weight ${weight(parentN)}) is the same side child as node (weight ${weight(node)}) is to parent...`);
-      display(`...then we rotate the parent around the grandparent (weight ${weight(grandparent)})`);
+  if ( ( node === getLeft(parentN) && parentN === getLeft(grandparent) ) || 
+    ( node === getRight(parentN) && parentN === getRight(grandparent) ) ) {
+    // rotate the parent around the grandparent
+    display(`if parent (weight ${weight(parentN)}) is the same side child as node (weight ${weight(node)}) is to parent...`);
+    display(`...then we rotate the parent around the grandparent (weight ${weight(grandparent)})`);
     const newParentID = rotate(parentN);
     return newParentID;
   } else {
@@ -827,7 +830,7 @@ function resolveRed(node) {
 
   display(`We check the red property`)
   let parentN = getParent(node);
-  if (isRed(parentN) ) {
+  if ( isRed(parentN) ) {
     display(`We violate the red property with a red parent`)
     let uncle = getSibling(parentN);
     // Case 1: the uncle (sibling of the parent) is black
