@@ -169,7 +169,6 @@ function makeBlack(node) {
  * @param node the node to make red
  */
 function makeRed( node ) {
-  // setAttribute( borderColor( "red" ) ) // Something like this
   step(() => {
     highlight(node);
     setAttribute(node, "borderColor", "red");
@@ -336,11 +335,13 @@ function rotateR(node, parentN) {
   deleteNode(nodeLeft);
 
   // Remove node ( it will become the root )
+  display(`Removing node with weight ${weight(node)}`);
   const nodeWeight = weight(node);
   const nodeColor = getAttribute(node, 'borderColor');
   deleteNode(node);
 
   // Remove parent
+  display(`Removing parent with weight ${weight(parentN)}`);
   const parentWeight = weight(parentN);
   const parentColor = getAttribute(parentN, 'borderColor');
   deleteNode(parentN);
@@ -348,11 +349,14 @@ function rotateR(node, parentN) {
   // Make node the root
   let newNode = addNodeInsideWeight(nodeWeight);
   setAttribute(newNode, 'borderColor', nodeColor);
+  console.log("New node is", newNode);
+  display(`Made node with weight ${weight(newNode)} the new root`);
 
   // Make original parent left child of new root
   let newParent = addLeftInsideWeight(newNode, parentWeight);
   setAttribute(newParent, 'borderColor', parentColor);
-  display(`New parent is ${weight(newParent)}`);
+  console.log("Made node", newParent, "the left child of the new root");
+  display(`Made node with weight ${weight(newParent)} the left child of the new root`);
 
   // Make original left child the right child of new root
   let newNodeLeft = addRightInsideWeight(newParent, nodeLeftWeight);
@@ -361,11 +365,16 @@ function rotateR(node, parentN) {
   } else {
     setAttribute(newNodeLeft, 'borderColor', nodeLeftColor);
   }
+  console.log("Made node", newNodeLeft, "the right child of", newParent);
+  display(`Made node with weight ${weight(newParent)} the right child of node with weight ${weight(newParent)}`);
 
   // Add all the edges back ( relink )
+  console.log("Reconnecting edge", newNode, nodeRight);
   relink(newNode, nodeRight, false, nodeChildOtherIsDummy, nodeRightWeight, nodeRightColor);
+  console.log("Reconnecting edge", newParent, parentLeft);
   relink(newParent, parentLeft, true, parentChildOtherIsDummy, parentLeftWeight, parentLeftColor);
-
+  console.log("Reconnected edge", newNode, nodeRight);
+  console.log("Reconnected edge", newParent, parentLeft);
   // Check for no children off of nodeLeft
   if ( nodeLeftLeft != undefined && nodeLeftRight != undefined ) {
     addEdge(newNodeLeft, nodeLeftLeft);
@@ -725,11 +734,11 @@ function rotate(node) {
   let grandparent = getParent(parentN);
 
   display(`Rotate node with weight ${weight(node)} around its parent`);
-
+  console.log("Rotating", node, parentN, grandparent);
   // Will be used to update the node IDs that were updated
   let newNodeId = undefined;
 
-  step(() => {
+//  step(() => {
     // Get all nodes involved
     //let grandparentParent = getParent( grandparent );
     let grandparentLeft = null;
@@ -739,14 +748,14 @@ function rotate(node) {
     let nodeLeft = getLeft(node);
     let nodeRight = getRight(node);
 
-    if ( grandparent != undefined ) {
+    if ( grandparent !== undefined && grandparent !== undefined ) {
       // Update the children
       grandparentLeft = getLeft(grandparent);
       grandparentRight = getRight(grandparent);
     }
 
     // Now check and rotate nodes
-    if ( grandparent === undefined ) {
+    if ( grandparent === undefined || grandparent === undefined ) {
       if ( node === parentLeft ) {
         // Preform a Left rotate ( make node the root )
         newNodeId = rotateL(node, parentN);
@@ -772,7 +781,7 @@ function rotate(node) {
         newNodeId = rotateRR(node, parentN, grandparent);
       }
     }
-  });
+//  });
   return newNodeId;
 }
 
@@ -827,7 +836,6 @@ function restructure(node) {
  * @param node the position that may have a red parent
  */
 function resolveRed(node) {
-
   display(`We check the red property`)
   let parentN = getParent(node);
   if ( isRed(parentN) ) {
@@ -973,10 +981,12 @@ function put(w) {
     // if there is no root, add one
     if ( newNode === null ) {
       // Add root
-      const newN = addNodeInsideWeight(w);
-      display(`Created root with weight ${w}`);
-      expandLeaf(newN, w);
-      actionOnInsert(newN);
+      step(() => {
+        const newN = addNodeInsideWeight(w);
+        display(`Created root with weight ${w}`);
+        expandLeaf(newN, w);
+        actionOnInsert(newN);
+      });
       return true;
     }
 
@@ -1118,7 +1128,7 @@ function remove(node) {
  */
 function deleteWeight(weight) {
   const node = lookUp(getRoot(), weight);
-  if ( node === null || ( getAttribute(node, "dummy") === true ) ){
+  if ( node === null || getAttribute(node, "dummy") ) {
     display(`Node with weight ${weight} does not exist`);
     return false;
   }
@@ -1171,7 +1181,7 @@ function lookUp(node, w) {
     return null;
   }
 
-  if ( getAttribute(node, "dummy")) {
+  if ( getAttribute(node, "dummy") ) {
     // this is a dummy/sentinel node
     step(() => {
       if ( getParent(node) ) unmark(getParent(node));
@@ -1202,12 +1212,16 @@ function lookUp(node, w) {
  */
 function actionOnInsert(node) {
   if ( ! isRoot(node) ) {
-    display(`Make new non-root nodes red`)
-    makeRed(node);
+    step(() => {
+      display(`Make new non-root nodes red`)
+      makeRed(node);
+    })
     resolveRed(node);
   } else {
-    display(`If it's the root node, make it black`)
-    makeBlack(node);
+    step(() => {
+      display(`If it's the root node, make it black`)
+      makeBlack(node);
+    });
   }
 }
 

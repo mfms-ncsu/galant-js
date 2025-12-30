@@ -12,8 +12,10 @@ export default class Graph {
   isDirected = false;
   /** Name of the graph */
   name;
-  /** Map of nodes in the graph (NodeId -> Node)*/
+  /** Map of nodes in the graph (NodeId -> Node) */
   nodes;
+  /** List of node id's: determines the order in which nodes are rendered by Cytoscape */
+  nodeList = [];
   /** Node render size */
   nodeSize = 35;
   /** Object of x and y scales */

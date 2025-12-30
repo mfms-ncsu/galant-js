@@ -139,8 +139,10 @@ function getElements(graph) {
     // Create an array of elements
     let elements = [];
 
-    // Loop over each node
-    GraphInterface.getNodes(graph).forEach(node => {
+    // Loop over each node using the nodeList to determine order
+    graph.nodeList.forEach(nodeId => {
+        const node = graph.nodes.get(nodeId);
+
         elements.push(parseNode(graph, node));
 
         // Loop over each edge sourced at this node

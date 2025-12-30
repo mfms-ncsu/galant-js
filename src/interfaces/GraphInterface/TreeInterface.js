@@ -327,10 +327,8 @@ function setLeft(graph, nodeId, leftChildId) {
   // add an edge from nodeId to leftChildId
   GraphInterface.addEdge(graph, null, nodeId, leftChildId);
 
-  // put the left child at the front of the nodes map
-  let leftChild = graph.nodes.get(leftChildId);
-  graph.nodes.delete(leftChildId);
-  graph.nodes = new Map([[leftChildId, leftChild], ...graph.nodes.entries()]);
+  // put the left child at the front of the node list
+  graph.nodeList.unshift(leftChildId);
 }
 
 /**
@@ -365,10 +363,8 @@ function setRight(graph, nodeId, rightChildId) {
   // add an edge from nodeId to rightChildId
   GraphInterface.addEdge(graph, null, nodeId, rightChildId);
 
-  // put the right child at the end of the nodes map
-  let rightChild = graph.nodes.get(rightChildId);
-  graph.nodes.delete(rightChildId);
-  graph.nodes.set(rightChildId, rightChild);
+  // put the right child at the end of the node list
+  graph.nodeList.push(rightChildId);
 }
 
 /**

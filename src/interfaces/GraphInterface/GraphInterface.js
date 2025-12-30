@@ -444,7 +444,7 @@ function getNodeAttribute(graph, nodeId, name) {
   verifyGraph(graph);
 
   // Get the node
-  let node = graph.nodes.get(nodeId);
+  const node = graph.nodes.get(nodeId);
 
   if (node) {
     return node.attributes.get(name);
@@ -461,7 +461,7 @@ function getNodeAttribute(graph, nodeId, name) {
  */
 function getNodeIds(graph) {
   verifyGraph(graph);
-  return [...graph.nodes.keys()];
+  return graph.nodeList;
 }
 
 /**

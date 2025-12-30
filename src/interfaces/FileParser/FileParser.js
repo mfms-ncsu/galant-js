@@ -329,6 +329,7 @@ function addNode(graph, x, y, nodeId, attributes) {
         node = new Node(nodeId, x, y);
     }
     graph.nodes.set(nodeId, node);
+    graph.nodeList.push(nodeId);
 
     // Set the attributes
     for (let name in attributes) {
