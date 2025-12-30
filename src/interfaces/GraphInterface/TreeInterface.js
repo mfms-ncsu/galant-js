@@ -4,6 +4,7 @@ import produce from "immer";
 import ChangeManager from "states/ChangeManager/ChangeManager";
 import ChangeObject from "states/ChangeManager/ChangeObject";
 import Node from "states/Graph/GraphElement/Node";
+import Edge from "states/Graph/GraphElement/Edge";
 
 /**
  * Helper function to handle what to do when a graph
@@ -62,60 +63,6 @@ function recordChange(changeManager, change) {
             draft.recordedChanges.push(changeObj);
         });
     });
-}
-
-/**
- * adds a node with the given id and attributes as either a left child or a right child
- * this is called in a context where the parent node is already known and the edges are added outside this function
- * see @addLeft and @addRight for usage
- * the primary purpose is to ensure that a left child is added to the front of the nodes map and a right child is added to the end
- * so that the nodes will be displayed in the correct order
- * @param {Graph} graph Graph on which to operate
- * @param {ChangeManager} changeManager ChangeManager to use for storing changes
- * @param {string} nodeId Id of the node to add, or undefined to generate a new id
- * @param {Object} attributes Attributes to set on the node
- * @param {boolean} leftChild If true, identifies the node as a left child, otherwise as a right child
- * @returns [newGraph, newChangeManager, nodeId] The mutated graph, change manager, and the id of the new node
- */
-function addBinaryNode(graph, changeManager, nodeId, attributes, leftChild) {
-  isTree(graph);
-
-    // If the nodeId argument is passed, use that, otherwise generate an id
-    nodeId = nodeId || generateId(graph.nodes);
-  
-    const newGraph = produce(graph, (draft) => {
-      // Create the node
-      let node = new Node(nodeId, undefined, undefined);
-
-      // if it's a left child, add it to the front of the nodes map
-      if ( leftChild ) {
-        draft.nodes = new Map([[nodeId, node], ...draft.nodes.entries()]);
-      }
-      // otherwise (right child) simply add it: it will appear at the rear
-      else {
-        draft.nodes.set(nodeId, node);
-      }
-      // Set the attributes
-      for (let name in attributes) {
-        node.attributes.set(name, attributes[name]);
-      }
-    });
-  
-    // Add the change object to the changeManager
-    const newChangeManager = recordChange(changeManager, [
-      new ChangeObject("addNode", null, {
-        id: nodeId,
-        position: {
-          x: undefined,
-          y: undefined,
-        },
-        attributes: attributes
-      })
-    ]);
-  
-    // Return mutated graph and change manager to trigger re-render
-    // Add the node id as the third return value
-    return [newGraph, newChangeManager, nodeId];
 }
 
 /**
@@ -296,6 +243,50 @@ function getRight(graph, nodeId) {
 }
 
 /**
+ * adds a node with the given id and attributes as either a left child or a right child
+ * this is called in a context where the parent node is already known and the edges are added outside this function
+ * see @addLeft and @addRight for usage
+ * the primary purpose is to ensure that a left child is added to the front of the nodes map and a right child is added to the end
+ * so that the nodes will be displayed in the correct order
+ * @param {Graph} graph Graph on which to operate
+ * @param {ChangeManager} changeManager ChangeManager to use for storing changes
+ * @param {string} nodeId Id of the node to add, or undefined to generate a new id
+ * @param {Object} attributes Attributes to set on the node
+ * @param {boolean} leftChild If true, identifies the node as a left child, otherwise as a right child
+ * @returns [newGraph, newChangeManager, nodeId] The mutated graph, change manager, and the id of the new node
+ */
+
+function setChild(graph, changeManager, parentId, childId, isLeft) {
+  const newGraph = produce(graph, (draft) => {
+    let newEdge = new Edge(parentId, childId);
+    // Add the edge to both the source and target's adjacency lists
+    draft.nodes.get(parentId).edges.set(`${parentId},${childId}`, newEdge);
+    draft.nodes.get(childId).edges.set(`${childId},${parentId}`, newEdge);
+
+    // if it's a left child, put it at the front of the node list
+    if ( isLeft ) {
+      draft.nodeList.unshift(childId);
+    }
+    // otherwise (right child) put it at the end of the node list
+    else {
+      draft.nodeList.push(childId);
+    }
+  });
+  
+  // Add the new edge object to the changeManager
+  const newChangeManager = recordChange(changeManager, [
+    new ChangeObject("addEdge", null, {
+      source: parentId,
+      target: childId,
+    })
+  ]);
+  
+  // Return mutated graph and change manager to trigger re-render
+  // Add the node id as the third return value
+  return [newGraph, newChangeManager]
+}
+
+/**
  * Sets the left child of the node
  * @param {Graph} graph Graph on which to operate
  * @param {string} nodeId Node to check
@@ -304,14 +295,14 @@ function getRight(graph, nodeId) {
  * and that both the nodeId and leftChildId exist in the graph
  * @todo Add ChangeManager functionality -- see addBinaryNode for reference
  */
-function setLeft(graph, nodeId, leftChildId) {
+function setLeft(graph, changeManager, parentId, leftChildId) {
   isTree(graph);
 
   // Throw an error if the node doesn't exist
-  if ( ! graph.nodes.has(nodeId) ) {
+  if ( ! graph.nodes.has(parentId) ) {
     throw new Error(
       "Cannot set left child of node " +
-        nodeId +
+        parentId +
         " because no node with this id exists in the graph"
     );
   }
@@ -320,15 +311,12 @@ function setLeft(graph, nodeId, leftChildId) {
   if ( ! graph.nodes.has(leftChildId) ) {
     throw new Error(
       "Cannot set " + leftChildId +
-        " as left childbecause no node with this id exists in the graph"
+        " as left child because no node with this id exists in the graph"
     );
   }
+  [graph, changeManager] = setChild(graph, changeManager, parentId, leftChildId, true);
 
-  // add an edge from nodeId to leftChildId
-  GraphInterface.addEdge(graph, null, nodeId, leftChildId);
-
-  // put the left child at the front of the node list
-  graph.nodeList.unshift(leftChildId);
+  return [graph, changeManager];
 }
 
 /**
@@ -340,14 +328,14 @@ function setLeft(graph, nodeId, leftChildId) {
  * and that both the nodeId and rightChildId exist in the graph
  * @todo Add ChangeManager functionality -- see addBinaryNode for reference
  */
-function setRight(graph, nodeId, rightChildId) {
+function setRight(graph, changeManager,parentId, rightChildId) {
   isTree(graph);
 
   // Throw an error if the node doesn't exist
-  if ( ! graph.nodes.has(nodeId) ) {
+  if ( ! graph.nodes.has(parentId) ) {
     throw new Error(
       "Cannot set right child of node " +
-        nodeId +
+        parentId +
         " because no node with this id exists in the graph"
     );
   }
@@ -360,11 +348,63 @@ function setRight(graph, nodeId, rightChildId) {
     );
   }
 
-  // add an edge from nodeId to rightChildId
-  GraphInterface.addEdge(graph, null, nodeId, rightChildId);
+  [graph, changeManager] = setChild(graph, changeManager, parentId, rightChildId, false);
 
-  // put the right child at the end of the node list
-  graph.nodeList.push(rightChildId);
+  return [graph, changeManager];
+}
+
+/**
+ * adds a node with the given id and attributes as either a left child or a right child
+ * this is called in a context where the parent node is already known and the edges are added outside this function
+ * see @addLeft and @addRight for usage
+ * the primary purpose is to ensure that a left child is added to the front of the nodes map and a right child is added to the end
+ * so that the nodes will be displayed in the correct order
+ * @param {Graph} graph Graph on which to operate
+ * @param {ChangeManager} changeManager ChangeManager to use for storing changes
+ * @param {string} nodeId Id of the node to add, or undefined to generate a new id
+ * @param {Object} attributes Attributes to set on the node
+ * @param {boolean} leftChild If true, identifies the node as a left child, otherwise as a right child
+ * @returns [newGraph, newChangeManager, nodeId] The mutated graph, change manager, and the id of the new node
+ */
+function addBinaryNode(graph, changeManager, nodeId, attributes, leftChild) {
+  isTree(graph);
+
+    // If the nodeId argument is passed, use that, otherwise generate an id
+    nodeId = nodeId || generateId(graph.nodes);
+  
+    const newGraph = produce(graph, (draft) => {
+      // Create the node
+      let node = new Node(nodeId, undefined, undefined);
+
+      // if it's a left child, add it to the front of the nodes map
+      if ( leftChild ) {
+        draft.nodes = new Map([[nodeId, node], ...draft.nodes.entries()]);
+      }
+      // otherwise (right child) simply add it: it will appear at the rear
+      else {
+        draft.nodes.set(nodeId, node);
+      }
+      // Set the attributes
+      for (let name in attributes) {
+        node.attributes.set(name, attributes[name]);
+      }
+    });
+  
+    // Add the change object to the changeManager
+    const newChangeManager = recordChange(changeManager, [
+      new ChangeObject("addNode", null, {
+        id: nodeId,
+        position: {
+          x: undefined,
+          y: undefined,
+        },
+        attributes: attributes
+      })
+    ]);
+  
+    // Return mutated graph and change manager to trigger re-render
+    // Add the node id as the third return value
+    return [newGraph, newChangeManager, nodeId];
 }
 
 /**
