@@ -1047,6 +1047,9 @@ function redo(graph, changeManager) {
                 change.current.attribute.value
               );
             break;
+          case "changeNodeList":
+            draft.nodeList = change.current;
+            break;
         }
       });
     });
@@ -1770,6 +1773,9 @@ function undo(graph, changeManager) {
             change.previous.attributes.forEach((value, key) => {
               leftNode.attributes.set(key, value);
             });
+            break;
+          case "changeNodeList":
+            draft.nodeList = change.previous;
             break;
         }
       });

@@ -257,11 +257,13 @@ function getRight(graph, nodeId) {
  */
 
 function setChild(graph, changeManager, parentId, childId, isLeft) {
+  console.log("setChild called", parentId, childId, isLeft);
+  const oldNodeList = graph.nodeList;
   const newGraph = produce(graph, (draft) => {
-    let newEdge = new Edge(parentId, childId);
-    // Add the edge to both the source and target's adjacency lists
-    draft.nodes.get(parentId).edges.set(`${parentId},${childId}`, newEdge);
-    draft.nodes.get(childId).edges.set(`${childId},${parentId}`, newEdge);
+    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, parentId, childId);
+
+    // remove childId from nodeList
+    draft.nodeList.splice(draft.nodeList.indexOf(childId), 1);  
 
     // if it's a left child, put it at the front of the node list
     if ( isLeft ) {
@@ -273,17 +275,14 @@ function setChild(graph, changeManager, parentId, childId, isLeft) {
     }
   });
   
-  // Add the new edge object to the changeManager
+  // Let the change manager know that the node list has changed
   const newChangeManager = recordChange(changeManager, [
-    new ChangeObject("addEdge", null, {
-      source: parentId,
-      target: childId,
-    })
+    new ChangeObject("changeNodeList", oldNodeList, newGraph.nodeList)
   ]);
   
   // Return mutated graph and change manager to trigger re-render
   // Add the node id as the third return value
-  return [newGraph, newChangeManager]
+  return [newGraph, newChangeManager];
 }
 
 /**
@@ -296,6 +295,7 @@ function setChild(graph, changeManager, parentId, childId, isLeft) {
  * @todo Add ChangeManager functionality -- see addBinaryNode for reference
  */
 function setLeft(graph, changeManager, parentId, leftChildId) {
+  console.log("setLeft called", parentId, leftChildId);
   isTree(graph);
 
   // Throw an error if the node doesn't exist
@@ -520,6 +520,8 @@ const TreeInterface = {
   isLeaf,
   getLeft,
   getRight,
+  setLeft,
+  setRight,
   addLeft,
   addRight
 };

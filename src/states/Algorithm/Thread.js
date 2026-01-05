@@ -1075,6 +1075,7 @@ function addLeft(targetNode, childWeight) {
 }
 
 function setLeft(parent, child) {
+    console.log("SET LEFT CALLED", parent, child);
     if (stepDepth === 0) { postMessage({ action: "step" }) };
     [graph, changeManager] = TreeInterface.setLeft(graph, changeManager, parent, child);
     postMessage({ action: "setLeft", parent: parent, child: child});

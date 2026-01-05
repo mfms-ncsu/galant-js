@@ -131,7 +131,7 @@ function createDummy(){
 
 function addNodeBST(x, k) {
   // If empty, make new root
-  if ( x === null ) {
+  if ( x === null || x === undefined ) {
     addNodeInsideWeight(k);
     display(`Created root ${k}`);
     return;
@@ -275,7 +275,7 @@ function deleteNodeBST(x, k) {
     }
   }
 
-  else if ( ! rightDum ) {
+  if ( ! rightDum ) {
     // has only a right child
     if ( p ) {
       // if node has a parent, the right child takes its place    
