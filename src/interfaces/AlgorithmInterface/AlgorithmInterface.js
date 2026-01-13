@@ -298,6 +298,14 @@ function onMessage(algorithm, message) {
             [newGraph, newChangeManager] = LayeredGraphInterface.applyNodePositions(graph, changeManager, message.savedPositions);
             updateState(newGraph, newChangeManager);
             break;
+        case "setLeft":
+            [newGraph, newChangeManager] = TreeInterface.setLeft(graph, changeManager, message.parent, message.child);
+            updateState(newGraph, newChangeManager);
+            break;
+        case "setRight":
+            [newGraph, newChangeManager] = TreeInterface.setRight(graph, changeManager, message.parent, message.child);
+            updateState(newGraph, newChangeManager);
+            break;
         case "addLeft":
             [newGraph, newChangeManager] = TreeInterface.addLeft(graph, changeManager, message.targetNode, message.childWeight);
             updateState(newGraph, newChangeManager);

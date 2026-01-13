@@ -709,6 +709,8 @@ function addEdge(graph, changeManager, source, target, attributes) {
   // Error checking
   verifyNodes(graph, source, target, "create edge");
 
+  console.log("Adding edge from " + source + " to " + target);
+
   const newGraph = produce(graph, (draft) => {
     // Create the edge object
     let edge = new Edge(source, target);
@@ -772,10 +774,13 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
   // If the nodeId argument is passed, use that, otherwise generate an id
   nodeId = nodeId || generateId(graph.nodes);
 
+  const oldNodeList = graph.nodeList;
+
   const newGraph = produce(graph, (draft) => {
     // Create the node
     let node = new Node(nodeId, Math.round(x), Math.round(y));
     draft.nodes.set(nodeId, node);
+    draft.nodeList.push(nodeId);
 
     // Set the attributes
     for (let name in attributes) {
@@ -784,7 +789,7 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
   });
 
   // Add the change object to the changeManager
-  const newChangeManager = recordChange(changeManager, [
+  let newChangeManager = recordChange(changeManager, [
     new ChangeObject("addNode", null, {
       id: nodeId,
       position: {
@@ -900,7 +905,8 @@ function deleteNode(graph, changeManager, nodeId) {
       );
     });
 
-    // Finally, delete the node from the nodes list
+    // Finally, delete the node from both the nodes map and the nodeList
+    draft.nodeList = draft.nodeList.filter((id) => id !== nodeId);
     draft.nodes.delete(nodeId);
   });
 
@@ -993,9 +999,11 @@ function redo(graph, changeManager) {
                 change.current.position.y
               )
             );
+            draft.nodeList.push(change.current.id);
             break;
           case "deleteNode":
             draft.nodes.delete(change.previous.id);
+            draft.nodeList = draft.nodeList.filter((id => id !== change.previous.id));
             break;
           case "deleteLeft":
             draft.nodes.delete(change.previous.id);
@@ -1007,6 +1015,7 @@ function redo(graph, changeManager) {
                 `${change.current.source},${change.current.target}`,
                 new Edge(change.current.source, change.current.target)
               );
+              console.log("recording change for edge", change.current.source, ",", change.current.target);
             draft.nodes
               .get(change.current.target)
               .edges.set(
@@ -1693,6 +1702,7 @@ function undo(graph, changeManager) {
         switch (change.action) {
           case "addNode":
             draft.nodes.delete(change.current.id);
+            draft.nodeList = draft.nodeList.filter(id => id !== change.current.id);
             break;
           case "deleteNode":
             draft.nodes.set(
@@ -1707,6 +1717,7 @@ function undo(graph, changeManager) {
             change.previous.attributes.forEach((value, key) => {
               node.attributes.set(key, value);
             });
+            draft.nodeList.push(change.previous.id);
             break;
           case "addEdge":
             draft.nodes
@@ -1775,7 +1786,7 @@ function undo(graph, changeManager) {
             });
             break;
           case "changeNodeList":
-            draft.nodeList = change.previous;
+            draft.nodeList = change.current;
             break;
         }
       });

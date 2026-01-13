@@ -257,10 +257,22 @@ function getRight(graph, nodeId) {
  */
 
 function setChild(graph, changeManager, parentId, childId, isLeft) {
-  console.log("setChild called", parentId, childId, isLeft);
-  const oldNodeList = graph.nodeList;
+  console.log("-> setChild", parentId, childId, isLeft);
+  let changeObjects = [];
   const newGraph = produce(graph, (draft) => {
-    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, parentId, childId);
+    // create edge from parent to child
+    let edge = new Edge(parentId, childId);
+    // Add the edge to both the source and target's adjacency lists
+    draft.nodes.get(parentId).edges.set(`${parentId},${childId}`, edge);
+    draft.nodes.get(childId).edges.set(`${parentId},${childId}`, edge);
+    // record the change
+    changeObjects.push(
+      new ChangeObject("addEdge", null, {
+        source: parentId,
+        target: childId,
+        attributes: {}
+      })
+    );
 
     // remove childId from nodeList
     draft.nodeList.splice(draft.nodeList.indexOf(childId), 1);  
@@ -276,9 +288,10 @@ function setChild(graph, changeManager, parentId, childId, isLeft) {
   });
   
   // Let the change manager know that the node list has changed
-  const newChangeManager = recordChange(changeManager, [
-    new ChangeObject("changeNodeList", oldNodeList, newGraph.nodeList)
-  ]);
+  changeObjects.push(new ChangeObject("changeNodeList", null, newGraph.nodeList));
+  const newChangeManager = recordChange(changeManager, changeObjects);
+
+  console.log("<- setChild", newGraph, newChangeManager);
   
   // Return mutated graph and change manager to trigger re-render
   // Add the node id as the third return value
