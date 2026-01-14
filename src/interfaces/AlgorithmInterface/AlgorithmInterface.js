@@ -200,6 +200,7 @@ function onMessage(algorithm, message) {
             break;
         case "addNode":
             [newGraph, newChangeManager] = GraphInterface.addNode(graph, changeManager, message.x, message.y);
+            console.log("addNode in AlgorithmInterface", newGraph.nodeList);
             updateState(newGraph, newChangeManager);
             break;
         case "addEdge":

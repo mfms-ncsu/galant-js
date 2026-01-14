@@ -766,6 +766,8 @@ function addMessage(changeManager, message) {
  */
 function addNode(graph, changeManager, x, y, nodeId, attributes) {
   // Throw an error if the id is a duplicate
+  console.log("-> addNode", nodeId);
+
   verifyGraphChangeManager(graph, changeManager);
   if (nodeId && graph.nodes.has(nodeId)) {
     throw new Error("Cannot add node with duplicate ID");
@@ -800,6 +802,8 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
     })
   ]);
 
+  console.log("<- addNode", newGraph.nodeList);
+  
   // Return mutated graph and change manager to trigger re-render
   // Add the node id as the third return value
   return [newGraph, newChangeManager, nodeId];

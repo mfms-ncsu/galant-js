@@ -5,7 +5,6 @@
 *    - If the number is negative, it is deleted from the tree
 *    - If the number is 0, the algorithm stops
 */
-
 function cleanTree(){
   step(() => {
     clearNodeMarks();
@@ -22,7 +21,9 @@ function cleanTree(){
 function accentNode(nodeId) {
   step(() => {
     mark(nodeId)
-    if ( parent(nodeId) ) unmark(parent(nodeId));
+    if ( getParent(nodeId) !== null && getParent(nodeId) !== undefined ) {
+       unmark(getParent(nodeId));
+    }
   });
 }
 
@@ -55,7 +56,9 @@ function isDummy(nodeId) {
  * @param w weight of the new left child
  */
 function addLeftInsideWeight(nodeId, w) {
-  const newNode = addLeft(nodeId, w);
+  const newNode = addNode();
+  setWeight(newNode, w);
+  setLeft(nodeId, newNode);
   setAttribute(newNode, "weightInNode", true);
   hideWeight(newNode);
   return newNode;
@@ -67,7 +70,9 @@ function addLeftInsideWeight(nodeId, w) {
  * @param w weight of the new right child
  */
 function addRightInsideWeight(nodeId, w) {
-  const newNode = addRight(nodeId, w);
+  const newNode = addNode();
+  setWeight(newNode, w);
+  setRight(nodeId, newNode);
   setAttribute(newNode, "weightInNode", true);
   hideWeight(newNode);
   return newNode;
@@ -78,10 +83,14 @@ function addRightInsideWeight(nodeId, w) {
  * used when adding the root node
  */
 function addNodeInsideWeight(w) {
-  const newNode = addNode(0, w);
-  setAttribute(newNode, "weightInNode", true);
-  hideWeight(newNode);
-  return newNode;
+  step(() => {
+    display(`Adding node with weight ${w}`);
+    const newNode = addNode();
+    setWeight(newNode, w);
+    setAttribute(newNode, "weightInNode", true);
+    hideWeight(newNode);
+    return newNode;
+  });
 }
 
 /**
@@ -112,9 +121,13 @@ function dummify(nodeId) {
  * @param weight the weight of the new node
  */
 function undummify(nodeId, weight) {
-  setAttribute(nodeId, "dummy", false);
-  setAttribute(nodeId, "weight", weight);
-  display(`Successfully added node ${weight}`)
+  step(() => {
+    setAttribute(nodeId, "dummy", false);
+    setWeight(nodeId, weight);
+    setAttribute(nodeId, "weightInNode", true);
+    hideWeight(nodeId);
+    display(`Successfully added node ${weight}`)
+  });
   return nodeId;
 }
 
@@ -138,7 +151,7 @@ function addNodeBST(x, k) {
   }
 
   // Found duplicate node
-  if (k === weight(x)) {
+  if ( k === weight(x) ) {
     display(`Node with key ${k} already exists`);
     return;
   }
@@ -148,10 +161,12 @@ function addNodeBST(x, k) {
     step(()=>{
       if ( k < weight(x) ) {
         addLeftInsideWeight(x, k);
-        dummify(addRight(x, undefined));
+        const dummy = createDummy();
+        setRight(x, dummy);
       } else {
         addRightInsideWeight(x, k);
-        dummify(addLeft(x, undefined));
+        const dummy = createDummy();
+        setLeft(x, dummy);
       } 
       display(`Successfully added node ${k}`)
     });
@@ -207,7 +222,8 @@ function deleteNodeBST(x, k) {
 
   // CASE 1: DELETE A LEAF
   if ( isLeaf(x) ) {
-    // if sibling is a dummy, delete this and the sibling, otherwise turn this to a dummmy
+    // if sibling is a dummy, delete this and the sibling,
+    //  otherwise turn this into a dummmy
     if ( sibDummy ){
       deleteNode(x);
       deleteNode(sibling);
@@ -230,107 +246,28 @@ function deleteNodeBST(x, k) {
     let predecessor = findInOrderPredecessor(left(x));
 
     // Replace deleted node weight with in-order predecessor weight
-    step(() =>{
-      let predWeight = weight(predecessor);
-      // Delete the in-order predecessor
-      deleteNodeBST(x, predWeight, true);
-      setWeight(x, predWeight);
-      display(`Successully deleted: '${k}'`)
-    });
+    let predWeight = weight(predecessor);
+    // Delete the in-order predecessor
+    deleteNodeBST(x, predWeight);
+    setWeight(x, predWeight);
+    display(`Successully deleted: '${k}'`)
   } 
 
   // CASE 3: DELETE WITH 1 CHILD
-  // Get the lone child
-  const theChild = leftDummy ? getRight(x) : getLeft(x);
-
-  // first the easy case: x is the root
-  // then just make the child the new root,
-  // which is easy, since we can just delete the root
-  if ( ! p ) {
-    deleteNode(x);
-  }
   else {
-    // @todo: need functions makeLeftChild and makeRightChild for situations where
-    // both the node and the child already exist -- see TreeInterface.js
-    // these functions would be in Thread.js as well
-    // after that, it will be easy to refactor this code to use those functions
-
-    // if x has a parent, we need to attach the child to the parent
-    // first, figure out if x is a left or right child of its parent
-    if ( getLeft(p) === x ) {
-      // x is a left child
-      step(() => {
-        deleteEdge(p, x);
-        addEdge(p, theChild);
-        deleteNode(x);
-      });
+    // first the easy case: x is the root
+    // then just make the child the new root,
+    // which is easy, since we can just delete the root
+    if ( ! p ) {
+      deleteNode(x);
+    } else {
+      // Get the lone child
+      const theChild = leftDummy ? getRight(x) : getLeft(x);
+      // then replace x with its child
+      deleteEdge(p, x);
+      deleteNode(x);
+      addEdge(p, theChild);
     }
-    else {
-      // x is a right child
-      step(() => {
-        deleteEdge(p, x);
-        addEdge(p, theChild);
-        deleteNode(x);
-      });
-    }
-  }
-
-  if ( ! rightDum ) {
-    // has only a right child
-    if ( p ) {
-      // if node has a parent, the right child takes its place    
-
-      setWeight(x, weight(R));
-      const newChildren = getChildren(R);
-
-      // Delete both children
-      step(() => {
-        getChildren(x).forEach( (child) => {
-            deleteNode(child);
-        });
-      });
-
-      // Reattach new children
-      step(() => {
-        newChildren.forEach((child) => {
-            addEdge(x, child);
-        });
-      });
-      
-    }else{
-      step(() => {
-        deleteNode(L);
-        deleteNode(x);
-      });
-    }
-  } else {
-    if (p){
-
-      // Replace this node's weight with its only child and store its children
-      setWeight(x, weight(L));
-      let newChildren = getChildren(L);
-      // Delete both children
-      step(() => {
-        getChildren(x).forEach((child) => {
-          deleteNode(child);
-        });
-      });
-
-      // Reattach new children
-      step(() => {
-        newChildren.forEach((child) => { 
-          addEdge(x, child);
-        });
-      });
-    }else{
-      step(() => {
-        deleteNode(R);
-        deleteNode(x);
-      });
-    }
-  }
-
-  if( !hideDisplay ){
     display(`Successully deleted: '${k}'`);
   }
 }

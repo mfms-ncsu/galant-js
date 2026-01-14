@@ -112,7 +112,7 @@ function parseNode(graph, node) {
     // Add attributes
     node.attributes.forEach((value, name) => {
 
-        if (name === "weight" && parseAndRound(value)) {
+        if ( name === "weight" && parseAndRound(value) ) {
             element.data[name] = parseAndRound(value);
         }
         else {
@@ -147,7 +147,7 @@ function getElements(graph) {
 
         // Loop over each edge sourced at this node
         node.edges.forEach(edge => {
-            if (node.id === edge.source) {
+            if ( node.id === edge.source ) {
                 elements.push(parseEdge(graph, edge));
             }
         });
