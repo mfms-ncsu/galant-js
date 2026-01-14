@@ -709,8 +709,6 @@ function addEdge(graph, changeManager, source, target, attributes) {
   // Error checking
   verifyNodes(graph, source, target, "create edge");
 
-  console.log("Adding edge from " + source + " to " + target);
-
   const newGraph = produce(graph, (draft) => {
     // Create the edge object
     let edge = new Edge(source, target);
@@ -766,8 +764,6 @@ function addMessage(changeManager, message) {
  */
 function addNode(graph, changeManager, x, y, nodeId, attributes) {
   // Throw an error if the id is a duplicate
-  console.log("-> addNode", nodeId);
-
   verifyGraphChangeManager(graph, changeManager);
   if (nodeId && graph.nodes.has(nodeId)) {
     throw new Error("Cannot add node with duplicate ID");
@@ -802,8 +798,6 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
     })
   ]);
 
-  console.log("<- addNode", newGraph.nodeList);
-  
   // Return mutated graph and change manager to trigger re-render
   // Add the node id as the third return value
   return [newGraph, newChangeManager, nodeId];
@@ -1019,7 +1013,6 @@ function redo(graph, changeManager) {
                 `${change.current.source},${change.current.target}`,
                 new Edge(change.current.source, change.current.target)
               );
-              console.log("recording change for edge", change.current.source, ",", change.current.target);
             draft.nodes
               .get(change.current.target)
               .edges.set(
@@ -1233,7 +1226,8 @@ function setDirected(graph, isDirected) {
  */
 function setNodeAttribute(graph, changeManager, nodeId, name, value) {
   verifyGraphChangeManager(graph, changeManager);
-  if (!graph.nodes.has(nodeId)) {
+  console.log("Setting node attribute", nodeId, name, value);
+  if ( ! graph.nodes.has(nodeId) ) {
     throw new Error(
       "Cannot set attribute of node " +
         nodeId +

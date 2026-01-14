@@ -144,7 +144,6 @@ function isNumeric(str) {
  * @param {String} file File text
  */
 function loadGraph(name, file) {
-    console.log("-> loadGraph", name, file);
     // Split the file on the new line character and parse each line
     const lines = file.split("\n");
 

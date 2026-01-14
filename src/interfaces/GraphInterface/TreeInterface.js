@@ -257,7 +257,8 @@ function getRight(graph, nodeId) {
  */
 
 function setChild(graph, changeManager, parentId, childId, isLeft) {
-  console.log("-> setChild", parentId, childId, isLeft);
+  console.log(`-> setChild: parent ${parentId}, child ${childId}, isLeft ${isLeft}`);
+  const currentNodeList = graph.nodeList;
   let changeObjects = [];
   const newGraph = produce(graph, (draft) => {
     // create edge from parent to child
@@ -288,11 +289,10 @@ function setChild(graph, changeManager, parentId, childId, isLeft) {
   });
   
   // Let the change manager know that the node list has changed
-  changeObjects.push(new ChangeObject("changeNodeList", null, newGraph.nodeList));
+  changeObjects.push(new ChangeObject("changeNodeList", currentNodeList, newGraph.nodeList));
   const newChangeManager = recordChange(changeManager, changeObjects);
-
-  console.log("<- setChild", newGraph, newChangeManager);
   
+  console.log("<- setChild, chidren:", getChildren(newGraph, parentId), "nodeList:", newGraph.nodeList);
   // Return mutated graph and change manager to trigger re-render
   // Add the node id as the third return value
   return [newGraph, newChangeManager];
@@ -308,7 +308,6 @@ function setChild(graph, changeManager, parentId, childId, isLeft) {
  * @todo Add ChangeManager functionality -- see addBinaryNode for reference
  */
 function setLeft(graph, changeManager, parentId, leftChildId) {
-  console.log("setLeft called", parentId, leftChildId);
   isTree(graph);
 
   // Throw an error if the node doesn't exist
@@ -353,7 +352,7 @@ function setRight(graph, changeManager,parentId, rightChildId) {
     );
   }
 
-  // Throw an error if the left child doesn't exist
+  // Throw an error if the right child doesn't exist
   if ( ! graph.nodes.has(rightChildId) ) {
     throw new Error(
       "Cannot set " + rightChildId +

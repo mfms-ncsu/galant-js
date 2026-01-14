@@ -143,6 +143,8 @@ function createDummy(){
 //-----------------ADD/DELETE-------------------
 
 function addNodeBST(x, k) {
+  const theWeight = (x === null || x === undefined) ? null : weight(x);
+  console.log(`Adding node with key ${k}, at subroot with key ${theWeight}`);
   // If empty, make new root
   if ( x === null || x === undefined ) {
     addNodeInsideWeight(k);
@@ -156,7 +158,7 @@ function addNodeBST(x, k) {
     return;
   }
 
-  // If a leaf, then add 2 dummy nodes
+  // If a leaf, then add new node and a dummy here
   if ( isLeaf(x) ) {    
     step(()=>{
       if ( k < weight(x) ) {
@@ -164,9 +166,10 @@ function addNodeBST(x, k) {
         const dummy = createDummy();
         setRight(x, dummy);
       } else {
-        addRightInsideWeight(x, k);
+        // !!! order matters here: it determines which node becomes left child and which becomes right child
         const dummy = createDummy();
         setLeft(x, dummy);
+        addRightInsideWeight(x, k);
       } 
       display(`Successfully added node ${k}`)
     });
@@ -175,8 +178,10 @@ function addNodeBST(x, k) {
 
   // Not a leaf, keep searching
   accentNode(x);
+  console.log(`Not a leaf, key ${k} at subroot with key ${weight(x)}`);
   if ( k < weight(x) ) {
     const L = getLeft(x);
+    console.log("Going left, L key:", L ? weight(L) : "null");
     if ( L && isDummy(L) ) { //end, replace dummy
       return undummify(L, k);
     } else {
@@ -184,6 +189,7 @@ function addNodeBST(x, k) {
     }
   } else if ( k > weight(x) ) {
     const R = getRight(x);
+    console.log("Going right, R key:", R ? weight(R) : "null");
     if ( R && isDummy(R) ) { //end, replace dummy
       return undummify(R, k);
     } else {

@@ -126,7 +126,6 @@ function step(code = null) {
  * @returns {string} The user input
  */
 function prompt(message, error = "") {
-    console.log("Prompting with message: " + message + " and error: " + error);
     if (message === null || message === "") {
         message = "Prompt";
     }
@@ -1075,7 +1074,6 @@ function addLeft(targetNode, childWeight) {
 }
 
 function setLeft(parent, child) {
-    console.log("SET LEFT CALLED", parent, child);
     if (stepDepth === 0) { postMessage({ action: "step" }) };
     [graph, changeManager] = TreeInterface.setLeft(graph, changeManager, parent, child);
     postMessage({ action: "setLeft", parent: parent, child: child});
@@ -1167,7 +1165,6 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         // Load the graph with isDirected flag
         graph = FileParser.loadGraph(message[4], message[1]);
         graph.isDirected = message[2];
-        console.log(message);
 
         // Make sure that the stepDepth variable is initialized
         stepDepth = 0;
