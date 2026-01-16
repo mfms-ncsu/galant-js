@@ -249,7 +249,7 @@ function deleteNodeBST(x, k) {
   else if ( ! leftDummy  && ! rightDummy ) {
 
     // Find in-order predecessor
-    let predecessor = findInOrderPredecessor(left(x));
+    let predecessor = findInOrderPredecessor(getLeft(x));
 
     // Replace deleted node weight with in-order predecessor weight
     let predWeight = weight(predecessor);

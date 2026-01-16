@@ -195,6 +195,7 @@ function setAttribute(id, name, value) {
  * @param {Object} value Attribute value
  */
 function setAttributeAll(type, name, value) {
+    console.log("-> setAttributeAll:", type, name, value);
     if (stepDepth == 0) { postMessage({ action: "step" }) }
 
     if (type === "nodes") {
@@ -1157,6 +1158,7 @@ function addDummyNodes(attribute) {
 self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
 
     message = message.data;
+    console.log("Worker received message:", message[0]);
     if (message[0] === "shared") {
         sharedArray = message[1];
         flags = message[2];

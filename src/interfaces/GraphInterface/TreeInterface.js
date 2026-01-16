@@ -76,9 +76,7 @@ function getParent(graph, target) {
 
   if ( ! graph.nodes.has(target) ) {
     throw new Error(
-      "Cannot get parent of node " +
-        target +
-        " because no node with this id exists in the graph"
+      `Cannot get parent of node ${target} because no node with this id exists in the graph`
     );
   }
 
@@ -91,7 +89,7 @@ function getParent(graph, target) {
   }
   if ( incoming.length > 1 ) {
     throw new Error(
-      "Node " + target + " has multiple parents: " + incoming.join(", ")
+      `Node ${target} (weight ${GraphInterface.getNodeAttribute(graph, target, "weight")}) has multiple parents: ${incoming.join(", ")}`
     );
   }
   return incoming[0];
@@ -101,12 +99,16 @@ function getParent(graph, target) {
 /**
  * Gets children of target node
  * @param {Graph} graph Graph on which to operate
- * @param {String} target Node to check 
+ * @param {String} source Node whose children to return
  * @returns Array of children nodes
  */
 function getChildren(graph, source) {
   isTree(graph);
-
+  if ( ! graph.nodes.has(source) ) {
+    throw new Error(
+      `Cannot get children of node ${source} because no node with this id exists in the graph`
+    );
+  }
   return GraphInterface.getOutgoingNodes(graph, source);
 }
 
@@ -200,9 +202,7 @@ function getLeft(graph, nodeId) {
   // Throw an error if the node doesn't exist
   if ( ! graph.nodes.has(nodeId) ) {
     throw new Error(
-      "Cannot get left child of node " +
-        nodeId +
-        " because no node with this id exists in the graph"
+      `Cannot get left child of node ${nodeId}) because no node with this id exists in the graph`
     );
   }
 
@@ -243,20 +243,35 @@ function getRight(graph, nodeId) {
 }
 
 /**
- * adds a node with the given id and attributes as either a left child or a right child
- * this is called in a context where the parent node is already known and the edges are added outside this function
- * see @addLeft and @addRight for usage
- * the primary purpose is to ensure that a left child is added to the front of the nodes map and a right child is added to the end
- * so that the nodes will be displayed in the correct order
+ * Adds an edge from parent to child and sets the child as either a left child or a right child.
+ * Called from setLeft and setRight.
+ * Caution: The left child must be created and setLeft called before the right child and setRight,
+ * otherwise the getLeft and getRight functions will return the wrong children.
+ * The left child is added to the front of the nodeList and a right child is added to the end
+ * so that the nodes will be displayed in the correct order.
  * @param {Graph} graph Graph on which to operate
  * @param {ChangeManager} changeManager ChangeManager to use for storing changes
  * @param {string} nodeId Id of the node to add, or undefined to generate a new id
  * @param {Object} attributes Attributes to set on the node
  * @param {boolean} leftChild If true, identifies the node as a left child, otherwise as a right child
- * @returns [newGraph, newChangeManager, nodeId] The mutated graph, change manager, and the id of the new node
+ * @returns [newGraph, newChangeManager] The mutated graph and change manager.
  */
 
 function setChild(graph, changeManager, parentId, childId, isLeft) {
+  // Throw an error if the parent doesn't exist
+  if ( ! graph.nodes.has(parentId) ) {
+    throw new Error(
+      `setChild - no parent with id ${parentId} exists in the graph`
+    );
+  }
+
+  // Throw an error if the left child doesn't exist
+  if ( ! graph.nodes.has(childId) ) {
+    throw new Error(
+      `setChild - no child with id ${childId} exists in the graph, parent is ${parentId} (weight ${GraphInterface.getNodeAttribute(graph,parentId, "weight")})`
+    );
+  }
+
   console.log(`-> setChild: parent ${parentId}, child ${childId}, isLeft ${isLeft}`);
   const currentNodeList = graph.nodeList;
   let changeObjects = [];
@@ -309,25 +324,7 @@ function setChild(graph, changeManager, parentId, childId, isLeft) {
  */
 function setLeft(graph, changeManager, parentId, leftChildId) {
   isTree(graph);
-
-  // Throw an error if the node doesn't exist
-  if ( ! graph.nodes.has(parentId) ) {
-    throw new Error(
-      "Cannot set left child of node " +
-        parentId +
-        " because no node with this id exists in the graph"
-    );
-  }
-
-  // Throw an error if the left child doesn't exist
-  if ( ! graph.nodes.has(leftChildId) ) {
-    throw new Error(
-      "Cannot set " + leftChildId +
-        " as left child because no node with this id exists in the graph"
-    );
-  }
   [graph, changeManager] = setChild(graph, changeManager, parentId, leftChildId, true);
-
   return [graph, changeManager];
 }
 
@@ -342,26 +339,7 @@ function setLeft(graph, changeManager, parentId, leftChildId) {
  */
 function setRight(graph, changeManager,parentId, rightChildId) {
   isTree(graph);
-
-  // Throw an error if the node doesn't exist
-  if ( ! graph.nodes.has(parentId) ) {
-    throw new Error(
-      "Cannot set right child of node " +
-        parentId +
-        " because no node with this id exists in the graph"
-    );
-  }
-
-  // Throw an error if the right child doesn't exist
-  if ( ! graph.nodes.has(rightChildId) ) {
-    throw new Error(
-      "Cannot set " + rightChildId +
-        " as right childbecause no node with this id exists in the graph"
-    );
-  }
-
   [graph, changeManager] = setChild(graph, changeManager, parentId, rightChildId, false);
-
   return [graph, changeManager];
 }
 
