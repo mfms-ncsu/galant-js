@@ -205,14 +205,15 @@ function addNodeBST(x, k) {
  * @param x a subroot of BST, initially the root of the BST
  * @param k the weight of the node to delete
  */
-function deleteNodeBST(x, k) {
+function deleteNodeBST(x, k, displaySuccess = true) {
+  console.log(`-> deleteNodeBST called with k=${k} at node ${ x ? weight(x) : "null" }, displaySuccess=${displaySuccess}`);
   // Couldn't find node we are trying to delete, error
   if ( x === undefined || getAttribute(x, "dummy") || ( isLeaf(x) && k != weight(x) ) ){
     display(`Could not find node ${k} to delete`);
     return;
   }
 
-  //Not a leaf, and not == k, keep searching
+  //Not a leaf, and weight(x)not == k, keep searching
   accentNode(x);
   if ( k < weight(x) ) {
     return deleteNodeBST(getLeft(x), k);    
@@ -220,33 +221,46 @@ function deleteNodeBST(x, k) {
     return deleteNodeBST(getRight(x), k);
   }
 
+  console.log(`deleteNodeBST k=${k} = weight of x, which is ${ x ? weight(x) : "null" }`);
+
   // Found node to delete
   const leftDummy = getLeft(x) && isDummy(getLeft(x));
+  console.log(`leftDummy=${leftDummy}`);
   const rightDummy = getRight(x) && isDummy(getRight(x));
-  const sibling = getSibling(x);
-  const sibDummy = isDummy(sibling);
+  console.log(`rightDummy=${rightDummy}`);
 
   // CASE 1: DELETE A LEAF
   if ( isLeaf(x) ) {
-    // if sibling is a dummy, delete this and the sibling,
-    //  otherwise turn this into a dummmy
+    if ( x == getRoot()) {
+      // if root is a leaf, just delete it
+      deleteNode(x);
+      if ( displaySuccess ) {
+        display(`Successully deleted: ${k}`);
+      }
+      return;
+    }
+    // here if x is not the root, so has a sibling
+    const sibling = getSibling(x);
+    console.log(`sibling=${sibling ? weight(sibling) : "null"}`);
+    const sibDummy = isDummy(sibling);
+    // if sibling is a dummy, delete x and the sibling,
     if ( sibDummy ){
       deleteNode(x);
       deleteNode(sibling);
       display(`Deleted leaf ${k} and its dummy sibling`);
       return;
-    } else if ( getRoot() != x ) {
-      dummify(x);
-      display(`Successully deleted: ${k}`);
-      return;
-    } else {
-      deleteNode(x);
+    }
+    //  otherwise turn this x into a dummmy
+    dummify(x);
+    if ( displaySuccess ) {
       display(`Successully deleted: ${k}`);
     }
+    return;
   }
 
   // CASE 2: DELETE WITH 2 CHILDREN
   else if ( ! leftDummy  && ! rightDummy ) {
+    console.log(`deleting with two children k=${k} at node ${ x ? weight(x) : "null" }`);
 
     // Find in-order predecessor
     let predecessor = findInOrderPredecessor(getLeft(x));
@@ -254,10 +268,13 @@ function deleteNodeBST(x, k) {
     // Replace deleted node weight with in-order predecessor weight
     let predWeight = weight(predecessor);
     // Delete the in-order predecessor
-    deleteNodeBST(x, predWeight);
+    deleteNodeBST(getLeft(x), predWeight, false);
     setWeight(x, predWeight);
-    display(`Successully deleted: '${k}'`)
-  } 
+    if ( displaySuccess ) {
+      display(`Successully deleted: '${k}' by replacing with predecessor '${predWeight}'`);
+    }
+    return;
+  }
 
   // CASE 3: DELETE WITH 1 CHILD
   else {
@@ -274,7 +291,10 @@ function deleteNodeBST(x, k) {
       deleteNode(x);
       addEdge(p, theChild);
     }
-    display(`Successully deleted: '${k}'`);
+    if ( displaySuccess ) {
+      display(`Successully deleted: ${k}`);
+    }
+    return;
   }
 }
 
