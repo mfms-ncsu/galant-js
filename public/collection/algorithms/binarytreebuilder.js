@@ -4,7 +4,20 @@
 *    - If the number is positive, it is added to the tree
 *    - If the number is negative, it is deleted from the tree
 *    - If the number is 0, the algorithm stops
+* Note that duplicate numbers are not allowed in this BST, although it would be
+* relatively easy to modify the code to allow duplicates.
+*
+* Unlike many textbook descriptions, this animation uses dummy nodes only to ensure correct display.
+* A node has at most one dummy child. Thus, there are these cases for non-dummy nodes:
+* - node is a leaf; it has no children, *not* two dummy children as in the textbooks
+* - node has one real child and one dummy child
+* - node has two real children
 */
+
+/**
+ * Gets rid of all markings and highlights in the tree, so that the next operation
+ * can start fresh
+ */
 function cleanTree(){
   step(() => {
     clearNodeMarks();
@@ -27,17 +40,26 @@ function accentNode(nodeId) {
   });
 }
 
-// this should be added to Thread.js and TreeInterface.js
+/**
+ * @returns the sibling of the given node
+ * @param node the node whose sibling we are finding
+ * @assume the node has a parent
+ * 
+ * @todo add this to Thread.js and TreeInterface.js
+ */
 function getSibling(node) {
+  if ( node === null || node === undefined ) {
+    throw new Error(`getSibling called on nonexistent node`);  }
   const parent = getParent(node);
+  if ( parent === null || parent === undefined ) {
+    throw new Error(`getSibling called on node with ${node}, weight ${weight(node)}, no parent`);
+  }
 
   // If the left child of the parent is the node, return the right child 
   // of the parent which would be the sibling of node
   // else return the left child which would be node's sibling
   return getLeft(parent) === node ? getRight(parent) : getLeft(parent);
 }
-
-//-----------------UNIQUE BST FNS-------------------
 
 /**
  * checks if a node is a dummy node
@@ -94,7 +116,7 @@ function addNodeInsideWeight(w) {
 }
 
 /**
- * finds the in-order predecessor of a given node, i.e.,
+ * @returns the in-order predecessor of a given node, i.e.,
  * the node with maximum weight in the left subtree
  * @param currentNode the node whose in-order predecessor we are finding
  */
@@ -132,7 +154,7 @@ function undummify(nodeId, weight) {
 }
 
 /**
- * creates and returns a new dummy node
+ * @returns a new (newly created)dummy node
  */
 function createDummy(){
   const dummy = addNode(0, 0)
@@ -142,6 +164,11 @@ function createDummy(){
 
 //-----------------ADD/DELETE-------------------
 
+/**
+ * Adds a node with weight k to the BST rooted at x
+ * @param x a subroot of BST, initially the root of the BST
+ * @param k the weight of the node to add
+ */
 function addNodeBST(x, k) {
   const theWeight = (x === null || x === undefined) ? null : weight(x);
   console.log(`Adding node with key ${k}, at subroot with key ${theWeight}`);
@@ -201,19 +228,66 @@ function addNodeBST(x, k) {
 }
 
 /**
+ * @returns true if the given node has two real (non-dummy) children
+ * @param nodeId (id of) the node to check 
+ */
+function hasTwoRealChildren(nodeId) {
+  if ( isLeaf(nodeId) ) return false;
+  const leftChild = getLeft(nodeId);
+  const rightChild = getRight(nodeId);
+  return leftChild && ! isDummy(leftChild) && rightChild && ! isDummy(rightChild);
+}
+
+function isRightChild(nodeId) {
+  const parent = getParent(nodeId);
+  if ( parent === null || parent === undefined ) {
+    throw new Error(`isRightChild called on node with ${nodeId}, weight ${weight(nodeId)}, no parent`);
+  }
+  return getRight(parent) === nodeId;
+}
+
+/**
+ * handles deletion of a terminal node (a leaf or a node with one child)
+ * @param x the node to delete
+ */
+function terminalNodeDeletion(x) {
+  if ( x == getRoot() ) {
+    // if root is terminal, just delete it
+    deleteNode(x);
+    return;
+  }
+  // here if x is not the root, so has a sibling
+  // Get the lone real child of x
+  const parent = getParent(x);
+  const leftDummy = isDummy( getLeft(x) );
+  const theRealChild = leftDummy ? getRight(x) : getLeft(x);
+  // then replace x with the real child
+  deleteEdge(parent, x);
+  addEdge(parent, theRealChild);
+  // make sure that theRealChild is in the correct position
+  if ( isRightChild(x) ) {
+    setRight(parent, theRealChild);
+  } else {
+    setLeft(parent, theRealChild);
+  }
+  deleteNode(x);
+  return;
+}
+
+/**
  * Deletes a node with weight k from the BST rooted at x
  * @param x a subroot of BST, initially the root of the BST
  * @param k the weight of the node to delete
  */
-function deleteNodeBST(x, k, displaySuccess = true) {
-  console.log(`-> deleteNodeBST called with k=${k} at node ${ x ? weight(x) : "null" }, displaySuccess=${displaySuccess}`);
+function deleteNodeBST(x, k) {
+  console.log(`-> deleteNodeBST called with k=${k} at node ${ x ? weight(x) : "null" }`);
   // Couldn't find node we are trying to delete, error
   if ( x === undefined || getAttribute(x, "dummy") || ( isLeaf(x) && k != weight(x) ) ){
     display(`Could not find node ${k} to delete`);
     return;
   }
 
-  //Not a leaf, and weight(x)not == k, keep searching
+  //Not a leaf, and weight(x) not k, keep searching
   accentNode(x);
   if ( k < weight(x) ) {
     return deleteNodeBST(getLeft(x), k);    
@@ -221,84 +295,29 @@ function deleteNodeBST(x, k, displaySuccess = true) {
     return deleteNodeBST(getRight(x), k);
   }
 
-  console.log(`deleteNodeBST k=${k} = weight of x, which is ${ x ? weight(x) : "null" }`);
-
-  // Found node to delete
-  const leftDummy = getLeft(x) && isDummy(getLeft(x));
-  console.log(`leftDummy=${leftDummy}`);
-  const rightDummy = getRight(x) && isDummy(getRight(x));
-  console.log(`rightDummy=${rightDummy}`);
-
-  // CASE 1: DELETE A LEAF
-  if ( isLeaf(x) ) {
-    if ( x == getRoot()) {
-      // if root is a leaf, just delete it
-      deleteNode(x);
-      if ( displaySuccess ) {
-        display(`Successully deleted: ${k}`);
-      }
-      return;
-    }
-    // here if x is not the root, so has a sibling
-    const sibling = getSibling(x);
-    console.log(`sibling=${sibling ? weight(sibling) : "null"}`);
-    const sibDummy = isDummy(sibling);
-    // if sibling is a dummy, delete x and the sibling,
-    if ( sibDummy ){
-      deleteNode(x);
-      deleteNode(sibling);
-      display(`Deleted leaf ${k} and its dummy sibling`);
-      return;
-    }
-    //  otherwise turn this x into a dummmy
-    dummify(x);
-    if ( displaySuccess ) {
-      display(`Successully deleted: ${k}`);
-    }
+  if ( ! hasTwoRealChildren(x) ) {
+    terminalNodeDeletion(x);
+    display(`Successully deleted: ${k}`);
     return;
   }
 
-  // CASE 2: DELETE WITH 2 CHILDREN
-  else if ( ! leftDummy  && ! rightDummy ) {
-    console.log(`deleting with two children k=${k} at node ${ x ? weight(x) : "null" }`);
+  // Has two real children, need to replace x with in-order predecessor
 
-    // Find in-order predecessor
-    let predecessor = findInOrderPredecessor(getLeft(x));
+  // Find in-order predecessor
+  let predecessor = findInOrderPredecessor(getLeft(x));
 
-    // Replace deleted node weight with in-order predecessor weight
-    let predWeight = weight(predecessor);
-    // Delete the in-order predecessor
-    deleteNodeBST(getLeft(x), predWeight, false);
-    setWeight(x, predWeight);
-    if ( displaySuccess ) {
-      display(`Successully deleted: '${k}' by replacing with predecessor '${predWeight}'`);
-    }
-    return;
-  }
-
-  // CASE 3: DELETE WITH 1 CHILD
-  else {
-    // first the easy case: x is the root
-    // then just make the child the new root,
-    // which is easy, since we can just delete the root
-    if ( ! p ) {
-      deleteNode(x);
-    } else {
-      // Get the lone child
-      const theChild = leftDummy ? getRight(x) : getLeft(x);
-      // then replace x with its child
-      deleteEdge(p, x);
-      deleteNode(x);
-      addEdge(p, theChild);
-    }
-    if ( displaySuccess ) {
-      display(`Successully deleted: ${k}`);
-    }
-    return;
-  }
+  // Replace deleted node weight with in-order predecessor weight
+  let predWeight = weight(predecessor);
+  setWeight(x, predWeight);
+  // Now delete the predecessor node, which has at most one child
+  terminalNodeDeletion(predecessor);
+  display(`Successully deleted: '${k}' by replacing with predecessor '${predWeight}'`);
+  return
 }
 
-// Cannot store values <= 0
+/**
+ * Main loop for adding/deleting nodes in a BST
+ */
 setDirected(true);
 let running = true;
 while ( running ) {
