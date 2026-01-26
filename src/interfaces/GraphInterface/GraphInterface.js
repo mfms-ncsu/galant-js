@@ -812,6 +812,7 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
  * @returns Updated graph and change manager
  */
 function deleteEdge(graph, changeManager, source, target) {
+  console.log(`Deleting edge from ${source} to ${target}`);
   // Error checking
   verifyGraphChangeManager(graph, changeManager);
   verifyNodes(graph, source, target, "delete edge");
@@ -1226,7 +1227,7 @@ function setDirected(graph, isDirected) {
  */
 function setNodeAttribute(graph, changeManager, nodeId, name, value) {
   verifyGraphChangeManager(graph, changeManager);
-  console.log("Setting node attribute", nodeId, name, value);
+  console.log(`Setting attribute for node ${nodeId}, attribute ${name}, value) ${value}`);
   if ( ! graph.nodes.has(nodeId) ) {
     throw new Error(
       "Cannot set attribute of node " +

@@ -263,32 +263,30 @@ function terminalNodeDeletion(x) {
     const sibling = getSibling(x);
     console.log(`Deleting leaf node with weight ${weight(x)}`);
     console.log(`Its sibling has weight ${weight(sibling)}`);
-    deleteEdge(parent, x);
     console.log(`Deleted edge from parent with weight ${weight(parent)} to node with weight ${weight(x)}`);
-    deleteEdge(parent, sibling);
-    console.log(`Deleted edge from parent with weight ${weight(parent)} to sibling with weight ${weight(sibling)}`);
     if ( isDummy(sibling) ) {
       // delete x and its sibling dummy
       deleteNode(x);
       deleteNode(sibling);
       return;
     }
-    // sibling is real, so replace parent with sibling
-    if ( isRightChild(x) ) {
-      setRight(parent, sibling);
-    } else {
-      setLeft(parent, sibling);
-    }
+    // sibling is real, so dummify x
+    // first delete edge from parent to sibling
+    // now set sibling as child of parent in place of x
+    // and put a dummy node on the other side
+    // @todo setLeft and setRight should delete existing edges automatically
+    dummify(x);
+    return
   }
-  // at this point, x has one real child and one dummy child
-  console.log(`Deleting node with one child, weight ${weight(x)}`);
+  // at this point, x is not a leaf and has one real child and one dummy child
   const leftDummy = isDummy(getLeft(x));
   const theRealChild = leftDummy ? getRight(x) : getLeft(x);
   const theDummyChild = leftDummy ? getLeft(x) : getRight(x);
   console.log(`The real child has weight ${weight(theRealChild)}`);
-  // delete the dummy child or it will be orphaned in the tree
+  // now delete x from the tree and replace if with theRealChild
+  console.log(`Deleting node with weight ${weight(x)} and replacing with child with weight ${weight(theRealChild)}`);
+  // first delete the dummy child to keep it from dangling
   deleteNode(theDummyChild);
-  // now delete x from the tree
   // then replace x with the real child
   if ( parent === null || parent === undefined ) {
     // if x is the root, there is no parent,
@@ -298,15 +296,17 @@ function terminalNodeDeletion(x) {
     deleteNode(x);
     return;
   }
-  // x is not the root, so need to delete edge from parent to x and create edge from parent to theRealChild
+  // x is not the root, so create edge from parent to theRealChild
   // making sure that theRealChild is in the correct position
-  deleteEdge(parent, x);
-  if ( isRightChild(x) ) {
+  // then delete x
+  const xIsRightChild = isRightChild(x);
+  deleteNode(x);
+  console.log(`Deleted edge from parent with weight ${weight(parent)} to x)}`);
+  if ( xIsRightChild ) {
     setRight(parent, theRealChild);
   } else {
     setLeft(parent, theRealChild);
   }
-  deleteNode(x);
   return;
 }
 

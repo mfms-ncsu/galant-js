@@ -369,6 +369,7 @@ function deleteEdge(edgeId) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     let split = edgeId.split(",");
     let source = split[0], target = split[1];
+    console.log(`Thead: Deleting edge: ${edgeId}, source ${source}, target ${target}`);
     [graph, changeManager] = GraphInterface.deleteEdge(graph, changeManager, source, target);
     postMessage({ action: "deleteEdge", source: source, target: target });
     waitIfNeeded();
