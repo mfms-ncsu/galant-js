@@ -1,5 +1,5 @@
 /**
-* Allows the user to create a BST just with prompting.
+* Allows the user to create a binary search tree using a series of prompts.
 * They will be prompted to enter a number -->
 *    - If the number is positive, it is added to the tree
 *    - If the number is negative, it is deleted from the tree
@@ -157,7 +157,7 @@ function undummify(nodeId, weight) {
  * @returns a new (newly created)dummy node
  */
 function createDummy(){
-  const dummy = addNode(0, 0)
+  const dummy = addNode()
   setAttribute(dummy, "dummy", true);
   return dummy;
 }

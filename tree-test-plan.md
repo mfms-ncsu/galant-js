@@ -1,10 +1,23 @@
 # Test plan for trees and tree algorithms
 
 What follows is a sequence of tests for trees and related algorithms. They should be run using Chrome on all three platforms.
+And, for each algorithm, it is important to check whether undoing and redoing several steps works correctly.
 
 ## Arbitrary trees
 
 ## Binary search trees
+
+### insertion
+
+7
+4, 3 - insert left twice
+5 - insert right with left present
+6 - insert right
+9 - insert right with left present
+10, 11 - insert right twice
+8 - insert left with right present
+
+### deletion
 
 ## Red/black trees
 

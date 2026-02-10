@@ -761,6 +761,8 @@ function addMessage(changeManager, message) {
  * @param {String} nodeId Optional node id
  * @param {Object} attributes Optional attributes
  * @returns Updated graph and change manager, along with the new node's id
+ * 
+ * @todo: need to create a change object for the change in nodeList !!!
  */
 function addNode(graph, changeManager, x, y, nodeId, attributes) {
   // Throw an error if the id is a duplicate
@@ -855,6 +857,8 @@ function deleteEdge(graph, changeManager, source, target) {
  * @param {ChangeManager} changeManager ChangeManager to which to push the change
  * @param {String} nodeId ID of the node to delete
  * @returns Updated graph and change manager
+ * 
+ * @todo: need to create a change object for the change in nodeList !!!
  */
 function deleteNode(graph, changeManager, nodeId) {
   // Error checking
@@ -990,6 +994,7 @@ function redo(graph, changeManager) {
       step.forEach((change) => {
         switch (change.action) {
           case "addNode":
+            console.log("Redoing addNode, nodeList = ", draft.nodeList);
             draft.nodes.set(
               change.current.id,
               new Node(
@@ -999,6 +1004,7 @@ function redo(graph, changeManager) {
               )
             );
             draft.nodeList.push(change.current.id);
+            console.log("After redoing addNode, nodeList = ", draft.nodeList);
             break;
           case "deleteNode":
             draft.nodes.delete(change.previous.id);
@@ -1700,8 +1706,12 @@ function undo(graph, changeManager) {
       step.forEach((change) => {
         switch (change.action) {
           case "addNode":
+            console.log("Undoing addNode, nodeList =",
+               draft.nodeList);
             draft.nodes.delete(change.current.id);
             draft.nodeList = draft.nodeList.filter(id => id !== change.current.id);
+            console.log("After undoing addNode, nodeList =",
+               draft.nodeList);
             break;
           case "deleteNode":
             draft.nodes.set(
