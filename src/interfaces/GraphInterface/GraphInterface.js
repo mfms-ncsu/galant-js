@@ -40,6 +40,48 @@ function generateId(nodes) {
 }
 
 /**
+ * Puts the child in either the front or the rear of the nodeList if isLeft is true or false, respectively. 
+ */
+function updateNodeList(nodeList, childId, isLeft) {
+  const index = nodeList.indexOf(childId);
+  if (index === -1) {
+    throw new Error(`Child ${childId} not found in nodeList`);
+  }
+
+  // Remove the child from its current position
+  const updatedNodeList = [...nodeList];
+  updatedNodeList.splice(index, 1);
+
+  // Add the child to the front or rear of the list depending on isLeft
+  if (isLeft) {
+    updatedNodeList.unshift(childId);
+  } else {
+    updatedNodeList.push(childId);
+  }
+
+  return updatedNodeList;
+}
+
+/**
+ * Undoes the change to the nodeList caused by updateNodeList by moving the child back to its original position.
+ */
+function undoNodeListChange(nodeList, childId, originalIndex) {
+  const currentIndex = nodeList.indexOf(childId);
+  if (currentIndex === -1) {
+    throw new Error(`Child ${childId} not found in nodeList`);
+  }
+
+  // Remove the child from its current position
+  const updatedNodeList = [...nodeList];
+  updatedNodeList.splice(currentIndex, 1);
+
+  // Insert the child back at its original index
+  updatedNodeList.splice(originalIndex, 0, childId);
+
+  return updatedNodeList;
+}
+
+/**
  * Records a new change in the given change manager.
  * @param {ChangeManager} changeManager Change manager to which to add
  * @param {ChangeObject[]} change Changes to log
@@ -761,8 +803,6 @@ function addMessage(changeManager, message) {
  * @param {String} nodeId Optional node id
  * @param {Object} attributes Optional attributes
  * @returns Updated graph and change manager, along with the new node's id
- * 
- * @todo: need to create a change object for the change in nodeList !!!
  */
 function addNode(graph, changeManager, x, y, nodeId, attributes) {
   // Throw an error if the id is a duplicate
@@ -857,8 +897,6 @@ function deleteEdge(graph, changeManager, source, target) {
  * @param {ChangeManager} changeManager ChangeManager to which to push the change
  * @param {String} nodeId ID of the node to delete
  * @returns Updated graph and change manager
- * 
- * @todo: need to create a change object for the change in nodeList !!!
  */
 function deleteNode(graph, changeManager, nodeId) {
   // Error checking
@@ -994,7 +1032,7 @@ function redo(graph, changeManager) {
       step.forEach((change) => {
         switch (change.action) {
           case "addNode":
-            console.log("Redoing addNode, nodeList = ", draft.nodeList);
+            console.log("Redoing addNode, nodeList =", draft.nodeList, "nodes =", draft.nodes);
             draft.nodes.set(
               change.current.id,
               new Node(
@@ -1004,7 +1042,7 @@ function redo(graph, changeManager) {
               )
             );
             draft.nodeList.push(change.current.id);
-            console.log("After redoing addNode, nodeList = ", draft.nodeList);
+            console.log("After redoing addNode, nodeList =", draft.nodeList, "nodes =", draft.nodes);
             break;
           case "deleteNode":
             draft.nodes.delete(change.previous.id);
@@ -1061,7 +1099,8 @@ function redo(graph, changeManager) {
               );
             break;
           case "changeNodeList":
-            draft.nodeList = change.current;
+            draft.nodeList = updateNodeList(draft.nodeList,
+                 change.current.child, change.current.isLeft);
             break;
         }
       });
@@ -1707,11 +1746,11 @@ function undo(graph, changeManager) {
         switch (change.action) {
           case "addNode":
             console.log("Undoing addNode, nodeList =",
-               draft.nodeList);
+               draft.nodeList, "nodes =", draft.nodes);
             draft.nodes.delete(change.current.id);
             draft.nodeList = draft.nodeList.filter(id => id !== change.current.id);
             console.log("After undoing addNode, nodeList =",
-               draft.nodeList);
+               draft.nodeList, "nodes =", draft.nodes);
             break;
           case "deleteNode":
             draft.nodes.set(
@@ -1795,8 +1834,7 @@ function undo(graph, changeManager) {
             });
             break;
           case "changeNodeList":
-            draft.nodeList = change.current;
-            break;
+            draft.nodeList = undoNodeListChange(draft.nodeList, change.current.child, change.current.childIndex);
         }
       });
     });

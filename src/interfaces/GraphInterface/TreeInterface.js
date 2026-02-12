@@ -5,6 +5,7 @@ import ChangeManager from "states/ChangeManager/ChangeManager";
 import ChangeObject from "states/ChangeManager/ChangeObject";
 import Node from "states/Graph/GraphElement/Node";
 import Edge from "states/Graph/GraphElement/Edge";
+// import { is } from "immer/dist/internal.js";
 
 /**
  * Helper function to handle what to do when a graph
@@ -255,6 +256,11 @@ function getRight(graph, nodeId) {
  * @param {Object} attributes Attributes to set on the node
  * @param {boolean} leftChild If true, identifies the node as a left child, otherwise as a right child
  * @returns [newGraph, newChangeManager] The mutated graph and change manager.
+ * 
+ * @todo instead of a change object for the entire nodeList,
+ *  create a change object for the placement of the child in the nodeList; this can also have the effect of adding the edge.
+ * !!! Caution: The position of the child in the nodeList before the change needs to be recorded in the change object,
+ *  so that undo can put the child back in the correct position.
  */
 
 function setChild(graph, changeManager, parentId, childId, isLeft) {
@@ -273,7 +279,6 @@ function setChild(graph, changeManager, parentId, childId, isLeft) {
   }
 
   console.log(`-> setChild: parent ${parentId}, child ${childId}, isLeft ${isLeft}`);
-  const currentNodeList = graph.nodeList;
   let changeObjects = [];
   const newGraph = produce(graph, (draft) => {
     // create edge from parent to child
@@ -285,10 +290,17 @@ function setChild(graph, changeManager, parentId, childId, isLeft) {
     changeObjects.push(
       new ChangeObject("addEdge", null, {
         source: parentId,
-        target: childId,
-        attributes: {}
+        target: childId
       })
     );
+    // create a change object that records the current position of the child in nodeList;
+    // this is necessary so that undo can put the child back in the correct position
+    changeObjects.push(new ChangeObject("changeNodeList",   null, {
+    child: childId,
+    isLeft: isLeft,
+    childIndex: graph.nodeList.indexOf(childId)
+  }
+  ));
 
     // remove childId from nodeList
     draft.nodeList.splice(draft.nodeList.indexOf(childId), 1);  
@@ -303,8 +315,6 @@ function setChild(graph, changeManager, parentId, childId, isLeft) {
     }
   });
   
-  // Let the change manager know that the node list has changed
-  changeObjects.push(new ChangeObject("changeNodeList", currentNodeList, newGraph.nodeList));
   const newChangeManager = recordChange(changeManager, changeObjects);
   
   console.log("<- setChild, chidren:", getChildren(newGraph, parentId), "nodeList:", newGraph.nodeList);
@@ -355,6 +365,8 @@ function setRight(graph, changeManager,parentId, rightChildId) {
  * @param {Object} attributes Attributes to set on the node
  * @param {boolean} leftChild If true, identifies the node as a left child, otherwise as a right child
  * @returns [newGraph, newChangeManager, nodeId] The mutated graph, change manager, and the id of the new node
+ * 
+ * @todo the nodeId and the attributes are never used - addLeft and addRight call this function with them undefined
  */
 function addBinaryNode(graph, changeManager, nodeId, attributes, leftChild) {
   isTree(graph);
@@ -380,7 +392,8 @@ function addBinaryNode(graph, changeManager, nodeId, attributes, leftChild) {
       }
     });
   
-    // Add the change object to the changeManager
+    // Create a change object for the new node and the attributes defined above;
+    // other attributes will be set in the calling function (e.g. addLeft or addRight)
     const newChangeManager = recordChange(changeManager, [
       new ChangeObject("addNode", null, {
         id: nodeId,
@@ -429,7 +442,7 @@ function addLeft(graph, changeManager, node, childWeight) {
 
     return [graph, changeManager, leftChild];
   }
-  // Case 2: Node has a dummy left child
+  // Case 2: Node has a dummy left child: turn the dummy into the left child
   else {
     let children = getChildren(graph, node);
 
