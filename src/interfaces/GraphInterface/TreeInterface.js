@@ -245,8 +245,8 @@ function getRight(graph, nodeId) {
 
 /**
  * Adds an edge from parent to child and sets the child as either a left child or a right child.
- * Called from setLeft and setRight.
- * Caution: The left child must be created and setLeft called before the right child and setRight,
+ * Called from makeLeftChild and makeRightChild.
+ * Caution: The left child must be created and makeLeftChild called before the right child and makeRightChild,
  * otherwise the getLeft and getRight functions will return the wrong children.
  * The left child is added to the front of the nodeList and a right child is added to the end
  * so that the nodes will be displayed in the correct order.
@@ -295,10 +295,9 @@ function setChild(graph, changeManager, parentId, childId, isLeft) {
     );
     // create a change object that records the current position of the child in nodeList;
     // this is necessary so that undo can put the child back in the correct position
-    changeObjects.push(new ChangeObject("changeNodeList",   null, {
-    child: childId,
-    isLeft: isLeft,
-    childIndex: graph.nodeList.indexOf(childId)
+    changeObjects.push(new ChangeObject("changeNodeList",
+       {index: draft.nodeList.indexOf(childId)}, {
+    index: isLeft ? 0 : draft.nodeList.length
   }
   ));
 
@@ -332,7 +331,7 @@ function setChild(graph, changeManager, parentId, childId, isLeft) {
  * and that both the nodeId and leftChildId exist in the graph
  * @todo Add ChangeManager functionality -- see addBinaryNode for reference
  */
-function setLeft(graph, changeManager, parentId, leftChildId) {
+function makeLeftChild(graph, changeManager, parentId, leftChildId) {
   isTree(graph);
   [graph, changeManager] = setChild(graph, changeManager, parentId, leftChildId, true);
   return [graph, changeManager];
@@ -347,7 +346,7 @@ function setLeft(graph, changeManager, parentId, leftChildId) {
  * and that both the nodeId and rightChildId exist in the graph
  * @todo Add ChangeManager functionality -- see addBinaryNode for reference
  */
-function setRight(graph, changeManager,parentId, rightChildId) {
+function makeRightChild(graph, changeManager,parentId, rightChildId) {
   isTree(graph);
   [graph, changeManager] = setChild(graph, changeManager, parentId, rightChildId, false);
   return [graph, changeManager];
@@ -523,8 +522,8 @@ const TreeInterface = {
   isLeaf,
   getLeft,
   getRight,
-  setLeft,
-  setRight,
+  makeLeftChild,
+  makeRightChild,
   addLeft,
   addRight
 };

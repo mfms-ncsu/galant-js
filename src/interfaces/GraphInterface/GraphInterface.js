@@ -40,45 +40,17 @@ function generateId(nodes) {
 }
 
 /**
- * Puts the child in either the front or the rear of the nodeList if isLeft is true or false, respectively. 
+ * Moves an element from one position to another in the nodeList 
  */
-function updateNodeList(nodeList, childId, isLeft) {
-  const index = nodeList.indexOf(childId);
-  if (index === -1) {
-    throw new Error(`Child ${childId} not found in nodeList`);
+function changeNodeList(nodeList, oldIndex, newIndex) {
+  let newNodeList = [...nodeList];
+  if ( oldIndex >= 0 ) {
+    newNodeList.splice(oldIndex, 1);
   }
-
-  // Remove the child from its current position
-  const updatedNodeList = [...nodeList];
-  updatedNodeList.splice(index, 1);
-
-  // Add the child to the front or rear of the list depending on isLeft
-  if (isLeft) {
-    updatedNodeList.unshift(childId);
-  } else {
-    updatedNodeList.push(childId);
+  if ( newIndex >= 0 ) {
+    newNodeList.splice(newIndex, 0, nodeList[oldIndex]);
   }
-
-  return updatedNodeList;
-}
-
-/**
- * Undoes the change to the nodeList caused by updateNodeList by moving the child back to its original position.
- */
-function undoNodeListChange(nodeList, childId, originalIndex) {
-  const currentIndex = nodeList.indexOf(childId);
-  if (currentIndex === -1) {
-    throw new Error(`Child ${childId} not found in nodeList`);
-  }
-
-  // Remove the child from its current position
-  const updatedNodeList = [...nodeList];
-  updatedNodeList.splice(currentIndex, 1);
-
-  // Insert the child back at its original index
-  updatedNodeList.splice(originalIndex, 0, childId);
-
-  return updatedNodeList;
+  return newNodeList;
 }
 
 /**
@@ -814,8 +786,6 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
   // If the nodeId argument is passed, use that, otherwise generate an id
   nodeId = nodeId || generateId(graph.nodes);
 
-  const oldNodeList = graph.nodeList;
-
   const newGraph = produce(graph, (draft) => {
     // Create the node
     let node = new Node(nodeId, Math.round(x), Math.round(y));
@@ -837,7 +807,9 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
         y: y,
       },
       attributes: attributes
-    })
+    }),
+    new ChangeObject("changeNodeList", {index: -1},
+       {index: graph.nodeList.length})
   ]);
 
   // Return mutated graph and change manager to trigger re-render
@@ -906,12 +878,6 @@ function deleteNode(graph, changeManager, nodeId) {
     );
   }
 
-  // Need to check if it is a left node before the edge from the parent is deleted
-  // Checks to see if the graph is a tree and if the node is the left node of the parent
-  const parentId = getIncomingNodes(graph, nodeId)[0];
-  const isLeft = parentId != undefined ? getOutgoingNodes(graph, parentId)[0] == nodeId : false;
-  const deletingLeft = graph.type == "tree" && isLeft;
-
   // Keep an array of ChangeObjects for the delete step
   const changeObjects = [];
 
@@ -951,34 +917,26 @@ function deleteNode(graph, changeManager, nodeId) {
     draft.nodes.delete(nodeId);
   });
 
-  // Create a ChangeObject for the deleted node
-  // If we are deleting the left node of a tree, then send the "deleteLeft" message instead of "deleteNode"
+  // Create a ChangeObjects for the deleted node and for the change to the nodeList
   const node = graph.nodes.get(nodeId);
-  if (deletingLeft) {
-    changeObjects.push(
-      new ChangeObject(
-        "deleteLeft",
-        {
-          id: node.id,
-          position: node.position,
-          attributes: node.attributes,
-        },
-        null
-      )
-    );
-  } else {
-    changeObjects.push(
-      new ChangeObject(
-        "deleteNode",
-        {
-          id: node.id,
-          position: node.position,
-          attributes: node.attributes,
-        },
-        null
-      )
-    );
-  }
+  changeObjects.push(
+    new ChangeObject(
+     "deleteNode",
+      {
+        id: node.id,
+        position: node.position,
+        attributes: node.attributes,
+      },
+      null
+    )
+  );
+  changeObjects.push(
+    new ChangeObject(
+      "changeNodeList",
+      { index: graph.nodeList.indexOf(nodeId) },
+      { index: -1 }
+    )
+  );
 
   // Add the change objects to the changeManager
   const newChangeManager = recordChange(changeManager, changeObjects);
@@ -1099,8 +1057,8 @@ function redo(graph, changeManager) {
               );
             break;
           case "changeNodeList":
-            draft.nodeList = updateNodeList(draft.nodeList,
-                 change.current.child, change.current.isLeft);
+            draft.nodeList = changeNodeList(draft.nodeList,
+                 change.previous.index, change.current.index);
             break;
         }
       });
@@ -1737,7 +1695,7 @@ function toString(graph, algorithmName = "No Algorithm Running") {
 function undo(graph, changeManager) {
   // Check if there are any changes to undo
   if (changeManager.index > 0) {
-    // Get the previous step
+    // Get the previous step and put its changes in reverse order (since we need to undo them in reverse)
     const step = changeManager.changes[changeManager.index - 1].toReversed();
 
     // Undo the change
@@ -1834,7 +1792,7 @@ function undo(graph, changeManager) {
             });
             break;
           case "changeNodeList":
-            draft.nodeList = undoNodeListChange(draft.nodeList, change.current.child, change.current.childIndex);
+            draft.nodeList = changeNodeList(draft.nodeList, change.current.index, change.previous.index);
         }
       });
     });

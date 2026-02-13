@@ -1075,10 +1075,10 @@ function addLeft(targetNode, childWeight) {
     return newNode;
 }
 
-function setLeft(parent, child) {
+function makeLeftChild(parent, child) {
     if (stepDepth === 0) { postMessage({ action: "step" }) };
-    [graph, changeManager] = TreeInterface.setLeft(graph, changeManager, parent, child);
-    postMessage({ action: "setLeft", parent: parent, child: child});
+    [graph, changeManager] = TreeInterface.makeLeftChild(graph, changeManager, parent, child);
+    postMessage({action: "makeLeftChild", parent: parent, child: child});
     waitIfNeeded();
 }
 
@@ -1091,10 +1091,10 @@ function addRight(targetNode, childWeight) {
     return newNode;
 }
 
-function setRight(parent, child) {
+function makeRightChild(parent, child) {
     if (stepDepth === 0) { postMessage({ action: "step" }) };
-    [graph, changeManager] = TreeInterface.setRight(graph, changeManager, parent, child);
-    postMessage({ action: "setRight", parent: parent, child: child});
+    [graph, changeManager] = TreeInterface.makeRightChild(graph, changeManager, parent, child);
+    postMessage({action: "makeRightChild", parent: parent, child: child});
     waitIfNeeded();
 }
 
@@ -1388,6 +1388,6 @@ export {
     getRight,
     addLeft,
     addRight,
-    setLeft,
-    setRight,
+    makeLeftChild,
+    makeRightChild,
 };

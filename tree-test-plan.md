@@ -10,14 +10,19 @@ And, for each algorithm, it is important to check whether undoing and redoing se
 ### insertion
 
 7
-4, 3 - insert left twice
+4,3 - insert left twice
 5 - insert right with left present
 6 - insert right
 9 - insert right with left present
-10, 11 - insert right twice
+10,11 - insert right twice
 8 - insert left with right present
 
 ### deletion
+
+create tree with insertion sequence 7,1,8,5,3,2,4
+(-7) - finding greatest predecessor and shifting with right dummy
+(-1) - shift with left dummy
+(-4) - leaf
 
 ## Red/black trees
 

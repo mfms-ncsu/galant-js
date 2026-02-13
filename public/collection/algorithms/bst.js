@@ -80,7 +80,7 @@ function isDummy(nodeId) {
 function addLeftInsideWeight(nodeId, w) {
   const newNode = addNode();
   setWeight(newNode, w);
-  setLeft(nodeId, newNode);
+  makeLeftChild(nodeId, newNode);
   setAttribute(newNode, "weightInNode", true);
   hideWeight(newNode);
   return newNode;
@@ -94,7 +94,7 @@ function addLeftInsideWeight(nodeId, w) {
 function addRightInsideWeight(nodeId, w) {
   const newNode = addNode();
   setWeight(newNode, w);
-  setRight(nodeId, newNode);
+  makeRightChild(nodeId, newNode);
   setAttribute(newNode, "weightInNode", true);
   hideWeight(newNode);
   return newNode;
@@ -191,11 +191,11 @@ function addNodeBST(x, k) {
       if ( k < weight(x) ) {
         addLeftInsideWeight(x, k);
         const dummy = createDummy();
-        setRight(x, dummy);
+        makeRightChild(x, dummy);
       } else {
         // !!! order matters here: it determines which node becomes left child and which becomes right child
         const dummy = createDummy();
-        setLeft(x, dummy);
+        makeLeftChild(x, dummy);
         addRightInsideWeight(x, k);
       } 
       display(`Successfully added node ${k}`)
@@ -274,7 +274,7 @@ function terminalNodeDeletion(x) {
     // first delete edge from parent to sibling
     // now set sibling as child of parent in place of x
     // and put a dummy node on the other side
-    // @todo setLeft and setRight should delete existing edges automatically
+    // @todo makeLeftChild and makeRightChild should delete existing edges automatically
     dummify(x);
     return
   }
@@ -303,9 +303,9 @@ function terminalNodeDeletion(x) {
   deleteNode(x);
   console.log(`Deleted edge from parent with weight ${weight(parent)} to x)}`);
   if ( xIsRightChild ) {
-    setRight(parent, theRealChild);
+    makeRightChild(parent, theRealChild);
   } else {
-    setLeft(parent, theRealChild);
+    makeLeftChild(parent, theRealChild);
   }
   return;
 }
