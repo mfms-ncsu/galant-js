@@ -32,9 +32,6 @@ enableMapSet();
  * Generates the next unique node id from the given list of nodes.
  * @param {Node[]} nodes Array of nodes to check
  * @returns New node id
- * 
- * @todo !!! this does not work - duplicate ids may be created if addNode is undone and redone.
- * The solution is to make the nodes map immutable and use the nodeList to determine what nodes currently exist.
  */
 function generateId(nodes) {
   let id = 0;
@@ -49,7 +46,7 @@ function generateId(nodes) {
  * @param {String} nodeId Id of the node to move
  * @param {Number} newIndex New index for the node
  */
-function changeNodeList(nodeList, nodeId, oldIndex,newIndex) {
+function changeNodeList(nodeList, nodeId, oldIndex, newIndex) {
   console.log("-> changeNodeList, nodeList =", nodeList, "nodeId =", nodeId, "oldIndex =", oldIndex, "newIndex =", newIndex, "changeManager =", GraphInterface.changeManager);
   let newNodeList = [...nodeList];
   const knownNodeIndex = newNodeList.indexOf(nodeId);
@@ -808,7 +805,7 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
     // Create the node
     let node = new Node(newNodeId, Math.round(x), Math.round(y));
     draft.nodes.set(newNodeId, node);
-    draft.nodeList = changeNodeList(graph.nodeList, newNodeId, -1, draft.nodeList.length);
+    draft.nodeList.push(newNodeId);
 
     // Set the attributes
     for (let name in attributes) {
@@ -818,12 +815,6 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
 
   // Add the change object to the changeManager
   let newChangeManager = recordChange(changeManager, [
-    new ChangeObject("changeNodeList", 
-    { index: -1 },
-    {
-      nodeId: newNodeId,
-      index: graph.nodeList.length
-    }),
     new ChangeObject("addNode", null, {
       id: newNodeId,
       position: {
@@ -894,6 +885,7 @@ function deleteEdge(graph, changeManager, source, target) {
  * @returns Updated graph and change manager
  */
 function deleteNode(graph, changeManager, nodeId) {
+  console.log("-> deleteNode, nodeId =", nodeId, "nodeList =", graph.nodeList);
   // Error checking
   if (!graph.nodes.has(nodeId)) {
     throw new Error(
@@ -935,8 +927,8 @@ function deleteNode(graph, changeManager, nodeId) {
       );
     });
 
-    // Finally, delete the node from both the nodes map and the nodeList
-    draft.nodeList = changeNodeList(draft.nodeList, nodeId, draft.nodeList.indexOf(nodeId), -1);
+    // Finally, delete the node from the nodeList
+    draft.nodeList.splice(draft.nodeList.indexOf(nodeId), 1);
   });
 
   // Create a ChangeObjects for the deleted node and for the change to the nodeList
@@ -952,18 +944,11 @@ function deleteNode(graph, changeManager, nodeId) {
       null
     )
   );
-  changeObjects.push(
-    new ChangeObject(
-      "changeNodeList", 
-      {
-        index: graph.nodeList.indexOf(nodeId),
-      },
-      { nodeId: nodeId, index: -1 }
-    )
-  );
 
   // Add the change objects to the changeManager
   const newChangeManager = recordChange(changeManager, changeObjects);
+
+  console.log("<- deleteNode, new nodeList =", newGraph.nodeList, "newChangeManager =", newChangeManager);
 
   // Return mutated graph and change manager to trigger re-render
   return [newGraph, newChangeManager];
@@ -1023,13 +1008,12 @@ function redo(graph, changeManager) {
                 change.current.position.y
               )
             );
+            draft.nodeList.push(change.current.id);
             console.log("After redoing addNode, nodeList =", draft.nodeList, "nodes =", draft.nodes);
             break;
           case "deleteNode":
-            // do nothing here: the node should stay in the map and removing it from nodeList is taken care of by changeNodeList
-            break;
-          case "deleteLeft":
-            draft.nodes.delete(change.previous.id);
+            // leave the node in the nodes map so that we can still access its attibutes when we undo
+            draft.nodeList.splice(draft.nodeList.indexOf(change.previous.id), 1);
             break;
           case "addEdge":
             draft.nodes
@@ -1079,9 +1063,12 @@ function redo(graph, changeManager) {
               );
             break;
           case "changeNodeList":
-            draft.nodeList = changeNodeList(draft.nodeList,
+            // to be used for trees only, where presence of the node is a given and only its position matters.
+            console.log("Redoing changeNodeList, nodeList =", newGraph.nodeList);
+            graph.nodeList = changeNodeList(graph.nodeList,
                  change.current.nodeId, change.previous.index, change.current.index);
-            break;
+            console.log("After redoing changeNodeList, nodeList =", graph.nodeList);
+                 break;
         }
       });
     });
@@ -1725,8 +1712,10 @@ function undo(graph, changeManager) {
       step.forEach((change) => {
         switch (change.action) {
           case "addNode":
+            // when addNode is undone, the incident edges will have already been deleted.
             console.log("Undoing addNode, nodeList =",
                draft.nodeList, "nodes =", draft.nodes);
+            draft.nodeList.splice(draft.nodeList.indexOf(change.current.id), 1);
             console.log("After undoing addNode, nodeList =",
                draft.nodeList, "nodes =", draft.nodes);
             break;
@@ -1812,7 +1801,8 @@ function undo(graph, changeManager) {
             });
             break;
           case "changeNodeList":
-            draft.nodeList = changeNodeList(draft.nodeList, change.current.nodeId, change.current.index, change.previous.index);
+            console.log("Undoing changeNodeList, nodeList =", draft.nodeList);
+            draft.nodeList = changeNodeList(draft.nodeList, change.current.nodeId, change.previous.index, change.current.index);
         }
       });
     });
