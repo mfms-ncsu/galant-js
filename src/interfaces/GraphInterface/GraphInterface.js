@@ -932,7 +932,7 @@ function deleteNode(graph, changeManager, nodeId) {
     });
 
     // Finally, delete the node from both the nodes map and the nodeList
-    changeNodeList(draft.nodeList, nodeId, -1);
+    draft.nodeList = changeNodeList(draft.nodeList, nodeId, -1);
   });
 
   // Create a ChangeObjects for the deleted node and for the change to the nodeList
@@ -1016,11 +1016,11 @@ function redo(graph, changeManager) {
                 change.current.position.y
               )
             );
-            changeNodeList(draft.nodeList, change.current.id, change.current.index);
+            draft.nodeList =changeNodeList(draft.nodeList, change.current.id, change.current.index);
             console.log("After redoing addNode, nodeList =", draft.nodeList, "nodes =", draft.nodes);
             break;
           case "deleteNode":
-            changeNodeList(draft.nodeList, change.previous.id, -1);
+            draft.nodeList = changeNodeList(draft.nodeList, change.previous.id, -1);
             break;
           case "deleteLeft":
             draft.nodes.delete(change.previous.id);
@@ -1721,7 +1721,7 @@ function undo(graph, changeManager) {
           case "addNode":
             console.log("Undoing addNode, nodeList =",
                draft.nodeList, "nodes =", draft.nodes);
-            changeNodeList(draft.nodeList, change.current.id, -1);
+            draft.nodeList = changeNodeList(draft.nodeList, change.current.id, -1);
             console.log("After undoing addNode, nodeList =",
                draft.nodeList, "nodes =", draft.nodes);
             break;
