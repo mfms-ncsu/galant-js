@@ -49,19 +49,21 @@ function generateId(nodes) {
  * @param {String} nodeId Id of the node to move
  * @param {Number} newIndex New index for the node
  */
-function changeNodeList(nodeList, nodeId, newIndex) {
-  console.log("-> changeNodeList, nodeList =", nodeList, "nodeId =", nodeId, "newIndex =", newIndex);
+function changeNodeList(nodeList, nodeId, oldIndex,newIndex) {
+  console.log("-> changeNodeList, nodeList =", nodeList, "nodeId =", nodeId, "oldIndex =", oldIndex, "newIndex =", newIndex, "changeManager =", GraphInterface.changeManager);
   let newNodeList = [...nodeList];
-  let oldIndex = newNodeList.findIndex((element) => element === nodeId);
-  console.log("oldIndex =", oldIndex);
-  if ( oldIndex !== undefined && oldIndex >= 0 ) {
+  const knownNodeIndex = newNodeList.indexOf(nodeId);
+  if ( knownNodeIndex !== oldIndex ) {
+    throw new Error(`Error in changeNodeList:  oldIndex ${oldIndex} does not match the index ${knownNodeIndex} of nodeId ${nodeId} in nodeList ${nodeList}`);
+  }
+  if ( oldIndex >= 0 ) {
     newNodeList.splice(oldIndex, 1);
   }
-  console.log("After removing nodeId, newNodeList =", newNodeList);
+  console.log("After removing nodeId, newNodeList =", newNodeList, "oldIndex =", oldIndex);
   if ( newIndex >= 0 ) {
     newNodeList.splice(newIndex, 0, nodeId);
   }
-  console.log("<- changeNodeList, newNodeList =", newNodeList);
+  console.log("<- changeNodeList, newNodeList =", newNodeList, "changeManager =", GraphInterface.changeManager);
   return newNodeList;
 }
 
@@ -806,7 +808,7 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
     // Create the node
     let node = new Node(newNodeId, Math.round(x), Math.round(y));
     draft.nodes.set(newNodeId, node);
-    draft.nodeList = changeNodeList(graph.nodeList, newNodeId, draft.nodeList.length);
+    draft.nodeList = changeNodeList(graph.nodeList, newNodeId, -1, draft.nodeList.length);
 
     // Set the attributes
     for (let name in attributes) {
@@ -816,6 +818,12 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
 
   // Add the change object to the changeManager
   let newChangeManager = recordChange(changeManager, [
+    new ChangeObject("changeNodeList", 
+    { index: -1 },
+    {
+      nodeId: newNodeId,
+      index: graph.nodeList.length
+    }),
     new ChangeObject("addNode", null, {
       id: newNodeId,
       position: {
@@ -823,13 +831,9 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
         y: y,
       },
       attributes: attributes
-    }),
-    new ChangeObject("changeNodeList", null, {
-      nodeId: newNodeId,
-      index: graph.nodeList.length
     })
   ]);
-  console.log("<- addNode, new nodeList =", newGraph.nodeList, "nodes =",  newGraph.nodes)
+  console.log("<- addNode, new nodeList =", newGraph.nodeList, "nodes =",  newGraph.nodes, "newChangeManager =", newChangeManager);
 
   // Return mutated graph and change manager to trigger re-render
   // Add the node id as the third return value
@@ -932,7 +936,7 @@ function deleteNode(graph, changeManager, nodeId) {
     });
 
     // Finally, delete the node from both the nodes map and the nodeList
-    draft.nodeList = changeNodeList(draft.nodeList, nodeId, -1);
+    draft.nodeList = changeNodeList(draft.nodeList, nodeId, draft.nodeList.indexOf(nodeId), -1);
   });
 
   // Create a ChangeObjects for the deleted node and for the change to the nodeList
@@ -950,7 +954,10 @@ function deleteNode(graph, changeManager, nodeId) {
   );
   changeObjects.push(
     new ChangeObject(
-      "changeNodeList", null,
+      "changeNodeList", 
+      {
+        index: graph.nodeList.indexOf(nodeId),
+      },
       { nodeId: nodeId, index: -1 }
     )
   );
@@ -1016,11 +1023,10 @@ function redo(graph, changeManager) {
                 change.current.position.y
               )
             );
-            draft.nodeList =changeNodeList(draft.nodeList, change.current.id, change.current.index);
             console.log("After redoing addNode, nodeList =", draft.nodeList, "nodes =", draft.nodes);
             break;
           case "deleteNode":
-            draft.nodeList = changeNodeList(draft.nodeList, change.previous.id, -1);
+            // do nothing here: the node should stay in the map and removing it from nodeList is taken care of by changeNodeList
             break;
           case "deleteLeft":
             draft.nodes.delete(change.previous.id);
@@ -1074,7 +1080,7 @@ function redo(graph, changeManager) {
             break;
           case "changeNodeList":
             draft.nodeList = changeNodeList(draft.nodeList,
-                 change.current.nodeId, change.current.index);
+                 change.current.nodeId, change.previous.index, change.current.index);
             break;
         }
       });
@@ -1721,7 +1727,6 @@ function undo(graph, changeManager) {
           case "addNode":
             console.log("Undoing addNode, nodeList =",
                draft.nodeList, "nodes =", draft.nodes);
-            draft.nodeList = changeNodeList(draft.nodeList, change.current.id, -1);
             console.log("After undoing addNode, nodeList =",
                draft.nodeList, "nodes =", draft.nodes);
             break;
@@ -1807,7 +1812,7 @@ function undo(graph, changeManager) {
             });
             break;
           case "changeNodeList":
-            draft.nodeList = changeNodeList(draft.nodeList, change.current.nodeId, change.current.index);
+            draft.nodeList = changeNodeList(draft.nodeList, change.current.nodeId, change.current.index, change.previous.index);
         }
       });
     });
