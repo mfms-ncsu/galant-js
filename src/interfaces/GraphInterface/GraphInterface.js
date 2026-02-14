@@ -32,6 +32,9 @@ enableMapSet();
  * Generates the next unique node id from the given list of nodes.
  * @param {Node[]} nodes Array of nodes to check
  * @returns New node id
+ * 
+ * @todo !!! this does not work - duplicate ids may be created if addNode is undone and redone.
+ * The solution is to make the nodes map immutable and use the nodeList to determine what nodes currently exist.
  */
 function generateId(nodes) {
   let id = 0;
@@ -40,16 +43,25 @@ function generateId(nodes) {
 }
 
 /**
- * Moves an element from one position to another in the nodeList 
+ * Moves a node in the node list to a new index.
+ * @returns New node list with the node moved
+ * @param {String[]} nodeList Current node list
+ * @param {String} nodeId Id of the node to move
+ * @param {Number} newIndex New index for the node
  */
-function changeNodeList(nodeList, oldIndex, newIndex) {
+function changeNodeList(nodeList, nodeId, newIndex) {
+  console.log("-> changeNodeList, nodeList =", nodeList, "nodeId =", nodeId, "newIndex =", newIndex);
   let newNodeList = [...nodeList];
-  if ( oldIndex >= 0 ) {
+  let oldIndex = newNodeList.findIndex((element) => element === nodeId);
+  console.log("oldIndex =", oldIndex);
+  if ( oldIndex !== undefined && oldIndex >= 0 ) {
     newNodeList.splice(oldIndex, 1);
   }
+  console.log("After removing nodeId, newNodeList =", newNodeList);
   if ( newIndex >= 0 ) {
-    newNodeList.splice(newIndex, 0, nodeList[oldIndex]);
+    newNodeList.splice(newIndex, 0, nodeId);
   }
+  console.log("<- changeNodeList, newNodeList =", newNodeList);
   return newNodeList;
 }
 
@@ -720,6 +732,7 @@ function getSource(graph, edge) {
  * @returns Updated graph and change manager
  */
 function addEdge(graph, changeManager, source, target, attributes) {
+  console.log("-> addEdge, source =", source, "target =", target, "attributes =", attributes);
   // Error checking
   verifyNodes(graph, source, target, "create edge");
 
@@ -744,6 +757,8 @@ function addEdge(graph, changeManager, source, target, attributes) {
       target: target,
     }),
   ]);
+
+  console.log("<- addEdge, newGraph =", newGraph, "newChangeManager =", newChangeManager);
 
   // Return mutated graph and change manager to trigger re-render
   return [newGraph, newChangeManager];
@@ -777,6 +792,7 @@ function addMessage(changeManager, message) {
  * @returns Updated graph and change manager, along with the new node's id
  */
 function addNode(graph, changeManager, x, y, nodeId, attributes) {
+  console.log("-> addNode, x =", x, "y =", y, "nodeId =", nodeId, "attributes =", attributes, "nodeList =", graph.nodeList, "nodes =", graph.nodes)
   // Throw an error if the id is a duplicate
   verifyGraphChangeManager(graph, changeManager);
   if (nodeId && graph.nodes.has(nodeId)) {
@@ -784,13 +800,13 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
   }
 
   // If the nodeId argument is passed, use that, otherwise generate an id
-  nodeId = nodeId || generateId(graph.nodes);
+  let newNodeId = nodeId || generateId(graph.nodes);
 
   const newGraph = produce(graph, (draft) => {
     // Create the node
-    let node = new Node(nodeId, Math.round(x), Math.round(y));
-    draft.nodes.set(nodeId, node);
-    draft.nodeList.push(nodeId);
+    let node = new Node(newNodeId, Math.round(x), Math.round(y));
+    draft.nodes.set(newNodeId, node);
+    draft.nodeList = changeNodeList(graph.nodeList, newNodeId, draft.nodeList.length);
 
     // Set the attributes
     for (let name in attributes) {
@@ -801,20 +817,23 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
   // Add the change object to the changeManager
   let newChangeManager = recordChange(changeManager, [
     new ChangeObject("addNode", null, {
-      id: nodeId,
+      id: newNodeId,
       position: {
         x: x,
         y: y,
       },
       attributes: attributes
     }),
-    new ChangeObject("changeNodeList", {index: -1},
-       {index: graph.nodeList.length})
+    new ChangeObject("changeNodeList", null, {
+      nodeId: newNodeId,
+      index: graph.nodeList.length
+    })
   ]);
+  console.log("<- addNode, new nodeList =", newGraph.nodeList, "nodes =",  newGraph.nodes)
 
   // Return mutated graph and change manager to trigger re-render
   // Add the node id as the third return value
-  return [newGraph, newChangeManager, nodeId];
+  return [newGraph, newChangeManager, newNodeId];
 }
 
 /**
@@ -913,8 +932,7 @@ function deleteNode(graph, changeManager, nodeId) {
     });
 
     // Finally, delete the node from both the nodes map and the nodeList
-    draft.nodeList = draft.nodeList.filter((id) => id !== nodeId);
-    draft.nodes.delete(nodeId);
+    changeNodeList(draft.nodeList, nodeId, -1);
   });
 
   // Create a ChangeObjects for the deleted node and for the change to the nodeList
@@ -932,9 +950,8 @@ function deleteNode(graph, changeManager, nodeId) {
   );
   changeObjects.push(
     new ChangeObject(
-      "changeNodeList",
-      { index: graph.nodeList.indexOf(nodeId) },
-      { index: -1 }
+      "changeNodeList", null,
+      { nodeId: nodeId, index: -1 }
     )
   );
 
@@ -999,12 +1016,11 @@ function redo(graph, changeManager) {
                 change.current.position.y
               )
             );
-            draft.nodeList.push(change.current.id);
+            changeNodeList(draft.nodeList, change.current.id, change.current.index);
             console.log("After redoing addNode, nodeList =", draft.nodeList, "nodes =", draft.nodes);
             break;
           case "deleteNode":
-            draft.nodes.delete(change.previous.id);
-            draft.nodeList = draft.nodeList.filter((id => id !== change.previous.id));
+            changeNodeList(draft.nodeList, change.previous.id, -1);
             break;
           case "deleteLeft":
             draft.nodes.delete(change.previous.id);
@@ -1058,7 +1074,7 @@ function redo(graph, changeManager) {
             break;
           case "changeNodeList":
             draft.nodeList = changeNodeList(draft.nodeList,
-                 change.previous.index, change.current.index);
+                 change.current.nodeId, change.current.index);
             break;
         }
       });
@@ -1705,8 +1721,7 @@ function undo(graph, changeManager) {
           case "addNode":
             console.log("Undoing addNode, nodeList =",
                draft.nodeList, "nodes =", draft.nodes);
-            draft.nodes.delete(change.current.id);
-            draft.nodeList = draft.nodeList.filter(id => id !== change.current.id);
+            changeNodeList(draft.nodeList, change.current.id, -1);
             console.log("After undoing addNode, nodeList =",
                draft.nodeList, "nodes =", draft.nodes);
             break;
@@ -1792,7 +1807,7 @@ function undo(graph, changeManager) {
             });
             break;
           case "changeNodeList":
-            draft.nodeList = changeNodeList(draft.nodeList, change.current.index, change.previous.index);
+            draft.nodeList = changeNodeList(draft.nodeList, change.current.nodeId, change.current.index);
         }
       });
     });

@@ -295,10 +295,11 @@ function setChild(graph, changeManager, parentId, childId, isLeft) {
     );
     // create a change object that records the current position of the child in nodeList;
     // this is necessary so that undo can put the child back in the correct position
-    changeObjects.push(new ChangeObject("changeNodeList",
-       {index: draft.nodeList.indexOf(childId)}, {
-    index: isLeft ? 0 : draft.nodeList.length
-  }
+    changeObjects.push(new ChangeObject("changeNodeList", null,
+    {
+      nodeId: childId,
+      index: isLeft ? 0 : draft.nodeList.length
+    }
   ));
 
     // remove childId from nodeList

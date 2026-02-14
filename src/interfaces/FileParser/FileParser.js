@@ -157,6 +157,8 @@ function loadGraph(name, file) {
     } else {
         graph = new StandardGraph(name);
     }
+    graph.nodes = new Map();
+    graph.nodeList = [];
     // Parse each line, ignoring comments and blank lines
     // This part is the same for all graph types
     lines.forEach(line => { parseLine(graph, line) });
