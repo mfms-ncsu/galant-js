@@ -1,4 +1,7 @@
 /**
+ * Should create a new branch for making these changes, since they're pretty radical!
+ * call it new-nodelist
+ * 
  * This file gives an overview of one strategy for maintaining a node list so that indexes are unaffected by addNode and deleteNode
  * The philosopy behind this approach is that the nodeList is maintained by the graph,
  * along with an indexMap that maps ids to indexes in the list.
@@ -155,17 +158,13 @@ function getIncidentEdges(graph, nodeId) {
   verifyGraph(graph);
   // !!!
   if ( nodeExists(nodeId) ) {
-    let incidentEdges = [];
-    const edgeIds = [...graph.nodes.get(nodeId).edges.keys()];
-    edgeIds.forEach((edgeId) => {
-      if ( edgeExists(edgeId) ) {
-        incidentEdges.push(edgeId);
-      }
-    })
-    return incidentEdges;
+    let edgeIds = [... graph.nodes.get(nodeId).edges.keys()] ;
+    return edgeIds.filter(edgeId => edgeExists(edgeId));
   }
   // !!!
 }
+
+// !!! use the filter construct in all that follows !!!
 
 function getIncomingEdges(graph, target) { 
   // ...
