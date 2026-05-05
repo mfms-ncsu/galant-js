@@ -1,17 +1,26 @@
 /**
  * Should create a new branch for making these changes, since they're pretty radical!
- * call it new-nodelist
+ * call it `sequencing`
  * 
- * This file gives an overview of one strategy for maintaining a node list so that indexes are unaffected by addNode and deleteNode
- * The philosopy behind this approach is that the nodeList is maintained by the graph,
- * along with an indexMap that maps ids to indexes in the list.
- * The nodes map is also maintained by the graph.
+ * This file gives an alternate strategy that uses sequence numbers instead of a node list to avoid dependence on list indexes
+ * The philosopy behind this approach is that each node is given a sequence number.
+ * When the set of nodes is traversed for display, the list of nodes is sorted by sequence number.
  * Some invariants:
- * - a node stays in the nodes map even if deleted; this ensures that each node has a unique id
- * - a the index of a node in the nodeList stays the same unless changed by setChildren, described below
- * - when a node is deleted, its position in the nodeList is set to null;
- *   this ensures that indexes of other nodes are unaffected
+ * - no two nodes have the same sequence number
+ * - the sequence number of a node stays the same unless changed by setChildren, described below
+ *   + in the future, it may also make sense to use sequence numbers to reorder adjacency lists
+ * - when a node is added it is given the next available sequence number
+ * - when a node is deleted its sequence number is *not* reused
+ * Instead of restricting operations to binary trees, we use setChildren to change the order of children of a node.
+ * setChildren works as follows
+ * - let [n'_1, ... , n'_k] be the desired order of children
+ * - collect the sequence numbers of the children as a list of pairs P = [(node_1, seq#_1) , ... , (node_k, seq#_k)]
+ * - create a new list C = [(n'_1, seq#_1) , ... , (n'_k, seq#_k)]
+ * - create a change record using P and C as previous and current, respectively
+ * - reassign sequence numbers using C
  */
+
+/** !!! Need to fix everything below here !!! */
 
 /**
  * Here are the changes to relevant part of the code with the parts to modify bracketed
