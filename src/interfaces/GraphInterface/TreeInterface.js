@@ -244,26 +244,15 @@ function getRight(graph, nodeId) {
 }
 
 /**
- * Adds an edge from parent to child and sets the child as either a left child or a right child.
- * Called from makeLeftChild and makeRightChild.
- * Caution: The left child must be created and makeLeftChild called before the right child and makeRightChild,
- * otherwise the getLeft and getRight functions will return the wrong children.
- * The left child is added to the front of the nodeList and a right child is added to the end
- * so that the nodes will be displayed in the correct order.
+ * (Re)orders the list of children of a node
  * @param {Graph} graph Graph on which to operate
  * @param {ChangeManager} changeManager ChangeManager to use for storing changes
- * @param {string} nodeId Id of the node to add, or undefined to generate a new id
- * @param {Object} attributes Attributes to set on the node
- * @param {boolean} leftChild If true, identifies the node as a left child, otherwise as a right child
- * @returns [newGraph, newChangeManager] The mutated graph and change manager.
- * 
- * @todo instead of a change object for the entire nodeList,
- *  create a change object for the placement of the child in the nodeList; this can also have the effect of adding the edge.
- * !!! Caution: The position of the child in the nodeList before the change needs to be recorded in the change object,
- *  so that undo can put the child back in the correct position.
+ * @param {string} parentID Id of the parent of the children to be reordered
+ * @param {boolean} children A list of the children in the desired order
+ * @returns [newGraph, newChangeManager] The mutated sequence number list and change manager.
  */
 
-function setChild(graph, changeManager, parentId, childId, isLeft) {
+function setChildren(graph, changeManager, parentId, children) {
   // Throw an error if the parent doesn't exist
   if ( ! graph.nodes.has(parentId) ) {
     throw new Error(
@@ -271,37 +260,40 @@ function setChild(graph, changeManager, parentId, childId, isLeft) {
     );
   }
 
-  // Throw an error if the left child doesn't exist
-  if ( ! graph.nodes.has(childId) ) {
-    throw new Error(
-      `setChild - no child with id ${childId} exists in the graph, parent is ${parentId} (weight ${GraphInterface.getNodeAttribute(graph,parentId, "weight")})`
-    );
-  }
-
-  console.log(`-> setChild: parent ${parentId}, child ${childId}, isLeft ${isLeft}`);
-  let changeObjects = [];
-  const newGraph = produce(graph, (draft) => {
-    // create edge from parent to child
-    let edge = new Edge(parentId, childId);
-    // Add the edge to both the source and target's adjacency lists
-    draft.nodes.get(parentId).edges.set(`${parentId},${childId}`, edge);
-    draft.nodes.get(childId).edges.set(`${parentId},${childId}`, edge);
-    // record the change
-    changeObjects.push(
-      new ChangeObject("addEdge", null, {
-        source: parentId,
-        target: childId
-      })
-    );
-    // create a change object that records the current position of the child in nodeList;
-    // this is necessary so that undo can put the child back in the correct position
-    changeObjects.push(new ChangeObject("changeNodeList",
-    { index: draft.nodeList.indexOf(childId) },
-    {
-      nodeId: childId,
-      index: isLeft ? 0 : draft.nodeList.length
+  // Throw an error if any child does not exist
+  children.forEach( (childId) => {
+    if ( ! graph.nodes.has(childId) ) {
+      throw new Error(
+        `setChildren - no child with id ${childId} exists in the graph, parent is ${parentId} (weight ${GraphInterface.getNodeAttribute(graph,parentId, "weight")})`
+      )
     }
-  ));
+  })
+
+  // Throw an error if any child does not have the right parent,
+  // i.e., there is no edge from the parent to the child
+  children.forEach( (childId) => {
+    if ( graph.getEdge(parentId, childId) === undefined ) {
+      throw new Error(
+        `setChildren - no edge from ${parentId} to ${childId} exists in the graph.`
+      )
+    }
+  })
+
+  console.log(`-> setChildren: parent ${parentId}, children ${children}`);
+  const newGraph = produce(graph, (draft) => {
+    // create a change object that ensures sequence numbers are consistent with the desired child order
+    // first create a list of pairs of existing id's and sequence numbers
+    const childSequenceNumberPairs = Object.entries(draft.graph.nodes).filter((node) => children.includes(node.id))
+    childIdSequenceNumberPairs.forEach((pair) => { pair[1] = pair[1].sequenceNumber })
+    // then a list of pairs of child id's matched with sorted sequence numbers
+    const childSequenceNumbers = Object.keys(draft.graph.nodes).filter((id) => children.includes(id))
+    const sortedSequenceNumbers = childSequenceNumbers.sort((a, b) => a - b)
+    const newPairs = children.map((child, index) => [child, sortedSequenceNumbers[index]])
+  });
+
+  recordChange(new ChangeManager(
+    {}
+  ))
 
     // remove childId from nodeList
     draft.nodeList.splice(draft.nodeList.indexOf(childId), 1);  

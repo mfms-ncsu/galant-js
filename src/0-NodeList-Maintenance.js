@@ -54,6 +54,35 @@
   return elements
 
 /**
+ * Example of recording change
+ */
+  const newChangeManager = recordChange(changeManager, [
+    new ChangeObject(
+      "setEdgeAttribute",
+      {
+        source: source,
+        target: target,
+        attribute: {
+          name: name,
+          value: graph.nodes
+            .get(source)
+            .edges.get(`${source},${target}`)
+            .attributes.get(name),
+        },
+      },
+      {
+        source: source,
+        target: target,
+        attribute: {
+          name: name,
+          value: value,
+        },
+      }
+    ),
+  ]);
+
+
+/**
  * Functions to be added 
  */
 
