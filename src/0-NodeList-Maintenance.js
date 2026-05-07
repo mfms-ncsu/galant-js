@@ -23,9 +23,35 @@
 /** !!! Need to fix everything below here !!! */
 
 /**
- * Here are the changes to relevant part of the code with the parts to modify bracketed
+ * !!! Here are the changes to relevant part of the code with the parts to modify bracketed
  * by comments that begin with !!!
  */
+
+/**
+ * Add a new field called sequenceNumber to a node
+ */
+
+/**
+ * Need to modify addNode to give a new node a sequence number; a function to generate a new sequence number will be necessary, similar to generateId().
+ * When addNode is undone and redone, it keeps the sequence number.
+ * Sequence numbers are not reused.
+ * Consider a new method for assigning id's to new nodes; maybe require user to provide one.
+ */
+
+/**
+ * Get rid of nodeList.
+ * In CytoscapeInterface, turn nodes, the node map, into a list of pairs of the form
+ *  [[id_1, node_1] , ... , [id_n, node_n]]
+ * as follows
+ */
+ const nodeList = Object.entries(nodes).sort((a, b) => a[1].sequenceNumber - b[1].sequenceNumber);
+ /* Then ...
+ */
+  nodeList.forEach(idNodePair => {
+    const node = idNodePair[1];
+    // ...
+  })
+  return elements
 
 /**
  * Functions to be added 

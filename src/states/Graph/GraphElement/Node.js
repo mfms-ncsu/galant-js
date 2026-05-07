@@ -1,6 +1,22 @@
 import GraphElement from "./GraphElement.js";
 
 /**
+ * @returns a unique sequence number for a node
+ * Sequence numbers are used to determine the order of appearance of nodes
+ * when they are displayed, particularly important for rooted trees
+ * when elkjs mode is used.
+ * They are modified when the left to right order of children of a node
+ * needs to change during algorithm execution
+ * @todo could alse be used to order adjacency lists
+ */
+function generateSequenceNumber() {
+  currentSequenceNumber++
+  return currentSequenceNumber
+}
+
+let currentSequenceNumber = 0;
+
+/**
  * Node is a GraphElement with a unique id, an xy-position, and an
  * adjacency list of edges stored in a map.
  * 
@@ -29,8 +45,9 @@ export default class Node extends GraphElement {
             ["size", undefined],
             ["weight", undefined]
         ]));
-        // Set the id
-        this.id = nodeId;
+        // Set the id and sequence number
+        this.id = nodeId
+        this.sequenceNumber = generateSequenceNumber()
 
         // Create an object containing the xy-position
         this.position = {

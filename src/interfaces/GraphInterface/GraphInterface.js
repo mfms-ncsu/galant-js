@@ -805,7 +805,7 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
     // Create the node
     let node = new Node(newNodeId, Math.round(x), Math.round(y));
     draft.nodes.set(newNodeId, node);
-    draft.nodeList.push(newNodeId);
+//    draft.nodeList.push(newNodeId);
 
     // Set the attributes
     for (let name in attributes) {

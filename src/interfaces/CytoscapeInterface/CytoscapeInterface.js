@@ -111,7 +111,6 @@ function parseNode(graph, node) {
 
     // Add attributes
     node.attributes.forEach((value, name) => {
-
         if ( name === "weight" && parseAndRound(value) ) {
             element.data[name] = parseAndRound(value);
         }
@@ -136,24 +135,25 @@ function parseNode(graph, node) {
  * @returns Array of cytoscape elements to display
  */
 function getElements(graph) {
-    // Create an array of elements
-    let elements = [];
+  // Create an array of elements
+  let elements = [];
 
-    // Loop over each node using the nodeList to determine order
-    graph.nodeList.forEach(nodeId => {
-        const node = graph.nodes.get(nodeId);
+  // use sequence numbers to determine the order of appearance for nodes
+  const nodeMap = GraphInterface.getNodes(graph)
+  const idNodePairs = Object.entries(nodeMap).sort((a, b) => a[1].sequenceNumber - b[1].sequenceNumber);
 
-        elements.push(parseNode(graph, node));
+  idNodePairs.forEach(idNodePair => {
+    const node = idNodePair[1];
+    elements.push(parseNode(graph, node));
 
-        // Loop over each edge sourced at this node
-        node.edges.forEach(edge => {
-            if ( node.id === edge.source ) {
-                elements.push(parseEdge(graph, edge));
-            }
-        });
+    // Loop over each edge sourced at this node
+    node.edges.forEach(edge => {
+      if ( node.id === edge.source ) {
+        elements.push(parseEdge(graph, edge));
+      }
     });
-
-    return elements;
+  });
+  return elements;
 }
 
 /**
