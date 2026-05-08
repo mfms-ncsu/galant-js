@@ -86,10 +86,32 @@ Any change that can be undone and redone requires a ***change record*** that rec
 ```
 The constructor for a change object has three arguments
 - a tag to identify the type of change
-- two records, for current and changed states, respectively; each has fields that are used during undo and redo operations
-In the example, as elsewhere, the tag and the field names are arbitrary, but should obviously be identifyable. Note also that the value of a field can again be a record, as in the `attribute` field of the example.
+- two records, for previous and current (changed) states, respectively; each has fields that are used during undo and redo operations
+In the example, as elsewhere, the tag and the field names are arbitrary, but should obviously be mnemonic. Note also that the value of a field can again be a record, as in the `attribute` field of the example.
+It should not, however, be a *mutable data structure* such as an array.
 
 #### Undo and redo
 
 An undo operation, the function `undo`, first retrieves the previous step, i.e., the change record at `changeManager.index - 1` in the array `changeManager.changes`.
 The list of change records needs to be reversed in case some of the changes depended on previous ones.
+As in the original action on the graph, there is the Immer invocation, in this case containing a switch statement, as in
+```
+    const newGraph = produce(graph, (draft) => {
+      step.forEach((change) => {
+        switch (change.action) {
+            // in each case, undo an action based on its tag
+        }
+      })
+    })
+```
+The undo for `"setNodeAttribute"` looks like
+```
+            draft.nodes
+              .get(change.previous.id)
+              .attributes.set(
+                change.previous.attribute.name,
+                change.previous.attribute.value
+              );
+```
+
+Redo is similar. The only difference is that we use `current` instead of `previous`.
