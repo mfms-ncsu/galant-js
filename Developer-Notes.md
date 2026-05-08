@@ -45,4 +45,51 @@ Source files are organized into several subdirectors, based on their function.
         - `GraphElement` is the super class for nodes, edges, and messages
         - `Graph` is the super class for `StandardGraph` and `LayeredGraph`
     - `ChangeManager` is a list of `ChangeObject`s, each of which records an action, the previous state, and the new state resulting from the action; states are local in the sense that each applies to a single element only; in reality, the change manager is a list of lists, since a single step can trigger a set of changes via the `step(() =>{...})` incantation
+    
+## Common workflows
 
+### Changes and change records
+
+#### Effecting the change
+
+A typical change requires re-rendering of the graph. To avoid creating multiple copies of the graph, Immer is used. The incantation is
+```
+const newGraph = produce(graph, (draft) => {
+    // code that changes the current graph and/or its elements
+}
+```
+The code refers to components of the graph with the prefix `draft.`, for example `draft.nodes`
+
+#### Creating a change record
+
+Any change that can be undone and redone requires a ***change record*** that records the current state and the state after the change. A change record consists of a list of one or more change objects. For example, a change in an attribute of a node - only one change object in this case - looks like
+```
+  const newChangeManager = recordChange(changeManager, [
+    new ChangeObject(
+      "setNodeAttribute",
+      {
+        id: nodeId,
+        attribute: {
+          name: name,
+          value: graph.nodes.get(nodeId).attributes.get(name),
+        },
+      },
+      {
+        id: nodeId,
+        attribute: {
+          name: name,
+          value: value,
+        },
+      }
+    ),
+  ]);
+```
+The constructor for a change object has three arguments
+- a tag to identify the type of change
+- two records, for current and changed states, respectively; each has fields that are used during undo and redo operations
+In the example, as elsewhere, the tag and the field names are arbitrary, but should obviously be identifyable. Note also that the value of a field can again be a record, as in the `attribute` field of the example.
+
+#### Undo and redo
+
+An undo operation, the function `undo`, first retrieves the previous step, i.e., the change record at `changeManager.index - 1` in the array `changeManager.changes`.
+The list of change records needs to be reversed in case some of the changes depended on previous ones.
