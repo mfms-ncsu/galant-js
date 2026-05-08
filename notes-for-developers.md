@@ -115,3 +115,35 @@ The undo for `"setNodeAttribute"` looks like
 ```
 
 Redo is similar. The only difference is that we use `current` instead of `previous`.
+
+### Thread and algorithm
+
+#### Thread
+
+`Thread.js` is the point of contact for functions called from an animation implementation. All possible functions are collected here in an organized fashion.
+Functions that query graph properties call on the relevant graph interface directly.
+Definition of a function that modifies the graph/display looks like
+```
+  // the following causes the animation to take a step
+  // a `stepDepth > 0` implies that changes are being collected into a single step
+  // `stepDepth` indicates the level of nesting - steps within steps
+  if (stepDepth === 0) { postMessage({ action: "step" }) }
+  // call the relevant interface function, e.g.,
+  [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, id, name, value)
+  // post a message for the algorithm interface
+  postMessage({ action: "setNodeAttribute", nodeId: id, name: name, value: value })
+  // pause the thread until user solicits a step - if stepDepth is 0,
+  // a condition we may not need, but just to be safe
+  waitIfNeeded()
+```
+
+#### Algorithm interface
+
+`AlgorithmInterface.js` intercepts messages from the thread and takes the appropriate actions. It also reacts to the users step forward and step back requests.
+All actions that modify the graph or the change manager are handled via *Jotai* states - see the Galant-JS-Developer-Guide on the Google shared drive. Therefore messages from the thread must effect state changes to allow global access to new states.
+For example, inside a `switch` that handles message types, we see
+```
+        case "setNodeAttribute":
+            [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graph, changeManager, message.nodeId, message.name, message.value);
+            updateState(newGraph, newChangeManager);
+```

@@ -256,7 +256,7 @@ function setChildren(graph, changeManager, parentId, children) {
   // Throw an error if the parent doesn't exist
   if ( ! graph.nodes.has(parentId) ) {
     throw new Error(
-      `setChild - no parent with id ${parentId} exists in the graph`
+      `setChildren - no parent with id ${parentId} exists in the graph`
     );
   }
 
@@ -280,71 +280,80 @@ function setChildren(graph, changeManager, parentId, children) {
   })
 
   console.log(`-> setChildren: parent ${parentId}, children ${children}`);
+  // first create a list of pairs of existing id's and sequence numbers
+  const childSequenceNumberPairs = Object.entries(graph.nodes).filter((node) => children.includes(node.id))
+  childSequenceNumberPairs.forEach((pair) => { pair[1] = pair[1].sequenceNumber })
+  // then a list of pairs of child id's matched with sorted sequence numbers
+  const childSequenceNumbers = Object.keys(graph.nodes).filter((id) => children.includes(id))
+  const sortedSequenceNumbers = childSequenceNumbers.sort((a, b) => a - b)
+  const newPairs = children.map((child, index) => [child, sortedSequenceNumbers[index]])
+
+  // change the sequence numbers of the affected nodes
   const newGraph = produce(graph, (draft) => {
-    // create a change object that ensures sequence numbers are consistent with the desired child order
-    // first create a list of pairs of existing id's and sequence numbers
-    const childSequenceNumberPairs = Object.entries(draft.graph.nodes).filter((node) => children.includes(node.id))
-    childIdSequenceNumberPairs.forEach((pair) => { pair[1] = pair[1].sequenceNumber })
-    // then a list of pairs of child id's matched with sorted sequence numbers
-    const childSequenceNumbers = Object.keys(draft.graph.nodes).filter((id) => children.includes(id))
-    const sortedSequenceNumbers = childSequenceNumbers.sort((a, b) => a - b)
-    const newPairs = children.map((child, index) => [child, sortedSequenceNumbers[index]])
+    newPairs.forEach((pair) => {
+      draft.nodes.get(pair[0]).sequenceNumber = pair[1]
+    })
   });
 
-  recordChange(new ChangeManager(
-    {}
-  ))
+  // create a change object for each changed sequence number
+  // and collect these in a list as an object in the change manager
+  let changes = []
+  childSequenceNumberPairs.forEach((nodeId, index) => {
+    const oldSequenceNumber = childSequenceNumberPairs[index][1]
+    const newSequenceNumber = newPairs[index][1]
+    changes.push(new ChangeObject(
+      "changeSequenceNumber",
+      {
+        id: nodeId,
+        number: oldSequenceNumber
+      },
+      {
+        id: nodeId,
+        number: newSequenceNumber
+      }
+    ))
+  })
 
-    // remove childId from nodeList
-    draft.nodeList.splice(draft.nodeList.indexOf(childId), 1);  
+  const newChangeManager = recordChange(changeManager, changes)
 
-    // if it's a left child, put it at the front of the node list
-    if ( isLeft ) {
-      draft.nodeList.unshift(childId);
-    }
-    // otherwise (right child) put it at the end of the node list
-    else {
-      draft.nodeList.push(childId);
-    }
-  });
-  
-  const newChangeManager = recordChange(changeManager, changeObjects);
-  
-  console.log("<- setChild, chidren:", getChildren(newGraph, parentId), "nodeList:", newGraph.nodeList);
+  return [newGraph, newChangeManager]
+
+  console.log("<- setChildren, chidren:", getChildren(newGraph, parentId), "old:", childSequenceNumberPairs, "new:", newPairs);
+
   // Return mutated graph and change manager to trigger re-render
   // Add the node id as the third return value
   return [newGraph, newChangeManager];
 }
 
-/**
- * Sets the left child of the node
- * @param {Graph} graph Graph on which to operate
- * @param {string} nodeId Node to check
- * @param {string} leftChildId Left child node to set
- * Assumes that the edge from nodeId to leftChildId is not already present
- * and that both the nodeId and leftChildId exist in the graph
- * @todo Add ChangeManager functionality -- see addBinaryNode for reference
- */
-function makeLeftChild(graph, changeManager, parentId, leftChildId) {
-  isTree(graph);
-  [graph, changeManager] = setChild(graph, changeManager, parentId, leftChildId, true);
-  return [graph, changeManager];
-}
+// /**
+//  * Sets the left child of the node
+//  * @param {Graph} graph Graph on which to operate
+//  * @param {string} nodeId Node to check
+//  * @param {string} leftChildId Left child node to set
+//  * Assumes that the edge from nodeId to leftChildId is not already present
+//  * and that both the nodeId and leftChildId exist in the graph
+//  * @todo Add ChangeManager functionality -- see addBinaryNode for reference
+//  */
+// function makeLeftChild(graph, changeManager, parentId, leftChildId) {
+//   isTree(graph);
+//   [graph, changeManager] = setChild(graph, changeManager, parentId, leftChildId, true);
+//   return [graph, changeManager];
+// }
 
-/**
- * Sets the right child of the node
- * @param {Graph} graph Graph on which to operate
- * @param {string} nodeId Node to check
- * @param {string} rightChildId Right child node to set
- * Assumes that the edge from nodeId to rightChildId is not already present
- * and that both the nodeId and rightChildId exist in the graph
- * @todo Add ChangeManager functionality -- see addBinaryNode for reference
- */
-function makeRightChild(graph, changeManager,parentId, rightChildId) {
-  isTree(graph);
-  [graph, changeManager] = setChild(graph, changeManager, parentId, rightChildId, false);
-  return [graph, changeManager];
-}
+// /**
+//  * Sets the right child of the node
+//  * @param {Graph} graph Graph on which to operate
+//  * @param {string} nodeId Node to check
+//  * @param {string} rightChildId Right child node to set
+//  * Assumes that the edge from nodeId to rightChildId is not already present
+//  * and that both the nodeId and rightChildId exist in the graph
+//  * @todo Add ChangeManager functionality -- see addBinaryNode for reference
+//  */
+// function makeRightChild(graph, changeManager,parentId, rightChildId) {
+//   isTree(graph);
+//   [graph, changeManager] = setChild(graph, changeManager, parentId, rightChildId, false);
+//   return [graph, changeManager];
+// }
 
 /**
  * adds a node with the given id and attributes as either a left child or a right child
@@ -516,8 +525,8 @@ const TreeInterface = {
   isLeaf,
   getLeft,
   getRight,
-  makeLeftChild,
-  makeRightChild,
+  // makeLeftChild,
+  // makeRightChild,
   addLeft,
   addRight
 };

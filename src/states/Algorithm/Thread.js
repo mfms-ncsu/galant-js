@@ -58,9 +58,8 @@ function wait() {
  * 0.
  */
 function waitIfNeeded() {
-
     // Wait if we are not in a step
-    if (stepDepth == 0) {
+    if (stepDepth === 0) {
         wait();
     }
 }
@@ -1064,6 +1063,19 @@ function getLeft(nodeId) {
 
 function getRight(nodeId) {
     return TreeInterface.getRight(graph, nodeId);
+}
+
+/**
+ * sets the left to right order of children of a node
+ * should make most of what's below unnecessary
+ * @param parent the parent node
+ * @param childOrder a list of the children in the desired order
+ */
+function setChildren(parent, childOrder) {
+  if (stepDepth === 0) { postMessage({ action: "step" }) };
+  [graph, changeManager] = TreeInterface.setChildren(parent, childOrder)
+  postMessage( { action: "setChildren", parent: parent, children: childOrder })
+  waitIfNeeded()
 }
 
 function addLeft(targetNode, childWeight) {
