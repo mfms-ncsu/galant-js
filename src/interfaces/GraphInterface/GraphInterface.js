@@ -1062,13 +1062,10 @@ function redo(graph, changeManager) {
                 change.current.attribute.value
               );
             break;
-          case "changeNodeList":
-            // to be used for trees only, where presence of the node is a given and only its position matters.
-            console.log("Redoing changeNodeList, nodeList =", newGraph.nodeList);
-            graph.nodeList = changeNodeList(graph.nodeList,
-                 change.current.nodeId, change.previous.index, change.current.index);
-            console.log("After redoing changeNodeList, nodeList =", graph.nodeList);
-                 break;
+          case "changeSequenceNumber":
+            console.log(`Redoing changeSequenceNumber, id = ${change.current.id}, seq# =${change.current.number}`);
+            draft.nodes.get(change.current.id).sequenceNumber = change.current.sequenceNumber
+            break
         }
       });
     });
@@ -1800,10 +1797,11 @@ function undo(graph, changeManager) {
               leftNode.attributes.set(key, value);
             });
             break;
-          case "changeNodeList":
-            console.log("Undoing changeNodeList, nodeList =", draft.nodeList);
-            draft.nodeList = changeNodeList(draft.nodeList, change.current.nodeId, change.previous.index, change.current.index);
-        }
+          case "changeSequenceNumber":
+            console.log(`Undoing changeSequenceNumber, id = ${change.previous.id}, seq# =${change.previous.number}`);
+            draft.nodes.get(change.previous.id).sequenceNumber = change.previous.sequenceNumber
+            break
+          }
       });
     });
 

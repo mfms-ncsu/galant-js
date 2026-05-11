@@ -298,7 +298,7 @@ function onMessage(algorithm, message) {
             [newGraph, newChangeManager] = LayeredGraphInterface.applyNodePositions(graph, changeManager, message.savedPositions);
             updateState(newGraph, newChangeManager);
             break;
-        case "setChildren": 
+        case "setChildren":
             [newGraph, newChangeManager] = TreeInterface.setChildren(graph, changeManager, message.parent, message.children)
             updateState(newGraph, newChangeManager)
             break
