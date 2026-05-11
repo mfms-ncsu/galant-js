@@ -1073,7 +1073,7 @@ function getRight(nodeId) {
  */
 function setChildren(parent, childOrder) {
   if (stepDepth === 0) { postMessage({ action: "step" }) };
-  [graph, changeManager] = TreeInterface.setChildren(parent, childOrder)
+  [graph, changeManager] = TreeInterface.setChildren(graph, changeManager, parent, childOrder)
   postMessage( { action: "setChildren", parent: parent, children: childOrder })
   waitIfNeeded()
 }

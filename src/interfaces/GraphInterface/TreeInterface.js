@@ -272,7 +272,7 @@ function setChildren(graph, changeManager, parentId, children) {
   // Throw an error if any child does not have the right parent,
   // i.e., there is no edge from the parent to the child
   children.forEach( (childId) => {
-    if ( graph.getEdge(parentId, childId) === undefined ) {
+    if ( GraphInterface.getEdge(graph, parentId, childId) === undefined ) {
       throw new Error(
         `setChildren - no edge from ${parentId} to ${childId} exists in the graph.`
       )
@@ -281,12 +281,16 @@ function setChildren(graph, changeManager, parentId, children) {
 
   console.log(`-> setChildren: parent ${parentId}, children ${children}`);
   // first create a list of pairs of existing id's and sequence numbers
-  const childSequenceNumberPairs = Object.entries(graph.nodes).filter((node) => children.includes(node.id))
-  childSequenceNumberPairs.forEach((pair) => { pair[1] = pair[1].sequenceNumber })
+  let idSequenceNumberPairs = GraphInterface.getNodes(graph).map((node) => [node.id, node.sequenceNumber])
+  console.log("idSequenceNumberPairs before filter", idSequenceNumberPairs)
+  let oldPairs = idSequenceNumberPairs.filter((pair) => children.includes(pair[0]))
+  console.log("oldPairs", oldPairs)
+  let sequenceNumbers = oldPairs.map((pair) => pair[1])
+  console.log("sequence numbers:", sequenceNumbers)
   // then a list of pairs of child id's matched with sorted sequence numbers
-  const childSequenceNumbers = Object.keys(graph.nodes).filter((id) => children.includes(id))
-  const sortedSequenceNumbers = childSequenceNumbers.sort((a, b) => a - b)
+  const sortedSequenceNumbers = sequenceNumbers.sort((a, b) => a - b)
   const newPairs = children.map((child, index) => [child, sortedSequenceNumbers[index]])
+  console.log("newPairs", newPairs)
 
   // change the sequence numbers of the affected nodes
   const newGraph = produce(graph, (draft) => {
@@ -298,8 +302,8 @@ function setChildren(graph, changeManager, parentId, children) {
   // create a change object for each changed sequence number
   // and collect these in a list as an object in the change manager
   let changes = []
-  childSequenceNumberPairs.forEach((nodeId, index) => {
-    const oldSequenceNumber = childSequenceNumberPairs[index][1]
+  children.forEach((nodeId, index) => {
+    const oldSequenceNumber = oldPairs[index][1]
     const newSequenceNumber = newPairs[index][1]
     changes.push(new ChangeObject(
       "changeSequenceNumber",
@@ -315,10 +319,7 @@ function setChildren(graph, changeManager, parentId, children) {
   })
 
   const newChangeManager = recordChange(changeManager, changes)
-
-  return [newGraph, newChangeManager]
-
-  console.log("<- setChildren, chidren:", getChildren(newGraph, parentId), "old:", childSequenceNumberPairs, "new:", newPairs);
+  console.log("<- setChildren, chidren:", getChildren(newGraph, parentId), "old:", oldPairs, "new:", newPairs);
 
   // Return mutated graph and change manager to trigger re-render
   // Add the node id as the third return value
@@ -528,6 +529,7 @@ const TreeInterface = {
   // makeLeftChild,
   // makeRightChild,
   addLeft,
-  addRight
+  addRight,
+  setChildren
 };
 export default TreeInterface; 
