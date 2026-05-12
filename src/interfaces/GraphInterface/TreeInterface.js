@@ -288,10 +288,7 @@ function setChildren(graph, changeManager, parentId, children) {
 
   console.log(`-> setChildren: parent ${parentId}, children ${children}`);
   // first create a list of pairs of existing id's and sequence numbers
-  console.log("sequence numbers", GraphInterface.getSequenceNumbers(graph))
-  let idSequenceNumberPairs = Array.from(GraphInterface.getSequenceNumbers(graph))
-  console.log("idSequenceNumberPairs before filter", idSequenceNumberPairs)
-  let oldPairs = idSequenceNumberPairs.filter((pair) => children.includes(pair[0]))
+  let oldPairs = children.map((child, index) => [child, GraphInterface.getSequenceNumbers(graph).get(child)])
   console.log("oldPairs", oldPairs)
   let sequenceNumbers = oldPairs.map((pair) => pair[1])
   console.log("sequence numbers:", sequenceNumbers)
@@ -313,6 +310,7 @@ function setChildren(graph, changeManager, parentId, children) {
   children.forEach((nodeId, index) => {
     const oldSequenceNumber = oldPairs[index][1]
     const newSequenceNumber = newPairs[index][1]
+    console.log("pair: old = ", oldPairs[index], " new = ", newPairs[index])
     changes.push(new ChangeObject(
       "changeSequenceNumber",
       {

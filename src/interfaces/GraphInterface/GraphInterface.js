@@ -1072,7 +1072,7 @@ function redo(graph, changeManager) {
             break;
           case "changeSequenceNumber":
             console.log(`Redoing changeSequenceNumber, id = ${change.current.id}, seq# =${change.current.number}`);
-            draft.sequenceNumbers.set(change.current.id, change.current.sequenceNumber)
+            draft.sequenceNumbers.set(change.current.id, change.current.number)
             break
         }
       });
@@ -1806,8 +1806,8 @@ function undo(graph, changeManager) {
             });
             break;
           case "changeSequenceNumber":
-            console.log(`Undoing changeSequenceNumber, id = ${change.previous.id}, seq# =${change.previous.number}`);
-            draft.sequenceNumbers.set(change.previous.id, change.previous.sequenceNumber)
+            console.log(`Undoing changeSequenceNumber, id = ${change.previous.id}, seq# = ${change.previous.number}`);
+            draft.sequenceNumbers.set(change.previous.id, change.previous.number)
             break
           }
       });
