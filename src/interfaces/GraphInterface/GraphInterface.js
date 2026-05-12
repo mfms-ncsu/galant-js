@@ -519,6 +519,12 @@ function getNodes(graph) {
   return [...graph.nodes.values()];
 }
 
+function getSequenceNumbers(graph) {
+  verifyGraph(graph)
+  console.log("<-> getSequenceNumbers", graph.sequenceNumbers)
+  return graph.sequenceNumbers
+}
+
 /**
  * Returns the total number of edges in the graph.
  * @param {Graph} graph Graph on which to operate
@@ -805,7 +811,9 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
     // Create the node
     let node = new Node(newNodeId, Math.round(x), Math.round(y));
     draft.nodes.set(newNodeId, node);
-//    draft.nodeList.push(newNodeId);
+    draft.sequenceNumbers.set(newNodeId, draft.currentSequenceNumber++)
+
+    console.log("added node, sequence #'s", draft.sequenceNumbers)
 
     // Set the attributes
     for (let name in attributes) {
@@ -1064,7 +1072,7 @@ function redo(graph, changeManager) {
             break;
           case "changeSequenceNumber":
             console.log(`Redoing changeSequenceNumber, id = ${change.current.id}, seq# =${change.current.number}`);
-            draft.nodes.get(change.current.id).sequenceNumber = change.current.sequenceNumber
+            draft.sequenceNumbers.set(change.current.id, change.current.sequenceNumber)
             break
         }
       });
@@ -1799,7 +1807,7 @@ function undo(graph, changeManager) {
             break;
           case "changeSequenceNumber":
             console.log(`Undoing changeSequenceNumber, id = ${change.previous.id}, seq# =${change.previous.number}`);
-            draft.nodes.get(change.previous.id).sequenceNumber = change.previous.sequenceNumber
+            draft.sequenceNumbers.set(change.previous.id, change.previous.sequenceNumber)
             break
           }
       });
@@ -1833,6 +1841,7 @@ const GraphInterface = {
   getNodeIds,
   getNodePosition,
   getNodes,
+  getSequenceNumbers,
   getNumberOfEdges,
   getNumberOfNodes,
   getOppositeNode,

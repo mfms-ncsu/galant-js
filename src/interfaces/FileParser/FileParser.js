@@ -158,7 +158,7 @@ function loadGraph(name, file) {
         graph = new StandardGraph(name);
     }
     graph.nodes = new Map();
-    graph.nodeList = [];
+    graph.sequenceNumbers = new Map();
     // Parse each line, ignoring comments and blank lines
     // This part is the same for all graph types
     lines.forEach(line => { parseLine(graph, line) });
@@ -332,7 +332,7 @@ function addNode(graph, x, y, nodeId, attributes) {
         node = new Node(nodeId, x, y);
     }
     graph.nodes.set(nodeId, node);
-    graph.nodeList.push(nodeId);
+    graph.sequenceNumbers.set(nodeId, graph.currentSequenceNumber++);
 
     // Set the attributes
     for (let name in attributes) {

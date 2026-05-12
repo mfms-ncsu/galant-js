@@ -139,11 +139,11 @@ function getElements(graph) {
   let elements = [];
 
   // use sequence numbers to determine the order of appearance for nodes
-  const nodeMap = GraphInterface.getNodes(graph)
-  const idNodePairs = Object.entries(nodeMap).sort((a, b) => a[1].sequenceNumber - b[1].sequenceNumber);
+  const sequenceNumbers = GraphInterface.getSequenceNumbers(graph)
+  const idSequenceNumberPairsSorted = Array.from(sequenceNumbers).sort((a, b) => a[1] - b[1]);
 
-  idNodePairs.forEach(idNodePair => {
-    const node = idNodePair[1];
+  idSequenceNumberPairsSorted.forEach(pair => {
+    const node = graph.nodes.get(pair[0]);
     elements.push(parseNode(graph, node));
 
     // Loop over each edge sourced at this node

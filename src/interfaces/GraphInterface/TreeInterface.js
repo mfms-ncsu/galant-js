@@ -252,6 +252,13 @@ function getRight(graph, nodeId) {
  * @returns [newGraph, newChangeManager] The mutated sequence number list and change manager.
  */
 
+/** !!!
+ * It should be much easier to create a new Map that maps node id's to sequence numbers.
+ * So everything related to sequence numbers will be in GraphInterface
+ * While we're at it, the function that creates the next id should create a completely new one
+ * !!!
+ */
+
 function setChildren(graph, changeManager, parentId, children) {
   // Throw an error if the parent doesn't exist
   if ( ! graph.nodes.has(parentId) ) {
@@ -281,7 +288,8 @@ function setChildren(graph, changeManager, parentId, children) {
 
   console.log(`-> setChildren: parent ${parentId}, children ${children}`);
   // first create a list of pairs of existing id's and sequence numbers
-  let idSequenceNumberPairs = GraphInterface.getNodes(graph).map((node) => [node.id, node.sequenceNumber])
+  console.log("sequence numbers", GraphInterface.getSequenceNumbers(graph))
+  let idSequenceNumberPairs = Array.from(GraphInterface.getSequenceNumbers(graph))
   console.log("idSequenceNumberPairs before filter", idSequenceNumberPairs)
   let oldPairs = idSequenceNumberPairs.filter((pair) => children.includes(pair[0]))
   console.log("oldPairs", oldPairs)
@@ -295,7 +303,7 @@ function setChildren(graph, changeManager, parentId, children) {
   // change the sequence numbers of the affected nodes
   const newGraph = produce(graph, (draft) => {
     newPairs.forEach((pair) => {
-      draft.nodes.get(pair[0]).sequenceNumber = pair[1]
+      draft.sequenceNumbers.set(pair[0], pair[1])
     })
   });
 

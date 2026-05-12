@@ -14,8 +14,19 @@ export default class Graph {
   name;
   /** Map of nodes in the graph (NodeId -> Node) */
   nodes;
-  /** List of node id's: determines the order in which nodes are rendered by Cytoscape */
-  nodeList = [];
+  /**
+  * Sequence numbers are used to determine the order of appearance of nodes
+  * when they are displayed, particularly important for rooted trees
+  * when elkjs mode is used.
+  * They are modified when the left to right order of children of a node
+  * needs to change during algorithm execution
+  * @todo could alse be used to order adjacency lists
+  */
+  sequenceNumbers;
+  /** the current sequence number, i.e., the next one to be assigned
+   *  incremented each time one is assigned
+   */
+  currentSequenceNumber;
   /** Node render size */
   nodeSize = 35;
   /** Object of x and y scales */
@@ -37,6 +48,8 @@ export default class Graph {
     this.type = type;
     this.name = name;
     this.nodes = new Map();
+    this.sequenceNumbers = new Map();
+    this.currentSequenceNumber = 0;
     this.comments = new Set();
   }
 }
