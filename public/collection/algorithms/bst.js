@@ -73,34 +73,6 @@ function isDummy(nodeId) {
 }
 
 /**
- * adds a left child with weight w and puts the weight inside the node
- * @param nodeId (id of) the node whose left child we are adding
- * @param w weight of the new left child
- */
-function addLeftInsideWeight(nodeId, w) {
-  const newNode = addNode();
-  setWeight(newNode, w);
-  makeLeftChild(nodeId, newNode);
-  setAttribute(newNode, "weightInNode", true);
-  hideWeight(newNode);
-  return newNode;
-}
-
-/**
- * adds a right child with weight w and puts the weight inside the node
- * @param nodeId (id of) the node whose right child we are adding
- * @param w weight of the new right child
- */
-function addRightInsideWeight(nodeId, w) {
-  const newNode = addNode();
-  setWeight(newNode, w);
-  makeRightChild(nodeId, newNode);
-  setAttribute(newNode, "weightInNode", true);
-  hideWeight(newNode);
-  return newNode;
-}
-
-/**
  * adds a node with weight w and puts the weight inside the node
  * used when adding the root node
  */
@@ -188,15 +160,14 @@ function addNodeBST(x, k) {
   // If a leaf, then add new node and a dummy here
   if ( isLeaf(x) ) {    
     step(()=>{
+      const newNode = addNodeInsideWeight(k);
+      const dummy = createDummy();
+      addEdge(x, newNode);
+      addEdge(x, dummy)
       if ( k < weight(x) ) {
-        addLeftInsideWeight(x, k);
-        const dummy = createDummy();
-        makeRightChild(x, dummy);
+        setChildren(x, [newNode, dummy])
       } else {
-        // !!! order matters here: it determines which node becomes left child and which becomes right child
-        const dummy = createDummy();
-        makeLeftChild(x, dummy);
-        addRightInsideWeight(x, k);
+        setChildren(x, [dummy, newNode])
       } 
       display(`Successfully added node ${k}`)
     });
@@ -274,7 +245,6 @@ function terminalNodeDeletion(x) {
     // first delete edge from parent to sibling
     // now set sibling as child of parent in place of x
     // and put a dummy node on the other side
-    // @todo makeLeftChild and makeRightChild should delete existing edges automatically
     dummify(x);
     return
   }
@@ -300,12 +270,16 @@ function terminalNodeDeletion(x) {
   // making sure that theRealChild is in the correct position
   // then delete x
   const xIsRightChild = isRightChild(x);
+  const sibling = getSibling(x);
   deleteNode(x);
+  addEdge(parent, theRealChild);
   console.log(`Deleted edge from parent with weight ${weight(parent)} to x)}`);
+  // at this point the parent has edges to the sibling and the real child
+  // it remains to determine their order
   if ( xIsRightChild ) {
-    makeRightChild(parent, theRealChild);
+    setChildren(parent, [sibling, theRealChild]);
   } else {
-    makeLeftChild(parent, theRealChild);
+    setChildren(parent, [theRealChild, sibling]);
   }
   return;
 }
