@@ -77,14 +77,18 @@ function isDummy(nodeId) {
  * used when adding the root node
  */
 function addNodeInsideWeight(w) {
+  // need newNode in outer scope, otherwise undefined is returned
+  let newNode;
+  console.log(`-> addNodeInsideWeight(${w})`)
   step(() => {
     display(`Adding node with weight ${w}`);
-    const newNode = addNode();
+    newNode = addNode();
     setWeight(newNode, w);
     setAttribute(newNode, "weightInNode", true);
     hideWeight(newNode);
-    return newNode;
   });
+  console.log("<- addnodeInsideWeight, new node =", newNode)
+  return newNode;
 }
 
 /**
@@ -143,7 +147,7 @@ function createDummy(){
  */
 function addNodeBST(x, k) {
   const theWeight = (x === null || x === undefined) ? null : weight(x);
-  console.log(`Adding node with key ${k}, at subroot with key ${theWeight}`);
+  console.log(`*** -> addNodeBST x = ${x}, weight(x) =  ${theWeight}, dummy? ${isDummy(x)}, k = ${k}`);
   // If empty, make new root
   if ( x === null || x === undefined ) {
     addNodeInsideWeight(k);
@@ -162,6 +166,7 @@ function addNodeBST(x, k) {
     step(()=>{
       const newNode = addNodeInsideWeight(k);
       const dummy = createDummy();
+      console.log("x is a leaf, new node is ", newNode, " dummy is ", dummy)
       addEdge(x, newNode);
       addEdge(x, dummy)
       if ( k < weight(x) ) {

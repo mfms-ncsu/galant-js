@@ -30,39 +30,16 @@ enableMapSet();
 
 /**
  * Generates the next unique node id from the given list of nodes.
+ * Uniqueness is guaranteed by incrementing latestIdNumber.
  * @param {Node[]} nodes Array of nodes to check
  * @returns New node id
  */
 function generateId(nodes) {
-  let id = 0;
-  while (nodes.has(String(id))) id++;
-  return String(id);
+  while ( nodes.has(String(latestIdNumber)) ) latestIdNumber++;
+  return String(latestIdNumber);
 }
 
-/**
- * Moves a node in the node list to a new index.
- * @returns New node list with the node moved
- * @param {String[]} nodeList Current node list
- * @param {String} nodeId Id of the node to move
- * @param {Number} newIndex New index for the node
- */
-function changeNodeList(nodeList, nodeId, oldIndex, newIndex) {
-  console.log("-> changeNodeList, nodeList =", nodeList, "nodeId =", nodeId, "oldIndex =", oldIndex, "newIndex =", newIndex, "changeManager =", GraphInterface.changeManager);
-  let newNodeList = [...nodeList];
-  const knownNodeIndex = newNodeList.indexOf(nodeId);
-  if ( knownNodeIndex !== oldIndex ) {
-    throw new Error(`Error in changeNodeList:  oldIndex ${oldIndex} does not match the index ${knownNodeIndex} of nodeId ${nodeId} in nodeList ${nodeList}`);
-  }
-  if ( oldIndex >= 0 ) {
-    newNodeList.splice(oldIndex, 1);
-  }
-  console.log("After removing nodeId, newNodeList =", newNodeList, "oldIndex =", oldIndex);
-  if ( newIndex >= 0 ) {
-    newNodeList.splice(newIndex, 0, nodeId);
-  }
-  console.log("<- changeNodeList, newNodeList =", newNodeList, "changeManager =", GraphInterface.changeManager);
-  return newNodeList;
-}
+let latestIdNumber = 0;
 
 /**
  * Records a new change in the given change manager.
@@ -486,7 +463,7 @@ function getNodeAttribute(graph, nodeId, name) {
  */
 function getNodeIds(graph) {
   verifyGraph(graph);
-  return graph.nodeList;
+  return [...graph.nodes.keys()];
 }
 
 /**
@@ -797,7 +774,7 @@ function addMessage(changeManager, message) {
  * @returns Updated graph and change manager, along with the new node's id
  */
 function addNode(graph, changeManager, x, y, nodeId, attributes) {
-  console.log("-> addNode, x =", x, "y =", y, "nodeId =", nodeId, "attributes =", attributes, "nodeList =", graph.nodeList, "nodes =", graph.nodes)
+  console.log("-> addNode, x =", x, "y =", y, "nodeId =", nodeId, "attributes =", attributes, "nodes =", graph.nodes)
   // Throw an error if the id is a duplicate
   verifyGraphChangeManager(graph, changeManager);
   if (nodeId && graph.nodes.has(nodeId)) {
@@ -832,7 +809,7 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
       attributes: attributes
     })
   ]);
-  console.log("<- addNode, new nodeList =", newGraph.nodeList, "nodes =",  newGraph.nodes, "newChangeManager =", newChangeManager);
+  console.log("<- addNode, nodes =", newGraph.nodes, "newChangeManager =", newChangeManager);
 
   // Return mutated graph and change manager to trigger re-render
   // Add the node id as the third return value
@@ -893,7 +870,7 @@ function deleteEdge(graph, changeManager, source, target) {
  * @returns Updated graph and change manager
  */
 function deleteNode(graph, changeManager, nodeId) {
-  console.log("-> deleteNode, nodeId =", nodeId, "nodeList =", graph.nodeList);
+  console.log("-> deleteNode, nodeId =", nodeId);
   // Error checking
   if (!graph.nodes.has(nodeId)) {
     throw new Error(
@@ -934,12 +911,8 @@ function deleteNode(graph, changeManager, nodeId) {
         )
       );
     });
-
-    // Finally, delete the node from the nodeList
-    draft.nodeList.splice(draft.nodeList.indexOf(nodeId), 1);
   });
 
-  // Create a ChangeObjects for the deleted node and for the change to the nodeList
   const node = graph.nodes.get(nodeId);
   changeObjects.push(
     new ChangeObject(
@@ -956,7 +929,7 @@ function deleteNode(graph, changeManager, nodeId) {
   // Add the change objects to the changeManager
   const newChangeManager = recordChange(changeManager, changeObjects);
 
-  console.log("<- deleteNode, new nodeList =", newGraph.nodeList, "newChangeManager =", newChangeManager);
+  console.log("<- deleteNode, graph =", newGraph, "newChangeManager =", newChangeManager);
 
   // Return mutated graph and change manager to trigger re-render
   return [newGraph, newChangeManager];
@@ -1007,7 +980,7 @@ function redo(graph, changeManager) {
       step.forEach((change) => {
         switch (change.action) {
           case "addNode":
-            console.log("Redoing addNode, nodeList =", draft.nodeList, "nodes =", draft.nodes);
+            console.log("Redoing addNode, nodes =", draft.nodes);
             draft.nodes.set(
               change.current.id,
               new Node(
@@ -1016,12 +989,10 @@ function redo(graph, changeManager) {
                 change.current.position.y
               )
             );
-            draft.nodeList.push(change.current.id);
-            console.log("After redoing addNode, nodeList =", draft.nodeList, "nodes =", draft.nodes);
+            console.log("After redoing addNode, nodes =", draft.nodes);
             break;
           case "deleteNode":
-            // leave the node in the nodes map so that we can still access its attibutes when we undo
-            draft.nodeList.splice(draft.nodeList.indexOf(change.previous.id), 1);
+            draft.nodes.delete(change.previous.id);
             break;
           case "addEdge":
             draft.nodes
@@ -1718,11 +1689,8 @@ function undo(graph, changeManager) {
         switch (change.action) {
           case "addNode":
             // when addNode is undone, the incident edges will have already been deleted.
-            console.log("Undoing addNode, nodeList =",
-               draft.nodeList, "nodes =", draft.nodes);
-            draft.nodeList.splice(draft.nodeList.indexOf(change.current.id), 1);
-            console.log("After undoing addNode, nodeList =",
-               draft.nodeList, "nodes =", draft.nodes);
+            draft.nodes.delete(change.current.id);
+            console.log("Undoing addNode, nodes =", draft.nodes);
             break;
           case "deleteNode":
             draft.nodes.set(
@@ -1737,7 +1705,6 @@ function undo(graph, changeManager) {
             change.previous.attributes.forEach((value, key) => {
               node.attributes.set(key, value);
             });
-            draft.nodeList.push(change.previous.id);
             break;
           case "addEdge":
             draft.nodes
