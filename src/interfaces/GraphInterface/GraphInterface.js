@@ -786,12 +786,14 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
 
   // If the nodeId argument is passed, use that, otherwise generate an id
   let newNodeId = nodeId || generateId(graph.nodes);
+  let newSequenceNumber = graph.currentSequenceNumber;
 
   const newGraph = produce(graph, (draft) => {
     // Create the node
     let node = new Node(newNodeId, Math.round(x), Math.round(y));
     draft.nodes.set(newNodeId, node);
-    draft.sequenceNumbers.set(newNodeId, draft.currentSequenceNumber++)
+    draft.sequenceNumbers.set(newNodeId, newSequenceNumber)
+    draft.currentSequenceNumber++
 
     console.log("added node, sequence #'s", draft.sequenceNumbers)
 
@@ -809,7 +811,8 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
         x: x,
         y: y,
       },
-      attributes: attributes
+      attributes: attributes,
+      seqnum: newSequenceNumber
     })
   ]);
   console.log("<- addNode, nodes =", newGraph.nodes, "newChangeManager =", newChangeManager);
@@ -997,6 +1000,7 @@ function redo(graph, changeManager) {
                 change.current.position.y
               )
             );
+            draft.sequenceNumbers.set(change.current.id, change.current.seqnum)
             console.log("After redoing addNode, nodes =", draft.nodes);
             break;
           case "deleteNode":
@@ -1771,19 +1775,6 @@ function undo(graph, changeManager) {
                 change.previous.attribute.name,
                 change.previous.attribute.value
               );
-            break;
-          case "deleteLeft":
-            const newNode = new Node(
-                change.previous.id,
-                change.previous.position.x,
-                change.previous.position.y
-              )
-            // Places the new node before of all other nodes.
-            draft.nodes = new Map([[change.previous.id, newNode], ...draft.nodes.entries()]); 
-            let leftNode = draft.nodes.get(change.previous.id);
-            change.previous.attributes.forEach((value, key) => {
-              leftNode.attributes.set(key, value);
-            });
             break;
           case "changeSequenceNumber":
             console.log(`Undoing changeSequenceNumber, id = ${change.previous.id}, seq# = ${change.previous.number}`);

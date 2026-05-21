@@ -302,22 +302,6 @@ function onMessage(algorithm, message) {
             [newGraph, newChangeManager] = TreeInterface.setChildren(graph, changeManager, message.parent, message.children)
             updateState(newGraph, newChangeManager)
             break
-        case "makeLeftChild":
-            [newGraph, newChangeManager] = TreeInterface.makeLeftChild(graph, changeManager, message.parent, message.child);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "makeRightChild":
-            [newGraph, newChangeManager] = TreeInterface.makeRightChild(graph, changeManager, message.parent, message.child);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "addLeft":
-            [newGraph, newChangeManager] = TreeInterface.addLeft(graph, changeManager, message.targetNode, message.childWeight);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "addRight":
-            [newGraph, newChangeManager] = TreeInterface.addRight(graph, changeManager, message.targetNode, message.childWeight);
-            updateState(newGraph, newChangeManager);
-            break;
         case "startRecording":
             newChangeManager = GraphInterface.startRecording(changeManager);
             store.set(algorithmChangeManagerAtom, newChangeManager);
