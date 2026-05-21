@@ -96,7 +96,6 @@ function parseEdge(graph, edge) {
  * @returns Cytoscape node element
  */
 function parseNode(graph, node) {
-    //TODO: round node weight
     let scalar = graph.scalar;
 
     // Identifying data

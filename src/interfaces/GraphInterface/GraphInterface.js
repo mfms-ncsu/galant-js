@@ -496,6 +496,9 @@ function getNodes(graph) {
   return [...graph.nodes.values()];
 }
 
+/**
+ * @returns the map that maps node id's to sequence numbers
+ */
 function getSequenceNumbers(graph) {
   verifyGraph(graph)
   console.log("<-> getSequenceNumbers", graph.sequenceNumbers)
@@ -872,7 +875,7 @@ function deleteEdge(graph, changeManager, source, target) {
 function deleteNode(graph, changeManager, nodeId) {
   console.log("-> deleteNode, nodeId =", nodeId);
   // Error checking
-  if (!graph.nodes.has(nodeId)) {
+  if ( ! graph.nodes.has(nodeId) ) {
     throw new Error(
       "Cannot delete node " + nodeId + " because it does not exist in the graph"
     );
@@ -911,9 +914,13 @@ function deleteNode(graph, changeManager, nodeId) {
         )
       );
     });
+    // Finally, delete the node from the nodes and the sequence numbers maps
+    draft.nodes.delete(nodeId);
+    draft.sequenceNumbers.delete(nodeId);
   });
 
   const node = graph.nodes.get(nodeId);
+  const sequenceNumber = graph.sequenceNumbers.get(nodeId)
   changeObjects.push(
     new ChangeObject(
      "deleteNode",
@@ -921,6 +928,7 @@ function deleteNode(graph, changeManager, nodeId) {
         id: node.id,
         position: node.position,
         attributes: node.attributes,
+        seqnum: sequenceNumber
       },
       null
     )
@@ -993,6 +1001,7 @@ function redo(graph, changeManager) {
             break;
           case "deleteNode":
             draft.nodes.delete(change.previous.id);
+            draft.sequenceNumbers.delete(change.previous.id)
             break;
           case "addEdge":
             draft.nodes
@@ -1688,11 +1697,14 @@ function undo(graph, changeManager) {
       step.forEach((change) => {
         switch (change.action) {
           case "addNode":
-            // when addNode is undone, the incident edges will have already been deleted.
+            // when addNode is undone, the incident edges will have already been deleted
+            // - the corresponding change objects appear earlier in the list
             draft.nodes.delete(change.current.id);
+            draft.sequenceNumbers.delete(change.current.id)
             console.log("Undoing addNode, nodes =", draft.nodes);
             break;
           case "deleteNode":
+            // Here, the change objects for incident edges are later in the list and will be taken care of then
             draft.nodes.set(
               change.previous.id,
               new Node(
@@ -1705,6 +1717,7 @@ function undo(graph, changeManager) {
             change.previous.attributes.forEach((value, key) => {
               node.attributes.set(key, value);
             });
+            draft.sequenceNumbers.set(change.previous.id, change.previous.seqnum)
             break;
           case "addEdge":
             draft.nodes

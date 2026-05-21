@@ -186,7 +186,11 @@ function addNodeBST(x, k) {
     const L = getLeft(x);
     console.log("Going left, L key:", L ? weight(L) : "null");
     if ( L && isDummy(L) ) { //end, replace dummy
-      return undummify(L, k);
+      deleteNode(L);
+      const newnode = addNodeInsideWeight(k);
+      addEdge(x, newnode);
+      setChildren(x, [newnode, getRight(x)])      
+      return newnode;
     } else {
       return addNodeBST(L, k);  //not end, recur
     }
@@ -194,7 +198,11 @@ function addNodeBST(x, k) {
     const R = getRight(x);
     console.log("Going right, R key:", R ? weight(R) : "null");
     if ( R && isDummy(R) ) { //end, replace dummy
-      return undummify(R, k);
+      deleteNode(R);
+      const newnode = addNodeInsideWeight(k);
+      addEdge(x, newnode);
+      setChildren(x, [getLeft(x), newnode])      
+      return newnode;
     } else {
       return addNodeBST(R, k);  //not end, recur
     }
