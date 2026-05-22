@@ -175,7 +175,7 @@ function isLeaf(graph, nodeId) {
   isTree(graph);
 
   // Throw an error if the node doesn't exist
-  if ( !graph.nodes.has(nodeId) ) {
+  if ( ! graph.nodes.has(nodeId) ) {
     throw new Error(
       "Cannot check node " +
         nodeId +

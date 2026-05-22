@@ -163,7 +163,7 @@ function addNodeBST(x, k) {
 
   // If a leaf, then add new node and a dummy here
   if ( isLeaf(x) ) {    
-    step(()=>{
+    step(() => {
       const newNode = addNodeInsideWeight(k);
       const dummy = createDummy();
       console.log("x is a leaf, new node is ", newNode, " dummy is ", dummy)

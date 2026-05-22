@@ -1073,6 +1073,8 @@ function revert(graph, changeManager) {
 //      theChangeObject = null;
 //    }      
   }
+  latestIdNumber = 0
+  currentSequenceNumber = 0
   return [graph, changeManager];
 }
 
@@ -1786,6 +1788,7 @@ function undo(graph, changeManager) {
 
 /** Export an object containing the interface */
 const GraphInterface = {
+  generateSequenceNumber,
   getAdjacentNodes,
   getEdge,
   getEdgeAttribute,

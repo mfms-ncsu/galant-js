@@ -138,8 +138,11 @@ function getElements(graph) {
   let elements = [];
 
   // use sequence numbers to determine the order of appearance for nodes
-  const sequenceNumbers = GraphInterface.getSequenceNumbers(graph)
-  const idSequenceNumberPairsSorted = Array.from(sequenceNumbers).sort((a, b) => a[1] - b[1]);
+  let idSequenceNumberPairs = [] 
+  graph.nodes.entries().forEach((entry) => {
+    idSequenceNumberPairs.push([entry[0], entry[1].sequenceNumber])
+  })
+  const idSequenceNumberPairsSorted = idSequenceNumberPairs.sort((a, b) => a[1] - b[1]);
 
   idSequenceNumberPairsSorted.forEach(pair => {
     const node = graph.nodes.get(pair[0]);
