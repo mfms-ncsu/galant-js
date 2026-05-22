@@ -183,13 +183,21 @@ function addNodeBST(x, k) {
   accentNode(x);
   console.log(`Not a leaf, key ${k} at subroot with key ${weight(x)}`);
   if ( k < weight(x) ) {
-    const L = getLeft(x);
-    console.log("Going left, L key:", L ? weight(L) : "null");
-    if ( L && isDummy(L) ) { //end, replace dummy
-      deleteNode(L);
-      const newnode = addNodeInsideWeight(k);
-      addEdge(x, newnode);
-      setChildren(x, [newnode, getRight(x)])      
+      const L = getLeft(x);
+      console.log("Going left, L key:", L ? weight(L) : "null");
+      if ( L && isDummy(L) ) { //end, replace dummy
+        const newnode = addNodeInsideWeight(k);
+        // !!! the order of operations below is extremely important
+        //  - first getRight(x) while x still has two children
+        //  - then delete the dummy, so down to one child
+        //  - then add an edge to the new node, so two children
+        //  - then setChildren ensures that the new node is a left child 
+        const rightChild = getRight(x)
+      step(() => {
+        deleteNode(L);
+        addEdge(x, newnode);
+        setChildren(x, [newnode, rightChild])
+      })
       return newnode;
     } else {
       return addNodeBST(L, k);  //not end, recur

@@ -101,7 +101,7 @@ function getParent(graph, target) {
  * Gets children of target node
  * @param {Graph} graph Graph on which to operate
  * @param {String} source Node whose children to return
- * @returns Array of children nodes
+ * @returns Array of children nodes sorted by sequence number
  */
 function getChildren(graph, source) {
   isTree(graph);
@@ -110,7 +110,11 @@ function getChildren(graph, source) {
       `Cannot get children of node ${source} because no node with this id exists in the graph`
     );
   }
-  return GraphInterface.getOutgoingNodes(graph, source);
+  console.log(`-> getChildren, source = ${source}`)
+  let children = GraphInterface.getOutgoingNodes(graph, source)
+  children = children.sort((a, b) => graph.nodes.get(a).sequenceNumber - graph.nodes.get(b).sequenceNumber)
+  console.log("<- getChildren, children =", children)
+  return children;
 }
 
 /**
@@ -226,7 +230,7 @@ function getRight(graph, nodeId) {
   isTree(graph);
 
   // Throw an error if the node doesn't exist
-  if ( !graph.nodes.has(nodeId) ) {
+  if ( ! graph.nodes.has(nodeId) ) {
     throw new Error(
       "Cannot get right child of node " +
         nodeId +
