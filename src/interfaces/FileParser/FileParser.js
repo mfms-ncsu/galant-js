@@ -322,17 +322,17 @@ function addNode(graph, x, y, nodeId, attributes) {
     // 1. Layered graphs store layer and index instead of x and y, which are y and x, respectively
     // 2. Nodes in trees have undefined poisions
     let node;
+    const newSequenceNumber = GraphInterface.generateSequenceNumber()
     if ( graph.type === 'layered' ) {
-        node = new Node(nodeId, y, x, x, y)
+        node = new Node(nodeId, newSequenceNumber, y, x, x, y)
     }
     else if ( graph.type === 'tree' ) {
-        node = new Node(nodeId, undefined, undefined);
+        node = new Node(nodeId, newSequenceNumber, undefined, undefined);
     }
     else {
-        node = new Node(nodeId, x, y);
+        node = new Node(nodeId, newSequenceNumber, x, y);
     }
     graph.nodes.set(nodeId, node);
-    graph.sequenceNumbers.set(nodeId, graph.currentSequenceNumber++);
 
     // Set the attributes
     for (let name in attributes) {

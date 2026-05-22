@@ -6,6 +6,7 @@ import GraphElement from "./GraphElement.js";
  * 
  * @author Henry Morris
  */
+
 export default class Node extends GraphElement {
     /**
      * Constructs a new Node with a unique id and an xy-position.
@@ -16,7 +17,7 @@ export default class Node extends GraphElement {
      * @param {Number} layer Graph layer (layered only)
      * @param {Number} index Layer index (layered only)
      */
-    constructor(nodeId, x, y, layer, index) {
+    constructor(nodeId, sequenceNumber, x, y, layer, index) {
         // Call the super constructor with the map of attributes
         super(new Map([
             ["backgroundOpacity", undefined],
@@ -29,8 +30,9 @@ export default class Node extends GraphElement {
             ["size", undefined],
             ["weight", undefined]
         ]));
-        // Set the id and sequence number
+        // Set the id and give the node a new sequence number
         this.id = nodeId
+        this.sequenceNumber = sequenceNumber
 
         // Create an object containing the xy-position
         this.position = {

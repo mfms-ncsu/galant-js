@@ -41,6 +41,12 @@ function generateId(nodes) {
 
 let latestIdNumber = 0;
 
+function generateSequenceNumber() {
+  return currentSequenceNumber++
+}
+
+let currentSequenceNumber = 0
+
 /**
  * Records a new change in the given change manager.
  * @param {ChangeManager} changeManager Change manager to which to add
@@ -497,15 +503,6 @@ function getNodes(graph) {
 }
 
 /**
- * @returns the map that maps node id's to sequence numbers
- */
-function getSequenceNumbers(graph) {
-  verifyGraph(graph)
-  console.log("<-> getSequenceNumbers", graph.sequenceNumbers)
-  return graph.sequenceNumbers
-}
-
-/**
  * Returns the total number of edges in the graph.
  * @param {Graph} graph Graph on which to operate
  * @return the total number of edges in the graph
@@ -786,16 +783,12 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
 
   // If the nodeId argument is passed, use that, otherwise generate an id
   let newNodeId = nodeId || generateId(graph.nodes);
-  let newSequenceNumber = graph.currentSequenceNumber;
+  let newSequenceNumber = generateSequenceNumber();
 
   const newGraph = produce(graph, (draft) => {
     // Create the node
-    let node = new Node(newNodeId, Math.round(x), Math.round(y));
+    let node = new Node(newNodeId, newSequenceNumber, Math.round(x), Math.round(y));
     draft.nodes.set(newNodeId, node);
-    draft.sequenceNumbers.set(newNodeId, newSequenceNumber)
-    draft.currentSequenceNumber++
-
-    console.log("added node, sequence #'s", draft.sequenceNumbers)
 
     // Set the attributes
     for (let name in attributes) {
@@ -919,11 +912,9 @@ function deleteNode(graph, changeManager, nodeId) {
     });
     // Finally, delete the node from the nodes and the sequence numbers maps
     draft.nodes.delete(nodeId);
-    draft.sequenceNumbers.delete(nodeId);
   });
 
   const node = graph.nodes.get(nodeId);
-  const sequenceNumber = graph.sequenceNumbers.get(nodeId)
   changeObjects.push(
     new ChangeObject(
      "deleteNode",
@@ -931,7 +922,7 @@ function deleteNode(graph, changeManager, nodeId) {
         id: node.id,
         position: node.position,
         attributes: node.attributes,
-        seqnum: sequenceNumber
+        seqnum: node.sequenceNumber
       },
       null
     )
@@ -1000,12 +991,10 @@ function redo(graph, changeManager) {
                 change.current.position.y
               )
             );
-            draft.sequenceNumbers.set(change.current.id, change.current.seqnum)
             console.log("After redoing addNode, nodes =", draft.nodes);
             break;
           case "deleteNode":
             draft.nodes.delete(change.previous.id);
-            draft.sequenceNumbers.delete(change.previous.id)
             break;
           case "addEdge":
             draft.nodes
@@ -1056,7 +1045,7 @@ function redo(graph, changeManager) {
             break;
           case "changeSequenceNumber":
             console.log(`Redoing changeSequenceNumber, id = ${change.current.id}, seq# =${change.current.number}`);
-            draft.sequenceNumbers.set(change.current.id, change.current.number)
+            draft.nodes.get(change.current.id).sequenceNumber = change.current.number
             break
         }
       });
@@ -1704,7 +1693,6 @@ function undo(graph, changeManager) {
             // when addNode is undone, the incident edges will have already been deleted
             // - the corresponding change objects appear earlier in the list
             draft.nodes.delete(change.current.id);
-            draft.sequenceNumbers.delete(change.current.id)
             console.log("Undoing addNode, nodes =", draft.nodes);
             break;
           case "deleteNode":
@@ -1721,7 +1709,7 @@ function undo(graph, changeManager) {
             change.previous.attributes.forEach((value, key) => {
               node.attributes.set(key, value);
             });
-            draft.sequenceNumbers.set(change.previous.id, change.previous.seqnum)
+            node.sequenceNumber = change.previous.seqnum
             break;
           case "addEdge":
             draft.nodes
@@ -1778,7 +1766,7 @@ function undo(graph, changeManager) {
             break;
           case "changeSequenceNumber":
             console.log(`Undoing changeSequenceNumber, id = ${change.previous.id}, seq# = ${change.previous.number}`);
-            draft.sequenceNumbers.set(change.previous.id, change.previous.number)
+            draft.nodes.get(change.previous.id).sequenceNumber = change.previous.number
             break
           }
       });
@@ -1812,7 +1800,6 @@ const GraphInterface = {
   getNodeIds,
   getNodePosition,
   getNodes,
-  getSequenceNumbers,
   getNumberOfEdges,
   getNumberOfNodes,
   getOppositeNode,

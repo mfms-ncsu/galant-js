@@ -287,30 +287,34 @@ function setChildren(graph, changeManager, parentId, children) {
   })
 
   console.log(`-> setChildren: parent ${parentId}, children ${children}`);
-  // first create a list of pairs of existing id's and sequence numbers
-  let oldPairs = children.map((child, index) => [child, GraphInterface.getSequenceNumbers(graph).get(child)])
-  console.log("oldPairs", oldPairs)
-  let sequenceNumbers = oldPairs.map((pair) => pair[1])
-  console.log("sequence numbers:", sequenceNumbers)
-  // then a list of pairs of child id's matched with sorted sequence numbers
-  const sortedSequenceNumbers = sequenceNumbers.sort((a, b) => a - b)
-  const newPairs = children.map((child, index) => [child, sortedSequenceNumbers[index]])
-  console.log("newPairs", newPairs)
+
+  // save the old sequence numbers in a map
+  let oldSequenceNumbers = new Map()
+  children.forEach((child) => {
+    const childNode = graph.nodes.get(child)
+    oldSequenceNumbers.set(childNode, childNode.sequenceNumber)
+  })
+
+  // create a list of pairs, where each pair is of the form [id, sequence#]
+  // the sequencs #'s are monotonically increasing
+  const sequenceNumberPairs = children.map((child) => [child, GraphInterface.generateSequenceNumber()])
+  console.log("newPairs", sequenceNumberPairs)
 
   // change the sequence numbers of the affected nodes
   const newGraph = produce(graph, (draft) => {
-    newPairs.forEach((pair) => {
-      draft.sequenceNumbers.set(pair[0], pair[1])
+    sequenceNumberPairs.forEach((pair) => {
+      draft.nodes.get(pair[0]).sequenceNumber = pair[1]
     })
   });
 
   // create a change object for each changed sequence number
   // and collect these in a list as an object in the change manager
   let changes = []
-  children.forEach((nodeId, index) => {
-    const oldSequenceNumber = oldPairs[index][1]
-    const newSequenceNumber = newPairs[index][1]
-    console.log("pair: old = ", oldPairs[index], " new = ", newPairs[index])
+  sequenceNumberPairs.forEach((pair) => {
+    const nodeId = pair[0]
+    const oldSequenceNumber = oldSequenceNumbers.get(pair[0])
+    const newSequenceNumber = pair[1]
+    console.log(`<+> seq#, id = ${nodeId} old = ${oldSequenceNumber}, new = ${newSequenceNumber}`)
     changes.push(new ChangeObject(
       "changeSequenceNumber",
       {
@@ -325,7 +329,7 @@ function setChildren(graph, changeManager, parentId, children) {
   })
 
   const newChangeManager = recordChange(changeManager, changes)
-  console.log("<- setChildren, chidren:", getChildren(newGraph, parentId), "old:", oldPairs, "new:", newPairs);
+  console.log("<- setChildren, chidren:", getChildren(newGraph, parentId), "old:", oldSequenceNumbers, "new:", sequenceNumberPairs);
 
   // Return mutated graph and change manager to trigger re-render
   // Add the node id as the third return value

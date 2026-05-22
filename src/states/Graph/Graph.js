@@ -48,8 +48,6 @@ export default class Graph {
     this.type = type;
     this.name = name;
     this.nodes = new Map();
-    this.sequenceNumbers = new Map();
-    this.currentSequenceNumber = 0;
     this.comments = new Set();
   }
 }
