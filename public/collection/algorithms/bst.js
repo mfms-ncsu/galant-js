@@ -32,12 +32,11 @@ function cleanTree(){
  * @param nodeId the node to accent
  */
 function accentNode(nodeId) {
-  step(() => {
-    mark(nodeId)
-    if ( getParent(nodeId) !== null && getParent(nodeId) !== undefined ) {
-       unmark(getParent(nodeId));
-    }
-  });
+  color(nodeId, "orange")
+}
+
+function unaccent(nodeId) {
+  uncolor(nodeId)
 }
 
 /**
@@ -68,13 +67,16 @@ function getSibling(node) {
  * @param nodeId (id of) the node to check
  */
 function isDummy(nodeId) {
-  if ( nodeId === null || nodeId === undefined ) return false;
+  if ( nodeId === null || nodeId === undefined ) {
+    return false;
+  }
   return getAttribute(nodeId, "dummy");
 }
 
 /**
  * adds a node with weight w and puts the weight inside the node
  * used when adding the root node
+ * @todo make this a global property of a gaph during algorithm execution
  */
 function addNodeInsideWeight(w) {
   // need newNode in outer scope, otherwise undefined is returned
@@ -96,11 +98,13 @@ function addNodeInsideWeight(w) {
  * the node with maximum weight in the left subtree
  * @param currentNode the node whose in-order predecessor we are finding
  */
-function findInOrderPredecessor(currentNode){
+function findInOrderPredecessor(currentNode) {
+  accentNode(currentNode)
   // While there is a real right child, go right
   if ( getRight(currentNode) && ! getAttribute(getRight(currentNode), "dummy") ) {
     // If a real right child exists, recur
-    return findInOrderPredecessor(getRight(currentNode));
+    currentNode = findInOrderPredecessor(getRight(currentNode));
+    unaccent(currentNode)
   }
 
   // If I have no real right child, I am the predecessor
@@ -155,6 +159,8 @@ function addNodeBST(x, k) {
     return;
   }
 
+  accentNode(x)
+
   // Found duplicate node
   if ( k === weight(x) ) {
     display(`Node with key ${k} already exists`);
@@ -162,7 +168,12 @@ function addNodeBST(x, k) {
   }
 
   // If a leaf, then add new node and a dummy here
-  if ( isLeaf(x) ) {    
+  if ( isLeaf(x) ) {
+    if ( isDummy(x) ) {
+      undummify(x, k)
+      unaccent(x)
+      return x
+    } 
     step(() => {
       const newNode = addNodeInsideWeight(k);
       const dummy = createDummy();
@@ -176,47 +187,19 @@ function addNodeBST(x, k) {
       } 
       display(`Successfully added node ${k}`)
     });
+    unaccent(x)
     return;
   }
 
   // Not a leaf, keep searching
-  accentNode(x);
   console.log(`Not a leaf, key ${k} at subroot with key ${weight(x)}`);
   if ( k < weight(x) ) {
-      const L = getLeft(x);
-      console.log("Going left, L key:", L ? weight(L) : "null");
-      if ( L && isDummy(L) ) { //end, replace dummy
-        const newnode = addNodeInsideWeight(k);
-        // !!! the order of operations below is extremely important
-        //  - first getRight(x) while x still has two children
-        //  - then delete the dummy, so down to one child
-        //  - then add an edge to the new node, so two children
-        //  - then setChildren ensures that the new node is a left child 
-        const rightChild = getRight(x)
-      step(() => {
-        deleteNode(L);
-        addEdge(x, newnode);
-        setChildren(x, [newnode, rightChild])
-      })
-      return newnode;
-    } else {
-      return addNodeBST(L, k);  //not end, recur
-    }
-  } else if ( k > weight(x) ) {
-    const R = getRight(x);
-    console.log("Going right, R key:", R ? weight(R) : "null");
-    if ( R && isDummy(R) ) { //end, replace dummy
-      deleteNode(R);
-      const newnode = addNodeInsideWeight(k);
-      addEdge(x, newnode);
-      setChildren(x, [getLeft(x), newnode])      
-      return newnode;
-    } else {
-      return addNodeBST(R, k);  //not end, recur
-    }
+    unaccent(x)
+    return addNodeBST(getLeft(x), k);
+  } else {
+    unaccent(x)
+    return addNodeBST(getRight(x), k);
   }
-  // Should never reach here
-  display("Error: BSTadd did not recur or add a node.");
 }
 
 /**
@@ -233,7 +216,7 @@ function hasTwoRealChildren(nodeId) {
 function isRightChild(nodeId) {
   const parent = getParent(nodeId);
   if ( parent === null || parent === undefined ) {
-    throw new Error(`isRightChild called on node with ${nodeId}, weight ${weight(nodeId)}, no parent`);
+    throw new Error(`** Error: isRightChild called on node with no parent; id = ${nodeId}, weight = ${weight(nodeId)}`);
   }
   return getRight(parent) === nodeId;
 }
@@ -258,15 +241,23 @@ function terminalNodeDeletion(x) {
     console.log(`Deleted edge from parent with weight ${weight(parent)} to node with weight ${weight(x)}`);
     if ( isDummy(sibling) ) {
       // delete x and its sibling dummy
-      deleteNode(x);
-      deleteNode(sibling);
+      const weightX = weight(x)
+      step(() => {
+        display(`deleting node with weight ${weight(x)} and dummy sibling`)
+        deleteNode(x);
+        deleteNode(sibling);
+        unaccent(parent)
+      })
       return;
     }
     // sibling is real, so dummify x
     // first delete edge from parent to sibling
     // now set sibling as child of parent in place of x
     // and put a dummy node on the other side
-    dummify(x);
+    step(() => {
+      display(`deleting node with weight ${weight(x)}, turning it into a dummy`)
+      dummify(x);
+    })
     return
   }
   // at this point, x is not a leaf and has one real child and one dummy child
@@ -283,7 +274,7 @@ function terminalNodeDeletion(x) {
     // if x is the root, there is no parent,
     //  so no need to delete edge nor figure out if x is left or right child
     // simply delete it and the real child becomes the new root automatically
-    console.log(`Deleted root node, new root has weight ${weight(theRealChild)}`);
+    display(`Deleted root node, new root has weight ${weight(theRealChild)}`);
     deleteNode(x);
     return;
   }
@@ -292,16 +283,19 @@ function terminalNodeDeletion(x) {
   // then delete x
   const xIsRightChild = isRightChild(x);
   const sibling = getSibling(x);
-  deleteNode(x);
-  addEdge(parent, theRealChild);
-  console.log(`Deleted edge from parent with weight ${weight(parent)} to x)}`);
-  // at this point the parent has edges to the sibling and the real child
-  // it remains to determine their order
-  if ( xIsRightChild ) {
-    setChildren(parent, [sibling, theRealChild]);
-  } else {
-    setChildren(parent, [theRealChild, sibling]);
-  }
+  step(()=> {
+    deleteNode(x);
+    addEdge(parent, theRealChild);
+    console.log(`Deleted edge from parent with weight ${weight(parent)} to x)}`);
+    // at this point the parent has edges to the sibling and the real child
+    // it remains to determine their order
+    if ( xIsRightChild ) {
+      setChildren(parent, [sibling, theRealChild]);
+    } else {
+      setChildren(parent, [theRealChild, sibling]);
+    }
+    display(`deleted node with weight ${weight} by shifting its child`)
+  })
   return;
 }
 
@@ -321,14 +315,15 @@ function deleteNodeBST(x, k) {
   //Not a leaf, and weight(x) not k, keep searching
   accentNode(x);
   if ( k < weight(x) ) {
+    unaccent(x)
     return deleteNodeBST(getLeft(x), k);    
   } else if ( k > weight(x) ) {
+    unaccent(x)
     return deleteNodeBST(getRight(x), k);
   }
 
   if ( ! hasTwoRealChildren(x) ) {
     terminalNodeDeletion(x);
-    display(`Successully deleted: ${k}`);
     return;
   }
 
