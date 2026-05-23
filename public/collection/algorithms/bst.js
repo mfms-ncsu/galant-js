@@ -93,25 +93,6 @@ function addNodeInsideWeight(w) {
   return newNode;
 }
 
-/**
- * @returns the in-order predecessor of a given node, i.e.,
- * the node with maximum weight in the left subtree
- * @param currentNode the node whose in-order predecessor we are finding
- */
-function findInOrderPredecessor(currentNode) {
-  accentNode(currentNode)
-  // While there is a real right child, go right
-  if ( getRight(currentNode) && ! getAttribute(getRight(currentNode), "dummy") ) {
-    // If a real right child exists, recur
-    currentNode = findInOrderPredecessor(getRight(currentNode));
-    unaccent(currentNode)
-  }
-
-  // If I have no real right child, I am the predecessor
-  display(`Found predecessor at ${weight(currentNode)}`)
-  return currentNode
-}
-
 // this is sort of superfluous but makes the code more readable
 function dummify(nodeId) {
   setAttribute(nodeId, "dummy", true);
@@ -128,7 +109,7 @@ function undummify(nodeId, weight) {
     setWeight(nodeId, weight);
     setAttribute(nodeId, "weightInNode", true);
     hideWeight(nodeId);
-    display(`Successfully added node ${weight}`)
+    display(`Added node with weight ${weight}`)
   });
   return nodeId;
 }
@@ -142,7 +123,7 @@ function createDummy(){
   return dummy;
 }
 
-//-----------------ADD/DELETE-------------------
+//------------------ ADD -------------------
 
 /**
  * Adds a node with weight k to the BST rooted at x
@@ -185,7 +166,7 @@ function addNodeBST(x, k) {
       } else {
         setChildren(x, [dummy, newNode])
       } 
-      display(`Successfully added node ${k}`)
+      display(`Added node with weight ${k}`)
     });
     unaccent(x)
     return;
@@ -201,6 +182,8 @@ function addNodeBST(x, k) {
     return addNodeBST(getRight(x), k);
   }
 }
+
+// ------------- END ADD ------------
 
 /**
  * @returns true if the given node has two real (non-dummy) children
@@ -219,6 +202,27 @@ function isRightChild(nodeId) {
     throw new Error(`** Error: isRightChild called on node with no parent; id = ${nodeId}, weight = ${weight(nodeId)}`);
   }
   return getRight(parent) === nodeId;
+}
+
+// ========= DELETE ===============
+
+/**
+ * @returns the in-order predecessor of a given node, i.e.,
+ * the node with maximum weight in the left subtree
+ * @param currentNode the node whose in-order predecessor we are finding
+ */
+function findInOrderPredecessor(currentNode) {
+  accentNode(currentNode)
+  // While there is a real right child, go right
+  if ( getRight(currentNode) && ! getAttribute(getRight(currentNode), "dummy") ) {
+    // If a real right child exists, recur
+    unaccent(currentNode)
+    currentNode = findInOrderPredecessor(getRight(currentNode));
+  }
+
+  // If I have no real right child, I am the predecessor
+  display(`Found predecessor at node with weight ${weight(currentNode)}`)
+  return currentNode
 }
 
 /**
@@ -284,6 +288,7 @@ function terminalNodeDeletion(x) {
   const xIsRightChild = isRightChild(x);
   const sibling = getSibling(x);
   step(()=> {
+    display(`deleting predecessor node by shifting its child`)
     deleteNode(x);
     addEdge(parent, theRealChild);
     console.log(`Deleted edge from parent with weight ${weight(parent)} to x)}`);
@@ -294,7 +299,6 @@ function terminalNodeDeletion(x) {
     } else {
       setChildren(parent, [theRealChild, sibling]);
     }
-    display(`deleted node with weight ${weight} by shifting its child`)
   })
   return;
 }
@@ -334,12 +338,17 @@ function deleteNodeBST(x, k) {
 
   // Replace deleted node weight with in-order predecessor weight
   let predWeight = weight(predecessor);
-  setWeight(x, predWeight);
+  step(() => {
+    setWeight(x, predWeight);
+    color(predecessor, "black")
+  })
   // Now delete the predecessor node, which has at most one child
   terminalNodeDeletion(predecessor);
-  display(`Successully deleted: '${k}' by replacing with predecessor '${predWeight}'`);
+  display(`Deleted node with weight ${k} by replacing with predecessor having weight ${predWeight}`);
   return
 }
+
+// ------------ END DELETE -----------
 
 /**
  * Main loop for adding/deleting nodes in a BST
@@ -348,7 +357,7 @@ setDirected(true);
 let running = true;
 while ( running ) {
   cleanTree();
-  const weight = promptNumber("What is the weight and operation (weight is a number, +/- for add/delete, ex. -5 or +3) (0 to stop)")
+  const weight = promptNumber("What is the weight and operation (weight is a number, +/- for add/delete, ex. -5 or [+]3) (0 to stop)")
 
   if (weight > 0){
     addNodeBST(getRoot(), weight);
