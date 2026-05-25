@@ -1,4 +1,5 @@
 import GraphInterface from "../GraphInterface/GraphInterface"
+import GlobalVariables from "../../globals/GlobalVariables";
 
 /**
  * CytoscapeInterface returns the graph represented in cytoscape 
@@ -117,6 +118,12 @@ function parseNode(graph, node) {
             element.data[name] = value;
         }
     });
+
+    console.log("parsing node attributes, weightInNode =", node.weightInNode)
+    if ( node.weightInNode ) {
+        element.data["weightInNode"] = true
+        element.data["weightHidden"] = true
+    }
 
     return element;
 }
@@ -336,6 +343,6 @@ function getStyle(graph) {
 
 const CytoscapeInterface = {
     getElements,
-    getStyle
+    getStyle,
 }
 export default CytoscapeInterface;

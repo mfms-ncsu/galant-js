@@ -17,7 +17,7 @@ export default class Node extends GraphElement {
      * @param {Number} layer Graph layer (layered only)
      * @param {Number} index Layer index (layered only)
      */
-    constructor(nodeId, sequenceNumber, x, y, layer, index) {
+    constructor(nodeId, sequenceNumber, weightInNode, x, y, layer, index) {
         // Call the super constructor with the map of attributes
         super(new Map([
             ["backgroundOpacity", undefined],
@@ -28,11 +28,12 @@ export default class Node extends GraphElement {
             ["marked", false],
             ["shape", undefined],
             ["size", undefined],
-            ["weight", undefined]
+            ["weight", undefined],
         ]));
         // Set the id and give the node a new sequence number
         this.id = nodeId
         this.sequenceNumber = sequenceNumber
+        this.weightInNode = true
 
         // Create an object containing the xy-position
         this.position = {

@@ -5,6 +5,7 @@ import ChangeManager from "states/ChangeManager/ChangeManager";
 import Edge from "states/Graph/GraphElement/Edge";
 import Node from "states/Graph/GraphElement/Node";
 import LayeredGraph from "states/Graph/LayeredGraph";
+import GlobalVariables from "../../globals/GlobalVariables";
 
 /** Enable maps in immer */
 enableMapSet();
@@ -133,7 +134,7 @@ function verifyGraphChangeManager(graph, changeManager) {
     verifyChangeManager(changeManager);
 }
 
- /** Recursive function to shift nodes on a layer to the right or left to resolve overlap
+/** Recursive function to shift nodes on a layer to the right or left to resolve overlap
  * @param {Graph} graph Graph on which to operate
  * @param {ChangeManager} changeManager ChangeManager to which to push the change
  * @param {Node[]} sortedLayer Array of Nodes for this layer in the desired order (sorted by index)
@@ -278,7 +279,7 @@ function getEdgeAttribute(graph, source, target, name) {
  */
 function getEdgeBetween(graph, source, target) {
   let edge = getEdge(graph, source, target);
-  if (edge === undefined && !graph.isDirected) {
+  if ( edge === undefined && ! graph.isDirected ) {
     // If undirected, check the opposite as well
     edge = getEdge(graph, target, source);
   }
@@ -375,7 +376,7 @@ function getIncomingEdges(graph, target) {
   }
 
   // Get all edges if undirected
-  if (!graph.isDirected) {
+  if ( ! graph.isDirected ) {
     return getIncidentEdges(graph, target);
   }
 
@@ -408,7 +409,7 @@ function getIncomingNodes(graph, target) {
   }
   
   // Get all nodes if undirected
-  if (!graph.isDirected) {
+  if ( ! graph.isDirected ) {
     return getAdjacentNodes(graph, target);
   }
 
@@ -567,7 +568,7 @@ function getOutgoingEdges(graph, source) {
   }
 
   // Get all edges if undirected
-  if (!graph.isDirected) {
+  if ( ! graph.isDirected ) {
     return getIncidentEdges(graph, source);
   }
 
@@ -594,7 +595,7 @@ function getOutgoingEdges(graph, source) {
 function getOutgoingNodes(graph, source) {
   verifyGraph(graph);
   // Get all nodes if undirected
-  if (!graph.isDirected) {
+  if ( ! graph.isDirected ) {
     return getAdjacentNodes(graph, source);
   }
 
@@ -787,8 +788,11 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
 
   const newGraph = produce(graph, (draft) => {
     // Create the node
-    let node = new Node(newNodeId, newSequenceNumber, Math.round(x), Math.round(y));
+    console.log(`about to create node, inside weight = ${GlobalVariables.getWeightsInside()}`)
+    let node = new Node(newNodeId, newSequenceNumber, GlobalVariables.getWeightsInside(), Math.round(x), Math.round(y));
     draft.nodes.set(newNodeId, node);
+
+    console.log(`added node ${newNodeId}, seqnum = ${newSequenceNumber}, weightInNode = ${node.weightInNode}`)
 
     // Set the attributes
     for (let name in attributes) {
@@ -804,8 +808,9 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
         x: x,
         y: y,
       },
+      seqnum: newSequenceNumber,
+      weightInNode: GlobalVariables.getWeightsInside(),
       attributes: attributes,
-      seqnum: newSequenceNumber
     })
   ]);
   console.log("<- addNode, nodes =", newGraph.nodes, "newChangeManager =", newChangeManager);
@@ -922,7 +927,8 @@ function deleteNode(graph, changeManager, nodeId) {
         id: node.id,
         position: node.position,
         attributes: node.attributes,
-        seqnum: node.sequenceNumber
+        seqnum: node.sequenceNumber,
+        weightInNode: node.weightInNode
       },
       null
     )
@@ -988,7 +994,9 @@ function redo(graph, changeManager) {
               new Node(
                 change.current.id,
                 change.current.position.x,
-                change.current.position.y
+                change.current.position.y,
+                change.current.seqnum,
+                change.current.weightInNode
               )
             );
             console.log("After redoing addNode, nodes =", draft.nodes);
@@ -1075,6 +1083,7 @@ function revert(graph, changeManager) {
   }
   latestIdNumber = 0
   currentSequenceNumber = 0
+//  GlobalVariables.setWeightsInside(false)
   return [graph, changeManager];
 }
 
@@ -1704,14 +1713,15 @@ function undo(graph, changeManager) {
               new Node(
                 change.previous.id,
                 change.previous.position.x,
-                change.previous.position.y
+                change.previous.position.y,
+                change.previous.seqnum,
+                change.previous.weightInNode
               )
             );
             let node = draft.nodes.get(change.previous.id);
             change.previous.attributes.forEach((value, key) => {
               node.attributes.set(key, value);
             });
-            node.sequenceNumber = change.previous.seqnum
             break;
           case "addEdge":
             draft.nodes

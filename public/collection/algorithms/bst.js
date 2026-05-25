@@ -86,8 +86,8 @@ function addNodeInsideWeight(w) {
     display(`Adding node with weight ${w}`);
     newNode = addNode();
     setWeight(newNode, w);
-    setAttribute(newNode, "weightInNode", true);
-    hideWeight(newNode);
+    // setAttribute(newNode, "weightInNode", true);
+    // hideWeight(newNode);
   });
   console.log("<- addnodeInsideWeight, new node =", newNode)
   return newNode;
@@ -136,7 +136,7 @@ function addNodeBST(x, k) {
   // If empty, make new root
   if ( x === null || x === undefined ) {
     addNodeInsideWeight(k);
-    display(`Created root ${k}`);
+    display(`Created root with weight ${k}`);
     return;
   }
 
@@ -353,6 +353,7 @@ function deleteNodeBST(x, k) {
 /**
  * Main loop for adding/deleting nodes in a BST
  */
+setWeightsInside(true)
 setDirected(true);
 let running = true;
 while ( running ) {

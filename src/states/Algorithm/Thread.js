@@ -5,6 +5,8 @@ import LayeredGraphInterface from 'interfaces/GraphInterface/LayeredGraphInterfa
 import TreeInterface from 'interfaces/GraphInterface/TreeInterface';
 import { RampRightOutlined } from '@mui/icons-material';
 import Tree from 'states/Graph/Tree';
+import CytoscapeInterface from '../../interfaces/CytoscapeInterface/CytoscapeInterface';
+import GlobalVariables from '../../globals/GlobalVariables';
 
 /**
  * Execution environment for algorithms. This file provides all necessary functions
@@ -823,7 +825,7 @@ function promptEdge(message) {
 
     // If the graph is directed, put the reversed edges into edges
     let reversedEdges = new Map();
-    if (!graph.isDirected) {
+    if ( ! graph.isDirected ) {
         edges.forEach(edge => {
             // Split the edge into source and target
             let split = edge.split(",");
@@ -1135,8 +1137,9 @@ function makeRightChild(parent, child) {
  * Inside of TreeInterface.addLeft() and TreeInterface.addRight(), there is logic that looks at graph.weightsInside
  * and if true then it hides the new node's weight
  */
-function weightsInside() {
-    
+function setWeightsInside(flag) {
+    console.log("-> setWeightsInside, flag =", flag)
+    GlobalVariables.setWeightsInside(flag)
 }
 
 
@@ -1318,6 +1321,7 @@ export {
     hideAllNodeLabels,
     showNodeLabel,
     showAllNodeLabels,
+    setWeightsInside,
     
     // Hide/Show edge properties
     hideEdge,
