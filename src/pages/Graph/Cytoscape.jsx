@@ -46,7 +46,7 @@ export default function CytoscapeComponent() {
                 const showWeights = graph.showNodeWeights;
                 const showLabels = graph.showNodeLabels;
 
-                if ((showWeights && !data.weightHidden) || (showLabels && !data.labelHidden)) {
+                if ( (showWeights && ! data.weightHidden) || (showLabels && ! data.labelHidden) ) {
                     // This flag determines whether or not there is anything to render. If both the weight
                     // and label of the node are empty, then we should not draw the label
                     let hasWeight = data.weight !== undefined && data.weight !== "" && showWeights && !data.weightHidden;

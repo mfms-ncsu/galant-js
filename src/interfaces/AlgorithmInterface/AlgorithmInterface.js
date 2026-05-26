@@ -198,6 +198,10 @@ function onMessage(algorithm, message) {
             newGraph = GraphInterface.setDirected(graph, message.isDirected);
             store.set(graphAtom, newGraph);
             break;
+        case "setWeightsInside":
+            newGraph = GraphInterface.setWeightsInside(graph, message.weightsInside)
+            store.set(graphAtom, newGraph)
+            break
         case "addNode":
             [newGraph, newChangeManager] = GraphInterface.addNode(graph, changeManager, message.x, message.y);
             updateState(newGraph, newChangeManager);

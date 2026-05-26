@@ -39,7 +39,7 @@ function edgeHasAttribute(edge, attribute) {
     return edge.attributes.has(attribute) &&
            edge.attributes.get(attribute) !== "" &&
            edge.attributes.get(attribute) !== undefined &&
-           !edge.attributes.get(attribute + "Hidden");
+           ! edge.attributes.get(attribute + "Hidden");
 }
 
 /**
@@ -119,8 +119,8 @@ function parseNode(graph, node) {
         }
     });
 
-    console.log("parsing node attributes, weightInNode =", node.weightInNode)
-    if ( node.weightInNode ) {
+    console.log("parsing node attributes, weightInNode =", graph.weightsInside)
+    if ( graph.weightsInside ) {
         element.data["weightInNode"] = true
         element.data["weightHidden"] = true
     }

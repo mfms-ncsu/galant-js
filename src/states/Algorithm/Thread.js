@@ -259,6 +259,14 @@ function setDirected(isDirected) {
     waitIfNeeded();
 }
 
+function setWeightsInside(weightsInside) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    graph.weightsInside = weightsInside;
+    console.log("-> setWeightsInside, flag =", weightsInside)
+    postMessage({ action: "setWeightsInside", weightsInside: weightsInside });
+    waitIfNeeded();
+}
+
 /*
  * LIST GETTERS
  */
@@ -1137,11 +1145,6 @@ function makeRightChild(parent, child) {
  * Inside of TreeInterface.addLeft() and TreeInterface.addRight(), there is logic that looks at graph.weightsInside
  * and if true then it hides the new node's weight
  */
-function setWeightsInside(flag) {
-    console.log("-> setWeightsInside, flag =", flag)
-    GlobalVariables.setWeightsInside(flag)
-}
-
 
 /** 
  * Goes through the binary tree and adds dummy nodes to internal nodes with only one child

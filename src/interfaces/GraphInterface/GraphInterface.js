@@ -785,11 +785,12 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
   // If the nodeId argument is passed, use that, otherwise generate an id
   let newNodeId = nodeId || generateId(graph.nodes);
   let newSequenceNumber = generateSequenceNumber();
+  let weightsInside = graph.weightsInside;
 
   const newGraph = produce(graph, (draft) => {
     // Create the node
-    console.log(`about to create node, inside weight = ${GlobalVariables.getWeightsInside()}`)
-    let node = new Node(newNodeId, newSequenceNumber, GlobalVariables.getWeightsInside(), Math.round(x), Math.round(y));
+    console.log(`about to create node, inside weight = ${weightsInside}`)
+    let node = new Node(newNodeId, newSequenceNumber, weightsInside, Math.round(x), Math.round(y));
     draft.nodes.set(newNodeId, node);
 
     console.log(`added node ${newNodeId}, seqnum = ${newSequenceNumber}, weightInNode = ${node.weightInNode}`)
@@ -809,7 +810,7 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
         y: y,
       },
       seqnum: newSequenceNumber,
-      weightInNode: GlobalVariables.getWeightsInside(),
+      weightInNode: weightsInside,
       attributes: attributes,
     })
   ]);
@@ -1073,17 +1074,10 @@ function redo(graph, changeManager) {
 
 function revert(graph, changeManager) {
   while (changeManager.index > 0) {
-//    let theChangeObject = changeManager.changes[changeManager.index];
     [graph, changeManager] = undo(graph, changeManager);
-//    if (theChangeObject) {
-      // Remove references to the change objects at the current index
-      // does not help with the slow down problem
-//      theChangeObject = null;
-//    }      
   }
   latestIdNumber = 0
   currentSequenceNumber = 0
-//  GlobalVariables.setWeightsInside(false)
   return [graph, changeManager];
 }
 
@@ -1212,6 +1206,14 @@ function setDirected(graph, isDirected) {
   verifyGraph(graph);
   const newGraph = produce(graph, (draft) => {
     draft.isDirected = isDirected;
+  });
+  return newGraph;
+}
+
+function setWeightsInside(graph, weightsInside) {
+  verifyGraph(graph);
+  const newGraph = produce(graph, (draft) => {
+    draft.weightsInside = weightsInside;
   });
   return newGraph;
 }
@@ -1841,6 +1843,7 @@ const GraphInterface = {
   setShowEdgeWeights,
   setShowNodeLabels,
   setShowNodeWeights,
+  setWeightsInside,
   startRecording,
   toString,
   undo,

@@ -159,6 +159,7 @@ function loadGraph(name, file) {
     }
     graph.nodes = new Map();
     graph.sequenceNumbers = new Map();
+    graph.weightsInside = false
     // Parse each line, ignoring comments and blank lines
     // This part is the same for all graph types
     lines.forEach(line => { parseLine(graph, line) });
@@ -324,13 +325,13 @@ function addNode(graph, x, y, nodeId, attributes) {
     let node;
     const newSequenceNumber = GraphInterface.generateSequenceNumber()
     if ( graph.type === 'layered' ) {
-        node = new Node(nodeId, newSequenceNumber, y, x, x, y)
+        node = new Node(nodeId, newSequenceNumber, graph.weightsInside, y, x, x, y)
     }
     else if ( graph.type === 'tree' ) {
-        node = new Node(nodeId, newSequenceNumber, undefined, undefined);
+        node = new Node(nodeId, newSequenceNumber, graph.weightsInside, undefined, undefined);
     }
     else {
-        node = new Node(nodeId, newSequenceNumber, x, y);
+        node = new Node(nodeId, newSequenceNumber, graph.weightsInside, x, y);
     }
     graph.nodes.set(nodeId, node);
 

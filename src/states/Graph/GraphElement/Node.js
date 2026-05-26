@@ -33,7 +33,7 @@ export default class Node extends GraphElement {
         // Set the id and give the node a new sequence number
         this.id = nodeId
         this.sequenceNumber = sequenceNumber
-        this.weightInNode = true
+        this.weightInNode = weightInNode
 
         // Create an object containing the xy-position
         this.position = {
