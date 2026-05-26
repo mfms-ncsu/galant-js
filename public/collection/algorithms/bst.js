@@ -288,7 +288,7 @@ function terminalNodeDeletion(x) {
   const xIsRightChild = isRightChild(x);
   const sibling = getSibling(x);
   step(()=> {
-    display(`deleting predecessor node by shifting its child`)
+    display(`Deleting node with weight ${weight(x)}, replacing it with its child`)
     deleteNode(x);
     addEdge(parent, theRealChild);
     console.log(`Deleted edge from parent with weight ${weight(parent)} to x)}`);
@@ -334,13 +334,18 @@ function deleteNodeBST(x, k) {
   // Has two real children, need to replace x with in-order predecessor
 
   // Find in-order predecessor
+  step(() => {
+    display("Looking for in-order predecessor")
+    color(x, "black")
+  })
   let predecessor = findInOrderPredecessor(getLeft(x));
 
   // Replace deleted node weight with in-order predecessor weight
   let predWeight = weight(predecessor);
   step(() => {
     setWeight(x, predWeight);
-    color(predecessor, "black")
+    uncolor(x)
+    color(predecessor, "black");
   })
   // Now delete the predecessor node, which has at most one child
   terminalNodeDeletion(predecessor);
@@ -353,13 +358,15 @@ function deleteNodeBST(x, k) {
 /**
  * Main loop for adding/deleting nodes in a BST
  */
-setWeightsInside(true)
-setDirected(true);
+step(() => {
+  setWeightsInside(true)
+  setDirected(true);
+  cleanTree();
+})
 let running = true;
 while ( running ) {
-  cleanTree();
   const weight = promptNumber("What is the weight and operation (weight is a number, +/- for add/delete, ex. -5 or [+]3) (0 to stop)")
-
+  cleanTree();
   if (weight > 0){
     addNodeBST(getRoot(), weight);
   } else if (weight < 0){

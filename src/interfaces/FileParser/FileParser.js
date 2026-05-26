@@ -325,13 +325,13 @@ function addNode(graph, x, y, nodeId, attributes) {
     let node;
     const newSequenceNumber = GraphInterface.generateSequenceNumber()
     if ( graph.type === 'layered' ) {
-        node = new Node(nodeId, newSequenceNumber, graph.weightsInside, y, x, x, y)
+        node = new Node(nodeId, newSequenceNumber, y, x, x, y)
     }
     else if ( graph.type === 'tree' ) {
-        node = new Node(nodeId, newSequenceNumber, graph.weightsInside, undefined, undefined);
+        node = new Node(nodeId, newSequenceNumber, undefined, undefined);
     }
     else {
-        node = new Node(nodeId, newSequenceNumber, graph.weightsInside, x, y);
+        node = new Node(nodeId, newSequenceNumber, x, y);
     }
     graph.nodes.set(nodeId, node);
 

@@ -296,13 +296,14 @@ function setChildren(graph, changeManager, parentId, children) {
   let oldSequenceNumbers = new Map()
   children.forEach((child) => {
     const childNode = graph.nodes.get(child)
-    oldSequenceNumbers.set(childNode, childNode.sequenceNumber)
+    oldSequenceNumbers.set(child, childNode.sequenceNumber)
   })
 
   // create a list of pairs, where each pair is of the form [id, sequence#]
   // the sequencs #'s are monotonically increasing
   const sequenceNumberPairs = children.map((child) => [child, GraphInterface.generateSequenceNumber()])
   console.log("newPairs", sequenceNumberPairs)
+  console.log("oldSequenceNumbers before", oldSequenceNumbers)
 
   // change the sequence numbers of the affected nodes
   const newGraph = produce(graph, (draft) => {
@@ -311,11 +312,14 @@ function setChildren(graph, changeManager, parentId, children) {
     })
   });
 
+  console.log("oldSequenceNumbers after", oldSequenceNumbers)
   // create a change object for each changed sequence number
   // and collect these in a list as an object in the change manager
   let changes = []
   sequenceNumberPairs.forEach((pair) => {
+    console.log("oldSequenceNumbers in loop", oldSequenceNumbers)
     const nodeId = pair[0]
+    console.log(`pair[0] = ${pair[0]}`)
     const oldSequenceNumber = oldSequenceNumbers.get(pair[0])
     const newSequenceNumber = pair[1]
     console.log(`<+> seq#, id = ${nodeId} old = ${oldSequenceNumber}, new = ${newSequenceNumber}`)

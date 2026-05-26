@@ -119,7 +119,7 @@ function parseNode(graph, node) {
         }
     });
 
-    console.log("parsing node attributes, weightInNode =", graph.weightsInside)
+    console.log("parsing node attributes, weightsInside =", graph.weightsInside)
     if ( graph.weightsInside ) {
         element.data["weightInNode"] = true
         element.data["weightHidden"] = true

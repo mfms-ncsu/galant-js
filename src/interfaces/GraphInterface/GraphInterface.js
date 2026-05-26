@@ -790,10 +790,10 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
   const newGraph = produce(graph, (draft) => {
     // Create the node
     console.log(`about to create node, inside weight = ${weightsInside}`)
-    let node = new Node(newNodeId, newSequenceNumber, weightsInside, Math.round(x), Math.round(y));
+    let node = new Node(newNodeId, newSequenceNumber, Math.round(x), Math.round(y));
     draft.nodes.set(newNodeId, node);
 
-    console.log(`added node ${newNodeId}, seqnum = ${newSequenceNumber}, weightInNode = ${node.weightInNode}`)
+    console.log(`added node ${newNodeId}, seqnum = ${newSequenceNumber}`)
 
     // Set the attributes
     for (let name in attributes) {
@@ -810,7 +810,6 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
         y: y,
       },
       seqnum: newSequenceNumber,
-      weightInNode: weightsInside,
       attributes: attributes,
     })
   ]);
@@ -926,10 +925,9 @@ function deleteNode(graph, changeManager, nodeId) {
      "deleteNode",
       {
         id: node.id,
+        seqnum: node.sequenceNumber,
         position: node.position,
         attributes: node.attributes,
-        seqnum: node.sequenceNumber,
-        weightInNode: node.weightInNode
       },
       null
     )
@@ -994,10 +992,9 @@ function redo(graph, changeManager) {
               change.current.id,
               new Node(
                 change.current.id,
+                change.current.seqnum,
                 change.current.position.x,
                 change.current.position.y,
-                change.current.seqnum,
-                change.current.weightInNode
               )
             );
             console.log("After redoing addNode, nodes =", draft.nodes);
@@ -1714,10 +1711,9 @@ function undo(graph, changeManager) {
               change.previous.id,
               new Node(
                 change.previous.id,
+                change.previous.seqnum,
                 change.previous.position.x,
                 change.previous.position.y,
-                change.previous.seqnum,
-                change.previous.weightInNode
               )
             );
             let node = draft.nodes.get(change.previous.id);
