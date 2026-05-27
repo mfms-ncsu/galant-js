@@ -3,10 +3,7 @@ import FileParser from 'interfaces/FileParser/FileParser';
 import ChangeManager from 'states/ChangeManager/ChangeManager';
 import LayeredGraphInterface from 'interfaces/GraphInterface/LayeredGraphInterface';
 import TreeInterface from 'interfaces/GraphInterface/TreeInterface';
-import { RampRightOutlined } from '@mui/icons-material';
-import Tree from 'states/Graph/Tree';
-import CytoscapeInterface from '../../interfaces/CytoscapeInterface/CytoscapeInterface';
-import GlobalVariables from '../../globals/GlobalVariables';
+// import { RampRightOutlined } from '@mui/icons-material';
 
 /**
  * Execution environment for algorithms. This file provides all necessary functions
@@ -1027,16 +1024,6 @@ function applyNodePositions(savedPositions) {
     postMessage({ action: "applyNodePositions", savedPositions: savedPositions, });
     waitIfNeeded();
 }
-
-// function addNewNodeToTree(){
-//     const targetId = prompt("What is the ID of the new node?")
-//     const sourceId = prompt("What is the parent of the new node?")
-//     const attrs = prompt("What are the attributes of the new node?")
-//     addNodeIdAttrs(targetId, 0,0, attrs)
-
-
-//     addEdge(sourceId, targetId)
-// }
 
 /*
  * TREE ALGORITHMS

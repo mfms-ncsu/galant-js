@@ -1,5 +1,4 @@
 import GraphInterface from "../GraphInterface/GraphInterface"
-import GlobalVariables from "../../globals/GlobalVariables";
 
 /**
  * CytoscapeInterface returns the graph represented in cytoscape 

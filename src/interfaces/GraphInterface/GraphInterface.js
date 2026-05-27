@@ -5,7 +5,6 @@ import ChangeManager from "states/ChangeManager/ChangeManager";
 import Edge from "states/Graph/GraphElement/Edge";
 import Node from "states/Graph/GraphElement/Node";
 import LayeredGraph from "states/Graph/LayeredGraph";
-import GlobalVariables from "../../globals/GlobalVariables";
 
 /** Enable maps in immer */
 enableMapSet();

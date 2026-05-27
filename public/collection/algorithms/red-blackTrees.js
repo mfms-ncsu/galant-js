@@ -50,9 +50,6 @@ function cleanTree(){
     clearEdgeColors();
     hideAllNodeLabels();
     hideAllNodeWeights();
-    for ( const node of getNodes() ) {
-      setAttribute(node, "weightInNode", true);
-    }
   });
 }
 
@@ -75,17 +72,6 @@ function addLeftInsideWeight(nodeId, w) {
  */
 function addRightInsideWeight(nodeId, w) {
   const newNode = addRight(nodeId, w);
-  setAttribute(newNode, "weightInNode", true);
-  hideWeight(newNode);
-  return newNode;
-}
-
-/**
- * adds a node with weight w and puts the weight inside the node
- * used when adding the root node
- */
-function addNodeInsideWeight(w) {
-  const newNode = addNode(0, w);
   setAttribute(newNode, "weightInNode", true);
   hideWeight(newNode);
   return newNode;
@@ -273,7 +259,8 @@ function rotateL(node, parentN) {
   deleteNode(parentN);
 
   // Make node the root
-  let newNode = addNodeInsideWeight(nodeWeight);
+  const newNode = addNode();
+  setWeight(newNode, nodeWeight)
   setAttribute(newNode, 'borderColor', nodeColor);
 
   // Add original parent as right child of the new root
@@ -347,7 +334,8 @@ function rotateR(node, parentN) {
   deleteNode(parentN);
 
   // Make node the root
-  let newNode = addNodeInsideWeight(nodeWeight);
+  const newNode = addNode()
+  setWeight(newNode, nodeWeight)
   setAttribute(newNode, 'borderColor', nodeColor);
   console.log("New node is", newNode);
   display(`Made node with weight ${weight(newNode)} the new root`);
@@ -982,10 +970,11 @@ function put(w) {
     if ( newNode === null ) {
       // Add root
       step(() => {
-        const newN = addNodeInsideWeight(w);
+        const newNode = addNode()
+        setWeight(newNode, w)
         display(`Created root with weight ${w}`);
-        expandLeaf(newN, w);
-        actionOnInsert(newN);
+        expandLeaf(newNode, w);
+        actionOnInsert(newNode);
       });
       return true;
     }
@@ -1225,6 +1214,8 @@ function actionOnInsert(node) {
   }
 }
 
+setInsideWeights(true)
+
 // for some reason the new lines don't work in prompt
 // and it appears that all white space is replaced with a single space
 const promptString =
@@ -1232,7 +1223,6 @@ const promptString =
   + " \'(+)w\' adds a node with weight w;   \n"
   + " \'-w\' deletes a node with weight w;  \n"
   + "  and 0 exits the program, leaving the current tree intact \n";
-console.log(`prompt = ${promptString}`);
 
 while ( true ) {
   cleanTree();
