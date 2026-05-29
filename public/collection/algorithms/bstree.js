@@ -355,7 +355,9 @@ step(() => {
 })
 let running = true;
 while ( running ) {
-  const weight = promptNumber("What is the weight and operation (weight is a number, +/- for add/delete, ex. -5 or [+]3) (0 to stop)")
+  // the following does not work; something is amiss with prompts and line feeds
+  const LF = "\n"
+  const weight = promptNumber(`Add or remove a node:${LF} positive number => add node,${LF} negative number => remove,${LF} 0 => stop`)
   if (weight > 0) {
     display(`Adding node with weight ${weight}`)
     addNodeBST(getRoot(), weight);
