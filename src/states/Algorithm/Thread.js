@@ -371,6 +371,14 @@ function deleteNode(nodeId) {
     waitIfNeeded();
 }
 
+/**
+ * @todo deleteEdge should work as removeEdge does here
+ *        and internal uses of deleteEdge should be modified accordingly
+ */
+function removeEdge(sourceId, targetId) {
+    deleteEdge(sourceId + "," + targetId)
+}
+
 function deleteEdge(edgeId) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     let split = edgeId.split(",");

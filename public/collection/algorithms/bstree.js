@@ -53,10 +53,6 @@ function getSibling(node) {
   if ( parent === null || parent === undefined ) {
     throw new Error(`getSibling called on node with ${node}, weight ${weight(node)}, no parent`);
   }
-
-  // If the left child of the parent is the node, return the right child 
-  // of the parent which would be the sibling of node
-  // else return the left child which would be node's sibling
   return getLeft(parent) === node ? getRight(parent) : getLeft(parent);
 }
 
@@ -354,10 +350,10 @@ step(() => {
   cleanTree();
 })
 let running = true;
+display("Binary search tree animation. To add nodes, give positive weights; to remove, negative and to stop 0")
 while ( running ) {
   // the following does not work; something is amiss with prompts and line feeds
-  const LF = "\n"
-  const weight = promptNumber(`Add or remove a node:${LF} positive number => add node,${LF} negative number => remove,${LF} 0 => stop`)
+  const weight = promptNumber("Add (weight > 0), remove (-weight) or stop (0)")
   if (weight > 0) {
     display(`Adding node with weight ${weight}`)
     addNodeBST(getRoot(), weight);
