@@ -29,8 +29,10 @@ create tree with insertion sequence 7,1,8,5,3,2,4
 ### insertion sequence (see Goodrich, Tamassia, and Goldwasser)
 
 * 4, 7
-* 12 - rotate so 7 becomes root
+* 12 - rotate so 7 becomes root (LL)
 * 15 - recolor so that 15 only is red
 * 3, 5
-* 14 - rotate so 14 has 12 and 15 as children
+* 14 - rotate so 14 has 12 and 15 as children (RL)
 * 18 - recolor 12 and 15 black
+* 16 - rotate so 16 has 15 and 18 as children (LR)
+* 17 - a recolor followed by a rotation that puts 14 at the root (RR)

@@ -66,14 +66,20 @@ function replaceLeaf(leaf, newWeight) {
 }
 
 /**
+ * removes edges from a node to its children
+ */
+function disconnectChildren(node) {
+    // very important to remove edge to *right child* first;
+    //  it's the second child - if edge to left child is gone, there is no second child
+    removeEdge(node, getRight(node))
+    removeEdge(node, getLeft(node))
+}
+
+/**
  * Makes the two children the left and right children of the parent, removing any existing edges
  */
 function relink(parent, left, right) {
-    const leftOfParent = getLeft(parent)
-    const rightOfParent = getRight(parent)
-    console.log(`-> relink, parent = ${parent}, left = ${left}, right = ${right}, children = [${leftOfParent}, ${rightOfParent}]`)
-    removeEdge(parent, leftOfParent)
-    removeEdge(parent, rightOfParent)
+    console.log(`-> relink, parent = ${parent}, left = ${left}, right = ${right}`)
     addEdge(parent, left)
     addEdge(parent, right)
     setChildren(parent, [left, right])
@@ -86,10 +92,15 @@ function relink(parent, left, right) {
  *  parents[0] and parents[2] as its children,
  *  subtrees[0] and subtrees[1] as children of parents[0],
  *  subtrees[2] and subtrees[3] as children of parents[2]
- * @returns the root of the rotated subtree, i.e., parents[1]
  */
 function rotate(parents, subtrees) {
     console.log(`-> rotate, [${parents[0]}, ${parents[1]}, ${parents[2]}], [${subtrees[0]}, ${subtrees[1]}, ${subtrees[2]}, ${subtrees[3]}]`)
+    // important to remove all edges prior to relinking;
+    // otherwise cycles arise or some nodes end up with two parents
+    disconnectChildren(parents[0])
+    disconnectChildren(parents[1])
+    disconnectChildren(parents[2])
+    // now reconnect parents and subtrees in the desired order
     relink(parents[1], parents[0], parents[2])
     relink(parents[0], subtrees[0], subtrees[1])
     relink(parents[2], subtrees[2], subtrees[3])
@@ -145,8 +156,15 @@ function addNodeRBT(subroot, newWeight) {
         return newNode
     }
     let newChildSubroot
+    // Caution: if a restructure has occurred, newChildSubroot will no longer be a child of the subroot;
+    // that needs to be fixed;
+    // otherwise, newChildSubroot will end up with two parents
     if ( newWeight < weight(subroot) ) {
         newChildSubroot = addNodeRBT(getLeft(subroot), newWeight)
+        // the following may not solve the problem
+        if ( newChildSubroot !== getLeft(subroot) ) {
+            removeEdge(subroot, getLeft(subroot))
+        }
     } else {
         newChildSubroot = addNodeRBT(getRight(subroot), newWeight)
     }
