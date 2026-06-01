@@ -6,6 +6,14 @@ function isRoot(node) {
     return getParent(node) === null || getParent(node) === undefined
 }
 
+function isLeftChild(node) {
+    const parent = getParent(node)
+    if ( parent === undefined || parent === null ) {
+        return undefined
+    }
+    return getLeft(parent) === node
+}
+
 function makeBlack(node) {
     color(node, BLACK_COLOR)
 }
@@ -79,11 +87,11 @@ function disconnectChildren(node) {
  * Makes the two children the left and right children of the parent, removing any existing edges
  */
 function relink(parent, left, right) {
-    console.log(`-> relink, parent = ${parent}, left = ${left}, right = ${right}`)
+    console.log(`||| -> relink, parent = ${parent}, left = ${left}, right = ${right}`)
     addEdge(parent, left)
     addEdge(parent, right)
     setChildren(parent, [left, right])
-    console.log("<- relink")
+    console.log("||| <- relink")
 }
 
 /**
@@ -94,7 +102,7 @@ function relink(parent, left, right) {
  *  subtrees[2] and subtrees[3] as children of parents[2]
  */
 function rotate(parents, subtrees) {
-    console.log(`-> rotate, [${parents[0]}, ${parents[1]}, ${parents[2]}], [${subtrees[0]}, ${subtrees[1]}, ${subtrees[2]}, ${subtrees[3]}]`)
+    console.log(`()() -> rotate, [${parents[0]}, ${parents[1]}, ${parents[2]}], [${subtrees[0]}, ${subtrees[1]}, ${subtrees[2]}, ${subtrees[3]}]`)
     // important to remove all edges prior to relinking;
     // otherwise cycles arise or some nodes end up with two parents
     disconnectChildren(parents[0])
@@ -104,15 +112,17 @@ function rotate(parents, subtrees) {
     relink(parents[1], parents[0], parents[2])
     relink(parents[0], subtrees[0], subtrees[1])
     relink(parents[2], subtrees[2], subtrees[3])
+    console.log("()() <- rotate")
 }
 
 function restructure(child, parent, grandparent) {
-    console.log(`-> restructure, child weight = ${weight(child)}, parent weight = ${weight(parent)}, grandparent weight = ${weight(grandparent)}`)
+    console.log(`### -> restructure, child weight = ${weight(child)}, parent weight = ${weight(parent)}, grandparent weight = ${weight(grandparent)}`)
     if ( child === getLeft(parent) && parent === getLeft(grandparent) ) {
         rotate([child, parent, grandparent], [getLeft(child), getRight(child), getRight(parent), getRight(grandparent)])
         makeRed(grandparent)
         makeBlack(parent)
         makeRed(child)
+        console.log(`### <- restructure, return parent = ${parent}, weight = ${weight(parent)}`)
         return parent
     }
     if ( child === getRight(parent) && parent === getRight(grandparent) ) {
@@ -120,6 +130,7 @@ function restructure(child, parent, grandparent) {
         makeRed(grandparent)
         makeBlack(parent)
         makeRed(child)
+        console.log(`### <- restructure, return parent = ${parent}, weight = ${weight(parent)}`)
         return parent
     }
     if ( child === getLeft(parent) && parent === getRight(grandparent) ) {
@@ -127,14 +138,16 @@ function restructure(child, parent, grandparent) {
         makeRed(grandparent)
         makeBlack(child)
         makeRed(parent)
-        return parent
+        console.log(`### <- restructure, return child = ${parent}, weight = ${weight(child)}`)
+        return child
     }
     if ( child === getRight(parent) && parent === getLeft(grandparent) ) {
         rotate([parent, child, grandparent], [getLeft(parent), getLeft(child), getRight(child), getRight(grandparent)])
         makeRed(parent)
         makeBlack(child)
         makeRed(grandparent)
-        return parent
+        console.log(`### <- restructure, return child = ${parent}, weight = ${weight(child)}`)
+        return child
     }
 }
 
@@ -150,9 +163,10 @@ function addNodeRBT(subroot, newWeight) {
         makeBlack(newNode)
         return newNode
     }
-    console.log(`+++++++-> addNodeRBT(${weight(subroot)}, ${newWeight})`)
+    console.log(`+++ -> addNodeRBT(${subroot}, ${weight(subroot)}, ${newWeight})`)
     if ( isDummy(subroot) ) {
         const newNode = replaceLeaf(subroot, newWeight)
+        console.log(`+++ <- addNodeRBT, return node = ${newNode}, weight = ${weight(newNode)}`)
         return newNode
     }
     let newChildSubroot
@@ -161,20 +175,18 @@ function addNodeRBT(subroot, newWeight) {
     // otherwise, newChildSubroot will end up with two parents
     if ( newWeight < weight(subroot) ) {
         newChildSubroot = addNodeRBT(getLeft(subroot), newWeight)
-        // the following may not solve the problem
-        if ( newChildSubroot !== getLeft(subroot) ) {
-            removeEdge(subroot, getLeft(subroot))
-        }
     } else {
         newChildSubroot = addNodeRBT(getRight(subroot), newWeight)
     }
+    console.log(`^^^ newChildSubroot = ${newChildSubroot}, weight = ${weight(newChildSubroot)}`)
 
-    console.log(`weight(newChildSubroot) = ${weight(newChildSubroot)}`)
-
-    // subroot may have turned red during recoloring below
-    // it's always safe to make the root black: black depth is still the same for all leaves
+    // Note: Subroot may have turned red during recoloring below;
+    // but it's always safe to make the root black: black depth is still the same for all leaves.
+    // For technical reasons, you also get here in case of a restructure;
+    // this avoids confusion when intervening nodes are red.
     if ( isRoot(subroot) ) {
         makeBlack(subroot)
+        console.log(`+++ <- addNodeRBT, return node = ${subroot}, weight = ${weight(subroot)}`)
         return subroot
     }
 
@@ -184,30 +196,54 @@ function addNodeRBT(subroot, newWeight) {
     //   - subroot has turned red, so any double red will be detected up the line
     // if subroot is still black it doesn't matter if newChildSubroot is red
     if ( isBlack(newChildSubroot) || isBlack(subroot) ) {
+        console.log(`+++ <- addNodeRBT, return node = ${subroot}, weight = ${weight(subroot)}`)
         return subroot
     }
 
     // now we have a double red
     // newChildSubroot is red and subroot is red
+    // subroot must have a parent - the root is black
+    const parent = getParent(subroot)
     const sibling = getSibling(subroot)
+
     if ( isBlack(sibling) ) {
-        // do a restructure/recolor involving newChildSubroot, subroot, and parent(subroot)
-        // see slide 6 of the lecture slides
-        // then return the root of the restructured subtree
-        //  - this skips a level, but the returned node will be black, so no problem
-        restructure(newChildSubroot, subroot, getParent(subroot))
+        // Do a restructure/recolor involving newChildSubroot, subroot, and parent(subroot)
+        //   - see slide 6 of the lecture slides.
+        // Then return the root of the restructured subtree; this will always be black, so no problem above.
+        // Since subtree root may change during restructuring, the grandparent may have a different child.
+        // We need to know which child is replaced unless the parent is the root, i.e., has no parent.
+        const grandparent = getParent(parent)
+        const parentIsLeftChild = isLeftChild(parent)
+        // need to disconnect before restructuring to avoid confusion
+        if ( grandparent !== null && grandparent !== undefined ) {
+            removeEdge(grandparent, parent)
+        }
+        const newSubroot = restructure(newChildSubroot, subroot, parent)
+        // reconnect new subroot with grandparent
+        if ( grandparent !== null && grandparent !== undefined ) {
+            addEdge(grandparent, newSubroot)
+            if ( parentIsLeftChild ) {
+                setChildren(grandparent, [newSubroot, getRight(grandparent)])
+            }
+            else {
+                setChildren(grandparent, [getLeft(grandparent), newSubroot])
+            }
+        }
+        // need to return the root to be absolutely safe, i.e., avoid interim return values
+        const toReturn = getRoot()
+        console.log(`+++ <- addNodeRBT, return node = ${toReturn}, weight = ${weight(toReturn)}`)
+        return toReturn
     }
-    else { // sibling is red
-        // now we deal with a red sibling
-        // - see slide 8
-        // recoloring will turn the parent red, which may cause a double red up the line
-        // Note: if parent is the root, it can stay black; this case is dealt with up the line as well
-        step(() => {
-            makeBlack(subroot)
-            makeBlack(sibling)
-            makeRed(getParent(subroot))
-        })
-    }
+    // Now we deal with a red sibling
+    // - see slide 8
+    // Recoloring will turn the parent red, which may cause a double red up the line
+    // Note: If parent is the root, it can stay black; this case is dealt with up the line as well
+    step(() => {
+        makeBlack(subroot)
+        makeBlack(sibling)
+        makeRed(getParent(subroot))
+    })
+    console.log(`+++ <- addNodeRBT, return node = ${subroot}, weight = ${weight(subroot)}`)
     return subroot
 }
 
