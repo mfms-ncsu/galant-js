@@ -157,9 +157,12 @@ function restructure(child, parent, grandparent) {
  * Main function that adds a node
  * @param subroot root of subtree where the search continues
  * @param newWeight weight of the node to be added
- * @returns true if the subroot has been recolored red, leading to a potential double red
- *          false means we're done - no possibility of double red up the line
- * The return value is important as an indicator that we're done after a restructure
+ * @returns true if we are done, no longer concerned about double red; this occurs in one of the following
+ *           - a restructure has happened
+ *           - a recolor has reached the root, which stays black
+ *           - a node with weight = newWeight exists, so no new node
+ *           - subroot is the root; for completeness
+ *          false if a recoloring opens up the possibility of a double red above
  */
 function addNodeRBT(subroot, newWeight) {
     // empty tree, create a new root
@@ -168,55 +171,56 @@ function addNodeRBT(subroot, newWeight) {
         display("empty tree, new node =", newNode)
         replaceLeaf(newNode, newWeight)
         makeBlack(newNode)
-        return false
+        return true
     }
 
-    let redSubroot
+    let done
     display(`+++ -> addNodeRBT(${subroot}, ${weight(subroot)}, ${newWeight})`)
     if ( isDummy(subroot) ) {
       const newNode = replaceLeaf(subroot, newWeight)
       display(`added new (red) node`)
       // we replaced the current subroot with a red node
-      redSubroot = true
+      done = false
     } else {
       // Note: weights will be equal if we replaced the subroot,
       //  so need to put the check for equality in the else clause
       if ( newWeight < weight(subroot) ) {
-        redSubroot = addNodeRBT(getLeft(subroot), newWeight)
+        done = addNodeRBT(getLeft(subroot), newWeight)
       } else if ( newWeight > weight(subroot) ) {
-        redSubroot = addNodeRBT(getRight(subroot), newWeight)
+        done = addNodeRBT(getRight(subroot), newWeight)
       } else {
         // weights are equal
         display(`A node with weight ${newWeight} already exists`)
-        return false
+        return true
       }
     }
 
     // the root will always be black, regardless of what happens below
     if ( isRoot(subroot) ) {
-        makeBlack(subroot)
-        display(`+++ <- addNodeRBT(${subroot}), subroot is the root, return false`)
-        return false
+        display(`+++ <- addNodeRBT(${subroot}), subroot is the root, return true`)
+        return true
     }
 
     // No recoloring of the subroot means it's safe to return
-    if ( ! redSubroot ) {
-        display(`+++ <- addNodeRBT(${subroot}): subroot is black or node with newWeight already exists,  return false`)
-        return false
+    if ( done ) {
+        display(`+++ <- addNodeRBT(${subroot}): done,  return true`)
+        return true
     }
 
-    // parent is black, so no double red
-    if ( isBlack(getParent(subroot))) {
-        display(`+++ <- addNodeRBT(${subroot}), parent of subroot is black, return false`)
-        return false
-    }
-
-    // Now we have a double red:
+    // Now we have to check for double red involving the subroot and its parent
     //  subroot is red and its parent is also red
     // Subroot must have a parent - we've already handled the case where it is the root
-    // The two red nodes are the subroot and its parent
     const parent = getParent(subroot)
+
+    // if either relevant node is black, there's no double red => we're done
+    if ( isBlack(subroot) || isBlack(parent) ) {
+      display(`+++ <- addNodeRBT(${subroot}): subroot is black or has black parent (double red may occur above), return ${done}`)
+      return done
+    }
+
+    // Now we have a double red - both subroot and its parent are red
     const sibling = getSibling(parent)
+    const grandparent = getParent(parent)
 
     if ( isBlack(sibling) ) {
         // Do a restructure/recolor involving subroot, parent, and grandparent
@@ -224,7 +228,6 @@ function addNodeRBT(subroot, newWeight) {
         // This is the end of the line - the subroot of the restructured subtree is black
         // Since subtree root may change during restructuring, the grandparent may have a different child.
         // We need to know which child is replaced unless the parent is the root, i.e., has no parent.
-        const grandparent = getParent(parent)
         const greatgrandparent = getParent(grandparent)
         display(`sibling is black, parent = ${parent}, grandparent = ${grandparent}`)
         let grandparentIsLeftChild
@@ -239,7 +242,7 @@ function addNodeRBT(subroot, newWeight) {
         makeRed(getRight(newSubroot))
         // reconnect new subroot with greatgrandparent
         if ( greatgrandparent !== null && greatgrandparent !== undefined ) {
-            addEdge(grandparent, newSubroot)
+            addEdge(greatgrandparent, newSubroot)
             if ( grandparentIsLeftChild ) {
               setChildren(greatgrandparent, [newSubroot, getRight(greatgrandparent)])
             }
@@ -247,20 +250,25 @@ function addNodeRBT(subroot, newWeight) {
               setChildren(greatgrandparent, [getLeft(greatgrandparent), newSubroot])
             }
         }
-        display(`+++ <- addNodeRBT(${subroot}), retructuring has occurred, return false`)
-        return false
+        display(`+++ <- addNodeRBT(${subroot}), retructuring has occurred, return true`)
+        return true
     }
     // Now we deal with a red sibling
     // - see slide 8
     // Recoloring will turn the parent red, which may cause a double red up the line
     // Note: If parent is the root, it can stay black; this case is dealt with up the line as well
     step(() => {
-        makeBlack(subroot)
+        makeBlack(parent)
         makeBlack(sibling)
-        makeRed(parent)
+        if ( grandparent !== getRoot() ) {
+          makeRed(grandparent)
+          display(`+++ <- addNodeRBT(${subroot}), grandparent has turned red, so return false`)
+          return false
+        } else {
+          display(`+++ <- addNodeRBT(${subroot}), grandparent is root, so return true`)
+          return true
+        }
     })
-    display(`+++ <- addNodeRBT(${subroot}), parent has turned red, return true`)
-    return true
 }
 
 /// +++ END, ADDITION
