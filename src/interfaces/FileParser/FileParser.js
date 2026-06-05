@@ -219,6 +219,10 @@ function parseAttributes(tokens, startingIndex) {
         startingIndex += 1;
     }
 
+    // @todo Check each attribute value to see if it's a boolean or a number
+    //       and act accordingly
+    //       Otherwise all attributes after the weight are treated as strings!
+    
     // Adds each remaining attribute to the attribute map
     for ( let tokenIndex = startingIndex; tokenIndex < tokens.length; tokenIndex++ ) {
         // Find and set the attribute
