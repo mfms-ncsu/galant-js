@@ -1,5 +1,7 @@
 // colors used for red and black nodes should not obscure the weights. so use lighter versions
+// also use heavy border for black nodes
 const BLACK_COLOR = "gray"
+const BLACK_BORDER_WIDTH = 6
 const RED_COLOR = "pink"
 
 function isRoot(node) {
@@ -15,7 +17,11 @@ function isLeftChild(node) {
 }
 
 function makeBlack(node) {
+  step(() => {
     color(node, BLACK_COLOR)
+    setBorderWidth(node, BLACK_BORDER_WIDTH)
+    setAttribute(node, "borderColor", "black")
+  })
 }
 
 function isBlack(node) {
@@ -23,7 +29,11 @@ function isBlack(node) {
 }
 
 function makeRed(node) {
+  step(() => {
     color(node, RED_COLOR)
+    clearBorderWidth(node)
+    setAttribute(node, "borderColor", "red")
+  })
 }
 
 function isRed(node) {
@@ -115,6 +125,13 @@ function rotate(parents, subtrees) {
     display("()() <- rotate")
 }
 
+/**
+ * Performs a trinode restructuring of the three nodes based on their left to right order.
+ * The left to right order is preserved and one of the three nodes becomes parent of the others.
+ * This yields a more balanced tree.
+ * The three nodes are in the relationship suggested by their names
+ * @returns the node that ends up as parent of the other two
+ */
 function restructure(child, parent, grandparent) {
     display(`### -> restructure, child weight = ${weight(child)}, parent weight = ${weight(parent)}, grandparent weight = ${weight(grandparent)}`)
     if ( child === getLeft(parent) && parent === getLeft(grandparent) ) {
@@ -381,30 +398,32 @@ function terminalNodeDeletion(x, isPredecessor) {
 }
 
 /**
- * Deletes a node with weight k from the BST rooted at x
+ * Deletes a node with weight weightToRemove from the BST rooted at x
  * @param x a subroot of BST, initially the root of the BST
- * @param k the weight of the node to delete
+ * @param weightToRemove the weight of the node to remove
+ * @returns the node to be removed or undefined if no such node exists;
+ *          if the node with weight weightToRemove has two real children, the inorder predecessor is returned;
+ *          the returned node will have at most one real child
  */
-function removeNodeRBT(x, k) {
+function findNodeToRemove(subroot, weightToRemove) {
   // Couldn't find node we are trying to delete, error
-  if ( x === undefined || getAttribute(x, "dummy") || ( isLeaf(x) && k != weight(x) ) ){
-    display(`Could not find node ${k} to delete`);
-    return;
+  if ( getAttribute(subroot, "dummy") ) {
+    display(`Could not find node with weight ${weightToRemove}`);
+    return null;
   }
 
   //Not a leaf, and weight(x) not k, keep searching
-  accentNode(x);
-  if ( k < weight(x) ) {
-    unaccent(x)
-    return removeNodeRBT(getLeft(x), k);    
-  } else if ( k > weight(x) ) {
-    unaccent(x)
-    return removeNodeRBT(getRight(x), k);
+  accentNode(subroot);
+  if ( weightToRemove < weight(subroot) ) {
+    unaccent(subroot)
+    return removeNodeRBT(getLeft(subroot), weightToRemove);    
+  } else if ( weightToRemove > weight(subroot) ) {
+    unaccent(subroot)
+    return removeNodeRBT(getRight(subroot), weightToRemove);
   }
 
-  if ( ! hasTwoRealChildren(x) ) {
-    terminalNodeDeletion(x, false);
-    return;
+  if ( ! hasTwoRealChildren(subroot) ) {
+    return subroot;
   }
 
   // Has two real children, need to replace x with in-order predecessor
@@ -412,21 +431,98 @@ function removeNodeRBT(x, k) {
   // Find in-order predecessor
   step(() => {
     display("Looking for in-order predecessor")
-    color(x, "black")
+    color(subroot, "black")
   })
-  const predecessor = findInOrderPredecessor(getLeft(x));
+  const predecessor = findInOrderPredecessor(getLeft(subroot));
 
   // Replace deleted node weight with in-order predecessor weight
   const predWeight = weight(predecessor);
   step(() => {
-    setWeight(x, predWeight);
-    uncolor(x)
+    setWeight(subroot, predWeight);
+    uncolor(subroot)
     color(predecessor, "black");
   })
-  // Now delete the predecessor node, which has at most one child
-  terminalNodeDeletion(predecessor, true);
-  display(`Deleted node with weight ${k} by replacing with predecessor`);
-  return
+  return predecessor
+}
+
+function getRedChild(node) {
+  if ( isRed(getLeft(node)) ) {
+    return getLeft(node)
+  }
+  if ( isRed(getRight(node)) ) {
+    return getRight(node)
+  }
+  return undefined
+}
+
+/**
+ * Removes the node that has the given weight and adjust coloring and and/or restructure as needed
+ * @param root the root of the tree
+ * @param weightToRemove weight of the node to be removed
+ */
+function removeNodeRBT(root, weightToRemove) {
+  // first identify the actual node to remove, which may be the one holding the inorder predecessor
+  const nodeToRemove = findNodeToRemove(root, weightToRemove)
+  // then remove it and iteratively, bottom-up recolor and/or restructure as needed
+
+  // the node to remove has at most one real child,
+  //  so identify a dummy child and its sibling, which may or may not be a dummy
+  const dummyChild = isDummy(getLeft(nodeToRemove)) ? getLeft(nodeToRemove) : getRight(nodeToRemove)
+  const sibling = getSibling(dummyChild)
+  const parent = getParent(nodeToRemove)
+  // the sibling will replace the node to be removed so
+  //  - make sibling a child of the parent
+  //  - delete the node to be removed
+  // before we do any deletion and reconnection, we need to know
+  //  - whether nodeToRemove is a left or right child of its parent
+  //  - the color of nodeToRemove, so we know if to reolor or restructure
+
+  if ( parent === null || parent === undefined ) {
+    // removing the root
+    // if it's the only real node, tree is now empty; delete it and its dummy children
+    if ( isDummy(sibling) ) {
+      deleteNode(nodeToRemove)
+      deleteNode(dummyChild)
+      deleteNode(sibling)
+    }
+    // otherwise the sibling becomes the root and will turn black
+    deleteNode(nodeToRemove)
+    deleteNode(dummyChild)
+    makeBlack(sibling)
+  }
+  const removeLeft = isLeftChild(nodeToRemove)
+  const removeRed = isRed(nodeToRemove)
+  deleteNode(nodeToRemove)
+  addEdge(parent, sibling)
+  if ( removeLeft ) {
+    setChildren(parent, [sibling, getRight(parent)])
+  } else {
+    setChildren(parent, [getLeft(parent), sibling])
+  }
+
+  // the easy case is if either the removed node or the sibling replacement was/is red
+  if ( removeRed || isRed(sibling) ) {
+    makeBlack(sibling)
+    return
+  }
+
+  // !!! turn the following into a separate function doubleBlack
+
+  // Now we have a double black situation
+  // The three cases outlined in Goodrich and Tamassia depend on the  sibling of the sibling after the replacement
+  const newSibling = getSibling(sibling)
+  const redChild = getRedChild(newSibling)
+  // Case 1: newSibling is black and has a red child => restructure
+  if ( isBlack(newSibling) && redChild !== undefined ) {
+    const newParent = restructure(redChild, newSibling, parent)
+    makeRed(newParent)
+    makeBlack(getLeft(newParent))
+    makeBlack(getRight(newParent))
+    return
+  }
+
+  // Case 2: newSibling is black and both of its children are black
+  // This may involve propagation of the double black - recursion?
 }
 
 /// --- END REMOVAL

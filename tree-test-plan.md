@@ -26,7 +26,9 @@ create tree with insertion sequence 7,1,8,5,3,2,4
 
 ## Red/black trees
 
-### insertion sequence (see Goodrich and Tamassia, *Algorithm Design*, pp. 175-6)
+### insertion sequence 
+- see Goodrich and Tamassia, *Algorithm Design*, pp. 175-6
+- or Goodrich, Tamassia and Golwasser *Data Structures & Algorithms*, pp. 515-6
 
 * 4, 7
 * 12 - rotate so 7 becomes root (LL)
@@ -37,7 +39,8 @@ create tree with insertion sequence 7,1,8,5,3,2,4
 * 16 - rotate so 16 has 15 and 18 as children (LR)
 * 17 - a recolor followed by a rotation that puts 14 at the root (RR)
 
-### deletion sequence (see Goodrich and Tamassia, *Algorithm Design*, pp. 182-3)
+### deletion sequence
+ - see Goodrich and Tamassia, *Algorithm Design*, pp. 182-3
 
 Start with tree from insertion sequence, saved as **public/collection/trees/rt-example.tree**
 
