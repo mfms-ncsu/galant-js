@@ -40,6 +40,16 @@ function isRed(node) {
     return getColor(node) === RED_COLOR
 }
 
+function makeDoubleBlack(node) {
+  const parentEdge = getEdge(getParent(node), node)
+  setEdgeWidth(parentEdge, BLACK_BORDER_WIDTH)
+}
+
+function clearDoubleBlack (node) {
+  const parentEdge = getEdge(getParent(node), node)
+  clearEdgeWidth(parentEdge)
+}
+
 /**
  * @returns a new (newly created)dummy node
  */
@@ -94,7 +104,16 @@ function disconnectChildren(node) {
 }
 
 /**
- * Makes the two children the left and right children of the parent, removing any existing edges
+ * Functions relink(), rotate() and restructure are based on
+ * Goodrich, Tamassia and Goldwasser, Sixth Edition, p.478
+ */
+
+/**
+ * Makes the child either the left or right child of the parent
+ *  removing any existing edges
+ * @param parent the parent to be
+ * @param left the left child to be
+ * @param right the right child to be
  */
 function relink(parent, left, right) {
     display(`||| -> relink, parent = ${parent}, left = ${left}, right = ${right}`)
@@ -105,11 +124,14 @@ function relink(parent, left, right) {
 }
 
 /**
- * Performs a rotation based on subtrees and the parents of their roots
- * The end result has parents[1] as root of the final subtree,
- *  parents[0] and parents[2] as its children,
- *  subtrees[0] and subtrees[1] as children of parents[0],
- *  subtrees[2] and subtrees[3] as children of parents[2]
+ * Performs a rotation based on the relative positions of the node, its parent and its grandparent
+ * This version differs from Goodrich et al.
+ * It's based on my notes and is more explicit about the order of the subtrees
+ * Too whit,
+ *  
+ *  parents[1] has parents[0] and parents[2] as its children,
+ *  subtrees[0] and subtrees[1] are children of parents[0],
+ *  subtrees[2] and subtrees[3] are children of parents[2]
  */
 function rotate(parents, subtrees) {
     display(`()() -> rotate, [${parents[0]}, ${parents[1]}, ${parents[2]}], [${subtrees[0]}, ${subtrees[1]}, ${subtrees[2]}, ${subtrees[3]}]`)
@@ -126,46 +148,55 @@ function rotate(parents, subtrees) {
 }
 
 /**
- * Performs a trinode restructuring of the three nodes based on their left to right order.
+ * Performs a trinode restructuring of the node, its parent and its grandparent,
+ *  based on their left to right order.
  * The left to right order is preserved and one of the three nodes becomes parent of the others.
  * This yields a more balanced tree.
- * The three nodes are in the relationship suggested by their names
+ * @param child the node at the lowest level before restructuring
  * @returns the node that ends up as parent of the other two
  */
-function restructure(child, parent, grandparent) {
-    display(`### -> restructure, child weight = ${weight(child)}, parent weight = ${weight(parent)}, grandparent weight = ${weight(grandparent)}`)
-    if ( child === getLeft(parent) && parent === getLeft(grandparent) ) {
-        rotate([child, parent, grandparent], [getLeft(child), getRight(child), getRight(parent), getRight(grandparent)])
-        // makeRed(grandparent)
-        // makeBlack(parent)
-        // makeRed(child)
-        display(`### <- restructure, return parent = ${parent}, weight = ${weight(parent)}`)
-        return parent
+function restructure(child) {
+  const parent = getParent(child)
+  const grandparent = getParent(parent)
+  display(`### -> restructure, node = ${child}, parent = ${parent}, grandparent = ${grandparent}`)
+
+  // this will be the root of the subtree after restructure
+  let newSubtreeRoot
+
+  // If the greatgrandparent exists, need to disconnect before restructuring to avoid confusion
+  // Also need to save important information that will get lost after restructure
+  const grandparentIsRoot = isRoot(grandparent)
+  // the following will be needed only if grandparent is not currently the root
+  const greatgrandparent = getParent(grandparent)
+  const grandparentIsLeftChild = grandparentIsRoot ? undefined : isLeftChild(grandparent)
+  if ( ! grandparentIsRoot ) {
+    removeEdge(greatgrandparent, grandparent)
+  }
+  if ( child === getLeft(parent) && parent === getLeft(grandparent) ) {
+    rotate([child, parent, grandparent], [getLeft(child), getRight(child), getRight(parent), getRight(grandparent)])
+    newSubtreeRoot = parent
+  }
+  if ( child === getRight(parent) && parent === getRight(grandparent) ) {
+    rotate([grandparent, parent, child], [getLeft(grandparent), getLeft(parent), getLeft(child), getRight(child)])
+    newSubtreeRoot = parent
+  }
+  if ( child === getLeft(parent) && parent === getRight(grandparent) ) {
+    rotate([grandparent, child, parent], [getLeft(grandparent), getLeft(child), getRight(child), getRight(parent)])
+    newSubtreeRoot = child
+  }
+  if ( child === getRight(parent) && parent === getLeft(grandparent) ) {
+    rotate([parent, child, grandparent], [getLeft(parent), getLeft(child), getRight(child), getRight(grandparent)])
+    newSubtreeRoot = child
+  }
+  if ( ! grandparentIsRoot ) {
+    if ( grandparentIsLeftChild ) {
+      relink(greatgrandparent, newSubtreeRoot, getRight(greatgrandparent))
+    } else {
+      relink(greatgrandparent, getLeft(greatgrandparent), newSubtreeRoot)
     }
-    if ( child === getRight(parent) && parent === getRight(grandparent) ) {
-        rotate([grandparent, parent, child], [getLeft(grandparent), getLeft(parent), getLeft(child), getRight(child)])
-        // makeRed(grandparent)
-        // makeBlack(parent)
-        // makeRed(child)
-        display(`### <- restructure, return parent = ${parent}, weight = ${weight(parent)}`)
-        return parent
-    }
-    if ( child === getLeft(parent) && parent === getRight(grandparent) ) {
-        rotate([grandparent, child, parent], [getLeft(grandparent), getLeft(child), getRight(child), getRight(parent)])
-        // makeRed(grandparent)
-        // makeBlack(child)
-        // makeRed(parent)
-        display(`### <- restructure, return child = ${parent}, weight = ${weight(child)}`)
-        return child
-    }
-    if ( child === getRight(parent) && parent === getLeft(grandparent) ) {
-        rotate([parent, child, grandparent], [getLeft(parent), getLeft(child), getRight(child), getRight(grandparent)])
-        // makeRed(parent)
-        // makeBlack(child)
-        // makeRed(grandparent)
-        display(`### <- restructure, return child = ${parent}, weight = ${weight(child)}`)
-        return child
-    }
+  }
+  display(`### <- restructure, return newSubtreeRoot = ${newSubtreeRoot}, weight = ${weight(newSubtreeRoot)}`)
+  return newSubtreeRoot
 }
 
 /// +++ ADDITION
@@ -196,8 +227,7 @@ function addNodeRBT(subroot, newWeight) {
     if ( isDummy(subroot) ) {
       const newNode = replaceLeaf(subroot, newWeight)
       display(`added new (red) node`)
-      // we replaced the current subroot with a red node
-      done = false
+      // we replaced the current subroot with a red node, not done
     } else {
       // Note: weights will be equal if we replaced the subroot,
       //  so need to put the check for equality in the else clause
@@ -229,10 +259,10 @@ function addNodeRBT(subroot, newWeight) {
     // Subroot must have a parent - we've already handled the case where it is the root
     const parent = getParent(subroot)
 
-    // if either relevant node is black, there's no double red => we're done
+    // if either relevant node is black, there may still be a double red above
     if ( isBlack(subroot) || isBlack(parent) ) {
-      display(`+++ <- addNodeRBT(${subroot}): subroot is black or has black parent (double red may occur above), return ${done}`)
-      return done
+      display(`+++ <- addNodeRBT(${subroot}): subroot is black or has black parent (double red may occur above), return false`)
+      return false
     }
 
     // Now we have a double red - both subroot and its parent are red
@@ -245,28 +275,11 @@ function addNodeRBT(subroot, newWeight) {
         // This is the end of the line - the subroot of the restructured subtree is black
         // Since subtree root may change during restructuring, the grandparent may have a different child.
         // We need to know which child is replaced unless the parent is the root, i.e., has no parent.
-        const greatgrandparent = getParent(grandparent)
         display(`sibling is black, parent = ${parent}, grandparent = ${grandparent}`)
-        let grandparentIsLeftChild
-        // If the grandparent exists, need to disconnect before restructuring to avoid confusion
-        if ( greatgrandparent !== null && greatgrandparent !== undefined ) {
-            grandparentIsLeftChild = isLeftChild(grandparent)
-            removeEdge(greatgrandparent, grandparent)
-        }
         const newSubroot = restructure(subroot, parent, grandparent)
         makeBlack(newSubroot)
         makeRed(getLeft(newSubroot))
         makeRed(getRight(newSubroot))
-        // reconnect new subroot with greatgrandparent
-        if ( greatgrandparent !== null && greatgrandparent !== undefined ) {
-            addEdge(greatgrandparent, newSubroot)
-            if ( grandparentIsLeftChild ) {
-              setChildren(greatgrandparent, [newSubroot, getRight(greatgrandparent)])
-            }
-            else {
-              setChildren(greatgrandparent, [getLeft(greatgrandparent), newSubroot])
-            }
-        }
         display(`+++ <- addNodeRBT(${subroot}), retructuring has occurred, return true`)
         return true
     }
@@ -469,7 +482,6 @@ function removeNodeRBT(root, weightToRemove) {
   //  so identify a dummy child and its sibling, which may or may not be a dummy
   const dummyChild = isDummy(getLeft(nodeToRemove)) ? getLeft(nodeToRemove) : getRight(nodeToRemove)
   const sibling = getSibling(dummyChild)
-  const parent = getParent(nodeToRemove)
   // the sibling will replace the node to be removed so
   //  - make sibling a child of the parent
   //  - delete the node to be removed
@@ -477,7 +489,7 @@ function removeNodeRBT(root, weightToRemove) {
   //  - whether nodeToRemove is a left or right child of its parent
   //  - the color of nodeToRemove, so we know if to reolor or restructure
 
-  if ( parent === null || parent === undefined ) {
+  if ( isRoot(nodeToRemove) ) {
     // removing the root
     // if it's the only real node, tree is now empty; delete it and its dummy children
     if ( isDummy(sibling) ) {
@@ -490,6 +502,7 @@ function removeNodeRBT(root, weightToRemove) {
     deleteNode(dummyChild)
     makeBlack(sibling)
   }
+  const parent = getParent(nodeToRemove)
   const removeLeft = isLeftChild(nodeToRemove)
   const removeRed = isRed(nodeToRemove)
   deleteNode(nodeToRemove)
@@ -505,24 +518,42 @@ function removeNodeRBT(root, weightToRemove) {
     makeBlack(sibling)
     return
   }
+  remedyDoubleBlack(sibling)
+}
 
-  // !!! turn the following into a separate function doubleBlack
-
-  // Now we have a double black situation
+function remedyDoubleBlack(node) {
   // The three cases outlined in Goodrich and Tamassia depend on the  sibling of the sibling after the replacement
-  const newSibling = getSibling(sibling)
-  const redChild = getRedChild(newSibling)
+  const parent = getParent(node)
+  const sibling = getSibling(node)
+  const redChild = getRedChild(sibling)
   // Case 1: newSibling is black and has a red child => restructure
-  if ( isBlack(newSibling) && redChild !== undefined ) {
-    const newParent = restructure(redChild, newSibling, parent)
+  if ( isBlack(sibling) && redChild !== undefined ) {
+    clearDoubleBlack(node)
+    const newParent = restructure(redChild, sibling, parent)
     makeRed(newParent)
     makeBlack(getLeft(newParent))
     makeBlack(getRight(newParent))
     return
   }
 
-  // Case 2: newSibling is black and both of its children are black
-  // This may involve propagation of the double black - recursion?
+  // Case 2: sibling is black and both of its children are black
+  //  At this point a black sibling cannot have a red child - that was handled above
+  if ( isBlack(sibling) ) {
+    clearDoubleBlack(node)
+    makeRed(sibling)
+    if ( isRed(parent) ) {
+      makeBlack(parent)
+      return
+    }
+    if ( isRoot(parent) ) {
+      return
+    }
+    makeDoubleBlack(parent)
+    remedyDoubleBlack(parent)
+  }
+
+  // Case 3: sibling is red
+
 }
 
 /// --- END REMOVAL
