@@ -10,6 +10,7 @@ function accentNode(node) {
 
 function unaccent(node) {
   unlabel(node)
+  label(node, node)
 }
 
 function isRoot(node) {
@@ -64,6 +65,7 @@ function clearDoubleBlack (node) {
 function createDummy() {
   const dummy = addNode()
   setAttribute(dummy, "dummy", true);
+  label(dummy, dummy)
   return dummy;
 }
 
@@ -227,6 +229,7 @@ function addNodeRBT(subroot, newWeight) {
     // empty tree, create a new root
     if ( subroot === null || subroot === undefined ) {
         const newNode = addNode()
+        label(newNode, newNode)
         display("empty tree, new node =", newNode)
         replaceLeaf(newNode, newWeight)
         makeBlack(newNode)
@@ -420,6 +423,7 @@ function removeNodeRBT(root, weightToRemove) {
   //  so identify a dummy child and its sibling, which may or may not be a dummy
   const dummyChild = isDummy(getLeft(nodeToRemove)) ? getLeft(nodeToRemove) : getRight(nodeToRemove)
   const sibling = getSibling(dummyChild)
+  display(`dummy child is ${dummyChild}, sibling is ${sibling}`)
   // the sibling will replace the node to be removed so
   //  - make sibling a child of the parent
   //  - delete the node to be removed
@@ -448,15 +452,19 @@ function removeNodeRBT(root, weightToRemove) {
   }
 
   const parent = getParent(nodeToRemove)
-  const removeLeft = isLeftChild(nodeToRemove)
+  // before deleting anything, need to remember the state of affairs before deletion
+  const leftChild = getLeft(parent)
+  const rightChild = getRight(parent)
+  const removeLeft = nodeToRemove === leftChild
   const removeRed = isRed(nodeToRemove)
+  display(`parent is ${parent}, removeLeft is ${removeLeft}, removeRed is ${removeRed}`)
   deleteNode(nodeToRemove)
   deleteNode(dummyChild)
   addEdge(parent, sibling)
   if ( removeLeft ) {
-    setChildren(parent, [sibling, getRight(parent)])
+    setChildren(parent, [sibling, rightChild])
   } else {
-    setChildren(parent, [getLeft(parent), sibling])
+    setChildren(parent, [leftChild, sibling])
   }
 
   // the easy case is if either the removed node or the sibling replacement was/is red
@@ -507,8 +515,14 @@ function remedyDoubleBlack(node) {
   }
 
   // Case 3: sibling is red
-  const newSubtreeRoot = restructure(sibling)
-  makeBlack(newSubtreeRoot)
+  // Here we need to rotate so that the sibling becomes the new subtree root.
+  // It will always be a single rotation, centered on the sibling
+  if ( isLeftChild(sibling) ) {
+    restructure(getLeft(sibling))
+  } else {
+    restructure(getRight(sibling))
+  }
+  makeBlack(sibling)
   makeRed(parent)
   remedyDoubleBlack(node)
   display(`[[]] <- remedied double black, sibling was red`)
@@ -520,7 +534,7 @@ function remedyDoubleBlack(node) {
  * Main loop for adding/deleting nodes in a BST
  */
 step(() => {
-//  setWeightsInside(true)
+  setWeightsInside(true)
   setDirected(true);
 })
 let running = true;

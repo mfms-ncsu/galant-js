@@ -45,6 +45,10 @@ function generateSequenceNumber() {
   return currentSequenceNumber++
 }
 
+function resetSequenceNumbers() {
+  currentSequenceNumber = 0
+}
+
 let currentSequenceNumber = 0
 
 /**
@@ -1602,7 +1606,16 @@ function toString(graph, algorithmName = "No Algorithm Running") {
   content += `c Current Algorithm: ${algorithmName}\n\n`;
 
   // Loop over each node
-  graph.nodes.forEach((node) => {
+  // Sort by sequence number first
+    // use sequence numbers to determine the order of appearance for nodes
+  let idSequenceNumberPairs = [] 
+  graph.nodes.entries().forEach((entry) => {
+    idSequenceNumberPairs.push([entry[0], entry[1].sequenceNumber])
+  })
+  const idSequenceNumberPairsSorted = idSequenceNumberPairs.sort((a, b) => a[1] - b[1]);
+
+  idSequenceNumberPairsSorted.forEach(pair => {
+    const node = graph.nodes.get(pair[0]);
     // Get the attributes string
     let attributesString =
       " " +
@@ -1796,6 +1809,7 @@ function undo(graph, changeManager) {
 /** Export an object containing the interface */
 const GraphInterface = {
   generateSequenceNumber,
+  resetSequenceNumbers,
   getAdjacentNodes,
   getEdge,
   getEdgeAttribute,

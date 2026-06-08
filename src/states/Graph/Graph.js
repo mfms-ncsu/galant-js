@@ -20,12 +20,11 @@ export default class Graph {
   * when elkjs mode is used.
   * They are modified when the left to right order of children of a node
   * needs to change during algorithm execution
-  * @todo could alse be used to order adjacency lists
+  * the current sequence number, i.e., the next one to be assigned
+  *  incremented each time one is assigned
+  * Each node has a sequence number in addtion to an id.
+  * The next sequence number is assigned when the node is created and reassigned when the children of a node need to be reordered
   */
-  sequenceNumbers;
-  /** the current sequence number, i.e., the next one to be assigned
-   *  incremented each time one is assigned
-   */
   currentSequenceNumber;
   /** Node render size */
   nodeSize = 35;

@@ -149,6 +149,7 @@ function loadGraph(name, file) {
     const lines = file.split("\n");
 
     // Initialize the proper graph type
+    GraphInterface.resetSequenceNumbers()
     let graph = null;
     if ( isLayeredGraph(name, file) ) {
         graph = new LayeredGraph(name) }
@@ -158,7 +159,6 @@ function loadGraph(name, file) {
         graph = new StandardGraph(name);
     }
     graph.nodes = new Map();
-    graph.sequenceNumbers = new Map();
     graph.weightsInside = false
     // Parse each line, ignoring comments and blank lines
     // This part is the same for all graph types
