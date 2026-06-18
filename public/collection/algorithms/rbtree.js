@@ -126,8 +126,8 @@ function replaceLeaf(leaf, newWeight) {
 function disconnectChildren(node) {
   // very important to remove edge to *right child* first;
   //  it's the second child - if edge to left child is gone, there is no second child
-  removeEdge(node, getRight(node))
-  removeEdge(node, getLeft(node))
+  deleteEdge(node, getRight(node))
+  deleteEdge(node, getLeft(node))
 }
 
 /**
@@ -144,8 +144,12 @@ function disconnectChildren(node) {
  */
 function relink(parent, left, right) {
   display(`||| -> relink, parent = ${parent}, left = ${left}, right = ${right}`)
-  addEdge(parent, left)
-  addEdge(parent, right)
+  if ( ! edgeExists(parent, left) ) {
+    addEdge(parent, left)
+  }
+  if ( ! edgeExists(parent, right) ) {
+    addEdge(parent, right)
+  }
   setChildren(parent, [left, right])
   display("||| <- relink")
 }
@@ -187,7 +191,7 @@ function restructure(child) {
   const grandparent = getParent(parent)
   // this will be the root of the subtree after restructure
   let newSubtreeRoot
-  step(() => {
+//  step(() => {
     display(`restructure, node ${weight(child)}, parent ${weight(parent)}, grandparent ${weight(grandparent)}`)
 
     // If the greatgrandparent exists, need to disconnect before restructuring to avoid confusion
@@ -199,21 +203,21 @@ function restructure(child) {
     const leftOfGreatgrandparent = grandparentIsRoot ? undefined : getLeft(greatgrandparent)
     const rightOfGreatgrandparent = grandparentIsRoot ? undefined : getRight(greatgrandparent)
     if ( ! grandparentIsRoot ) {
-      removeEdge(greatgrandparent, grandparent)
+      deleteEdge(greatgrandparent, grandparent)
     }
     if ( child === getLeft(parent) && parent === getLeft(grandparent) ) {
       rotate([child, parent, grandparent], [getLeft(child), getRight(child), getRight(parent), getRight(grandparent)])
       newSubtreeRoot = parent
     }
-    if ( child === getRight(parent) && parent === getRight(grandparent) ) {
+    else if ( child === getRight(parent) && parent === getRight(grandparent) ) {
       rotate([grandparent, parent, child], [getLeft(grandparent), getLeft(parent), getLeft(child), getRight(child)])
       newSubtreeRoot = parent
     }
-    if ( child === getLeft(parent) && parent === getRight(grandparent) ) {
+    else if ( child === getLeft(parent) && parent === getRight(grandparent) ) {
       rotate([grandparent, child, parent], [getLeft(grandparent), getLeft(child), getRight(child), getRight(parent)])
       newSubtreeRoot = child
     }
-    if ( child === getRight(parent) && parent === getLeft(grandparent) ) {
+    else if ( child === getRight(parent) && parent === getLeft(grandparent) ) {
       rotate([parent, child, grandparent], [getLeft(parent), getLeft(child), getRight(child), getRight(grandparent)])
       newSubtreeRoot = child
     }
@@ -224,7 +228,7 @@ function restructure(child) {
         relink(greatgrandparent, leftOfGreatgrandparent, newSubtreeRoot)
       }
     }
-  })
+//  })
   return newSubtreeRoot
 }
 

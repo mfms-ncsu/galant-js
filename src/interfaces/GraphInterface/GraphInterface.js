@@ -281,7 +281,7 @@ function getEdgeAttribute(graph, source, target, name) {
  * @returns Edge between source and target nodes, or undefined if no such edge exists
  */
 function getEdgeBetween(graph, source, target) {
-  let edge = getEdge(graph, source, target);
+  const edge = getEdge(graph, source, target);
   if ( edge === undefined && ! graph.isDirected ) {
     // If undirected, check the opposite as well
     edge = getEdge(graph, target, source);
@@ -298,10 +298,23 @@ function getEdgeBetween(graph, source, target) {
  * @returns Edge between source and target nodes
  */
 function getEdgeIDBetween(graph, source, target) {
-  let edge = getEdgeBetween(graph, source, target);
+  const edge = getEdgeBetween(graph, source, target);
   return getEdgeID(graph, edge);
 }
 
+/**
+ * @param {Graph} graph Graph on which to operate
+ * @param {String} source Source node
+ * @param {String} target Target node
+ * @returns true if an edge exists from the source to the target
+ * The primary purpose of this function is as a guard against addEdge
+ *  of a duplicate edge during algorithm execution;
+ *  a step back (undo) of such an operation will cause a mysterious edge deletion
+ */
+function edgeExists(graph, source, target) {
+  const edge = getEdge(graph, source, target);
+  return edge !== undefined
+}
 
 /**
  * Returns the ID of an edge
@@ -1710,6 +1723,7 @@ function undo(graph, changeManager) {
     // Undo the change
     const newGraph = produce(graph, (draft) => {
       step.forEach((change) => {
+        console.log(`*UNDO* ${change.action}, change =`, change)
         switch (change.action) {
           case "addNode":
             // when addNode is undone, the incident edges will have already been deleted
@@ -1812,6 +1826,7 @@ const GraphInterface = {
   resetSequenceNumbers,
   getAdjacentNodes,
   getEdge,
+  edgeExists,
   getEdgeAttribute,
   getEdgeIDBetween,
   getEdgeIds,

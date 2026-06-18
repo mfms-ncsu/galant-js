@@ -300,6 +300,10 @@ function getEdgeBetween(source, target) {
     return GraphInterface.getEdgeIDBetween(graph, source, target);
 }
 
+function edgeExists(source, target) {
+    return GraphInterface.edgeExists(graph, source, target)
+}
+
 function other(nodeId, edgeId) {
     return GraphInterface.getOppositeNode(graph, nodeId, edgeId);
 }
@@ -353,6 +357,9 @@ function setPosition(nodeId, x, y) {
 }
 
 function addEdge(source, target) {
+    if ( edgeExists(source, target) ) {
+        throw new Error(`Error in addEdge: edge from ${source} to ${target} already exists`)
+    }
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, source, target);
     postMessage({ action: "addEdge", source: source, target: target });
@@ -371,21 +378,11 @@ function deleteNode(nodeId) {
     waitIfNeeded();
 }
 
-/**
- * @todo deleteEdge should work as removeEdge does here
- *        and internal uses of deleteEdge should be modified accordingly
- */
-function removeEdge(sourceId, targetId) {
-    deleteEdge(sourceId + "," + targetId)
-}
-
-function deleteEdge(edgeId) {
+function deleteEdge(sourceId, targetId) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
-    let split = edgeId.split(",");
-    let source = split[0], target = split[1];
-    console.log(`Thead: Deleting edge: ${edgeId}, source ${source}, target ${target}`);
-    [graph, changeManager] = GraphInterface.deleteEdge(graph, changeManager, source, target);
-    postMessage({ action: "deleteEdge", source: source, target: target });
+    console.log(`Thread: Deleting edge: source ${sourceId}, target ${targetId}`);
+    [graph, changeManager] = GraphInterface.deleteEdge(graph, changeManager, sourceId, targetId);
+    postMessage({ action: "deleteEdge", source: sourceId, target: targetId });
     waitIfNeeded();
 }
 
