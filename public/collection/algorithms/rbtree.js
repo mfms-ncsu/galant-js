@@ -5,12 +5,31 @@ const RED_COLOR = "pink"
 const HEAVY_BORDER_WIDTH = 7
 
 function accentNode(node) {
-  label(node, ">")
+  // step(() => {
+    label(node, "V")
+  //   const parent = getParent(node)
+  //   if ( parent !== undefined && parent !== null ) {
+  //     unaccent(parent)
+  //   }
+  // })
 }
 
 function unaccent(node) {
   unlabel(node)
-  label(node, node)
+  // for debugging
+  // label(node, node)
+}
+
+/**
+ * Removes accents from all nodes on the path from node to root
+ */
+function unaccentPath(node) {
+  step(() => {
+    while ( node !== undefined && node !== null ) {
+      unaccent(node)
+      node = getParent(node)
+    }
+  })
 }
 
 function isRoot(node) {
@@ -46,7 +65,7 @@ function makeRed(node) {
 }
 
 function isRed(node) {
-    return getColor(node) === RED_COLOR
+  return getColor(node) === RED_COLOR
 }
 
 function makeDoubleBlack(node) {
@@ -81,7 +100,8 @@ function clearDoubleRed(node) {
 function createDummy() {
   const dummy = addNode()
   setAttribute(dummy, "dummy", true);
-  label(dummy, dummy)
+  // for debugging
+  // label(dummy, dummy)
   return dummy;
 }
 
@@ -136,20 +156,16 @@ function disconnectChildren(node) {
  */
 
 /**
- * Makes the child either the left or right child of the parent
- *  removing any existing edges
+ * Connects the parent to two children and ensures they are displayed in the correct order
+ * Caution: this function is to be used only if neither child is already connected to the parent
  * @param parent the parent to be
  * @param left the left child to be
  * @param right the right child to be
  */
 function relink(parent, left, right) {
   display(`||| -> relink, parent = ${parent}, left = ${left}, right = ${right}`)
-  if ( ! edgeExists(parent, left) ) {
-    addEdge(parent, left)
-  }
-  if ( ! edgeExists(parent, right) ) {
-    addEdge(parent, right)
-  }
+  addEdge(parent, left)
+  addEdge(parent, right)
   setChildren(parent, [left, right])
   display("||| <- relink")
 }
@@ -191,7 +207,7 @@ function restructure(child) {
   const grandparent = getParent(parent)
   // this will be the root of the subtree after restructure
   let newSubtreeRoot
-//  step(() => {
+  step(() => {
     display(`restructure, node ${weight(child)}, parent ${weight(parent)}, grandparent ${weight(grandparent)}`)
 
     // If the greatgrandparent exists, need to disconnect before restructuring to avoid confusion
@@ -222,13 +238,14 @@ function restructure(child) {
       newSubtreeRoot = child
     }
     if ( ! grandparentIsRoot ) {
+      addEdge(greatgrandparent, newSubtreeRoot)
       if ( grandparentIsLeftChild ) {
-        relink(greatgrandparent, newSubtreeRoot, rightOfGreatgrandparent)
+        setChildren(greatgrandparent, [newSubtreeRoot, rightOfGreatgrandparent])
       } else {
-        relink(greatgrandparent, leftOfGreatgrandparent, newSubtreeRoot)
+        setChildren(greatgrandparent, [leftOfGreatgrandparent, newSubtreeRoot])
       }
     }
-//  })
+  })
   return newSubtreeRoot
 }
 
@@ -246,7 +263,8 @@ function addNodeRBT(subroot, newWeight) {
   if ( subroot === null || subroot === undefined ) {
     step(() => {
       const newNode = addNode()
-      label(newNode, newNode)
+      // for debugging
+      // label(newNode, newNode)
       display("Empty tree, creating a new root")
       replaceLeaf(newNode, newWeight)
       makeBlack(newNode)
@@ -270,7 +288,7 @@ function addNodeRBT(subroot, newWeight) {
       addNodeRBT(getRight(subroot), newWeight)
     } else {
       // weights are equal
-      display(`A node with weight ${newWeight} already exists`)
+      display(`A node with key ${newWeight} already exists`)
     }
   }
 }
@@ -286,11 +304,12 @@ function resolveRed(node) {
     return
   }
 
-  makeDoubleRed(node)
-
   // Now we have a double red - both subroot and its parent are red
   const uncle = getSibling(parent)
-  display(`Double red at node with weight ${weight(node)}, uncle with weight = ${weight(uncle)}`)
+  step(() => {
+    makeDoubleRed(node)
+    display(`Double red at node with key ${weight(node)}, uncle with key = ${weight(uncle)}`)
+  })
 
   if ( isBlack(uncle) ) {
     // Do a restructure/recolor involving subroot, parent, and grandparent
@@ -351,12 +370,14 @@ function findInOrderPredecessor(currentNode) {
   // While there is a real right child, go right
   if ( getRight(currentNode) && ! getAttribute(getRight(currentNode), "dummy") ) {
     // If a real right child exists, recur
-    unaccent(currentNode)
     currentNode = findInOrderPredecessor(getRight(currentNode));
   }
 
   // If I have no real right child, I am the predecessor
-  display(`Found predecessor at node with weight ${weight(currentNode)}`)
+  step(() => {
+    display(`Found predecessor at node with key ${weight(currentNode)}`)
+    unaccentPath(currentNode)
+  })
   return currentNode
 }
 
@@ -369,28 +390,32 @@ function findInOrderPredecessor(currentNode) {
  *          the returned node will have at most one real child
  */
 function findNodeToRemove(subroot, weightToRemove) {
-  display(`^^^ -> findNodeToRemove(${subroot}, ${weightToRemove})`)
+  step(() => {
+    display(`Looking for node with key ${weightToRemove} to remove`)
+    accentNode(subroot);
+  })
 
   // Couldn't find node we are trying to delete, error
   if ( isDummy(subroot) ) {
-    display(`Could not find node with weight ${weightToRemove}`);
+    display(`Could not find node with key ${weightToRemove}`);
+    unaccentPath(subroot)
     return null;
   }
 
   //Not a leaf, and weight(x) not k, keep searching
-  accentNode(subroot);
   if ( weightToRemove < weight(subroot) ) {
-    unaccent(subroot)
     return findNodeToRemove(getLeft(subroot), weightToRemove);    
   } else if ( weightToRemove > weight(subroot) ) {
-    unaccent(subroot)
     return findNodeToRemove(getRight(subroot), weightToRemove);
   }
 
   // found the node with the given weight
 
   if ( ! hasTwoRealChildren(subroot) ) {
-    display(`^^^ <- findNodeToRemove, at least one dummy child, subroot = ${subroot}`)
+    step(() => {
+      display(`found node to remove, has at least one dummy child, so remove directly`)
+     unaccentPath(subroot)
+    })
     return subroot;
   }
 
@@ -410,7 +435,7 @@ function findNodeToRemove(subroot, weightToRemove) {
     uncolor(subroot)
     color(predecessor, "black");
   })
-  display(`^^^ <- returning predecessor ${predecessor} with weight ${predWeight}`)
+  display(`Found predecessor with key ${predWeight}`)
   return predecessor
 }
 
@@ -430,7 +455,7 @@ function getRedChild(node) {
  * @param weightToRemove weight of the node to be removed
  */
 function removeNodeRBT(root, weightToRemove) {
-  display(`--- -> removeNodeRBT(${root}, ${weightToRemove})`)
+  display(`Removing node with key ${weightToRemove}`)
   // first identify the actual node to remove, which may be the one holding the inorder predecessor
   const nodeToRemove = findNodeToRemove(root, weightToRemove)
   // then remove it and iteratively, bottom-up recolor and/or restructure as needed
@@ -438,32 +463,37 @@ function removeNodeRBT(root, weightToRemove) {
   // the node to remove has at most one real child,
   //  so identify a dummy child and its sibling, which may or may not be a dummy
   const dummyChild = isDummy(getLeft(nodeToRemove)) ? getLeft(nodeToRemove) : getRight(nodeToRemove)
-  const sibling = getSibling(dummyChild)
-  display(`dummy child is ${dummyChild}, sibling is ${sibling}`)
-  // the sibling will replace the node to be removed so
-  //  - make sibling a child of the parent
+  const replacement = getSibling(dummyChild)
+//  display(`dummy child is ${dummyChild}, sibling is ${sibling}`)
+  // the replacement will replace the node to be removed so
+  //  - make replacement a child of the parent
   //  - delete the node to be removed
   // before we do any deletion and reconnection, we need to know
   //  - whether nodeToRemove is a left or right child of its parent
   //  - the color of nodeToRemove, so we know if to reolor or restructure
 
-  // if the node has no real children we can simply remove it and its dummy children
 
+  // if the removed node was the root
+  //   - it's the only non-dummy node, so the tree is now empty 
   if ( isRoot(nodeToRemove) ) {
-    if ( isDummy(sibling) ) {
-      display("root has two dummy children, tree is now empty")
-      deleteNode(nodeToRemove)
-      deleteNode(dummyChild)
-      deleteNode(sibling)
-      display(`--- <- removeNodeRBT`)
+    if ( isDummy(replacement) ) {
+      step(() => {
+        display("root has two dummy children, tree is now empty")
+        deleteNode(nodeToRemove)
+        deleteNode(dummyChild)
+        deleteNode(replacement)
+      })
       return
     }
     // if the root has a real child we make that the new root
-    display(`removing root ${nodeToRemove} with real child ${sibling}`)
-    deleteNode(nodeToRemove)
-    deleteNode(dummyChild)
-    makeBlack(sibling)
-    display(`--- <- removeNodeRBT`)
+    // and color it black
+    // black height property is preserved because there is no other branch
+    step(() => {
+      display(`Replacing root with node that has key ${weight(sibling)}`)
+      deleteNode(nodeToRemove)
+      deleteNode(dummyChild)
+      makeBlack(replacement)
+    })
     return
   }
 
@@ -471,77 +501,115 @@ function removeNodeRBT(root, weightToRemove) {
   // before deleting anything, need to remember the state of affairs before deletion
   const leftChild = getLeft(parent)
   const rightChild = getRight(parent)
-  const removeLeft = nodeToRemove === leftChild
-  const removeRed = isRed(nodeToRemove)
-  display(`parent is ${parent}, removeLeft is ${removeLeft}, removeRed is ${removeRed}`)
-  deleteNode(nodeToRemove)
-  deleteNode(dummyChild)
-  addEdge(parent, sibling)
-  if ( removeLeft ) {
-    setChildren(parent, [sibling, rightChild])
-  } else {
-    setChildren(parent, [leftChild, sibling])
-  }
+  const removedLeft = nodeToRemove === leftChild
+  step(() => {
+    display(`Replacing deleted node with node that has key ${weight(replacement)}`)
+    deleteNode(nodeToRemove)
+    deleteNode(dummyChild)
+    addEdge(parent, replacement)
+    if ( removedLeft ) {
+      setChildren(parent, [replacement, rightChild])
+    } else {
+      setChildren(parent, [leftChild, replacement])
+    }
+  })
 
-  // the easy case is if either the removed node or the sibling replacement was/is red
-  if ( removeRed || isRed(sibling) ) {
-    makeBlack(sibling)
-    display(`--- <- removeNodeRBT, made sibling ${sibling} black`)
+  // one easy case is if the replacememt is red
+  if ( isRed(replacement) ) {
+    step(() => {
+      display(`Easy case: replacement is red, so make it black`)
+      makeBlack(replacement)
+    })
     return
   }
-  remedyDoubleBlack(sibling)
+
+  const sibling = getSibling(replacement)
+
+  // if sibling is a dummy its subtree has black depth 1
+  // this means the replacement subtree will have black depth at least that  
+  if ( isDummy(sibling) ) {
+    display(`replacement is black and its sibling is a dummy, no need to do anything`)
+    return
+  }
+
+  // if sibling is red and has a dummy child its subtree has black depth 1
+  // note: if either child is dummy, the other must be as well
+  if ( isRed(sibling) && isDummy(getLeft(sibling)) ) {
+    display(`replacement is black, its sibling is red and has a dummy child, no need to do anything`)
+    return
+  }
+
+  step(() => {
+    display(`Double black situation, need to fix`)
+    makeDoubleBlack(replacement)
+  })
+  remedyDoubleBlack(replacement)
 }
 
 function remedyDoubleBlack(node) {
-  // The three cases outlined in Goodrich and Tamassia depend on the  sibling of the sibling after the replacement
+  // The three cases outlined in Goodrich and Tamassia depend on the sibling of the replacement after the replacement
   const parent = getParent(node)
   const sibling = getSibling(node)
-  display(`[[]] -> remedyDoubleBlack, node = ${node}, parent = ${parent}, sibling = ${sibling}`)
-  const redChild = getRedChild(sibling)
+  console.log(`[[]] -> remedyDoubleBlack, node = ${node}, parent = ${parent}, sibling = ${sibling}`)
   // Case 1: newSibling is black and has a red child => restructure
+  const redChild = getRedChild(sibling)
   if ( isBlack(sibling) && redChild !== undefined ) {
-    display(`found red child ${redChild}`)
-    clearDoubleBlack(node)
+    step(() => {
+      display(`Found red child of sibling with key ${weight(redChild)}, so restructure`)
+      clearDoubleBlack(node)
+    })
     const newParent = restructure(redChild)
-    makeRed(newParent)
-    makeBlack(getLeft(newParent))
-    makeBlack(getRight(newParent))
-    display(`[[]] <- remedyDoubleBlack, sibling was black with a red child`)
+    step(() => {
+      makeRed(newParent)
+      makeBlack(getLeft(newParent))
+      makeBlack(getRight(newParent))
+    })
+    console.log(`[[]] <- remedyDoubleBlack, sibling was black with a red child`)
     return
   }
 
   // Case 2: sibling is black and both of its children are black
   //  At this point a black sibling cannot have a red child - that was handled above
   if ( isBlack(sibling) ) {
-    clearDoubleBlack(node)
-    makeRed(sibling)
-    if ( isRed(parent) ) {
-      makeBlack(parent)
-      display(`[[]] <- remedyDoubleBlack, both children of sibling are black, parent is red`)
-      return
+    // information for later; parent will turn black later in this case;
+    // the recursive call outside the step should not happen unless parent was black 
+    const parentWasRed = isRed(parent)
+    step(() => {
+      clearDoubleBlack(node)
+      makeRed(sibling)
+      if ( isRed(parent) ) {
+        display(`black sibling and parent is red: make parent black and sibling red`)
+        makeBlack(parent)
+      }
+      else if ( ! isRoot(parent) ) {
+        makeDoubleBlack(parent)
+        display(`black sibling and parent is neither red nor the root, continue looking to remedy double black`)
+      } else {
+        display(`black sibling and parent is root, no need to do anything`)
+      }
+    })
+    if ( ! parentWasRed && ! isRoot(parent) ) {
+      remedyDoubleBlack(parent)
     }
-    if ( isRoot(parent) ) {
-      display(`[[]] <- remedyDoubleBlack, parent is the root`)
-      return
-    }
-    makeDoubleBlack(parent)
-    remedyDoubleBlack(parent)
-    display(`[[]] <- remedied double black, parent was black`)
+    console.log(`[[]] <- remedied double black, parent was black`)
     return
   }
 
   // Case 3: sibling is red
   // Here we need to rotate so that the sibling becomes the new subtree root.
   // It will always be a single rotation, centered on the sibling
-  if ( isLeftChild(sibling) ) {
-    restructure(getLeft(sibling))
-  } else {
-    restructure(getRight(sibling))
-  }
-  makeBlack(sibling)
-  makeRed(parent)
+  display(`Red sibling: rotate sibling upward and continue looking for double black`)
+  step(() => {
+    if ( isLeftChild(sibling) ) {
+      restructure(getLeft(sibling))
+    } else {
+      restructure(getRight(sibling))
+    }
+    makeBlack(sibling)
+    makeRed(parent)
+  })
   remedyDoubleBlack(node)
-  display(`[[]] <- remedied double black, sibling was red`)
+  console.log(`[[]] <- remedied double black, sibling was red`)
 }
 
 /// --- END REMOVAL
@@ -554,16 +622,16 @@ step(() => {
   setDirected(true)
 })
 let running = true;
-display("Red/black tree animation. To add nodes, give positive weights; to remove, negative and to stop 0")
+display("Red/black tree animation. To add nodes, give positive numbers; to remove, negative and to stop 0")
 while ( running ) {
   // the following does not work; something is amiss with prompts and line feeds
   const LF = "\n"
-  const weight = promptNumber("Add (weight > 0), remove (-weight) or stop (0)")
+  const weight = promptNumber("Add (> 0), remove (< 0) or stop (0)")
   if (weight > 0) {
-    display(`Adding node with weight ${weight}`)
+    display(`Adding node with key ${weight}`)
     addNodeRBT(getRoot(), weight);
   } else if (weight < 0) {
-    display(`Deleting node with weight ${-weight}`)
+    display(`Deleting node with key ${-weight}`)
     removeNodeRBT(getRoot(), -weight);  
   } else {
     running = false; 
