@@ -163,11 +163,11 @@ function disconnectChildren(node) {
  * @param right the right child to be
  */
 function relink(parent, left, right) {
-  display(`||| -> relink, parent = ${parent}, left = ${left}, right = ${right}`)
+  console.log(`||| -> relink, parent = ${parent}, left = ${left}, right = ${right}`)
   addEdge(parent, left)
   addEdge(parent, right)
   setChildren(parent, [left, right])
-  display("||| <- relink")
+  console.log("||| <- relink")
 }
 
 /**
@@ -181,7 +181,7 @@ function relink(parent, left, right) {
  *  subtrees[2] and subtrees[3] are children of parents[2]
  */
 function rotate(parents, subtrees) {
-  display(`()() -> rotate, [${parents[0]}, ${parents[1]}, ${parents[2]}], [${subtrees[0]}, ${subtrees[1]}, ${subtrees[2]}, ${subtrees[3]}]`)
+  console.log(`()() -> rotate, [${parents[0]}, ${parents[1]}, ${parents[2]}], [${subtrees[0]}, ${subtrees[1]}, ${subtrees[2]}, ${subtrees[3]}]`)
   // important to remove all edges prior to relinking;
   // otherwise cycles arise or some nodes end up with two parents
   disconnectChildren(parents[0])
@@ -191,7 +191,7 @@ function rotate(parents, subtrees) {
   relink(parents[1], parents[0], parents[2])
   relink(parents[0], subtrees[0], subtrees[1])
   relink(parents[2], subtrees[2], subtrees[3])
-  display("()() <- rotate")
+  console.log("()() <- rotate")
 }
 
 /**
@@ -208,7 +208,7 @@ function restructure(child) {
   // this will be the root of the subtree after restructure
   let newSubtreeRoot
   step(() => {
-    display(`restructure, node ${weight(child)}, parent ${weight(parent)}, grandparent ${weight(grandparent)}`)
+    console.log(`restructure, node ${weight(child)}, parent ${weight(parent)}, grandparent ${weight(grandparent)}`)
 
     // If the greatgrandparent exists, need to disconnect before restructuring to avoid confusion
     // Also need to save important information that will get lost after restructure
