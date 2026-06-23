@@ -555,6 +555,10 @@ function hideWeight(id) {
     setAttribute(id, "weightHidden", true);
 }
 
+function hideLabel(id) {
+    setAttribute(id, "labelHidden", true)
+}
+
 function showWeight(id) {
     setAttribute(id, "weightHidden", false);
 }
@@ -1294,6 +1298,7 @@ export {
     unlabel,
     getLabel,
     hasLabel,
+    hideLabel,
     clearNodeLabels,
     clearEdgeLabels,
     
