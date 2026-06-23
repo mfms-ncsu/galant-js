@@ -34,8 +34,8 @@ enableMapSet();
  * @param {Node[]} nodes Array of nodes to check
  * @returns New node id
  */
-function generateId(nodes) {
-  while ( nodes.has(String(latestIdNumber)) ) latestIdNumber++;
+function generateId(graph) {
+  while ( graph.nodes.has(String(latestIdNumber)) ) latestIdNumber++;
   return String(latestIdNumber);
 }
 
@@ -799,7 +799,7 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
   }
 
   // If the nodeId argument is passed, use that, otherwise generate an id
-  let newNodeId = nodeId || generateId(graph.nodes);
+  let newNodeId = nodeId || generateId(graph);
   let newSequenceNumber = generateSequenceNumber();
   let weightsInside = graph.weightsInside;
 
@@ -1822,6 +1822,7 @@ function undo(graph, changeManager) {
 
 /** Export an object containing the interface */
 const GraphInterface = {
+  generateId,
   generateSequenceNumber,
   resetSequenceNumbers,
   getAdjacentNodes,

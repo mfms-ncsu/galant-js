@@ -13,22 +13,9 @@ import Edge from "states/Graph/GraphElement/Edge";
  * @param {Graph} graph Graph on which to operate
  */
 function isTree(graph) {
-  if ( !(graph.type === "tree") ) {
+  if ( ! (graph.type === "tree") ) {
     throw new Error("Function can only be performed on trees.");
   }
-}
-
-/**
- * Generates the next unique node id from the given list of nodes.
- * Copied over from GraphInterface. This function is copied so the function
- * remains usable without needing to export it from GraphInterface.
- * @param {Node[]} nodes Array of nodes to check
- * @returns New node id
- */
-function generateId(nodes) {
-  let id = 0;
-  while (nodes.has(String(id))) id++;
-  return String(id);
 }
 
 /**
@@ -252,17 +239,11 @@ function getRight(graph, nodeId) {
  * @param {Graph} graph Graph on which to operate
  * @param {ChangeManager} changeManager ChangeManager to use for storing changes
  * @param {string} parentID Id of the parent of the children to be reordered
- * @param {boolean} children A list of the children in the desired order
+ * @param {boolean} children A list of the children in the desired order;
+ *                           the list need not include all children
+ *                           - those not included will appear before the ones that are
  * @returns [newGraph, newChangeManager] The mutated sequence number list and change manager.
  */
-
-/** !!!
- * It should be much easier to create a new Map that maps node id's to sequence numbers.
- * So everything related to sequence numbers will be in GraphInterface
- * While we're at it, the function that creates the next id should create a completely new one
- * !!!
- */
-
 function setChildren(graph, changeManager, parentId, children) {
   // Throw an error if the parent doesn't exist
   if ( ! graph.nodes.has(parentId) ) {
@@ -393,7 +374,7 @@ function addBinaryNode(graph, changeManager, nodeId, attributes, leftChild) {
   isTree(graph);
 
     // If the nodeId argument is passed, use that, otherwise generate an id
-    nodeId = nodeId || generateId(graph.nodes);
+    nodeId = nodeId || GraphInterface.generateId(graph);
   
     const newGraph = produce(graph, (draft) => {
       // Create the node

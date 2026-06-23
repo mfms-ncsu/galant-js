@@ -31,7 +31,18 @@ import GraphInterface from "../GraphInterface/GraphInterface"
   }
 
 /**
- * Returns true if the given attribute in the ege is not undefined, not 
+ * Returns true if the given attribute of the node is not undefined, not 
+ * an empty string, and is not hidden.
+ */
+function nodeHasAttribute(node, attribute) {
+    return node.attributes.has(attribute) &&
+           node.attributes.get(attribute) !== "" &&
+           node.attributes.get(attribute) !== undefined &&
+           ! node.attributes.get(attribute + "Hidden");
+}
+
+/**
+ * Returns true if the given attribute of the edge is not undefined, not 
  * an empty string, and is not hidden.
  */
 function edgeHasAttribute(edge, attribute) {
@@ -63,19 +74,18 @@ function parseEdge(graph, edge) {
     let text = "";
     let addedWeight = false;
 
-    if (edgeHasAttribute(edge, "weight") && graph.showEdgeWeights) {
+    if ( edgeHasAttribute(edge, "weight") && graph.showEdgeWeights ) {
         addedWeight = true;
         if (parseAndRound(edge.attributes.get("weight"))) {
             text += parseAndRound(edge.attributes.get("weight"));
         }
     }
     
-    if (edgeHasAttribute(edge, "label") && graph.showEdgeLabels) {
+    if ( edgeHasAttribute(edge, "label") && graph.showEdgeLabels ) {
         // If we added a weight, separate the label and weight with a newline
-        if (addedWeight) {
+        if ( addedWeight ) {
             text += "\n";
         }
-
         text += edge.attributes.get("label");
     }
 
@@ -83,10 +93,9 @@ function parseEdge(graph, edge) {
 
     // If either the source or target nodes are hidden, then this edge should 
     // also be hidden
-    if (GraphInterface.getNodeAttribute(graph, edge.source, "hidden") || GraphInterface.getNodeAttribute(graph, edge.target, "hidden")) {
+    if ( GraphInterface.getNodeAttribute(graph, edge.source, "hidden") || GraphInterface.getNodeAttribute(graph, edge.target, "hidden") ) {
         element.data["hidden"] = true;
     }
-
     return element;
 }
 
@@ -110,20 +119,44 @@ function parseNode(graph, node) {
 
     // Add attributes
     node.attributes.forEach((value, name) => {
-        if ( name === "weight" && parseAndRound(value) ) {
-            element.data[name] = parseAndRound(value);
-        }
-        else {
-            element.data[name] = value;
-        }
+        element.data[name] = value;
     });
+
+    // Add the edge label to display. Since we put both the label and weight 
+    // in the same textbox, we need to put them together
+    let text = "";
+    let addedWeight = false;
+    if ( nodeHasAttribute(node, "weight") && graph.showNodeWeights ) {
+        addedWeight = true;
+        if (parseAndRound(node.attributes.get("weight"))) {
+            text += parseAndRound(node.attributes.get("weight"));
+        }
+    }
+    
+    if ( nodeHasAttribute(node, "label") && graph.showNodeLabels ) {
+        // If we added a weight, separate the label and weight with a newline
+        if ( addedWeight ) {
+            text += "\n";
+        }
+        text += node.attributes.get("label");
+    }
+
+    element.data["textToDisplay"] = text;
+    // node.attributes.forEach((value, name) => {
+    //     console.log(`CytoscapeInterface: parsing node attribute, name = ${name}, value = ${value}`)
+    //     if ( name === "weight" && graph.showNodeWeights && parseAndRound(value) ) {
+    //         element.data[name] = parseAndRound(value);
+    //     }
+    //     else {
+    //         element.data[name] = value;
+    //     }
+    // });
 
     console.log("parsing node attributes, weightsInside =", graph.weightsInside)
     if ( graph.weightsInside ) {
         element.data["weightInNode"] = true
         element.data["weightHidden"] = true
     }
-
     return element;
 }
 

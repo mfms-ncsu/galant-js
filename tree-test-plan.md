@@ -5,6 +5,15 @@ And, for each algorithm, it is important to check whether undoing and redoing se
 
 ## Arbitrary trees
 
+### Run `src/testing/sequencing.js`
+- should create four nodes: 0, 1, 2, 3
+- nodes 1, 2, 3 will become children of 0 in that order
+- the order is changed to 2, 1, 3
+- the order is changed to 3, 1, 2
+- the order is changed to 3, 2, 1 (`setChildren` works with a subset of the children)
+- an error occurs: no edge from 1 to 0
+- it is still possible to step back and forth
+
 ## Binary search trees
 
 ### insertion

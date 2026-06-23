@@ -320,7 +320,7 @@ function addNode(graph, x, y, nodeId, attributes) {
     }
 
     // If the nodeId argument is passed, use that, otherwise generate an id
-    nodeId = nodeId || generateId(graph.nodes);
+    nodeId = nodeId || GraphInterface.generateId(graph);
 
     // Create the node
     // Two special cases:
@@ -345,13 +345,6 @@ function addNode(graph, x, y, nodeId, attributes) {
     }
 
     return node;
-
-    // Get the smallest unused node id for automatic assigning
-    function generateId(nodes) {
-        let id = 0;
-        while (nodes.has(String(id))) id++;
-        return String(id);
-    }
 }
 
 /**
