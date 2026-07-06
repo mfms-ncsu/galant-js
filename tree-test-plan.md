@@ -14,6 +14,10 @@ And, for each algorithm, it is important to check whether undoing and redoing se
 - an error occurs: no edge from 1 to 0
 - it is still possible to step back and forth
 
+### Preorder and postorder
+
+Run `preorder_traversal.js` and `postorder_traversal.js` on any of the `ub?.tree` files in `tree-tests`
+
 ## Binary search trees
 
 ### insertion

@@ -36,7 +36,7 @@ function preOrder(node) {
   });
 
   // Visit all children
-  for (const x of outgoingNodes(node)) {
+  for ( const x of getChildren(node) ) {
     preOrder(x);
   }
 }
