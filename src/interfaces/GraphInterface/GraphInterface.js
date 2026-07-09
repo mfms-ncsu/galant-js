@@ -799,9 +799,9 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
   }
 
   // If the nodeId argument is passed, use that, otherwise generate an id
-  let newNodeId = nodeId || generateId(graph);
-  let newSequenceNumber = generateSequenceNumber();
-  let weightsInside = graph.weightsInside;
+  const newNodeId = nodeId || generateId(graph);
+  const newSequenceNumber = generateSequenceNumber();
+  const weightsInside = graph.weightsInside;
 
   const newGraph = produce(graph, (draft) => {
     // Create the node
@@ -812,7 +812,7 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
     console.log(`added node ${newNodeId}, seqnum = ${newSequenceNumber}`)
 
     // Set the attributes
-    for (let name in attributes) {
+    for ( const name in attributes ) {
       node.attributes.set(name, attributes[name]);
     }
   });
