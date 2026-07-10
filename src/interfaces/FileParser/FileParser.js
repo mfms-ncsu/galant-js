@@ -129,8 +129,8 @@ function isLayeredGraph(name, file) {
  * @todo Allow for Infinity, NaN, and other special numeric values
  */
 function isNumeric(str) {
-    if (typeof str !== "string") return false;
-    return !Number.isNaN(Number(str)) && !Number.isNaN(parseFloat(str));
+    if ( typeof str !== "string" ) return false;
+    return ! Number.isNaN(Number(str)) && ! Number.isNaN(parseFloat(str));
 }
 
 /**
@@ -292,11 +292,12 @@ function parseComment(graph, line) {
  * @param {Array} tokens Values to parse
  * @todo instead of a list of tokens, start with the line string and parse attributes separately,
  *    checking for errors along the way
+ * @todo this no longer catches missing coordinates
  */
 function parseNode(graph, tokens) {
     // Get the necessary tokens to create a node
-    let id = tokens[1];
-    let x = parseFloat(tokens[2]), y = parseFloat(tokens[3]);
+    const id = tokens[1];
+    const x = parseFloat(tokens[2]), y = parseFloat(tokens[3]);
     
     // Get attributes from remaining tokens
     const attributes = parseAttributes(tokens, 4);
@@ -316,7 +317,7 @@ function parseNode(graph, tokens) {
 function addNode(graph, x, y, nodeId, attributes) {
     // Throw an error if the id is a duplicate
     if (nodeId && graph.nodes.has(nodeId)) {
-        throw new Error("Cannot add node with duplicate ID");
+        throw new Error(`Cannot add node with duplicate ID ${nodeId}`);
     }
 
     // If the nodeId argument is passed, use that, otherwise generate an id
@@ -335,6 +336,10 @@ function addNode(graph, x, y, nodeId, attributes) {
         node = new Node(nodeId, newSequenceNumber, undefined, undefined);
     }
     else {
+        // @todo need to catch this sooner, when x is still a string
+        if ( x === NaN ) {
+            throw new Error(`File read error: expected x coordinate, got ${x}`)
+        }
         node = new Node(nodeId, newSequenceNumber, x, y);
     }
     graph.nodes.set(nodeId, node);
@@ -369,14 +374,15 @@ function parseEdge(graph, tokens) {
  * @param {String} source Source node
  * @param {String} target Target node
  * @param {Object} attributes Edge attributes
+ * @todo catch errors earlier, when parsing the edge
  */
 function addEdge(graph, source, target, attributes) {
     // Error checking
-    if (!graph.nodes.has(source) && !graph.nodes.has(target))
+    if ( ! graph.nodes.has(source) && ! graph.nodes.has(target) )
         throw new Error(`Cannot create edge because neither the source (${source}) nor the target (${target}) node exist in the graph`);
-    if (!graph.nodes.has(source))
+    if ( ! graph.nodes.has(source))
         throw new Error(`Cannot create edge because the source node (${source}) does not exist in the graph`);
-    if (!graph.nodes.has(target))
+    if ( ! graph.nodes.has(target) )
         throw new Error(`Cannot create edge because the target node (${target}) does not exist in the graph`);
 
     // Create the edge object

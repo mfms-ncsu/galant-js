@@ -25,6 +25,7 @@ step(() => { // Initialize with start node
 
     clearEdgeHighlights();
     clearEdgeColors();
+    clearEdgeWeights();
 
     const start = promptNode("Enter start node:");
     queueNode(start, 0);

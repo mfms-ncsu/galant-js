@@ -123,4 +123,4 @@ while ( PQsize() > 0 ) {
         }
     }
 }
-display("Done: MST found for component reachable from start node")
+display(`Done: MST with weight ${total_weight} found for component reachable from start node`)

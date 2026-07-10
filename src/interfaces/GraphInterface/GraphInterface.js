@@ -795,7 +795,7 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
   // Throw an error if the id is a duplicate
   verifyGraphChangeManager(graph, changeManager);
   if (nodeId && graph.nodes.has(nodeId)) {
-    throw new Error("Cannot add node with duplicate ID");
+    throw new Error(`Cannot add node with duplicate ID ${nodeId}`);
   }
 
   // If the nodeId argument is passed, use that, otherwise generate an id
