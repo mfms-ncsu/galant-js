@@ -119,7 +119,11 @@ function parseNode(graph, node) {
 
     // Add attributes
     node.attributes.forEach((value, name) => {
-        element.data[name] = value;
+        if ( name === "weight" ) {
+            element.data[name] = parseAndRound(value);
+        } else {
+            element.data[name] = value;
+        }
     });
 
     // !!! labels and weights for nodes are handled in Cytoscape.jsx
