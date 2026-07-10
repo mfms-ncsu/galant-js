@@ -5,7 +5,7 @@ TODO:
 - [later] see if it's possible to get headers when content in a json file === null; have to be careful about <ul></ul> pairs
 - test using all platform/browser combinations
 - merge dev into main and get rid of all console logs
-- publish version 2.2.1
+- publish version 3.0
 
 ## Test for speed
 
@@ -21,12 +21,14 @@ TODO:
 - get rid of console.log statements (should devise a script for this)
 - push changes, create version on github.com site
 - add version history notes to the comments on the version
-- deploy the version on the galant.csc.ncsu.edu site
+- deploy the version on the galant.csc.ncsu.edu site; best if you follow the commands in `deploy.sh` by hand
 - make changes in user documentation and bugs document as needed
 
 ## Testing overview
 
-These tests should be carried out with the following platform/brower combinations. You may have to reload the main page or even clear browser history (Opera, in particular, forces you to do this). For most tests the Mac/Chrome combination is sufficient. All combinations should be tested for those marked with (!). These should be tested with keyboard shortcuts. Files marked with + are in the `src/testing` directory.
+These tests should be carried out with the following platform/brower combinations. You may have to reload the main page or even clear browser history (Opera, in particular, forces you to do this). For most tests the Mac/Chrome combination is sufficient.
+All combinations should be tested for those marked with (!). These should be tested with keyboard shortcuts.
+Files marked with (+) are in the `src/testing` directory.
 
 Tests should be done in the dev branch with console.log's added as needed. The logs should be removed in the main branch before deployment.
 
@@ -50,7 +52,7 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 
 1. Upload a graph (e.g., (+) triangle).
 2. Make a few minor changes in the `Edit` window: add a node and edge, change a position, color a node/edge, change shape, add a weight and label
-2'. Make some changes in the  main window.
+2'. Make some changes in the main window.
 3. Download to a different name/location, close the window, focus on a different graph, and upload again
 
 ### Uploads with different node and edge attributes/variations; graphs are in src/testing

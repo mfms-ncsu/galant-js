@@ -2,10 +2,11 @@
 
 What follows is a sequence of tests for trees and related algorithms. They should be run using Chrome on all three platforms.
 And, for each algorithm, it is important to check whether undoing and redoing several steps works correctly.
+The tests marked with (!) should be carried out with all platform/browswer combinations - see system-test-plan.md
 
 ## Arbitrary trees
 
-### Run `src/testing/sequencing.js`
+### (!) Run `src/testing/sequencing.js`
 - should create four nodes: 0, 1, 2, 3
 - nodes 1, 2, 3 will become children of 0 in that order
 - the order is changed to 2, 1, 3

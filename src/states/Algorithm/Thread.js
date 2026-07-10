@@ -1328,8 +1328,5 @@ export {
     isLeaf, 
     getLeft,
     getRight,
-    addLeft,
-    addRight,
-    makeLeftChild,
-    makeRightChild,
+    setChildren
 };
