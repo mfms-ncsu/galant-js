@@ -29,7 +29,7 @@ function postOrder(node) {
   mark(node);
 
   // Visit all children
-  for (const x of outgoingNodes(node)) {
+  for ( const x of getChildren(node) ) {
     postOrder(x);
   }
 

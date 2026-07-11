@@ -6,6 +6,7 @@ import GraphElement from "./GraphElement.js";
  * 
  * @author Henry Morris
  */
+
 export default class Node extends GraphElement {
     /**
      * Constructs a new Node with a unique id and an xy-position.
@@ -16,7 +17,7 @@ export default class Node extends GraphElement {
      * @param {Number} layer Graph layer (layered only)
      * @param {Number} index Layer index (layered only)
      */
-    constructor(nodeId, x, y, layer, index) {
+    constructor(nodeId, sequenceNumber, x, y, layer, index) {
         // Call the super constructor with the map of attributes
         super(new Map([
             ["backgroundOpacity", undefined],
@@ -27,10 +28,23 @@ export default class Node extends GraphElement {
             ["marked", false],
             ["shape", undefined],
             ["size", undefined],
-            ["weight", undefined]
+            ["weight", undefined],
         ]));
-        // Set the id
-        this.id = nodeId;
+        // Set the id and give the node a new sequence number
+        this.id = nodeId
+/**
+ * Sequence numbers are used to determine the order of appearance of nodes
+ * when they are displayed, particularly important for rooted trees
+ * when elkjs mode is used.
+ * They are modified when the left to right order of children of a node
+ * needs to change during algorithm execution.
+ * The current sequence number, as defined in GraphInterface.js,
+ *  is the next one to be assigned; it is incremented each time one is assigned.
+ * Each node has a sequence number in addtion to an id.
+ * Sequence numbers are reassigned when the children of a node need to be reordered
+ *   - see setChildren in TreeInterface.js
+ */
+        this.sequenceNumber = sequenceNumber
 
         // Create an object containing the xy-position
         this.position = {

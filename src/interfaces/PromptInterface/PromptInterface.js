@@ -11,7 +11,6 @@ function dequeuePrompt(promptQueue) {
 }
 
 function queuePrompt(promptQueue, data, callback) {
-    console.log("Queueing prompt with data: ", data);
     return [...promptQueue, {data, callback}];
 }
 

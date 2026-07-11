@@ -4,6 +4,8 @@ import produce from "immer";
 import ChangeManager from "states/ChangeManager/ChangeManager";
 import ChangeObject from "states/ChangeManager/ChangeObject";
 import Node from "states/Graph/GraphElement/Node";
+import Edge from "states/Graph/GraphElement/Edge";
+// import { is } from "immer/dist/internal.js";
 
 /**
  * Helper function to handle what to do when a graph
@@ -11,22 +13,9 @@ import Node from "states/Graph/GraphElement/Node";
  * @param {Graph} graph Graph on which to operate
  */
 function isTree(graph) {
-  if ( !(graph.type === "tree") ) {
+  if ( ! (graph.type === "tree") ) {
     throw new Error("Function can only be performed on trees.");
   }
-}
-
-/**
- * Generates the next unique node id from the given list of nodes.
- * Copied over from GraphInterface. This function is copied so the function
- * remains usable without needing to export it from GraphInterface.
- * @param {Node[]} nodes Array of nodes to check
- * @returns New node id
- */
-function generateId(nodes) {
-  let id = 0;
-  while (nodes.has(String(id))) id++;
-  return String(id);
 }
 
 /**
@@ -65,60 +54,6 @@ function recordChange(changeManager, change) {
 }
 
 /**
- * adds a node with the given id and attributes as either a left child or a right child
- * this is called in a context where the parent node is already known and the edges are added outside this function
- * see @addLeft and @addRight for usage
- * the primary purpose is to ensure that a left child is added to the front of the nodes map and a right child is added to the end
- * so that the nodes will be displayed in the correct order
- * @param {Graph} graph Graph on which to operate
- * @param {ChangeManager} changeManager ChangeManager to use for storing changes
- * @param {string} nodeId Id of the node to add, or undefined to generate a new id
- * @param {Object} attributes Attributes to set on the node
- * @param {boolean} leftChild If true, identifies the node as a left child, otherwise as a right child
- * @returns [newGraph, newChangeManager, nodeId] The mutated graph, change manager, and the id of the new node
- */
-function addBinaryNode(graph, changeManager, nodeId, attributes, leftChild) {
-  isTree(graph);
-
-    // If the nodeId argument is passed, use that, otherwise generate an id
-    nodeId = nodeId || generateId(graph.nodes);
-  
-    const newGraph = produce(graph, (draft) => {
-      // Create the node
-      let node = new Node(nodeId, undefined, undefined);
-
-      // if it's a left child, add it to the front of the nodes map
-      if ( leftChild ) {
-        draft.nodes = new Map([[nodeId, node], ...draft.nodes.entries()]);
-      }
-      // otherwise (right child) simply add it: it will appear at the rear
-      else {
-        draft.nodes.set(nodeId, node);
-      }
-      // Set the attributes
-      for (let name in attributes) {
-        node.attributes.set(name, attributes[name]);
-      }
-    });
-  
-    // Add the change object to the changeManager
-    const newChangeManager = recordChange(changeManager, [
-      new ChangeObject("addNode", null, {
-        id: nodeId,
-        position: {
-          x: undefined,
-          y: undefined,
-        },
-        attributes: attributes
-      })
-    ]);
-  
-    // Return mutated graph and change manager to trigger re-render
-    // Add the node id as the third return value
-    return [newGraph, newChangeManager, nodeId];
-}
-
-/**
  * Gets parent of target node
  * @param {Graph} graph Graph on which to operate
  * @param {String} target Node to check 
@@ -127,11 +62,9 @@ function addBinaryNode(graph, changeManager, nodeId, attributes, leftChild) {
 function getParent(graph, target) {
   isTree(graph);
 
-  if ( !graph.nodes.has(target) ) {
+  if ( ! graph.nodes.has(target) ) {
     throw new Error(
-      "Cannot get parent of node " +
-        target +
-        " because no node with this id exists in the graph"
+      `Cannot get parent of node ${target} because no node with this id exists in the graph`
     );
   }
 
@@ -144,7 +77,7 @@ function getParent(graph, target) {
   }
   if ( incoming.length > 1 ) {
     throw new Error(
-      "Node " + target + " has multiple parents: " + incoming.join(", ")
+      `Node ${target} (weight ${GraphInterface.getNodeAttribute(graph, target, "weight")}) has multiple parents: ${incoming.join(", ")}`
     );
   }
   return incoming[0];
@@ -154,13 +87,21 @@ function getParent(graph, target) {
 /**
  * Gets children of target node
  * @param {Graph} graph Graph on which to operate
- * @param {String} target Node to check 
- * @returns Array of children nodes
+ * @param {String} source Node whose children to return
+ * @returns Array of children nodes sorted by sequence number
  */
 function getChildren(graph, source) {
   isTree(graph);
-
-  return GraphInterface.getOutgoingNodes(graph, source);
+  if ( ! graph.nodes.has(source) ) {
+    throw new Error(
+      `Cannot get children of node ${source} because no node with this id exists in the graph`
+    );
+  }
+  console.log(`-> getChildren, source = ${source}`)
+  let children = GraphInterface.getOutgoingNodes(graph, source)
+  children = children.sort((a, b) => graph.nodes.get(a).sequenceNumber - graph.nodes.get(b).sequenceNumber)
+  console.log("<- getChildren, children =", children)
+  return children;
 }
 
 /**
@@ -225,7 +166,7 @@ function isLeaf(graph, nodeId) {
   isTree(graph);
 
   // Throw an error if the node doesn't exist
-  if ( !graph.nodes.has(nodeId) ) {
+  if ( ! graph.nodes.has(nodeId) ) {
     throw new Error(
       "Cannot check node " +
         nodeId +
@@ -251,11 +192,9 @@ function getLeft(graph, nodeId) {
   isTree(graph);
 
   // Throw an error if the node doesn't exist
-  if ( !graph.nodes.has(nodeId) ) {
+  if ( ! graph.nodes.has(nodeId) ) {
     throw new Error(
-      "Cannot get left child of node " +
-        nodeId +
-        " because no node with this id exists in the graph"
+      `Cannot get left child of node ${nodeId}) because no node with this id exists in the graph`
     );
   }
 
@@ -278,7 +217,7 @@ function getRight(graph, nodeId) {
   isTree(graph);
 
   // Throw an error if the node doesn't exist
-  if ( !graph.nodes.has(nodeId) ) {
+  if ( ! graph.nodes.has(nodeId) ) {
     throw new Error(
       "Cannot get right child of node " +
         nodeId +
@@ -296,183 +235,94 @@ function getRight(graph, nodeId) {
 }
 
 /**
- * Sets the left child of the node
+ * (Re)orders the list of children of a node
  * @param {Graph} graph Graph on which to operate
- * @param {string} nodeId Node to check
- * @param {string} leftChildId Left child node to set
- * Assumes that the edge from nodeId to leftChildId is not already present
- * and that both the nodeId and leftChildId exist in the graph
- * @todo Add ChangeManager functionality -- see addBinaryNode for reference
+ * @param {ChangeManager} changeManager ChangeManager to use for storing changes
+ * @param {string} parentID Id of the parent of the children to be reordered
+ * @param {boolean} children A list of the children in the desired order;
+ *                           the list need not include all children
+ *                           - those not included will appear before the ones that are
+ * @returns [newGraph, newChangeManager] The mutated sequence number list and change manager.
  */
-function setLeft(graph, nodeId, leftChildId) {
-  isTree(graph);
-
-  // Throw an error if the node doesn't exist
-  if ( ! graph.nodes.has(nodeId) ) {
+function setChildren(graph, changeManager, parentId, children) {
+  // Throw an error if the parent doesn't exist
+  if ( ! graph.nodes.has(parentId) ) {
     throw new Error(
-      "Cannot set left child of node " +
-        nodeId +
-        " because no node with this id exists in the graph"
+      `setChildren - no parent with id ${parentId} exists in the graph`
     );
   }
 
-  // Throw an error if the left child doesn't exist
-  if ( ! graph.nodes.has(leftChildId) ) {
-    throw new Error(
-      "Cannot set " + leftChildId +
-        " as left childbecause no node with this id exists in the graph"
-    );
-  }
-
-  // add an edge from nodeId to leftChildId
-  GraphInterface.addEdge(graph, null, nodeId, leftChildId);
-
-  // put the left child at the front of the nodes map
-  let leftChild = graph.nodes.get(leftChildId);
-  graph.nodes.delete(leftChildId);
-  graph.nodes = new Map([[leftChildId, leftChild], ...graph.nodes.entries()]);
-}
-
-/**
- * Sets the right child of the node
- * @param {Graph} graph Graph on which to operate
- * @param {string} nodeId Node to check
- * @param {string} rightChildId Right child node to set
- * Assumes that the edge from nodeId to rightChildId is not already present
- * and that both the nodeId and rightChildId exist in the graph
- * @todo Add ChangeManager functionality -- see addBinaryNode for reference
- */
-function setRight(graph, nodeId, rightChildId) {
-  isTree(graph);
-
-  // Throw an error if the node doesn't exist
-  if ( !graph.nodes.has(nodeId) ) {
-    throw new Error(
-      "Cannot set right child of node " +
-        nodeId +
-        " because no node with this id exists in the graph"
-    );
-  }
-
-  // Throw an error if the left child doesn't exist
-  if ( ! graph.nodes.has(rightChildId) ) {
-    throw new Error(
-      "Cannot set " + rightChildId +
-        " as right childbecause no node with this id exists in the graph"
-    );
-  }
-
-  // add an edge from nodeId to rightChildId
-  GraphInterface.addEdge(graph, null, nodeId, rightChildId);
-
-  // put the right child at the end of the nodes map
-  let rightChild = graph.nodes.get(rightChildId);
-  graph.nodes.delete(rightChildId);
-  graph.nodes.set(rightChildId, rightChild);
-}
-
-/**
- * Creates left child
- * @param {Graph} graph Graph on which to operate
- * @param {Graph} {ChangeManager} changeManager ChangeManager to use for storing changes
- * @param {string} node Source node
- * @param {float} childWeight Weight of the child node
- */
-function addLeft(graph, changeManager, node, childWeight) {
-  isTree(graph);
-  let leftChild, dummy;
-
-  // Throw an error if the node doesn't exist
-  if ( ! graph.nodes.has(node) ) {
-    throw new Error(
-      "Cannot create left child of node " +
-        node +
-        " because no node with this id exists in the graph"
-    );
-  }
-
-  // Case 1: Node has no children
-  if ( isLeaf(graph, node) ) {
-    [graph, changeManager, leftChild] = addBinaryNode(graph, changeManager, undefined, undefined, true);
-    [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, leftChild, "weight", childWeight);
-    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, leftChild);
-
-    [graph, changeManager, dummy] = addBinaryNode(graph, changeManager, undefined, undefined);
-    [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, dummy, "dummy", true);
-    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, dummy);
-
-    return [graph, changeManager, leftChild];
-  }
-  // Case 2: Node has a dummy left child
-  else {
-    let children = getChildren(graph, node);
-
-    if ( GraphInterface.getNodeAttribute(graph, children[0], "dummy") ) {
-      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[0], "dummy", false);
-      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[0], "weight", childWeight);
-
-      return [graph, changeManager, children[0]]
+  // Throw an error if any child does not exist
+  children.forEach( (childId) => {
+    if ( ! graph.nodes.has(childId) ) {
+      throw new Error(
+        `setChildren - no child with id ${childId} exists in the graph, parent is ${parentId} (weight ${GraphInterface.getNodeAttribute(graph,parentId, "weight")})`
+      )
     }
-  }
+  })
 
-  // Throws error if node already has a left child
-  throw new Error(
-    "Cannot create left child of node " +
-      node +
-      " because left child already exists"
-  );
-}
-
-/**
- * Creates right child
- * @param {Graph} graph Graph on which to operate
- * @param {Graph} {ChangeManager} changeManager ChangeManager to use for storing changes
- * @param {string} node Source node
- * @param {float} childWeight Weight of the child node
- */
-function addRight(graph, changeManager, node, childWeight) {
-  isTree(graph);
-  let rightChild, dummy;
-
-  // Throw an error if the node doesn't exist
-  if ( !graph.nodes.has(node) ) {
-    throw new Error(
-      "Cannot create right child of node " +
-        node +
-        " because no node with this id exists in the graph"
-    );
-  }
-
-  // Case 1: Node has no children
-  if ( isLeaf(graph, node) ) {
-    [graph, changeManager, dummy] = addBinaryNode(graph, changeManager, undefined, undefined);
-    [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, dummy, "dummy", true);
-    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, dummy);
-
-    [graph, changeManager, rightChild] = addBinaryNode(graph, changeManager, undefined, undefined, false);
-    [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, rightChild, "weight", childWeight);
-    [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, node, rightChild);
-
-    return [graph, changeManager, rightChild];
-  }
-  // Case 2: Node has a dummy right child
-  else {
-    let children = getChildren(graph, node);
-
-    if ( GraphInterface.getNodeAttribute(graph, children[1], "dummy") ) {
-      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[1], "dummy", false);
-      [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, children[1], "weight", childWeight);
-
-      return [graph, changeManager, children[1]]
+  // Throw an error if any child does not have the right parent,
+  // i.e., there is no edge from the parent to the child
+  children.forEach( (childId) => {
+    if ( GraphInterface.getEdge(graph, parentId, childId) === undefined ) {
+      throw new Error(
+        `setChildren - no edge from ${parentId} to ${childId} exists in the graph.`
+      )
     }
-  }
+  })
 
-  // Throws error if node already has a right child
-  throw new Error(
-    "Cannot create right child of node " +
-      node +
-      " because right child already exists"
-  );
+  console.log(`-> setChildren: parent ${parentId}, children ${children}`);
+
+  // save the old sequence numbers in a map
+  let oldSequenceNumbers = new Map()
+  children.forEach((child) => {
+    const childNode = graph.nodes.get(child)
+    oldSequenceNumbers.set(child, childNode.sequenceNumber)
+  })
+
+  // create a list of pairs, where each pair is of the form [id, sequence#]
+  // the sequencs #'s are monotonically increasing
+  const sequenceNumberPairs = children.map((child) => [child, GraphInterface.generateSequenceNumber()])
+  console.log("newPairs", sequenceNumberPairs)
+  console.log("oldSequenceNumbers before", oldSequenceNumbers)
+
+  // change the sequence numbers of the affected nodes
+  const newGraph = produce(graph, (draft) => {
+    sequenceNumberPairs.forEach((pair) => {
+      draft.nodes.get(pair[0]).sequenceNumber = pair[1]
+    })
+  });
+
+  console.log("oldSequenceNumbers after", oldSequenceNumbers)
+  // create a change object for each changed sequence number
+  // and collect these in a list as an object in the change manager
+  let changes = []
+  sequenceNumberPairs.forEach((pair) => {
+    console.log("oldSequenceNumbers in loop", oldSequenceNumbers)
+    const nodeId = pair[0]
+    console.log(`pair[0] = ${pair[0]}`)
+    const oldSequenceNumber = oldSequenceNumbers.get(pair[0])
+    const newSequenceNumber = pair[1]
+    console.log(`<+> seq#, id = ${nodeId} old = ${oldSequenceNumber}, new = ${newSequenceNumber}`)
+    changes.push(new ChangeObject(
+      "changeSequenceNumber",
+      {
+        id: nodeId,
+        number: oldSequenceNumber
+      },
+      {
+        id: nodeId,
+        number: newSequenceNumber
+      }
+    ))
+  })
+
+  const newChangeManager = recordChange(changeManager, changes)
+  console.log("<- setChildren, chidren:", getChildren(newGraph, parentId), "old:", oldSequenceNumbers, "new:", sequenceNumberPairs);
+
+  // Return mutated graph and change manager to trigger re-render
+  // Add the node id as the third return value
+  return [newGraph, newChangeManager];
 }
 
 /** Export an object containing the interface */
@@ -484,7 +334,6 @@ const TreeInterface = {
   isLeaf,
   getLeft,
   getRight,
-  addLeft,
-  addRight
+  setChildren
 };
 export default TreeInterface; 

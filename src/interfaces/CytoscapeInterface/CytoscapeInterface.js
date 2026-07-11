@@ -17,13 +17,22 @@ import GraphInterface from "../GraphInterface/GraphInterface"
  function parseAndRound(input) {
     const num = Number(input);
     
-    if (isNaN(num)) {
+    if ( isNaN(num) ) {
         return null;
     }
-  
+
+    // @todo use the symbol for infinity
+    if ( num === Infinity ) {
+        return 'Inf'
+    }
+
+    if ( num === -Infinity ) {
+        return '-Inf'
+    }
+
     // Check if it needs to be rounded
     const parts = num.toString().split(".");
-    if (parts.length === 2 && parts[1].length > 2) {
+    if ( parts.length === 2 && parts[1].length > 2 ) {
       return Math.round(num * 100) / 100;
     }
   
@@ -31,14 +40,25 @@ import GraphInterface from "../GraphInterface/GraphInterface"
   }
 
 /**
- * Returns true if the given attribute in the ege is not undefined, not 
+ * Returns true if the given attribute of the node is not undefined, not 
+ * an empty string, and is not hidden.
+ */
+function nodeHasAttribute(node, attribute) {
+    return node.attributes.has(attribute) &&
+           node.attributes.get(attribute) !== "" &&
+           node.attributes.get(attribute) !== undefined &&
+           ! node.attributes.get(attribute + "Hidden");
+}
+
+/**
+ * Returns true if the given attribute of the edge is not undefined, not 
  * an empty string, and is not hidden.
  */
 function edgeHasAttribute(edge, attribute) {
     return edge.attributes.has(attribute) &&
            edge.attributes.get(attribute) !== "" &&
            edge.attributes.get(attribute) !== undefined &&
-           !edge.attributes.get(attribute + "Hidden");
+           ! edge.attributes.get(attribute + "Hidden");
 }
 
 /**
@@ -63,19 +83,18 @@ function parseEdge(graph, edge) {
     let text = "";
     let addedWeight = false;
 
-    if (edgeHasAttribute(edge, "weight") && graph.showEdgeWeights) {
+    if ( edgeHasAttribute(edge, "weight") && graph.showEdgeWeights ) {
         addedWeight = true;
-        if (parseAndRound(edge.attributes.get("weight"))) {
+        if ( parseAndRound(edge.attributes.get("weight")) ) {
             text += parseAndRound(edge.attributes.get("weight"));
         }
     }
     
-    if (edgeHasAttribute(edge, "label") && graph.showEdgeLabels) {
+    if ( edgeHasAttribute(edge, "label") && graph.showEdgeLabels ) {
         // If we added a weight, separate the label and weight with a newline
-        if (addedWeight) {
+        if ( addedWeight ) {
             text += "\n";
         }
-
         text += edge.attributes.get("label");
     }
 
@@ -83,10 +102,9 @@ function parseEdge(graph, edge) {
 
     // If either the source or target nodes are hidden, then this edge should 
     // also be hidden
-    if (GraphInterface.getNodeAttribute(graph, edge.source, "hidden") || GraphInterface.getNodeAttribute(graph, edge.target, "hidden")) {
+    if ( GraphInterface.getNodeAttribute(graph, edge.source, "hidden") || GraphInterface.getNodeAttribute(graph, edge.target, "hidden") ) {
         element.data["hidden"] = true;
     }
-
     return element;
 }
 
@@ -96,7 +114,6 @@ function parseEdge(graph, edge) {
  * @returns Cytoscape node element
  */
 function parseNode(graph, node) {
-    //TODO: round node weight
     let scalar = graph.scalar;
 
     // Identifying data
@@ -111,19 +128,37 @@ function parseNode(graph, node) {
 
     // Add attributes
     node.attributes.forEach((value, name) => {
-
-        if (name === "weight" && parseAndRound(value)) {
-            element.data[name] = parseAndRound(value);
-        }
-        else {
+        if ( name === "weight" ) {
+            const numericalValue = parseAndRound(value)
+            if ( numericalValue ) {
+                element.data[name] = numericalValue;
+            }
+        } else {
             element.data[name] = value;
         }
     });
 
+    // !!! labels and weights for nodes are handled in Cytoscape.jsx
+    // They require an html element !!!
+
+    console.log("parsing node attributes, weightsInside =", graph.weightsInside)
+    if ( graph.weightsInside ) {
+        element.data["weightInNode"] = true
+        element.data["weightHidden"] = true
+    }
+
+    // Need the following because Cytoscape.jsx does not handle
+    //  graph.showNodeLabels and graph.showNodeWeights correctly
+    if ( ! graph.showNodeLabels ) {
+        element.data["labelHidden"] = true
+    }
+
+    if ( ! graph.showNodeWeights ) {
+        element.data["weightHidden"] = true
+    }
+
     return element;
 }
-
-
 
 /**
  ***********
@@ -136,22 +171,28 @@ function parseNode(graph, node) {
  * @returns Array of cytoscape elements to display
  */
 function getElements(graph) {
-    // Create an array of elements
-    let elements = [];
+  // Create an array of elements
+  let elements = [];
 
-    // Loop over each node
-    GraphInterface.getNodes(graph).forEach(node => {
-        elements.push(parseNode(graph, node));
+  // use sequence numbers to determine the order of appearance for nodes
+  let idSequenceNumberPairs = [] 
+  graph.nodes.entries().forEach((entry) => {
+    idSequenceNumberPairs.push([entry[0], entry[1].sequenceNumber])
+  })
+  const idSequenceNumberPairsSorted = idSequenceNumberPairs.sort((a, b) => a[1] - b[1]);
 
-        // Loop over each edge sourced at this node
-        node.edges.forEach(edge => {
-            if (node.id === edge.source) {
-                elements.push(parseEdge(graph, edge));
-            }
-        });
+  idSequenceNumberPairsSorted.forEach(pair => {
+    const node = graph.nodes.get(pair[0]);
+    elements.push(parseNode(graph, node));
+
+    // Loop over each edge sourced at this node
+    node.edges.forEach(edge => {
+      if ( node.id === edge.source ) {
+        elements.push(parseEdge(graph, edge));
+      }
     });
-
-    return elements;
+  });
+  return elements;
 }
 
 /**

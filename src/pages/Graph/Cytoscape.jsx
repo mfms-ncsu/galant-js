@@ -22,10 +22,7 @@ export default function CytoscapeComponent() {
     useEffect(() => {
         // Return if window.cytoscape has already been mounted
 
-        // TODO: To get the Node HTML labels to update properly, we need to
-        // restart cytoscape with each change. There must be a more efficient
-        // way to do this.
-        if (!Cytoscape.container()) {
+        if ( ! Cytoscape.container() ) {
         
             // Initialize the cytoscape instance
             Cytoscape.mount(cytoscapeElement.current);
@@ -35,7 +32,9 @@ export default function CytoscapeComponent() {
             Cytoscape.maxZoom(10);
             Cytoscape.autounselectify(true); // Disable multi-select for now (until supported in ChangeRecords)
         }
-        
+
+        // Since the "label" of a node is its id in Cytoscape
+        // we need to handle labels and weights of a node as html labels
         Cytoscape.nodeHtmlLabel([{
             query: "node",
             valign: "top",
@@ -43,31 +42,28 @@ export default function CytoscapeComponent() {
             halign: "center",
             halignBox: "center",
             tpl: (data) => {
-                const showWeights = graph.showNodeWeights;
-                const showLabels = graph.showNodeLabels;
+               // Determine whether or not there is anything to render:
+               //  if both the weight and label of the node are empty,
+               //  then we should not draw the label
+                const hasWeight = data.weight !== undefined && data.weight !== "" && ! data.weightHidden;
+                const hasLabel = data.label !== undefined && data.label !== "" && ! data.labelHidden;
+                const hasWeightOrLabel = hasWeight || hasLabel;
 
-                if ((showWeights && !data.weightHidden) || (showLabels && !data.labelHidden)) {
-                    // This flag determines whether or not there is anything to render. If both the weight
-                    // and label of the node are empty, then we should not draw the label
-                    let hasWeight = data.weight !== undefined && data.weight !== "" && showWeights && !data.weightHidden;
-                    let hasLabel = data.label !== undefined && data.label !== "" && showLabels && !data.labelHidden;
-                    let hasWeightOrLabel = hasWeight || hasLabel;
-
-                    return renderToString(
-                        <div className=
-                            {`flex flex-col items-center justify-center border bg-white border-black  ${(data.hidden || !hasWeightOrLabel) && "hidden"}`
-                            }>
-                            <p className="leading-none">
-                                {(!data.weightHidden && showWeights) ? data.weight : ""}
-                            </p>
-                            <p className="leading-none">
-                                {(!data.labelHidden && showLabels) ? data.label : ""}
-                            </p>
-                        </div>
+                return renderToString(
+                    <div className=
+                        {`flex flex-col items-center justify-center border bg-white border-black  ${(data.hidden || ! hasWeightOrLabel) && "hidden"}`
+                        }>
+                        <p className="leading-none">
+                            { ! data.weightHidden ? data.weight : "" }
+                        </p>
+                        <p className="leading-none">
+                            { ! data.labelHidden ? data.label : ""}
+                        </p>
+                    </div>
                     );
                 }
             }
-        }]);
+        ]);
 
         // Allows cypress to access cytoscape via window.cytoscape and read the graph state
         // Also allows this cytoscape instance to be referenced across the application

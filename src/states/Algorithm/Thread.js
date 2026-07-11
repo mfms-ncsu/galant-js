@@ -3,8 +3,6 @@ import FileParser from 'interfaces/FileParser/FileParser';
 import ChangeManager from 'states/ChangeManager/ChangeManager';
 import LayeredGraphInterface from 'interfaces/GraphInterface/LayeredGraphInterface';
 import TreeInterface from 'interfaces/GraphInterface/TreeInterface';
-import { RampRightOutlined } from '@mui/icons-material';
-import Tree from 'states/Graph/Tree';
 
 /**
  * Execution environment for algorithms. This file provides all necessary functions
@@ -58,9 +56,8 @@ function wait() {
  * 0.
  */
 function waitIfNeeded() {
-
     // Wait if we are not in a step
-    if (stepDepth == 0) {
+    if (stepDepth === 0) {
         wait();
     }
 }
@@ -126,7 +123,6 @@ function step(code = null) {
  * @returns {string} The user input
  */
 function prompt(message, error = "") {
-    console.log("Prompting with message: " + message + " and error: " + error);
     if (message === null || message === "") {
         message = "Prompt";
     }
@@ -196,6 +192,7 @@ function setAttribute(id, name, value) {
  * @param {Object} value Attribute value
  */
 function setAttributeAll(type, name, value) {
+    console.log("-> setAttributeAll:", type, name, value);
     if (stepDepth == 0) { postMessage({ action: "step" }) }
 
     if (type === "nodes") {
@@ -258,6 +255,14 @@ function setDirected(isDirected) {
     waitIfNeeded();
 }
 
+function setWeightsInside(weightsInside) {
+    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    graph.weightsInside = weightsInside;
+    console.log("-> setWeightsInside, flag =", weightsInside)
+    postMessage({ action: "setWeightsInside", weightsInside: weightsInside });
+    waitIfNeeded();
+}
+
 /*
  * LIST GETTERS
  */
@@ -292,6 +297,10 @@ function target(edge) {
 
 function getEdgeBetween(source, target) {
     return GraphInterface.getEdgeIDBetween(graph, source, target);
+}
+
+function edgeExists(source, target) {
+    return GraphInterface.edgeExists(graph, source, target)
 }
 
 function other(nodeId, edgeId) {
@@ -347,6 +356,9 @@ function setPosition(nodeId, x, y) {
 }
 
 function addEdge(source, target) {
+    if ( edgeExists(source, target) ) {
+        throw new Error(`Error in addEdge: edge from ${source} to ${target} already exists`)
+    }
     if (stepDepth == 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, source, target);
     postMessage({ action: "addEdge", source: source, target: target });
@@ -365,12 +377,11 @@ function deleteNode(nodeId) {
     waitIfNeeded();
 }
 
-function deleteEdge(edgeId) {
+function deleteEdge(sourceId, targetId) {
     if (stepDepth == 0) { postMessage({ action: "step" }) }
-    let split = edgeId.split(",");
-    let source = split[0], target = split[1];
-    [graph, changeManager] = GraphInterface.deleteEdge(graph, changeManager, source, target);
-    postMessage({ action: "deleteEdge", source: source, target: target });
+    console.log(`Thread: Deleting edge: source ${sourceId}, target ${targetId}`);
+    [graph, changeManager] = GraphInterface.deleteEdge(graph, changeManager, sourceId, targetId);
+    postMessage({ action: "deleteEdge", source: sourceId, target: targetId });
     waitIfNeeded();
 }
 
@@ -465,6 +476,9 @@ function clearEdgeHighlights() {
 
 /*
  * COLORS
+ * @todo nomenclature of coloring is reverse of that for weights, so either
+ *  - rename color -> setColor and getColor -> color
+ *  - or, see if Javascript allows overloading
  */
 
 function color(id, color) {
@@ -538,6 +552,10 @@ function weight(id) {
 
 function hideWeight(id) {
     setAttribute(id, "weightHidden", true);
+}
+
+function hideLabel(id) {
+    setAttribute(id, "labelHidden", true)
 }
 
 function showWeight(id) {
@@ -823,7 +841,7 @@ function promptEdge(message) {
 
     // If the graph is directed, put the reversed edges into edges
     let reversedEdges = new Map();
-    if (!graph.isDirected) {
+    if ( ! graph.isDirected ) {
         edges.forEach(edge => {
             // Split the edge into source and target
             let split = edge.split(",");
@@ -1018,16 +1036,6 @@ function applyNodePositions(savedPositions) {
     waitIfNeeded();
 }
 
-// function addNewNodeToTree(){
-//     const targetId = prompt("What is the ID of the new node?")
-//     const sourceId = prompt("What is the parent of the new node?")
-//     const attrs = prompt("What are the attributes of the new node?")
-//     addNodeIdAttrs(targetId, 0,0, attrs)
-
-
-//     addEdge(sourceId, targetId)
-// }
-
 /*
  * TREE ALGORITHMS
  */
@@ -1065,76 +1073,16 @@ function getRight(nodeId) {
     return TreeInterface.getRight(graph, nodeId);
 }
 
-function addLeft(targetNode, childWeight) {
-    if (stepDepth === 0) { postMessage({ action: "step" }) };
-    let newNode;
-    [graph, changeManager, newNode] = TreeInterface.addLeft(graph, changeManager, targetNode, childWeight);
-    postMessage({ action: "addLeft", targetNode: targetNode, childWeight: childWeight});
-    waitIfNeeded();
-    return newNode;
+function setChildren(parent, childOrder) {
+  if (stepDepth === 0) { postMessage({ action: "step" }) };
+  [graph, changeManager] = TreeInterface.setChildren(graph, changeManager, parent, childOrder)
+  postMessage( { action: "setChildren", parent: parent, children: childOrder })
+  waitIfNeeded()
 }
-
-function addRight(targetNode, childWeight) {
-    if (stepDepth === 0) { postMessage({ action: "step" }) };
-    let newNode;
-    [graph, changeManager, newNode] = TreeInterface.addRight(graph, changeManager, targetNode, childWeight);
-    postMessage({ action: "addRight", targetNode: targetNode, childWeight: childWeight});
-    waitIfNeeded();
-    return newNode;
-}
-
-/**
- * This is more complicated than it would first appear due to how the graphs are stored.
- * The showNodeWeights variable does not work from our testing (displaying or hiding the weight boxes universally at render time),
- * so the current approach uses a graph variable and when creating nodes, hides their weight box individually. This is not a good
- * solution because it is overhead at every step, and is decentralized so to turn it off, we would have to go back to every node
- * and set the show weight to true. However it seems like the only option from where we stand without a large refactor of multiple 
- * cytoscape files, and we are not sure if it is even possible to do it this preferred 'centralized' way.
- * 
- * -----What we've tried-----
- * Setting graph.showNodeWeights doesn't actually work as intended. 
- * Even on main, the weights would not hide during the algorithm using the NodeSettingsPopover.
- * We believe this is because there is a disconnect somewhere between the graph that is altered by the algorithm and the graph that is rendered (unsure).
- * We can still see this some times when debugging, as if we ask it to print the graph inside of Cytoscape.jsx, we see 2 statements.
- * --one saying Tree <Graph>  
- * --one saying StandardGraph <Graph> 
- * From all of this, we think that without further investigation on how to keep these two graphs fully synchronized, the best solution is
- * hiding the weight on each individual node.
- *  
- * -----Possible solution-----
- * Call hideAllNodeWeights() immediately
- * Set graph.weightsInside to true with a GraphInterface method
- * -- Need to make a new one, can copy code from GraphInterface.setShowNodeWeights()
- * Inside of TreeInterface.addLeft() and TreeInterface.addRight(), there is logic that looks at graph.weightsInside
- * and if true then it hides the new node's weight
- */
-function weightsInside() {
-    
-}
-
-
-/** 
- * Goes through the binary tree and adds dummy nodes to internal nodes with only one child
- * @param {Graph} graph The binary tree graph to add dummy nodes to
- * @param {String} attribute The attribute to assess dummy nodes by
-*/
-function addDummyNodes(attribute) {
-    // For each node
-        // If this node has only one child
-            // If the child is left, add a dummy right child
-            // If the child is right, add a dummy left child
-            // Attach dummy node to parent
-        
-}
-
 
 /**************************************************************/
 /*************** End of algorithm methods *********************/
 /**************************************************************/
-
-
-
-
 
 /**
  * Receives the shared array reference, graph string to parse, and a copy of the 
@@ -1144,6 +1092,7 @@ function addDummyNodes(attribute) {
 self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
 
     message = message.data;
+    console.log("Worker received message:", message[0]);
     if (message[0] === "shared") {
         sharedArray = message[1];
         flags = message[2];
@@ -1152,7 +1101,6 @@ self.onmessage = message => { /* eslint-disable-line no-restricted-globals */
         // Load the graph with isDirected flag
         graph = FileParser.loadGraph(message[4], message[1]);
         graph.isDirected = message[2];
-        console.log(message);
 
         // Make sure that the stepDepth variable is initialized
         stepDepth = 0;
@@ -1266,6 +1214,7 @@ export {
     unlabel,
     getLabel,
     hasLabel,
+    hideLabel,
     clearNodeLabels,
     clearEdgeLabels,
     
@@ -1291,6 +1240,7 @@ export {
     hideAllNodeLabels,
     showNodeLabel,
     showAllNodeLabels,
+    setWeightsInside,
     
     // Hide/Show edge properties
     hideEdge,
@@ -1371,6 +1321,5 @@ export {
     isLeaf, 
     getLeft,
     getRight,
-    addLeft,
-    addRight,
+    setChildren
 };

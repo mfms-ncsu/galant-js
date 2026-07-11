@@ -30,14 +30,26 @@ enableMapSet();
 
 /**
  * Generates the next unique node id from the given list of nodes.
+ * Uniqueness is guaranteed by incrementing latestIdNumber.
  * @param {Node[]} nodes Array of nodes to check
  * @returns New node id
  */
-function generateId(nodes) {
-  let id = 0;
-  while (nodes.has(String(id))) id++;
-  return String(id);
+function generateId(graph) {
+  while ( graph.nodes.has(String(latestIdNumber)) ) latestIdNumber++;
+  return String(latestIdNumber);
 }
+
+let latestIdNumber = 0;
+
+function generateSequenceNumber() {
+  return currentSequenceNumber++
+}
+
+function resetSequenceNumbers() {
+  currentSequenceNumber = 0
+}
+
+let currentSequenceNumber = 0
 
 /**
  * Records a new change in the given change manager.
@@ -125,7 +137,7 @@ function verifyGraphChangeManager(graph, changeManager) {
     verifyChangeManager(changeManager);
 }
 
- /** Recursive function to shift nodes on a layer to the right or left to resolve overlap
+/** Recursive function to shift nodes on a layer to the right or left to resolve overlap
  * @param {Graph} graph Graph on which to operate
  * @param {ChangeManager} changeManager ChangeManager to which to push the change
  * @param {Node[]} sortedLayer Array of Nodes for this layer in the desired order (sorted by index)
@@ -269,8 +281,8 @@ function getEdgeAttribute(graph, source, target, name) {
  * @returns Edge between source and target nodes, or undefined if no such edge exists
  */
 function getEdgeBetween(graph, source, target) {
-  let edge = getEdge(graph, source, target);
-  if (edge === undefined && !graph.isDirected) {
+  const edge = getEdge(graph, source, target);
+  if ( edge === undefined && ! graph.isDirected ) {
     // If undirected, check the opposite as well
     edge = getEdge(graph, target, source);
   }
@@ -286,10 +298,23 @@ function getEdgeBetween(graph, source, target) {
  * @returns Edge between source and target nodes
  */
 function getEdgeIDBetween(graph, source, target) {
-  let edge = getEdgeBetween(graph, source, target);
+  const edge = getEdgeBetween(graph, source, target);
   return getEdgeID(graph, edge);
 }
 
+/**
+ * @param {Graph} graph Graph on which to operate
+ * @param {String} source Source node
+ * @param {String} target Target node
+ * @returns true if an edge exists from the source to the target
+ * The primary purpose of this function is as a guard against addEdge
+ *  of a duplicate edge during algorithm execution;
+ *  a step back (undo) of such an operation will cause a mysterious edge deletion
+ */
+function edgeExists(graph, source, target) {
+  const edge = getEdge(graph, source, target);
+  return edge !== undefined
+}
 
 /**
  * Returns the ID of an edge
@@ -367,7 +392,7 @@ function getIncomingEdges(graph, target) {
   }
 
   // Get all edges if undirected
-  if (!graph.isDirected) {
+  if ( ! graph.isDirected ) {
     return getIncidentEdges(graph, target);
   }
 
@@ -400,7 +425,7 @@ function getIncomingNodes(graph, target) {
   }
   
   // Get all nodes if undirected
-  if (!graph.isDirected) {
+  if ( ! graph.isDirected ) {
     return getAdjacentNodes(graph, target);
   }
 
@@ -444,7 +469,7 @@ function getNodeAttribute(graph, nodeId, name) {
   verifyGraph(graph);
 
   // Get the node
-  let node = graph.nodes.get(nodeId);
+  const node = graph.nodes.get(nodeId);
 
   if (node) {
     return node.attributes.get(name);
@@ -559,7 +584,7 @@ function getOutgoingEdges(graph, source) {
   }
 
   // Get all edges if undirected
-  if (!graph.isDirected) {
+  if ( ! graph.isDirected ) {
     return getIncidentEdges(graph, source);
   }
 
@@ -586,7 +611,7 @@ function getOutgoingEdges(graph, source) {
 function getOutgoingNodes(graph, source) {
   verifyGraph(graph);
   // Get all nodes if undirected
-  if (!graph.isDirected) {
+  if ( ! graph.isDirected ) {
     return getAdjacentNodes(graph, source);
   }
 
@@ -706,6 +731,7 @@ function getSource(graph, edge) {
  * @returns Updated graph and change manager
  */
 function addEdge(graph, changeManager, source, target, attributes) {
+  console.log("-> addEdge, source =", source, "target =", target, "attributes =", attributes);
   // Error checking
   verifyNodes(graph, source, target, "create edge");
 
@@ -730,6 +756,8 @@ function addEdge(graph, changeManager, source, target, attributes) {
       target: target,
     }),
   ]);
+
+  console.log("<- addEdge, newGraph =", newGraph, "newChangeManager =", newChangeManager);
 
   // Return mutated graph and change manager to trigger re-render
   return [newGraph, newChangeManager];
@@ -763,41 +791,49 @@ function addMessage(changeManager, message) {
  * @returns Updated graph and change manager, along with the new node's id
  */
 function addNode(graph, changeManager, x, y, nodeId, attributes) {
+  console.log("-> addNode, x =", x, "y =", y, "nodeId =", nodeId, "attributes =", attributes, "nodes =", graph.nodes)
   // Throw an error if the id is a duplicate
   verifyGraphChangeManager(graph, changeManager);
   if (nodeId && graph.nodes.has(nodeId)) {
-    throw new Error("Cannot add node with duplicate ID");
+    throw new Error(`Cannot add node with duplicate ID ${nodeId}`);
   }
 
   // If the nodeId argument is passed, use that, otherwise generate an id
-  nodeId = nodeId || generateId(graph.nodes);
+  const newNodeId = nodeId || generateId(graph);
+  const newSequenceNumber = generateSequenceNumber();
+  const weightsInside = graph.weightsInside;
 
   const newGraph = produce(graph, (draft) => {
     // Create the node
-    let node = new Node(nodeId, Math.round(x), Math.round(y));
-    draft.nodes.set(nodeId, node);
+    console.log(`about to create node, inside weight = ${weightsInside}`)
+    let node = new Node(newNodeId, newSequenceNumber, Math.round(x), Math.round(y));
+    draft.nodes.set(newNodeId, node);
+
+    console.log(`added node ${newNodeId}, seqnum = ${newSequenceNumber}`)
 
     // Set the attributes
-    for (let name in attributes) {
+    for ( const name in attributes ) {
       node.attributes.set(name, attributes[name]);
     }
   });
 
   // Add the change object to the changeManager
-  const newChangeManager = recordChange(changeManager, [
+  let newChangeManager = recordChange(changeManager, [
     new ChangeObject("addNode", null, {
-      id: nodeId,
+      id: newNodeId,
       position: {
         x: x,
         y: y,
       },
+      seqnum: newSequenceNumber,
       attributes: attributes
     })
   ]);
+  console.log("<- addNode, nodes =", newGraph.nodes, "newChangeManager =", newChangeManager);
 
   // Return mutated graph and change manager to trigger re-render
   // Add the node id as the third return value
-  return [newGraph, newChangeManager, nodeId];
+  return [newGraph, newChangeManager, newNodeId];
 }
 
 /**
@@ -809,6 +845,7 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
  * @returns Updated graph and change manager
  */
 function deleteEdge(graph, changeManager, source, target) {
+  console.log(`Deleting edge from ${source} to ${target}`);
   // Error checking
   verifyGraphChangeManager(graph, changeManager);
   verifyNodes(graph, source, target, "delete edge");
@@ -834,7 +871,7 @@ function deleteEdge(graph, changeManager, source, target) {
       {
         source: source,
         target: target,
-        attributes: attributes,
+        attributes: attributes
       },
       null
     ),
@@ -853,18 +890,13 @@ function deleteEdge(graph, changeManager, source, target) {
  * @returns Updated graph and change manager
  */
 function deleteNode(graph, changeManager, nodeId) {
+  console.log("-> deleteNode, nodeId =", nodeId);
   // Error checking
-  if (!graph.nodes.has(nodeId)) {
+  if ( ! graph.nodes.has(nodeId) ) {
     throw new Error(
       "Cannot delete node " + nodeId + " because it does not exist in the graph"
     );
   }
-
-  // Need to check if it is a left node before the edge from the parent is deleted
-  // Checks to see if the graph is a tree and if the node is the left node of the parent
-  const parentId = getIncomingNodes(graph, nodeId)[0];
-  const isLeft = parentId != undefined ? getOutgoingNodes(graph, parentId)[0] == nodeId : false;
-  const deletingLeft = graph.type == "tree" && isLeft;
 
   // Keep an array of ChangeObjects for the delete step
   const changeObjects = [];
@@ -899,42 +931,28 @@ function deleteNode(graph, changeManager, nodeId) {
         )
       );
     });
-
-    // Finally, delete the node from the nodes list
+    // Finally, delete the node from the node map
     draft.nodes.delete(nodeId);
   });
 
-  // Create a ChangeObject for the deleted node
-  // If we are deleting the left node of a tree, then send the "deleteLeft" message instead of "deleteNode"
   const node = graph.nodes.get(nodeId);
-  if (deletingLeft) {
-    changeObjects.push(
-      new ChangeObject(
-        "deleteLeft",
-        {
-          id: node.id,
-          position: node.position,
-          attributes: node.attributes,
-        },
-        null
-      )
-    );
-  } else {
-    changeObjects.push(
-      new ChangeObject(
-        "deleteNode",
-        {
-          id: node.id,
-          position: node.position,
-          attributes: node.attributes,
-        },
-        null
-      )
-    );
-  }
+  changeObjects.push(
+    new ChangeObject(
+     "deleteNode",
+      {
+        id: node.id,
+        seqnum: node.sequenceNumber,
+        position: node.position,
+        attributes: node.attributes,
+      },
+      null
+    )
+  );
 
   // Add the change objects to the changeManager
   const newChangeManager = recordChange(changeManager, changeObjects);
+
+  console.log("<- deleteNode, graph =", newGraph, "newChangeManager =", newChangeManager);
 
   // Return mutated graph and change manager to trigger re-render
   return [newGraph, newChangeManager];
@@ -985,19 +1003,19 @@ function redo(graph, changeManager) {
       step.forEach((change) => {
         switch (change.action) {
           case "addNode":
+            console.log("Redoing addNode, nodes =", draft.nodes);
             draft.nodes.set(
               change.current.id,
               new Node(
                 change.current.id,
+                change.current.seqnum,
                 change.current.position.x,
                 change.current.position.y
               )
             );
+            console.log("After redoing addNode, nodes =", draft.nodes);
             break;
           case "deleteNode":
-            draft.nodes.delete(change.previous.id);
-            break;
-          case "deleteLeft":
             draft.nodes.delete(change.previous.id);
             break;
           case "addEdge":
@@ -1047,6 +1065,10 @@ function redo(graph, changeManager) {
                 change.current.attribute.value
               );
             break;
+          case "changeSequenceNumber":
+            console.log(`Redoing changeSequenceNumber, id = ${change.current.id}, seq# =${change.current.number}`);
+            draft.nodes.get(change.current.id).sequenceNumber = change.current.number
+            break
         }
       });
     });
@@ -1065,14 +1087,10 @@ function redo(graph, changeManager) {
 
 function revert(graph, changeManager) {
   while (changeManager.index > 0) {
-//    let theChangeObject = changeManager.changes[changeManager.index];
     [graph, changeManager] = undo(graph, changeManager);
-//    if (theChangeObject) {
-      // Remove references to the change objects at the current index
-      // does not help with the slow down problem
-//      theChangeObject = null;
-//    }      
   }
+  latestIdNumber = 0
+  currentSequenceNumber = 0
   return [graph, changeManager];
 }
 
@@ -1205,6 +1223,14 @@ function setDirected(graph, isDirected) {
   return newGraph;
 }
 
+function setWeightsInside(graph, weightsInside) {
+  verifyGraph(graph);
+  const newGraph = produce(graph, (draft) => {
+    draft.weightsInside = weightsInside;
+  });
+  return newGraph;
+}
+
 /**
  * Sets a new value for an attribute within a node and creates a corresponding
  * ChangeObject to record the change.
@@ -1217,7 +1243,8 @@ function setDirected(graph, isDirected) {
  */
 function setNodeAttribute(graph, changeManager, nodeId, name, value) {
   verifyGraphChangeManager(graph, changeManager);
-  if (!graph.nodes.has(nodeId)) {
+  console.log(`Setting attribute for node ${nodeId}, attribute ${name}, value) ${value}`);
+  if ( ! graph.nodes.has(nodeId) ) {
     throw new Error(
       "Cannot set attribute of node " +
         nodeId +
@@ -1592,7 +1619,16 @@ function toString(graph, algorithmName = "No Algorithm Running") {
   content += `c Current Algorithm: ${algorithmName}\n\n`;
 
   // Loop over each node
-  graph.nodes.forEach((node) => {
+  // Sort by sequence number first
+    // use sequence numbers to determine the order of appearance for nodes
+  let idSequenceNumberPairs = [] 
+  graph.nodes.entries().forEach((entry) => {
+    idSequenceNumberPairs.push([entry[0], entry[1].sequenceNumber])
+  })
+  const idSequenceNumberPairsSorted = idSequenceNumberPairs.sort((a, b) => a[1] - b[1]);
+
+  idSequenceNumberPairsSorted.forEach(pair => {
+    const node = graph.nodes.get(pair[0]);
     // Get the attributes string
     let attributesString =
       " " +
@@ -1681,21 +1717,27 @@ function toString(graph, algorithmName = "No Algorithm Running") {
 function undo(graph, changeManager) {
   // Check if there are any changes to undo
   if (changeManager.index > 0) {
-    // Get the previous step
+    // Get the previous step and put its changes in reverse order (since we need to undo them in reverse)
     const step = changeManager.changes[changeManager.index - 1].toReversed();
 
     // Undo the change
     const newGraph = produce(graph, (draft) => {
       step.forEach((change) => {
+        console.log(`*UNDO* ${change.action}, change =`, change)
         switch (change.action) {
           case "addNode":
+            // when addNode is undone, the incident edges will have already been deleted
+            // - the corresponding change objects appear earlier in the list
             draft.nodes.delete(change.current.id);
+            console.log("Undoing addNode, nodes =", draft.nodes);
             break;
           case "deleteNode":
+            // Here, the change objects for incident edges are later in the list and will be taken care of then
             draft.nodes.set(
               change.previous.id,
               new Node(
                 change.previous.id,
+                change.previous.seqnum,
                 change.previous.position.x,
                 change.previous.position.y
               )
@@ -1758,20 +1800,11 @@ function undo(graph, changeManager) {
                 change.previous.attribute.value
               );
             break;
-          case "deleteLeft":
-            const newNode = new Node(
-                change.previous.id,
-                change.previous.position.x,
-                change.previous.position.y
-              )
-            // Places the new node before of all other nodes.
-            draft.nodes = new Map([[change.previous.id, newNode], ...draft.nodes.entries()]); 
-            let leftNode = draft.nodes.get(change.previous.id);
-            change.previous.attributes.forEach((value, key) => {
-              leftNode.attributes.set(key, value);
-            });
-            break;
-        }
+          case "changeSequenceNumber":
+            console.log(`Undoing changeSequenceNumber, id = ${change.previous.id}, seq# = ${change.previous.number}`);
+            draft.nodes.get(change.previous.id).sequenceNumber = change.previous.number
+            break
+          }
       });
     });
 
@@ -1789,8 +1822,12 @@ function undo(graph, changeManager) {
 
 /** Export an object containing the interface */
 const GraphInterface = {
+  generateId,
+  generateSequenceNumber,
+  resetSequenceNumbers,
   getAdjacentNodes,
   getEdge,
+  edgeExists,
   getEdgeAttribute,
   getEdgeIDBetween,
   getEdgeIds,
@@ -1831,6 +1868,7 @@ const GraphInterface = {
   setShowEdgeWeights,
   setShowNodeLabels,
   setShowNodeWeights,
+  setWeightsInside,
   startRecording,
   toString,
   undo,

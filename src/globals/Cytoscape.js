@@ -1,7 +1,6 @@
 import cytoscape from "cytoscape";
 import nodeHtmlLabel from "cytoscape-node-html-label";
 import coseBilkent from "cytoscape-cose-bilkent";
-import dagre from "cytoscape-dagre";
 import elk from 'cytoscape-elk';
 
 /** Set up add-ons to cytoscape */

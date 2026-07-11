@@ -198,6 +198,10 @@ function onMessage(algorithm, message) {
             newGraph = GraphInterface.setDirected(graph, message.isDirected);
             store.set(graphAtom, newGraph);
             break;
+        case "setWeightsInside":
+            newGraph = GraphInterface.setWeightsInside(graph, message.weightsInside)
+            store.set(graphAtom, newGraph)
+            break
         case "addNode":
             [newGraph, newChangeManager] = GraphInterface.addNode(graph, changeManager, message.x, message.y);
             updateState(newGraph, newChangeManager);
@@ -298,14 +302,10 @@ function onMessage(algorithm, message) {
             [newGraph, newChangeManager] = LayeredGraphInterface.applyNodePositions(graph, changeManager, message.savedPositions);
             updateState(newGraph, newChangeManager);
             break;
-        case "addLeft":
-            [newGraph, newChangeManager] = TreeInterface.addLeft(graph, changeManager, message.targetNode, message.childWeight);
-            updateState(newGraph, newChangeManager);
-            break;
-        case "addRight":
-            [newGraph, newChangeManager] = TreeInterface.addRight(graph, changeManager, message.targetNode, message.childWeight);
-            updateState(newGraph, newChangeManager);
-            break;
+        case "setChildren":
+            [newGraph, newChangeManager] = TreeInterface.setChildren(graph, changeManager, message.parent, message.children)
+            updateState(newGraph, newChangeManager)
+            break
         case "startRecording":
             newChangeManager = GraphInterface.startRecording(changeManager);
             store.set(algorithmChangeManagerAtom, newChangeManager);

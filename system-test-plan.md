@@ -5,7 +5,7 @@ TODO:
 - [later] see if it's possible to get headers when content in a json file === null; have to be careful about <ul></ul> pairs
 - test using all platform/browser combinations
 - merge dev into main and get rid of all console logs
-- publish version 2.2.1
+- publish version 3.0
 
 ## Test for speed
 
@@ -21,12 +21,14 @@ TODO:
 - get rid of console.log statements (should devise a script for this)
 - push changes, create version on github.com site
 - add version history notes to the comments on the version
-- deploy the version on the galant.csc.ncsu.edu site
+- to deploy, log on to `galant.csc.ncsu.edu` and follow commands in `deploy.sh` by hand
 - make changes in user documentation and bugs document as needed
 
 ## Testing overview
 
-These tests should be carried out with the following platform/brower combinations. You may have to reload the main page or even clear browser history (Opera, in particular, forces you to do this). For most tests the Mac/Chrome combination is sufficient. All combinations should be tested for those marked with (!). These should be tested with keyboard shortcuts. Files marked with + are in the `src/testing` directory.
+These tests should be carried out with the following platform/brower combinations. You may have to reload the main page or even clear browser history (Opera, in particular, forces you to do this). For most tests the Mac/Chrome combination is sufficient.
+All combinations should be tested for those marked with (!). These should be tested with keyboard shortcuts.
+Files marked with (+) are in the `src/testing` directory.
 
 Tests should be done in the dev branch with console.log's added as needed. The logs should be removed in the main branch before deployment.
 
@@ -50,7 +52,7 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 
 1. Upload a graph (e.g., (+) triangle).
 2. Make a few minor changes in the `Edit` window: add a node and edge, change a position, color a node/edge, change shape, add a weight and label
-2'. Make some changes in the  main window.
+2'. Make some changes in the main window.
 3. Download to a different name/location, close the window, focus on a different graph, and upload again
 
 ### Uploads with different node and edge attributes/variations; graphs are in src/testing
@@ -81,8 +83,8 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 Run these on both undirected and directed graphs; dfs-scc forces the graph to be directed. Make sure both the back and forward buttons/arrow keys work. The restart feature does not work consistently for some reason. This may be slow reaction for algorithms that ask for a start node.
 
 1. Run bfs on g-12; start at any node if undirected; at node 1 if directed; bfs does not have restart capability when some nodes are unreachable; also, the messages are a little out of sync with the algorithm actions.
-2. Run dfs on g-12; start anywhere if undirected; start at nodes 7, 4, and 1; also try an illegal starting point before choosing 4 (e.g. 11); dfs could be more informative about the edges it is exploring; and it could let you know when it's done (same for other search algorithms)
-3. Run dfs-scc on g-12, starting at node 3, then 1. Use the restart feature to do a second run with a different sequence. 
+2. Run dfs on g-12; start anywhere if undirected; if directed, start at nodes 7, 4, and 1; also try an illegal starting point before choosing 4 (e.g. 11); dfs could be more informative about the edges it is exploring; and it could let you know when it's done (same for other search algorithms)
+3. Run dfs-scc on g-12, starting at node 3, then 1. Use the restart feature to do a second run with a different sequence. *Restart will ignore changes to the graph*, e.g., changing directedness of edges
 4. During at least one of these runs, move nodes to see if the positions are preserved.
 
 ### Shortest paths
@@ -95,6 +97,10 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 
 1. Run prim on g-10 starting at node 2, then starting on node 7. Results will differ. The first run includes edge 2,9; the second edge 7,9
 2. Run kruskal on g-10.
+
+### Sorting
+
+Load sorting_13 and run both insertion_sort and quicksort on it.
 
 ### Layered graphs
 
@@ -109,13 +115,13 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 
 ### Graph input
 
-1. (!) Load all of of the graphs with prefix `bad` in the `src/testing` directory (there are six). There should be error messages reflecting what's wrong with these graphs. You should be able to select and upload all of these at once. [!!! duplicate edge should result in an error, but des not !!!] [!!! errors on layered graphs are not detected !!!]
-2. Load (+) same-coordinates. Instead of an error, the nodes should land on top of each other and allow user to fix this by editing.
+1. (!) Load all of of the graphs with prefix `bad` in the `src/testing` directory (there are six). There should be error messages reflecting what's wrong with these graphs. You should be able to select and upload all of these at once. [!!! duplicate edge should result in an error, but des not !!!] [!!! errors on layered graphs are not detected !!!] [!!! errors related to missing or bad coordinates are no longer caught !!!]
+2. Load (+) same-coordinates. Instead of an error, node 3 will land on top of 0 and allow user to fix by moving 3.
 3. Load (+) same-position. In this case nodes should shift appropriately: node 3 should end up in position 1 of layer 0. [!!! does not work !!!]
 
 ### Algorithm execution
 
-1. (!) Run (+) `color-nonexistent-node.js` on triangle (or any other graph); check console.
+1. (!) Run (+) `color-nonexistent-node.js` on (+) triangle (or any other graph); check console.
 2. (!) Run (+) `infinite-loop.js` on triangle
 
 -----------------------------------

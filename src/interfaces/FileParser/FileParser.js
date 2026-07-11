@@ -129,8 +129,8 @@ function isLayeredGraph(name, file) {
  * @todo Allow for Infinity, NaN, and other special numeric values
  */
 function isNumeric(str) {
-    if (typeof str !== "string") return false;
-    return !Number.isNaN(Number(str)) && !Number.isNaN(parseFloat(str));
+    if ( typeof str !== "string" ) return false;
+    return ! Number.isNaN(Number(str)) && ! Number.isNaN(parseFloat(str));
 }
 
 /**
@@ -144,10 +144,12 @@ function isNumeric(str) {
  * @param {String} file File text
  */
 function loadGraph(name, file) {
+    console.log("-> loadGraph:", name, file);
     // Split the file on the new line character and parse each line
     const lines = file.split("\n");
 
     // Initialize the proper graph type
+    GraphInterface.resetSequenceNumbers()
     let graph = null;
     if ( isLayeredGraph(name, file) ) {
         graph = new LayeredGraph(name) }
@@ -156,6 +158,8 @@ function loadGraph(name, file) {
     } else {
         graph = new StandardGraph(name);
     }
+    graph.nodes = new Map();
+    graph.weightsInside = false
     // Parse each line, ignoring comments and blank lines
     // This part is the same for all graph types
     lines.forEach(line => { parseLine(graph, line) });
@@ -215,6 +219,10 @@ function parseAttributes(tokens, startingIndex) {
         startingIndex += 1;
     }
 
+    // @todo Check each attribute value to see if it's a boolean or a number
+    //       and act accordingly
+    //       Otherwise all attributes after the weight are treated as strings!
+    
     // Adds each remaining attribute to the attribute map
     for ( let tokenIndex = startingIndex; tokenIndex < tokens.length; tokenIndex++ ) {
         // Find and set the attribute
@@ -284,11 +292,12 @@ function parseComment(graph, line) {
  * @param {Array} tokens Values to parse
  * @todo instead of a list of tokens, start with the line string and parse attributes separately,
  *    checking for errors along the way
+ * @todo this no longer catches missing coordinates
  */
 function parseNode(graph, tokens) {
     // Get the necessary tokens to create a node
-    let id = tokens[1];
-    let x = parseFloat(tokens[2]), y = parseFloat(tokens[3]);
+    const id = tokens[1];
+    const x = parseFloat(tokens[2]), y = parseFloat(tokens[3]);
     
     // Get attributes from remaining tokens
     const attributes = parseAttributes(tokens, 4);
@@ -308,25 +317,30 @@ function parseNode(graph, tokens) {
 function addNode(graph, x, y, nodeId, attributes) {
     // Throw an error if the id is a duplicate
     if (nodeId && graph.nodes.has(nodeId)) {
-        throw new Error("Cannot add node with duplicate ID");
+        throw new Error(`Cannot add node with duplicate ID ${nodeId}`);
     }
 
     // If the nodeId argument is passed, use that, otherwise generate an id
-    nodeId = nodeId || generateId(graph.nodes);
+    nodeId = nodeId || GraphInterface.generateId(graph);
 
     // Create the node
     // Two special cases:
     // 1. Layered graphs store layer and index instead of x and y, which are y and x, respectively
     // 2. Nodes in trees have undefined poisions
     let node;
+    const newSequenceNumber = GraphInterface.generateSequenceNumber()
     if ( graph.type === 'layered' ) {
-        node = new Node(nodeId, y, x, x, y)
+        node = new Node(nodeId, newSequenceNumber, y, x, x, y)
     }
     else if ( graph.type === 'tree' ) {
-        node = new Node(nodeId, undefined, undefined);
+        node = new Node(nodeId, newSequenceNumber, undefined, undefined);
     }
     else {
-        node = new Node(nodeId, x, y);
+        // @todo need to catch this sooner, when x is still a string
+        if ( x === NaN ) {
+            throw new Error(`File read error: expected x coordinate, got ${x}`)
+        }
+        node = new Node(nodeId, newSequenceNumber, x, y);
     }
     graph.nodes.set(nodeId, node);
 
@@ -336,13 +350,6 @@ function addNode(graph, x, y, nodeId, attributes) {
     }
 
     return node;
-
-    // Get the smallest unused node id for automatic assigning
-    function generateId(nodes) {
-        let id = 0;
-        while (nodes.has(String(id))) id++;
-        return String(id);
-    }
 }
 
 /**
@@ -367,14 +374,15 @@ function parseEdge(graph, tokens) {
  * @param {String} source Source node
  * @param {String} target Target node
  * @param {Object} attributes Edge attributes
+ * @todo catch errors earlier, when parsing the edge
  */
 function addEdge(graph, source, target, attributes) {
     // Error checking
-    if (!graph.nodes.has(source) && !graph.nodes.has(target))
+    if ( ! graph.nodes.has(source) && ! graph.nodes.has(target) )
         throw new Error(`Cannot create edge because neither the source (${source}) nor the target (${target}) node exist in the graph`);
-    if (!graph.nodes.has(source))
+    if ( ! graph.nodes.has(source))
         throw new Error(`Cannot create edge because the source node (${source}) does not exist in the graph`);
-    if (!graph.nodes.has(target))
+    if ( ! graph.nodes.has(target) )
         throw new Error(`Cannot create edge because the target node (${target}) does not exist in the graph`);
 
     // Create the edge object
