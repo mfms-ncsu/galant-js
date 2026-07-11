@@ -54,7 +54,7 @@ export default function CytoscapeComponent() {
                         {`flex flex-col items-center justify-center border bg-white border-black  ${(data.hidden || ! hasWeightOrLabel) && "hidden"}`
                         }>
                         <p className="leading-none">
-                            { ! data.weightHidden ? data.weight : ""}
+                            { ! data.weightHidden ? data.weight : "" }
                         </p>
                         <p className="leading-none">
                             { ! data.labelHidden ? data.label : ""}

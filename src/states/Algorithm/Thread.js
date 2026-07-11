@@ -3,7 +3,6 @@ import FileParser from 'interfaces/FileParser/FileParser';
 import ChangeManager from 'states/ChangeManager/ChangeManager';
 import LayeredGraphInterface from 'interfaces/GraphInterface/LayeredGraphInterface';
 import TreeInterface from 'interfaces/GraphInterface/TreeInterface';
-// import { RampRightOutlined } from '@mui/icons-material';
 
 /**
  * Execution environment for algorithms. This file provides all necessary functions
@@ -1074,12 +1073,6 @@ function getRight(nodeId) {
     return TreeInterface.getRight(graph, nodeId);
 }
 
-/**
- * sets the left to right order of children of a node
- * should make most of what's below unnecessary
- * @param parent the parent node
- * @param childOrder a list of the children in the desired order
- */
 function setChildren(parent, childOrder) {
   if (stepDepth === 0) { postMessage({ action: "step" }) };
   [graph, changeManager] = TreeInterface.setChildren(graph, changeManager, parent, childOrder)

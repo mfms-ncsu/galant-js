@@ -826,7 +826,7 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
         y: y,
       },
       seqnum: newSequenceNumber,
-      attributes: attributes,
+      attributes: attributes
     })
   ]);
   console.log("<- addNode, nodes =", newGraph.nodes, "newChangeManager =", newChangeManager);
@@ -871,7 +871,7 @@ function deleteEdge(graph, changeManager, source, target) {
       {
         source: source,
         target: target,
-        attributes: attributes,
+        attributes: attributes
       },
       null
     ),
@@ -931,7 +931,7 @@ function deleteNode(graph, changeManager, nodeId) {
         )
       );
     });
-    // Finally, delete the node from the nodes and the sequence numbers maps
+    // Finally, delete the node from the node map
     draft.nodes.delete(nodeId);
   });
 
@@ -1010,7 +1010,7 @@ function redo(graph, changeManager) {
                 change.current.id,
                 change.current.seqnum,
                 change.current.position.x,
-                change.current.position.y,
+                change.current.position.y
               )
             );
             console.log("After redoing addNode, nodes =", draft.nodes);
@@ -1739,7 +1739,7 @@ function undo(graph, changeManager) {
                 change.previous.id,
                 change.previous.seqnum,
                 change.previous.position.x,
-                change.previous.position.y,
+                change.previous.position.y
               )
             );
             let node = draft.nodes.get(change.previous.id);

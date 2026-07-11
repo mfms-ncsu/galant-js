@@ -17,13 +17,22 @@ import GraphInterface from "../GraphInterface/GraphInterface"
  function parseAndRound(input) {
     const num = Number(input);
     
-    if (isNaN(num)) {
+    if ( isNaN(num) ) {
         return null;
     }
-  
+
+    // @todo use the symbol for infinity
+    if ( num === Infinity ) {
+        return 'Inf'
+    }
+
+    if ( num === -Infinity ) {
+        return '-Inf'
+    }
+
     // Check if it needs to be rounded
     const parts = num.toString().split(".");
-    if (parts.length === 2 && parts[1].length > 2) {
+    if ( parts.length === 2 && parts[1].length > 2 ) {
       return Math.round(num * 100) / 100;
     }
   
@@ -76,7 +85,7 @@ function parseEdge(graph, edge) {
 
     if ( edgeHasAttribute(edge, "weight") && graph.showEdgeWeights ) {
         addedWeight = true;
-        if (parseAndRound(edge.attributes.get("weight"))) {
+        if ( parseAndRound(edge.attributes.get("weight")) ) {
             text += parseAndRound(edge.attributes.get("weight"));
         }
     }
@@ -120,7 +129,10 @@ function parseNode(graph, node) {
     // Add attributes
     node.attributes.forEach((value, name) => {
         if ( name === "weight" ) {
-            element.data[name] = parseAndRound(value);
+            const numericalValue = parseAndRound(value)
+            if ( numericalValue ) {
+                element.data[name] = numericalValue;
+            }
         } else {
             element.data[name] = value;
         }
@@ -361,6 +373,6 @@ function getStyle(graph) {
 
 const CytoscapeInterface = {
     getElements,
-    getStyle,
+    getStyle
 }
 export default CytoscapeInterface;

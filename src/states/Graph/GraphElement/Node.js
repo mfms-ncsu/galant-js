@@ -32,6 +32,18 @@ export default class Node extends GraphElement {
         ]));
         // Set the id and give the node a new sequence number
         this.id = nodeId
+/**
+ * Sequence numbers are used to determine the order of appearance of nodes
+ * when they are displayed, particularly important for rooted trees
+ * when elkjs mode is used.
+ * They are modified when the left to right order of children of a node
+ * needs to change during algorithm execution.
+ * The current sequence number, as defined in GraphInterface.js,
+ *  is the next one to be assigned; it is incremented each time one is assigned.
+ * Each node has a sequence number in addtion to an id.
+ * Sequence numbers are reassigned when the children of a node need to be reordered
+ *   - see setChildren in TreeInterface.js
+ */
         this.sequenceNumber = sequenceNumber
 
         // Create an object containing the xy-position
