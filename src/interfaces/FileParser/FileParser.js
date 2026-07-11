@@ -46,55 +46,11 @@ function isTree(name, file) {
     return isTree;
 }
 
-/**
- * @todo The following two functions should go into Thread.js.
- * They are no longer needed here. 
- */
-
-/**
- * Gets the children of a given node
- * Possibly needs to move to GraphInterface or TreeInterface
- * @param {Graph} graph The graph that the given node exists in
- * @param {Node} node The node to find children of
- * @returns The children of a given node
- */
-function getChildren(graph, node){
-    // Initialize necessary variables
-    let children = [];
-
-    // Find children from edges
-    for( const [subjects, edge] of node.edges ){
-        // If the edge leads to a child, store child node
-        if ( edge.source == node.id ){
-            children.push(graph.nodes.get(edge.target));
-        }
-    }
-
-   // Returns an array of child nodes 
-    return children;
-}
-
-/**
- * Gets the parent of a given node
- * Possibly needs to move to GraphInterface or TreeInterface
- * @param {Graph} graph The graph containing our node and parent
- * @param {Node} node The node to find a parent of
- * @returns The parent of the given node
- */
-function getParent(graph, node){
-
-    // Find an edge that comes from a parent, and return the parent node
-    for( const [subjects, edge] of node.edges ){
-        if ( edge.target == node.id ){
-            return graph.nodes[edge.source];
-        }
-    }
-}
-
  /**
  * Helper method for determing the graph file format.
- * A graph is in SGF if the extension is .sgf, or there is a header line starting with a 't'
- * Otherwise it is assumed to be in GPH
+ * A graph is a layered graph if the extension is .sgf,
+ *  or there is a header line starting with a 't'
+ * Otherwise it is either a standard graph or a tree
  * @param {String} name Name of the graph file
  * @param {String} file The text of the graph file
  * @returns True if the graph is in SGF format.
@@ -162,7 +118,10 @@ function loadGraph(name, file) {
     graph.weightsInside = false
     // Parse each line, ignoring comments and blank lines
     // This part is the same for all graph types
-    lines.forEach(line => { parseLine(graph, line) });
+    lines.forEach(line => { 
+        lineNumber++
+        parseLine(graph, line)
+    });
 
     if ( graph.type === "layered" ) {
         createLayers(graph);
@@ -203,6 +162,8 @@ function createLayers(graph) {
     }
 }
 
+let lineNumber = 0
+
 /**
  * @return a list of attribute based on the line string and starting index
  * Each atribute is a key:value pair separated by a colon
@@ -224,11 +185,13 @@ function parseAttributes(tokens, startingIndex) {
     //       Otherwise all attributes after the weight are treated as strings!
     
     // Adds each remaining attribute to the attribute map
-    for ( let tokenIndex = startingIndex; tokenIndex < tokens.length; tokenIndex++ ) {
+    for ( const tokenIndex = startingIndex; tokenIndex < tokens.length; tokenIndex++ ) {
         // Find and set the attribute
         let pair = tokens[tokenIndex].trim().split(":");
         if (pair.length === 2) {
             attributes[pair[0]] = pair[1];
+        } else {
+            throw new Error(`${lineNumber}: malformed attribute string '${tokens[tokenIndex]}'`)
         }
     }
 
@@ -242,18 +205,18 @@ function parseAttributes(tokens, startingIndex) {
  * @param {String} line Line string
  */
 function parseLine(graph, line) {
-    // Trim the line string to remove leading/trailing whitespace and split along spacez
-    line = line.trim();
-    if ( line.length === 0 ) return; // Ignore blank lines
+    // Trim the line string to remove leading/trailing whitespace and split along spaces
+    const trimmedLine = line.trim();
+    if ( trimmedLine.length === 0 ) return; // Ignore blank lines
     // Javascript must have a standard regex for whitespace
     const whitespaceRegex = /[ \t]+/;
-    const tokens = line.split(whitespaceRegex);
+    const tokens = trimmedLine.split(whitespaceRegex);
 
     // Check the first token and send the tokens to be parsed as a node or edge as appropriate
     switch ( tokens[0] ) {
         case "c":
             // Add comments to the graph's comments list
-            parseComment(graph, line);
+            parseComment(graph, trimmedLine);
             return;
         case "n":
             parseNode(graph, tokens);
@@ -272,13 +235,12 @@ function parseLine(graph, line) {
             return;
         default:
             // If the line starts with an unrecognized character, throw an error
-            throw new Error("input line from file: \"" + line + "\" is not a valid node or edge.");
+            throw new Error(`${lineNumber}: expected one of [n,e,c,g,t,r,b] as tag, got '${tokens[0]}'`);
     }
 }
 
 /**
  * @author Heath Dyer (hadyer)
- * TODO: add better comment & header handling system
  * @param {*} graph Graph to update
  * @param {*} line 
  */
@@ -297,7 +259,14 @@ function parseComment(graph, line) {
 function parseNode(graph, tokens) {
     // Get the necessary tokens to create a node
     const id = tokens[1];
-    const x = parseFloat(tokens[2]), y = parseFloat(tokens[3]);
+    const x = parseFloat(tokens[2]);
+    if ( ! x ) {
+        throw new Error(`${lineNumber}: missing or malformed x coordinate '${tokens[2]}' for node ${id}`)
+    }
+    const y = parseFloat(tokens[3]);
+    if ( ! y ) {
+        throw new Error(`${lineNumber}: missing or malformed y coordinate '${tokens[3]}' for node ${id}`)
+    }
     
     // Get attributes from remaining tokens
     const attributes = parseAttributes(tokens, 4);
@@ -317,7 +286,7 @@ function parseNode(graph, tokens) {
 function addNode(graph, x, y, nodeId, attributes) {
     // Throw an error if the id is a duplicate
     if (nodeId && graph.nodes.has(nodeId)) {
-        throw new Error(`Cannot add node with duplicate ID ${nodeId}`);
+        throw new Error(`${lineNumber}: cannot add node with duplicate ID ${nodeId}`);
     }
 
     // If the nodeId argument is passed, use that, otherwise generate an id
@@ -336,10 +305,6 @@ function addNode(graph, x, y, nodeId, attributes) {
         node = new Node(nodeId, newSequenceNumber, undefined, undefined);
     }
     else {
-        // @todo need to catch this sooner, when x is still a string
-        if ( x === NaN ) {
-            throw new Error(`File read error: expected x coordinate, got ${x}`)
-        }
         node = new Node(nodeId, newSequenceNumber, x, y);
     }
     graph.nodes.set(nodeId, node);
@@ -379,11 +344,11 @@ function parseEdge(graph, tokens) {
 function addEdge(graph, source, target, attributes) {
     // Error checking
     if ( ! graph.nodes.has(source) && ! graph.nodes.has(target) )
-        throw new Error(`Cannot create edge because neither the source (${source}) nor the target (${target}) node exist in the graph`);
+        throw new Error(`${lineNumber}: cannot create edge because neither the source (${source}) nor the target (${target}) node exist in the graph`);
     if ( ! graph.nodes.has(source))
-        throw new Error(`Cannot create edge because the source node (${source}) does not exist in the graph`);
+        throw new Error(`${lineNumber}: cannot create edge because the source node (${source}) does not exist in the graph`);
     if ( ! graph.nodes.has(target) )
-        throw new Error(`Cannot create edge because the target node (${target}) does not exist in the graph`);
+        throw new Error(`${lineNumber}: cannot create edge because the target node (${target}) does not exist in the graph`);
 
     // Create the edge object
     let edge = new Edge(source, target);

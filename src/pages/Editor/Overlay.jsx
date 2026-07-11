@@ -63,7 +63,7 @@ function LoadButton({ tab, editorType }) {
                 setShowLoadedMessage(false);
             }, 3000);
         } catch (e) {
-            setLoadError("Failed to load " + editorType.toLowerCase() + ": " + e.message);
+            setLoadError("Error in line " + e.message);
         }
     }
 
