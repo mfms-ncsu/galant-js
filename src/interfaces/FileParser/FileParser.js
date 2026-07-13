@@ -4,7 +4,6 @@ import LayeredGraph from "../../states/Graph/LayeredGraph";
 import Node from "../../states/Graph/GraphElement/Node";
 import StandardGraph from "../../states/Graph/StandardGraph";
 import Tree from "../../states/Graph/Tree";
-import Graph from "states/Graph/Graph";
 
 /**
  * The comments below suggest a refactoring of the code to make it significantly easier to follow
@@ -101,6 +100,8 @@ function isNumeric(str) {
  */
 function loadGraph(name, file) {
     console.log("-> loadGraph:", name, file);
+    lineNumber = 0
+
     // Split the file on the new line character and parse each line
     const lines = file.split("\n");
 
@@ -185,7 +186,7 @@ function parseAttributes(tokens, startingIndex) {
     //       Otherwise all attributes after the weight are treated as strings!
     
     // Adds each remaining attribute to the attribute map
-    for ( const tokenIndex = startingIndex; tokenIndex < tokens.length; tokenIndex++ ) {
+    for ( let tokenIndex = startingIndex; tokenIndex < tokens.length; tokenIndex++ ) {
         // Find and set the attribute
         let pair = tokens[tokenIndex].trim().split(":");
         if (pair.length === 2) {
@@ -259,14 +260,14 @@ function parseComment(graph, line) {
 function parseNode(graph, tokens) {
     // Get the necessary tokens to create a node
     const id = tokens[1];
-    const x = parseFloat(tokens[2]);
-    if ( ! x ) {
+    if ( ! isNumeric(tokens[2]) ) {
         throw new Error(`${lineNumber}: missing or malformed x coordinate '${tokens[2]}' for node ${id}`)
     }
-    const y = parseFloat(tokens[3]);
-    if ( ! y ) {
+    const x = parseFloat(tokens[2]);
+    if ( ! isNumeric(tokens[3] ) ) {
         throw new Error(`${lineNumber}: missing or malformed y coordinate '${tokens[3]}' for node ${id}`)
     }
+    const y = parseFloat(tokens[3]);
     
     // Get attributes from remaining tokens
     const attributes = parseAttributes(tokens, 4);
@@ -352,6 +353,19 @@ function addEdge(graph, source, target, attributes) {
     const sourceNode = graph.nodes.get(source)
     if ( sourceNode.edges.get(`${source},${target}`) !== undefined ) {
         throw new Error(`${lineNumber}: edge from ${source} to ${target} already exists`)
+    }
+
+    // additional error handling for layered graphs
+    if ( graph.type === 'layered' ) {
+        const sourceLayer = graph.nodes.get(source).layer
+        const targetLayer = graph.nodes.get(target).layer
+
+        if ( sourceLayer === targetLayer ) {
+            throw new Error(`${lineNumber}: edge ${source},${target} connects nodes on same layer`)
+        }
+        if ( targetLayer !== sourceLayer + 1 ) {
+            throw new Error(`${lineNumber}: edge ${source},${target} connects nodes on non-adjacent layers`)
+        }
     }
 
     // Create the edge object

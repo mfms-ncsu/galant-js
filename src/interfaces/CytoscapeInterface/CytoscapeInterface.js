@@ -40,17 +40,6 @@ import GraphInterface from "../GraphInterface/GraphInterface"
   }
 
 /**
- * Returns true if the given attribute of the node is not undefined, not 
- * an empty string, and is not hidden.
- */
-function nodeHasAttribute(node, attribute) {
-    return node.attributes.has(attribute) &&
-           node.attributes.get(attribute) !== "" &&
-           node.attributes.get(attribute) !== undefined &&
-           ! node.attributes.get(attribute + "Hidden");
-}
-
-/**
  * Returns true if the given attribute of the edge is not undefined, not 
  * an empty string, and is not hidden.
  */

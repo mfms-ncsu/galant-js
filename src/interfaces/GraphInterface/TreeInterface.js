@@ -1,11 +1,6 @@
-import Tree from "states/Graph/Tree";
 import GraphInterface from "./GraphInterface";
 import produce from "immer";
-import ChangeManager from "states/ChangeManager/ChangeManager";
 import ChangeObject from "states/ChangeManager/ChangeObject";
-import Node from "states/Graph/GraphElement/Node";
-import Edge from "states/Graph/GraphElement/Edge";
-// import { is } from "immer/dist/internal.js";
 
 /**
  * Helper function to handle what to do when a graph

@@ -1,7 +1,5 @@
-import LayeredGraph from "states/Graph/LayeredGraph";
-import produce, { enableMapSet } from "immer";
+import produce from "immer";
 import GraphInterface from "./GraphInterface";
-import ChangeManager from "states/ChangeManager/ChangeManager";
 import ChangeObject from "states/ChangeManager/ChangeObject";
 
 
@@ -25,7 +23,7 @@ import ChangeObject from "states/ChangeManager/ChangeObject";
  * @author Heath Dyer
  */
 function isLayered(graph) {
-    if (!(graph.type == 'layered')) {
+    if (!(graph.type === 'layered')) {
         throw new Error("Function can only be performed on layered graphs.");
     }
 }
@@ -49,14 +47,14 @@ function isCrossed(graph, e, f) {
     let z = graph.nodes.get(f.target);
     // Check if layers are correct but swapped
     // @todo this seems wrong - swapping if nodes are not on correct layers (?)
-    if (w.layer == z.layer && y.layer == x.layer) {
+    if (w.layer === z.layer && y.layer === x.layer) {
         //we must swap for algorithm correctness
         let temp = x;
         x = z;
         z = temp;
     }
     // Now layers should be correct. If they aren't, they are on different layers
-    if (w.layer != x.layer && y.layer != z.layer) {
+    if (w.layer !== x.layer && y.layer !== z.layer) {
         return false;
     }
     // Now check if they are crossed
@@ -82,7 +80,7 @@ function crossings(graph, e) {
     let visitedEdges = new Set();
     graph.nodes.forEach(node => {
         node.edges.forEach((f, index) => {
-            if (e != f && !visitedEdges.has(index) && isCrossed(graph, e, f)) {
+            if (e !== f && !visitedEdges.has(index) && isCrossed(graph, e, f)) {
                 crossings += 1;
             }
             visitedEdges.add(index);
@@ -259,7 +257,7 @@ function setChannelProperty(graph, changeManager, channel, attribute, value) {
             node.edges.forEach((e, index) => {
                 const source = draft.nodes.get(e.source);
                 const target = draft.nodes.get(e.target);
-                if ((source.layer == channel && target.layer == channel + 1) || (source.layer == channel + 1 && target.layer == channel )) {
+                if ((source.layer === channel && target.layer === channel + 1) || (source.layer === channel + 1 && target.layer === channel )) {
                     //create change object
                     changeObjects.push(new ChangeObject("setEdgeAttribute",
                         {
@@ -318,12 +316,12 @@ function setWeightsUp(graph, changeManager, layer, type) {
                 const source = graph.nodes.get(edge.source);
                 const target = graph.nodes.get(edge.target);
                 // the target is the adjacent node and on layer up?
-                if (source == node && target.layer == layer - 1) {
+                if (source === node && target.layer === layer - 1) {
                     // then we keep track of this node
                     adjacentNodes.add(target);
                 } 
                 // the target is the adjacent node and on layer up?
-                else if (target == node && source.layer == layer - 1) {
+                else if (target === node && source.layer === layer - 1) {
                     // then we keep track of this node
                     adjacentNodes.add(source);
                 }
@@ -331,7 +329,7 @@ function setWeightsUp(graph, changeManager, layer, type) {
             //calculate average weight based on index
             let total = 0;
             adjacentNodes.forEach(adjacentNode => {
-                if (type == "index") {
+                if (type === "index") {
                     total += adjacentNode.index;
                 }
                 else {
@@ -391,12 +389,12 @@ function setWeightsDown(graph, changeManager, layer, type) {
                 const source = graph.nodes.get(edge.source);
                 const target = graph.nodes.get(edge.target);
                 // the target is the adjacent node and on layer down?
-                if (source == node && target.layer == layer + 1) {
+                if (source === node && target.layer === layer + 1) {
                     // then we keep track of this node
                     adjacentNodes.add(target);
                 } 
                 // the target is the adjacent node and on layer down?
-                else if (target == node && source.layer == layer + 1) {
+                else if (target === node && source.layer === layer + 1) {
                     // then we keep track of this node
                     adjacentNodes.add(source);
                 }
@@ -404,7 +402,7 @@ function setWeightsDown(graph, changeManager, layer, type) {
             //calculate average weight based on index
             let total = 0;
             adjacentNodes.forEach(adjacentNode => {
-                if (type == "index") {
+                if (type === "index") {
                     total += adjacentNode.index;
                 }
                 else {
@@ -434,7 +432,7 @@ function setWeightsDown(graph, changeManager, layer, type) {
     });
     //update change record
     const newChangeManager = GraphInterface.recordChange(changeManager, changeObjects);
-    return [newGraph, changeManager];
+    return [newGraph, newChangeManager];
 }
 
 /**
@@ -464,12 +462,12 @@ function setWeightsBoth(graph, changeManager, layer, type) {
                 const source = graph.nodes.get(edge.source);
                 const target = graph.nodes.get(edge.target);
                 // the target is the adjacent node and on layers up and down?
-                if (source == node && (target.layer == layer + 1 || target.layer == layer - 1)) {
+                if (source === node && (target.layer === layer + 1 || target.layer === layer - 1)) {
                     // then we keep track of this node
                     adjacentNodes.add(target);
                 } 
                 // the target is the adjacent node and on layers up and down?
-                else if (target == node && (source.layer == layer + 1 || source.layer == layer - 1)) {
+                else if (target === node && (source.layer === layer + 1 || source.layer === layer - 1)) {
                     // then we keep track of this node
                     adjacentNodes.add(source);
                 }
@@ -477,7 +475,7 @@ function setWeightsBoth(graph, changeManager, layer, type) {
             //calculate average weight based on index
             let total = 0;
             adjacentNodes.forEach(adjacentNode => {
-                if (type == "index") {
+                if (type === "index") {
                     total += adjacentNode.index;
                 }
                 else {
@@ -507,7 +505,7 @@ function setWeightsBoth(graph, changeManager, layer, type) {
     });
     //update change record
     const newChangeManager = GraphInterface.recordChange(changeManager, changeObjects);
-    return [newGraph, changeManager];
+    return [newGraph, newChangeManager];
 }
 
 /**
@@ -531,7 +529,7 @@ function setWeights(graph, changeManager, layer, type) {
         // iterate through each node's edges on that layer
         layerNodes.forEach(node => {
             // set the weights appropriately
-            const newWeight = node.index
+            let newWeight = node.index
             if ( type === "position" ) {
                 newWeight = node.position.x
             }
@@ -557,7 +555,7 @@ function setWeights(graph, changeManager, layer, type) {
     });
     //update change record
     const newChangeManager = GraphInterface.recordChange(changeManager, changeObjects);
-    return [newGraph, changeManager];
+    return [newGraph, newChangeManager];
 }
 
 /**
@@ -648,7 +646,7 @@ function swap(graph, changeManager, x, y) {
     isLayered(graph);
     const a = graph.nodes.get(x);
     const b = graph.nodes.get(y);
-    if (a.layer != b.layer) {
+    if (a.layer !== b.layer) {
         throw new Error("Nodes must be on the same layer to swap.");
     }
     //get old position and index
@@ -718,7 +716,7 @@ function nodesOnLayer(graph, layerIndex) {
     isLayered(graph);
     return Array.from(graph.nodes.values())
         // Filter the nodes to only those on the same layer
-        .filter(n => n.layer == layerIndex)
+        .filter(n => n.layer === layerIndex)
         // Sort the nodes by X coordinate (ascending order)
         .sort((a, b) => a.index - b.index);
 }
@@ -730,7 +728,7 @@ function nodesOnLayer(graph, layerIndex) {
  * @author Michael Richardson (maricha6)
  */
 function evenlySpacedLayout(graph, changeManager) {
-    if (graph.type != "layered") {
+    if (graph.type !== "layered") {
         throw new Error(
             `Cannot run evenly-spaced layout because this is not a layered graph`
         );
@@ -751,7 +749,6 @@ function evenlySpacedLayout(graph, changeManager) {
     // Iterate over each layer and space the nodes evenly to fit the "widest" layer
     let newGraph = graph;
     let newChangeManager = changeManager;
-//    newChangeManager = GraphInterface.startRecording(changeManager);
 
     for (let i = 0; i <= maxLayer; i++) {
         const layer = nodesOnLayer(graph, i);
@@ -790,8 +787,6 @@ function evenlySpacedLayout(graph, changeManager) {
 
         }
     }
-
-//    newChangeManager = GraphInterface.endRecording(newChangeManager);
 
     return [newGraph, newChangeManager];
 }

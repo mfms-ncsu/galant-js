@@ -1,10 +1,7 @@
 import produce, { enableMapSet } from "immer";
 import ChangeObject from "states/ChangeManager/ChangeObject";
-import Graph from "states/Graph/Graph";
-import ChangeManager from "states/ChangeManager/ChangeManager";
 import Edge from "states/Graph/GraphElement/Edge";
 import Node from "states/Graph/GraphElement/Node";
-import LayeredGraph from "states/Graph/LayeredGraph";
 
 /** Enable maps in immer */
 enableMapSet();
@@ -165,7 +162,7 @@ function shiftNodes(graph, changeManager, sortedLayer, nodeIndex, shiftRight) {
   const nextNode = sortedLayer[nodeIndex + offset];
     
   // If there is overlap, move the neighbor over by one (right or left) and continue the recursive check
-  if (currentNode.position.x == nextNode.position.x) {
+  if (currentNode.position.x === nextNode.position.x) {
     // Update the neighbor (nextNode)'s position
     const oldPosition = nextNode.position;
     const newPosition = {
@@ -281,7 +278,7 @@ function getEdgeAttribute(graph, source, target, name) {
  * @returns Edge between source and target nodes, or undefined if no such edge exists
  */
 function getEdgeBetween(graph, source, target) {
-  const edge = getEdge(graph, source, target);
+  let edge = getEdge(graph, source, target);
   if ( edge === undefined && ! graph.isDirected ) {
     // If undirected, check the opposite as well
     edge = getEdge(graph, target, source);
@@ -672,7 +669,7 @@ function getScalar(graph) {
   let scaleX = window.innerWidth / rangeX;
   let scaleY = window.innerHeight / rangeY;
 
-  if (graph.type != "layered") {
+  if (graph.type !== "layered") {
     scaleX = Math.min(scaleX, scaleY);
     scaleY = Math.min(scaleX, scaleY);
   }
@@ -1069,6 +1066,8 @@ function redo(graph, changeManager) {
             console.log(`Redoing changeSequenceNumber, id = ${change.current.id}, seq# =${change.current.number}`);
             draft.nodes.get(change.current.id).sequenceNumber = change.current.number
             break
+          default:
+            throw new Error(`unrecognized redo action ${change.action}`)
         }
       });
     });
@@ -1355,7 +1354,7 @@ function setNodePosition(graph, changeManager, nodeId, x, y) {
   }
 
   // Defer to the "setNodePositionLayered" function for layered graphs
-  if (graph.type == "layered") {
+  if (graph.type === "layered") {
     return setNodePositionLayered(graph, changeManager, nodeId, x);
   } 
 
@@ -1374,7 +1373,7 @@ function setNodePosition(graph, changeManager, nodeId, x, y) {
   });
 
   // If the node did not move, no need to add a new ChangeRecord
-  if (newPosition.x == oldPosition.x && newPosition.y == oldPosition.y) {
+  if (newPosition.x === oldPosition.x && newPosition.y === oldPosition.y) {
     return [newGraph, changeManager];
   }
 
@@ -1415,7 +1414,7 @@ function setNodePositionLayered(graph, changeManager, nodeId, x) {
         `Cannot set position of node ${nodeId} because it does not exist in the graph`
         );
     }
-    if (graph.type != "layered") {
+    if (graph.type !== "layered") {
         throw new Error(
             `Cannot set position of node ${nodeId} because this is not a layered graph`
         );
@@ -1436,7 +1435,7 @@ function setNodePositionLayered(graph, changeManager, nodeId, x) {
     });
 
     // If the node did not move, no need to add a new ChangeRecord
-    if (newPosition.x == oldPosition.x) {
+    if (newPosition.x === oldPosition.x) {
         return [newGraph, changeManager];
     }
 
@@ -1467,14 +1466,14 @@ function setNodePositionLayered(graph, changeManager, nodeId, x) {
     // if !movedRight.
     const sortedLayer = Array.from(newGraph.nodes.values())
         // Filter the nodes to only those on the same layer
-        .filter(n => n.layer == node.layer)
+        .filter(n => n.layer === node.layer)
         // Sort the nodes by X coordinate (ascending order)
         .sort((a, b) => {
             const difference = a.position.x - b.position.x;
             // If two nodes overlap, one must be the node that just moved
-            if (difference == 0) {
+            if (difference === 0) {
                 // Place the moved node to the right if movedRight and to the left if !movedRight
-                if (a.id == node.id)
+                if (a.id === node.id)
                     return movedRight ? 1 : -1;
                 else
                     return movedRight ? -1 : 1;
@@ -1652,7 +1651,7 @@ function toString(graph, algorithmName = "No Algorithm Running") {
         
 
     // Add the node line
-    if (graph.type == "layered") {
+    if (graph.type === "layered") {
         // Add the node line
             content += `n ${node.id} ${node.layer
             .toFixed(4)
@@ -1660,7 +1659,7 @@ function toString(graph, algorithmName = "No Algorithm Running") {
             .toFixed(4)
             .replace(/[.,]0000$/, "")}${weightString}${attributesString}\n`;
     }
-    else if ( graph.type == "tree" ) {
+    else if ( graph.type === "tree" ) {
       // Add the node line (fixes undefined node defns problem)
       content += `n ${node.id} ${0} ${0}${weightString}${attributesString}\n`;
     } 
@@ -1804,6 +1803,8 @@ function undo(graph, changeManager) {
             console.log(`Undoing changeSequenceNumber, id = ${change.previous.id}, seq# = ${change.previous.number}`);
             draft.nodes.get(change.previous.id).sequenceNumber = change.previous.number
             break
+          default:
+            throw new Error(`unrecognized undo action ${change.action}`)
           }
       });
     });

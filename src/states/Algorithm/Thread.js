@@ -74,12 +74,12 @@ function step(code = null) {
 
     // Tell the ChangeManager to start recording our changes, but only
     // if we are not in debug mode
-    if (flags[0] == 0) {
+    if (flags[0] === 0) {
 
         // Are we the lowest level of step? If so, start and end the
         // recording. If not, we shouldn't start a recording, because
         // only the lowest level should be recording.
-        let lowestLayer = stepDepth == 0;
+        let lowestLayer = stepDepth === 0;
 
         // Start recording, so that a single change record is made
         if (lowestLayer) {
@@ -165,9 +165,9 @@ function promptFrom(message, list, error) {
  * @param {Object} value Value of the attribute
  */
 function setAttribute(id, name, value) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
 
-    if (id == null) {
+    if (id === null) {
         console.error("id is null! name: " + name + ", value: " + value);
     }
     if (id.includes(",")) {
@@ -193,7 +193,7 @@ function setAttribute(id, name, value) {
  */
 function setAttributeAll(type, name, value) {
     console.log("-> setAttributeAll:", type, name, value);
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
 
     if (type === "nodes") {
         [graph, changeManager] = GraphInterface.setNodeAttributeAll(graph, changeManager, name, value);
@@ -238,25 +238,25 @@ function getAttribute(id, name) {
  * USER INTERFACE AND GRAPH SETTINGS
  */
 function display(message) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     postMessage({ action: "message", message: message });
     waitIfNeeded();
 }
 
 function print(message) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     postMessage({ action: "print", message: message });
 }
 
 function setDirected(isDirected) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     graph.isDirected = isDirected;
     postMessage({ action: "setDirected", isDirected: isDirected });
     waitIfNeeded();
 }
 
 function setWeightsInside(weightsInside) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     graph.weightsInside = weightsInside;
     console.log("-> setWeightsInside, flag =", weightsInside)
     postMessage({ action: "setWeightsInside", weightsInside: weightsInside });
@@ -312,21 +312,12 @@ function other(nodeId, edgeId) {
  */
 
 function addNode(x, y) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     let newNode;
     [graph, changeManager, newNode] = GraphInterface.addNode(graph, changeManager, x, y);
     postMessage({ action: "addNode", x: x, y: y });
     waitIfNeeded();
 
-    return newNode;
-}
-
-function addNodeIdAttrs(id, x, y, attrs) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
-    let newNode;
-    [graph, changeManager, newNode] = GraphInterface.addNode(graph, changeManager, x, y, id, attrs);
-    postMessage({ action: "addNode", x: x, y: y, id:id});
-    waitIfNeeded();
     return newNode;
 }
 
@@ -349,7 +340,7 @@ function getY(nodeId) {
 }
 
 function setPosition(nodeId, x, y) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = GraphInterface.setNodePosition(graph, changeManager, nodeId, x, y);
     postMessage({ action: "setNodePosition", nodeId: nodeId, x: x, y: y });
     waitIfNeeded();
@@ -359,7 +350,7 @@ function addEdge(source, target) {
     if ( edgeExists(source, target) ) {
         throw new Error(`Error in addEdge: edge from ${source} to ${target} already exists`)
     }
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = GraphInterface.addEdge(graph, changeManager, source, target);
     postMessage({ action: "addEdge", source: source, target: target });
     waitIfNeeded();
@@ -371,14 +362,14 @@ function incrementPosition(nodeId, x, y) {
 }
 
 function deleteNode(nodeId) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = GraphInterface.deleteNode(graph, changeManager, nodeId);
     postMessage({ action: "deleteNode", nodeId: nodeId });
     waitIfNeeded();
 }
 
 function deleteEdge(sourceId, targetId) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     console.log(`Thread: Deleting edge: source ${sourceId}, target ${targetId}`);
     [graph, changeManager] = GraphInterface.deleteEdge(graph, changeManager, sourceId, targetId);
     postMessage({ action: "deleteEdge", source: sourceId, target: targetId });
@@ -580,7 +571,7 @@ function clearEdgeWeights() {
  */
 
 function isHidden(id) {
-    return getAttribute(id, "hidden") == true;
+    return getAttribute(id, "hidden") === true;
 }
 
 function hideNode(node) {
@@ -908,7 +899,7 @@ function bottleneckVerticality() {
 }
 
 function setLayerProperty(layer, attribute, value) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.setLayerProperty(graph, changeManager, layer, attribute, value);
     postMessage({
         action: "setLayerProperty",
@@ -920,7 +911,7 @@ function setLayerProperty(layer, attribute, value) {
 }
 
 function setChannelProperty(channel, attribute, value) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.setChannelProperty(graph, changeManager, channel, attribute, value);
     postMessage({
         action: "setChannelProperty",
@@ -932,7 +923,7 @@ function setChannelProperty(channel, attribute, value) {
 }
 
 function setWeightsUp(layer, type) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.setWeightsUp(graph, changeManager, layer, type);
     postMessage({
         action: "setWeightsUp",
@@ -943,7 +934,7 @@ function setWeightsUp(layer, type) {
 }
 
 function setWeightsDown(layer, type) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.setWeightsDown(graph, changeManager, layer, type);
     postMessage({
         action: "setWeightsDown",
@@ -954,7 +945,7 @@ function setWeightsDown(layer, type) {
 }
 
 function setWeightsBoth(layer, type) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.setWeightsBoth(graph, changeManager, layer, type);
     postMessage({
         action: "setWeightsBoth",
@@ -965,7 +956,7 @@ function setWeightsBoth(layer, type) {
 }
 
 function setWeights(layer, type) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.setWeights(graph, changeManager, layer, type);
     postMessage({
         action: "setWeights",
@@ -976,7 +967,7 @@ function setWeights(layer, type) {
 }
 
 function sortByWeight(layer) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.sortByWeight(graph, changeManager, layer);
     postMessage({
         action: "sortByWeight",
@@ -986,7 +977,7 @@ function sortByWeight(layer) {
 }
 
 function swap(x, y) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.swap(graph, changeManager, x, y);
     postMessage({
         action: "swap",
@@ -1008,14 +999,14 @@ function evenlySpacedLayout() {
 }
 
 function showPositions(layer) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.showPositions(graph, changeManager, layer);
     postMessage({ action: "showPositions", layer: layer, });
     waitIfNeeded();
 }
 
 function showIndexes(layer) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.showIndexes(graph, changeManager, layer);
     postMessage({ action: "showIndexes", layer: layer, });
     waitIfNeeded();
@@ -1030,7 +1021,7 @@ function copyNodePositions() {
 }
 
 function applyNodePositions(savedPositions) {
-    if (stepDepth == 0) { postMessage({ action: "step" }) }
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = LayeredGraphInterface.applyNodePositions(graph, changeManager, savedPositions);
     postMessage({ action: "applyNodePositions", savedPositions: savedPositions, });
     waitIfNeeded();
