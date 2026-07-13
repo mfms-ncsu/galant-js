@@ -115,7 +115,7 @@ Load sorting_13 and run both insertion_sort and quicksort on it.
 
 ### Graph input
 
-1. (!) Load all of of the graphs with prefix `bad` in the `src/testing` directory (there are six). There should be error messages reflecting what's wrong with these graphs. You should be able to select and upload all of these at once. [!!! duplicate edge should result in an error, but des not !!!] [!!! errors on layered graphs are not detected !!!] [!!! errors related to missing or bad coordinates are no longer caught !!!]
+1. (!) Load all of of the graphs with prefix `bad` in the `src/testing` directory (there are six). There should be error messages reflecting what's wrong with these graphs. You should be able to select and upload all of these at once. [!!! errors on layered graphs are not detected !!!]
 2. Load (+) same-coordinates. Instead of an error, node 3 will land on top of 0 and allow user to fix by moving 3.
 3. Load (+) same-position. In this case nodes should shift appropriately: node 3 should end up in position 1 of layer 0. [!!! does not work !!!]
 

@@ -235,7 +235,7 @@ function parseLine(graph, line) {
             return;
         default:
             // If the line starts with an unrecognized character, throw an error
-            throw new Error(`${lineNumber}: expected one of [n,e,c,g,t,r,b] as tag, got '${tokens[0]}'`);
+            throw new Error(`${lineNumber}: expected line to begin with one of [n,e,c,g,t,r,b], got '${tokens[0]}'`);
     }
 }
 
@@ -349,6 +349,10 @@ function addEdge(graph, source, target, attributes) {
         throw new Error(`${lineNumber}: cannot create edge because the source node (${source}) does not exist in the graph`);
     if ( ! graph.nodes.has(target) )
         throw new Error(`${lineNumber}: cannot create edge because the target node (${target}) does not exist in the graph`);
+    const sourceNode = graph.nodes.get(source)
+    if ( sourceNode.edges.get(`${source},${target}`) !== undefined ) {
+        throw new Error(`${lineNumber}: edge from ${source} to ${target} already exists`)
+    }
 
     // Create the edge object
     let edge = new Edge(source, target);
