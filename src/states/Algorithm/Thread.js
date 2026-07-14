@@ -473,6 +473,13 @@ function clearEdgeHighlights() {
  */
 
 function color(id, color) {
+    if ( arguments.length === 1 ) {
+        return getAttribute(id, "color");
+    }
+    setAttribute(id, "color", color);
+}
+
+function setColor(id, color) {
     setAttribute(id, "color", color);
 }
 
@@ -501,6 +508,9 @@ function clearEdgeColors() {
  */
 
 function label(id, label) {
+    if ( arguments.length === 1 ) {
+        return getAttribute(id, "label");
+    }
     setAttribute(id, "label", label);
 }
 
@@ -510,6 +520,10 @@ function unlabel(id) {
 
 function getLabel(id) {
     return getAttribute(id, "label");
+}
+
+function setLabel(id, label) {
+    setAttribute(id, "label", label); 
 }
 
 function hasLabel(id) {
@@ -1196,6 +1210,7 @@ export {
     color,
     uncolor,
     getColor,
+    setColor,
     hasColor,
     clearNodeColors,
     clearEdgeColors,
@@ -1204,6 +1219,7 @@ export {
     label,
     unlabel,
     getLabel,
+    setLabel,
     hasLabel,
     hideLabel,
     clearNodeLabels,

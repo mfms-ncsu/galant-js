@@ -44,7 +44,7 @@ function LoadButton({ tab, editorType }) {
             // parses it again.
 
             if (editorType === "Graph") {
-                let temp = FileParser.loadGraph(tab.name, tab.content);
+                FileParser.loadGraph(tab.name, tab.content);
             }
 
             // Send the message using shared worker

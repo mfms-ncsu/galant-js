@@ -85,7 +85,7 @@ export default function CytoscapeComponent() {
 
         // If the graph type is "tree", do a layout appropriate for trees - https://www.npmjs.com/package/cytoscape-dagre
         // In other cases, layout depends on user-specified node positions; Cytoscape is called on only for auto-layout - see ControlSettingsPopover 
-        if ( graph.type == 'tree' ) {
+        if ( graph.type === 'tree' ) {
             // Important Notes:
             // 1. Switched from dagre to Elkjs due to limited sorting functionality
             // 2. "fit: false" prevents issues with resizing during algorithms
@@ -142,7 +142,7 @@ export default function CytoscapeComponent() {
 
     useEffect(() => {
         //If there is a tree, do not draw the grid
-        if ( graph.type == 'tree'){ 
+        if ( graph.type === 'tree'){ 
             return;
         }
         

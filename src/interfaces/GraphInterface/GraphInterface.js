@@ -734,10 +734,13 @@ function addEdge(graph, changeManager, source, target, attributes) {
 
   const newGraph = produce(graph, (draft) => {
     // Create the edge object
+    if ( edgeExists(graph, source, target) ) {
+      throw new Error(`addEdge: an edge from ${source} to ${target} already exists`)
+    }
     let edge = new Edge(source, target);
 
     // Set the attributes
-    for (let name in attributes) {
+    for ( let name in attributes ) {
       edge.attributes.set(name, attributes[name]);
     }
 
@@ -791,7 +794,7 @@ function addNode(graph, changeManager, x, y, nodeId, attributes) {
   console.log("-> addNode, x =", x, "y =", y, "nodeId =", nodeId, "attributes =", attributes, "nodes =", graph.nodes)
   // Throw an error if the id is a duplicate
   verifyGraphChangeManager(graph, changeManager);
-  if (nodeId && graph.nodes.has(nodeId)) {
+  if ( nodeId && graph.nodes.has(nodeId) ) {
     throw new Error(`Cannot add node with duplicate ID ${nodeId}`);
   }
 
@@ -1065,6 +1068,10 @@ function redo(graph, changeManager) {
           case "changeSequenceNumber":
             console.log(`Redoing changeSequenceNumber, id = ${change.current.id}, seq# =${change.current.number}`);
             draft.nodes.get(change.current.id).sequenceNumber = change.current.number
+            break
+          case "message":
+            // message is a special case
+            //  - messages are retrieved for display via getMessage()
             break
           default:
             throw new Error(`unrecognized redo action ${change.action}`)
@@ -1802,6 +1809,10 @@ function undo(graph, changeManager) {
           case "changeSequenceNumber":
             console.log(`Undoing changeSequenceNumber, id = ${change.previous.id}, seq# = ${change.previous.number}`);
             draft.nodes.get(change.previous.id).sequenceNumber = change.previous.number
+            break
+          case "message":
+              // message is a special case
+              //  - messages are retrieved for display via getMessage()
             break
           default:
             throw new Error(`unrecognized undo action ${change.action}`)
