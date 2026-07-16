@@ -130,11 +130,12 @@ function parseNode(graph, node) {
     // !!! labels and weights for nodes are handled in Cytoscape.jsx
     // They require an html element !!!
 
-    console.log("parsing node attributes, weightsInside =", graph.weightsInside)
     if ( graph.weightsInside ) {
         element.data["weightInNode"] = true
         element.data["weightHidden"] = true
     }
+
+    element.data["labelFontSize"] = `${graph.nodeSize / 2}px`
 
     // Need the following because Cytoscape.jsx does not handle
     //  graph.showNodeLabels and graph.showNodeWeights correctly
@@ -200,7 +201,7 @@ function getStyle(graph) {
                 "color": "#000000",
                 "borderWidth": `${graph.nodeSize / 10}px`,
                 "borderStyle": "solid",
-                "borderColor": "#AAAAAA",
+                "borderColor": "#000000",
                 "backgroundOpacity": 1,
                 "shape": "ellipse",
                 "textValign": "center",
@@ -231,8 +232,7 @@ function getStyle(graph) {
         {
             "selector": "node[?highlighted]",
             "style": {
-                "borderWidth": `${graph.nodeSize / 6}px`,
-                "borderColor": "red",
+                "borderWidth": `${graph.nodeSize / 5}px`,
             }
         },
         {
@@ -250,7 +250,7 @@ function getStyle(graph) {
         {
             "selector": "edge[?highlighted]",
             "style": {
-                "width": `6px`
+                "width": `${graph.nodeSize / 5}px`
             }
         },
         {

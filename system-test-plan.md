@@ -22,6 +22,7 @@ TODO:
 - push changes, create version on github.com site
 - add version history notes to the comments on the version
 - to deploy, log on to `galant.csc.ncsu.edu` and follow commands in `deploy.sh` by hand
+    the path to the repository clone is `/var/www/galant-js`
 - make changes in user documentation and bugs document as needed
 
 ## Testing overview

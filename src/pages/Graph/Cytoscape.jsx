@@ -48,16 +48,18 @@ export default function CytoscapeComponent() {
                 const hasWeight = data.weight !== undefined && data.weight !== "" && ! data.weightHidden;
                 const hasLabel = data.label !== undefined && data.label !== "" && ! data.labelHidden;
                 const hasWeightOrLabel = hasWeight || hasLabel;
+                const textStyle = {
+                    fontSize: data.labelFontSize
+                }
 
                 return renderToString(
-                    <div className=
-                        {`flex flex-col items-center justify-center border bg-white border-black  ${(data.hidden || ! hasWeightOrLabel) && "hidden"}`
-                        }>
+                    <div style={textStyle} className=
+                        {`flex flex-col items-center justify-center border bg-white border-black ${(data.hidden || ! hasWeightOrLabel) && "hidden"}`}>
                         <p className="leading-none">
-                            { ! data.weightHidden ? data.weight : "" }
+                            { hasWeight ? data.weight : "" }
                         </p>
                         <p className="leading-none">
-                            { ! data.labelHidden ? data.label : ""}
+                            { hasLabel ? data.label : "" }
                         </p>
                     </div>
                     );
