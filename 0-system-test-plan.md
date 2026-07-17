@@ -112,6 +112,70 @@ Load sorting_13 and run both insertion_sort and quicksort on it.
 5. Move some nodes of n42-t48v150 to see if they shift correctly; do this both in edit mode and during algorithm execution
 6. (!) Load (+) shift-test. Move node B into position 4, occupied by E. Then move node J into position 1, occupied by G.
 
+## Trees
+
+### Arbitrary trees
+
+#### (!) Run `src/testing/sequencing.js`
+- should create four nodes: 0, 1, 2, 3
+- nodes 1, 2, 3 will become children of 0 in that order
+- the order is changed to 2, 1, 3
+- the order is changed to 3, 1, 2
+- the order is changed to 3, 2, 1 (`setChildren` works with a subset of the children)
+- an error occurs: no edge from 1 to 0
+- it is still possible to step back and forth
+
+#### Preorder and postorder
+
+Run `preorder_traversal.js` and `postorder_traversal.js` on any of the `ub?.tree` files in `tree-tests`
+
+### Binary search trees
+
+#### Insertion
+
+7
+4,3 - insert left twice
+5 - insert right with left present
+6 - insert right
+9 - insert right with left present
+10,11 - insert right twice
+8 - insert left with right present
+
+#### deletion
+
+create tree with insertion sequence 7,1,8,5,3,2,4
+(-7) - finding greatest predecessor and shifting with right dummy
+(-1) - shift with left dummy
+(-4) - leaf
+
+### Red/black trees
+
+#### insertion sequence 
+- see Goodrich and Tamassia, *Algorithm Design*, pp. 175-6
+- or Goodrich, Tamassia and Golwasser *Data Structures & Algorithms*, pp. 515-6
+
+* 4, 7
+* 12 - rotate so 7 becomes root (LL)
+* 15 - recolor so that 15 only is red
+* 3, 5
+* 14 - rotate so 14 has 12 and 15 as children (RL)
+* 18 - recolor 12 and 15 black
+* 16 - rotate so 16 has 15 and 18 as children (LR)
+* 17 - a recolor followed by a rotation that puts 14 at the root (RR)
+
+#### deletion sequence
+ - see Goodrich and Tamassia, *Algorithm Design*, pp. 182-3
+
+Start with tree from insertion sequence, saved as **public/collection/trees/rt-example.tree**
+
+* -3
+* -12 double black => restructure with subtree [4,5,7]
+* -17
+* -18 double black => recolor
+* -15
+* -16 double black => adjustment followed by recoloring
+
+
 ## Error handling
 
 ### Graph input
@@ -132,7 +196,6 @@ Load sorting_13 and run both insertion_sort and quicksort on it.
 ### Editing
 
 1. The drop down when right clicking on a node to make changes goes off screen if the node is too close to the bottom. Workaround is to pan and zoom.
-2. Labels/weights on nodes should change size with changes in node radius but they don't do that consistently.
 
 ### Algorithm execution
 
@@ -140,9 +203,7 @@ Load sorting_13 and run both insertion_sort and quicksort on it.
 
 ### Error handling
 
-1. Graph load error messages could be a lot more specific about cause of error and line number.
-2. Duplicate edges are not flagged as errors.
-3. Parallel edges in opposite directions are rendered too close to each other.
-4. Nodes with the same coordinates should be highlighted; this is also an issue during editing,
-5. Layered graphs: edges connecting nodes on the same layer or on nonadjacent layers are not flagged as errors.
-6. Nodes with the same layer and position do not cause a shift as they do during editing.
+1. Parallel edges in opposite directions are rendered too close to each other.
+2. Nodes with the same coordinates should be highlighted; this is also an issue during editing,
+3. Layered graphs: edges connecting nodes on the same layer or on nonadjacent layers are not flagged as errors.
+4. Nodes with the same layer and position do not cause a shift as they do during editing.
