@@ -33,16 +33,15 @@
 /**
  * In CytoscapeInterface, turn nodes, the node map, into a list of pairs of the form
  *  [[id_1, node_1] , ... , [id_n, node_n]]
- * as follows
- */
- const nodeList = Object.entries(nodes).sort((a, b) => a[1].sequenceNumber - b[1].sequenceNumber);
- /* Then ...
- */
+ * and sort the pairs by node_k.sequenceNumber
+ *
+ * Then you can do
   nodeList.forEach(idNodePair => {
     const node = idNodePair[1];
     // ...
   })
   return elements
+*/
 
 /**
  * in TreeInterface.js

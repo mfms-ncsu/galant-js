@@ -14,6 +14,12 @@ import GraphInterface from "../GraphInterface/GraphInterface"
  ***********
  */
 
+// minimum size text of a label, independent of node radius
+const MIN_LABEL_FONT_SIZE = 16
+// this will be the standard size for both nodes and edges - see below
+// idea is to use a size based on node radius unless that is smaller than the min
+let labelFontSize
+
  function parseAndRound(input) {
     const num = Number(input);
     
@@ -135,8 +141,12 @@ function parseNode(graph, node) {
         element.data["weightHidden"] = true
     }
 
-    element.data["labelFontSize"] = `${graph.nodeSize / 2}px`
-
+    // transmits information about desired size of node labels and weights
+    //  to Cytoscape.jsx
+    // Note: this does not work as intended when user zooms in and out
+    //  - measures such as px, mm, etc. expand and contract with the zoom
+    //    and there is no easy way to get around this, so don't even try
+    element.data["labelFontSize"] = `${labelFontSize}px`
     // Need the following because Cytoscape.jsx does not handle
     //  graph.showNodeLabels and graph.showNodeWeights correctly
     if ( ! graph.showNodeLabels ) {
@@ -161,6 +171,10 @@ function parseNode(graph, node) {
  * @returns Array of cytoscape elements to display
  */
 function getElements(graph) {
+  // define label font size for both nodes and edges
+  const standardLabelFontSize = graph.nodeSize / 2
+  labelFontSize = standardLabelFontSize > MIN_LABEL_FONT_SIZE ? standardLabelFontSize : MIN_LABEL_FONT_SIZE
+
   // Create an array of elements
   let elements = [];
 
@@ -257,7 +271,7 @@ function getStyle(graph) {
             "selector": "edge[label]",
             "style": {
                 "label": "data(textToDisplay)",
-                "fontSize": `${graph.nodeSize / 2}px`,
+                "fontSize": `${labelFontSize}px`,
                 "textWrap": "wrap",
                 "textBackgroundColor": "white",
                 "textBackgroundOpacity": "1.0",
