@@ -16,7 +16,7 @@ function LoadButton({ tab, editorType }) {
     // Effect hook to handle keyboard shortcut for loading graph/algorithm
     useEffect(() => {
         function onKeyPress(event) {
-            if (event.code === "KeyL" && (event.metaKey || event.ctrlKey)) {
+            if (event.code === "KeyL" && event.ctrlKey && event.shiftKey) {
                 event.preventDefault();
                 load();
             }
@@ -90,7 +90,7 @@ function LoadButton({ tab, editorType }) {
 
             <PrimaryButton onClick={load}>
                 <ArrowUpRightIcon className="inline h-4 me-2 stroke-2 stroke-black"/>
-                Load {editorType} (Ctrl-L)
+                Load {editorType} (Ctrl-Shift-L)
             </PrimaryButton>
         </>
     );
@@ -103,7 +103,7 @@ function DownloadButton({ editorType, tab }) {
     // Register the cmd/ctrl-S keyboard shortcut
     useEffect(() => {
         function handleKeydown(event) {
-            if (event.code === "KeyS" && (event.metaKey || event.ctrlKey)) {
+            if (event.code === "KeyS" && event.ctrlKey && event.shiftKey) {
                 event.preventDefault();
                 TabInterface.downloadTab(tab, editorType);
             }
@@ -115,7 +115,7 @@ function DownloadButton({ editorType, tab }) {
     return tab && tab.content.length >= 0 && (
         <PrimaryButton onClick={() => TabInterface.downloadTab(tab, editorType)}>
             <ArrowDownTrayIcon className="inline h-4 me-2 stroke-2 stroke-black" />
-            Download File (Ctrl-S)
+            Download File (Ctrl-Shift-S)
         </PrimaryButton>
     );
 }

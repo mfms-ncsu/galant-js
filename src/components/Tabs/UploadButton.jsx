@@ -16,7 +16,7 @@ export default function UploadButton({onFileUpload, acceptFileType}) {
         function onKeyPress(event) {
             // event.preventDefault(); this disables all keys
             // Using Ctrl-U because Ctrl-O is not even recognized as a key event on MacOS.
-            if (event.code === "KeyU" && (event.metaKey || event.ctrlKey)) {
+            if (event.code === "KeyO" && event.ctrlKey && event.shiftKey) {
                 event.preventDefault();
                 const fileInput = document.getElementById("file-upload");
                 // Simulate a click on the file input element to open the file picker dialog
@@ -61,7 +61,7 @@ export default function UploadButton({onFileUpload, acceptFileType}) {
         <PrimaryButton className="m-1">
             <label htmlFor="file-upload" className="cursor-pointer flex items-center"> 
                 <ArrowUpTrayIcon className="inline h-4 me-2 fill-black stroke stroke-black"/>
-                Upload File (Ctrl-U)
+                Upload File (Ctrl-Shift-O)
             </label>
             <input id="file-upload" type="file" accept={acceptFileType} multiple className="hidden" onChange={onUploadEvent}></input>
         </PrimaryButton>
