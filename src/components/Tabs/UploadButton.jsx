@@ -43,7 +43,7 @@ export default function UploadButton({onFileUpload, acceptFileType}) {
   }
 
     return (
-        <PrimaryButton className="m-1">
+        <PrimaryButton className="m-1" onClick={openFileDialog}>
             <label className="cursor-pointer flex items-center"> 
                 <ArrowUpTrayIcon className="inline h-4 me-2 fill-black stroke stroke-black"/>
                 Open (Ctrl-Shift-O)
