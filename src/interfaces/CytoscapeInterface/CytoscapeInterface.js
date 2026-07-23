@@ -15,7 +15,7 @@ import GraphInterface from "../GraphInterface/GraphInterface"
  */
 
 // minimum size text of a label, independent of node radius
-const MIN_LABEL_FONT_SIZE = 16
+const MIN_LABEL_FONT_SIZE = 14
 // this will be the standard size for both nodes and edges - see below
 // idea is to use a size based on node radius unless that is smaller than the min
 let labelFontSize
