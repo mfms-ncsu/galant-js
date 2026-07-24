@@ -49,7 +49,7 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 
 ### (!) Simple upload/download in editor window
 
-1. Upload a graph (e.g., triangle).
+1. Upload (+) `triangle`.
 2. Make a few minor changes in the `Edit` window: add a node and edge, change a position, color a node/edge, change shape, add a weight and label
 2'. Make some changes in the main window.
 3. Download to a different name/location, close the window, focus on a different graph, and upload again
@@ -108,7 +108,7 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 
 ### Sorting
 
-Load sorting_13 and run both insertion_sort and quicksort on it.
+Load sorting_13 and run both insertion_sort and quicksort on it. For one of the runs, move nodes during algorithm execution and see if they go back where they are supposed to be at the next step; also see what happens after execution
 
 ### Layered graphs
 
@@ -116,14 +116,14 @@ Load sorting_13 and run both insertion_sort and quicksort on it.
 2. Run barycenter on ex_20; stop after one pass - minima reached at iteration 6: 32 crossings, min bottleneck is 6 at iteration 0; run again and continue with two passes; min at iteration 12 with 30 crossings; min bottleneck is still 6.
 3. (!) Run layered-graph-stats on (+) two_unequal_layers: crossings = 0, nonverticality and bottleneck verticality = 1; move node 4 to position 0: crossings = bottleneck = 2; nonverticality = 5, bottleneck = 4
 4. Run layered-graph-stats on n42-t48v150: total crossings = 48, bottleneck crossings = 7, nonverticality = 150, and bottleneck verticality = 16
-5. Move some nodes of n42-t48v150 to see if they shift correctly; do this both in edit mode and during algorithm execution
+5. Move some nodes of n42-t48v150 to see if they shift correctly; do this both in edit mode and during algorithm execution; during algorithm execution, check that positions revert to those specified by algorithm at the next step, and see what happens on algorithm completion
 6. (!) Load (+) shift-test. Move node B into position 4, occupied by E. Then move node J into position 1, occupied by G.
 
 ## Trees
 
 ### Arbitrary trees
 
-#### (!) Run `src/testing/sequencing.js`
+#### (!) Run (+) `sequencing.js`
 - should create four nodes: 0, 1, 2, 3
 - nodes 1, 2, 3 will become children of 0 in that order
 - the order is changed to 2, 1, 3
@@ -134,7 +134,7 @@ Load sorting_13 and run both insertion_sort and quicksort on it.
 
 #### Preorder and postorder
 
-Run `preorder_traversal.js` and `postorder_traversal.js` on any of the `ub?.tree` files in `tree-tests`
+Run `preorder_traversal.js` and `postorder_traversal.js` on (+) `tree-for-traversals.tree`
 
 ### Binary search trees
 
@@ -173,7 +173,7 @@ create tree with insertion sequence 7,1,8,5,3,2,4
 #### deletion sequence
  - see Goodrich and Tamassia, *Algorithm Design*, pp. 182-3
 
-Start with tree from insertion sequence, saved as **public/collection/trees/rt-example.tree**
+Start with tree from insertion sequence, saved as `0-system-test-files/rb-test-example.tree`
 
 * -3
 * -12 double black => restructure with subtree [4,5,7]
