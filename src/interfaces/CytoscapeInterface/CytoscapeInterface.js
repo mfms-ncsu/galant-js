@@ -18,6 +18,9 @@ import GraphInterface from "../GraphInterface/GraphInterface"
 const MIN_LABEL_FONT_SIZE = 14
 // this will be the standard size for both nodes and edges - see below
 // idea is to use a size based on node radius unless that is smaller than the min
+// !!! this idea works only when user changes node radius
+//     labels will grow and shrink unconditionally as user zooms in and out
+// !!!
 let labelFontSize
 
  function parseAndRound(input) {

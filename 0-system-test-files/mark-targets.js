@@ -2,6 +2,11 @@ let edges = getEdges();
 print(edges);
 
 edges.forEach(edge => {
+    highlight(edge);
     let node = target(edge)
-    mark(node);
+    if ( ! marked(node) ) {
+        mark(node);
+    } else {
+        unmark(node);
+    }
 })

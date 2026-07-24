@@ -18,7 +18,7 @@ step(() => {
     clearEdgeHighlights();
     clearEdgeColors();
     clearEdgeLabels();
-    clearEdgeWeights();
+    hideAllEdgeWeights();
 })
 
 // let user choose another starting node if there are remaining unreachable nodes
@@ -27,7 +27,6 @@ while ( unvisited.size > 0 ) {
     const start = promptNodeFrom("Enter start node:", unvisited);
     visit(start);
 }
-display("algorithm done")
 
 function visit(node) {
     unvisited.delete(node);
@@ -39,7 +38,7 @@ function visit(node) {
         label(node, discoveryTimes[node]);
     });
 
-    for ( const edge of outgoing(node) ) {
+     for ( const edge of outgoing(node) ) {
         if ( hasColor(edge) ) continue; // seen this edge from the other end (undirected)
            const nextNode = other(node, edge);
             if ( hasLabel(edge) ) {
@@ -69,8 +68,5 @@ function visit(node) {
     }
 
     finishTimes[node] = time++;
-    step(() => {
-        label(node, discoveryTimes[node] + "/" + finishTimes[node]);
-        display(`done visiting ${node}`)
-    })
+    label(node, discoveryTimes[node] + "/" + finishTimes[node]);
 }

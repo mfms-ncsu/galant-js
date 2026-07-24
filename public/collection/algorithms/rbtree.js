@@ -421,7 +421,8 @@ function findNodeToRemove(subroot, weightToRemove) {
 
   // Has two real children, need to replace x with in-order predecessor
 
-  // Find in-order predecessor
+  // Find in-order predecessor, remember color of subroot for later
+  const subrootWasRed = isRed(subroot)
   step(() => {
     display("Looking for in-order predecessor")
     color(subroot, "black")
@@ -432,7 +433,11 @@ function findNodeToRemove(subroot, weightToRemove) {
   const predWeight = weight(predecessor);
   step(() => {
     setWeight(subroot, predWeight);
-    uncolor(subroot)
+    if ( subrootWasRed ) {
+      makeRed(subroot)
+    } else {
+      makeBlack(subroot)
+    }
     color(predecessor, "black");
   })
   display(`Found predecessor with key ${predWeight}`)
@@ -620,6 +625,7 @@ function remedyDoubleBlack(node) {
 step(() => {
   setWeightsInside(true)
   setDirected(true)
+  clearNodeLabels()
 })
 let running = true;
 display("Red/black tree animation. To add nodes, give positive numbers; to remove, negative and to stop 0")

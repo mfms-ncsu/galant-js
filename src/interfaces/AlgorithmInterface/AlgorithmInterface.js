@@ -270,6 +270,10 @@ function onMessage(algorithm, message) {
             [newGraph, newChangeManager] = LayeredGraphInterface.setChannelProperty(graph, changeManager, message.channel, message.attribute, message.value);
             updateState(newGraph, newChangeManager);
             break;
+        case "setWeights":
+            [newGraph, newChangeManager] = LayeredGraphInterface.setWeights(graph, changeManager, message.layer, message.type);
+            updateState(newGraph, newChangeManager);
+            break;
         case "setWeightsUp":
             [newGraph, newChangeManager] = LayeredGraphInterface.setWeightsUp(graph, changeManager, message.layer, message.type);
             updateState(newGraph, newChangeManager);

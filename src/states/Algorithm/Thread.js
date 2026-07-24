@@ -835,7 +835,7 @@ function promptNodeFrom(message, nodes) {
     if (nodes.length === 0) {
         throw new Error("Cannot prompt for a node when no valid nodes exist.");
     }
-    return promptFrom(message, nodes, "Must add node from: " + nodes.join(" "));
+    return promptFrom(message, nodes, "Node must be from {" + nodes.join(",") + "}");
 }
 
 function promptEdge(message) {
@@ -872,7 +872,7 @@ function promptEdgeFrom(message, edges) {
     if (edges.length === 0) {
         throw new Error("Cannot prompt for a edge when no valid edges exist.");
     }
-    return promptFrom(message, edges, "Must add edge from: " + edges.join(" "));
+    return promptFrom(message, edges, "Edge must be from {" + edges.join(",") + "}");
 }
 
 /*

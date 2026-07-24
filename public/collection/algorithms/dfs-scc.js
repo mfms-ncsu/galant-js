@@ -98,8 +98,8 @@ function visit(node) {
         label(node, discoveryTimes[node]);
     });
 
-	for ( const edge of outgoing(node) ) {
-	    const nextNode = other(node, edge);
+     for ( const edge of outgoing(node) ) {
+        const nextNode = other(node, edge);
         display(`considering neighbor ${nextNode}`)
         if ( ! marked(nextNode) ) { // not yet visited
             step(() => {

@@ -54,7 +54,7 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 2'. Make some changes in the main window.
 3. Download to a different name/location, close the window, focus on a different graph, and upload again
 
-### Uploads with different node and edge attributes/variations; graphs are in src/testing
+### Uploads with different node and edge attributes/variations; graphs are in `0-system-test-files`
 
 1. Load (+) opposite-edge. There should be parallel edges 1,2 and 2,1. Check both directed and undirected.
 2. Load (+) attributes. The graph should be displayed as indicated in the text.
@@ -69,7 +69,7 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 
 ### (!) Exporting a graph
 
-1. Upload and load a graph (dt-11); upload and load a simple algorithm (bfs from Examples)
+1. Load graph `dt-11` and algorithm `bfs` from Examples
 2. Run the algorithm for a few steps
 3. Export the graph to a file
 4. Upload and load the exported graph and check that the export was correct
@@ -79,20 +79,20 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 
 ### Simple algorithms
 
-1. Run `set-positions.js` on (+) `position-test.js`
+1. Run (+) `position-test.js` on `for-position-test.gph`
 - the first step lines up nodes 0, 1, 2 in the respective positions along the y = 0 line
 - second step puts nodes 2, 0 in positions 0, 2, respectively along y = 1
 - the third step puts nodes 0, 1 in positions 1, 2 along y = 2 
 
-2. Run `mark-targets.js` on any graph with more than three edges.
+2. Run `mark-targets.js` on any graph with more than three edges. The algorithm higlights each edge and marks its target unless it's already marked, in which case it unmarks it
 
 ### Graph searches
 
 Run these on both undirected and directed graphs; dfs-scc forces the graph to be directed. Make sure both the back and forward buttons/arrow keys work. The restart feature does not work consistently for some reason. This may be slow reaction for algorithms that ask for a start node.
 
-1. Run bfs on g-12; start at any node if undirected; at node 1 if directed; bfs does not have restart capability when some nodes are unreachable; also, the messages are a little out of sync with the algorithm actions.
+1. Run bfs on g-12; start at any node if undirected; at node 1 if directed; bfs does not have restart capability when some nodes are unreachable
 2. Run dfs on g-12; start anywhere if undirected; if directed, start at nodes 7, 4, and 1; also try an illegal starting point before choosing 4 (e.g. 11); dfs could be more informative about the edges it is exploring; and it could let you know when it's done (same for other search algorithms)
-3. Run dfs-scc on g-12, starting at node 3, then 1. Use the restart feature to do a second run with a different sequence. *Restart will ignore changes to the graph*, e.g., changing directedness of edges
+3. Run dfs-scc on g-12, starting at node 3, then 1. Use the restart feature to do a second run with a different sequence. *Restart will ignore changes to the graph*, e.g., changing directedness of edges [restart does not work if you run the algorithm to the end; not clear why]
 4. During at least one of these runs, move nodes to see if the positions are preserved.
 
 ### Shortest paths
@@ -108,7 +108,7 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 
 ### Sorting
 
-Load sorting_13 and run both insertion_sort and quicksort on it. For one of the runs, move nodes during algorithm execution and see if they go back where they are supposed to be at the next step; also see what happens after execution
+Load sorting_13 and run both insertion_sort and quicksort on it.\
 
 ### Layered graphs
 
@@ -123,14 +123,14 @@ Load sorting_13 and run both insertion_sort and quicksort on it. For one of the 
 
 ### Arbitrary trees
 
-#### (!) Run (+) `sequencing.js`
+#### (!) Run (+) `sequencing.js` on (+) `empty.tree`
 - should create four nodes: 0, 1, 2, 3
 - nodes 1, 2, 3 will become children of 0 in that order
 - the order is changed to 2, 1, 3
 - the order is changed to 3, 1, 2
 - the order is changed to 3, 2, 1 (`setChildren` works with a subset of the children)
 - an error occurs: no edge from 1 to 0
-- it is still possible to step back and forth
+- it is still possible to step back (but not forward)
 
 #### Preorder and postorder
 
@@ -139,6 +139,8 @@ Run `preorder_traversal.js` and `postorder_traversal.js` on (+) `tree-for-traver
 ### Binary search trees
 
 #### Insertion
+
+start with (+) `empty.tree`
 
 7
 4,3 - insert left twice
@@ -150,7 +152,7 @@ Run `preorder_traversal.js` and `postorder_traversal.js` on (+) `tree-for-traver
 
 #### deletion
 
-create tree with insertion sequence 7,1,8,5,3,2,4
+create tree with insertion sequence 7,1,8,5,3,2,4 or use (+) `bs-test-example.tree`
 (-7) - finding greatest predecessor and shifting with right dummy
 (-1) - shift with left dummy
 (-4) - leaf
@@ -173,7 +175,7 @@ create tree with insertion sequence 7,1,8,5,3,2,4
 #### deletion sequence
  - see Goodrich and Tamassia, *Algorithm Design*, pp. 182-3
 
-Start with tree from insertion sequence, saved as `0-system-test-files/rb-test-example.tree`
+Start with tree from insertion sequence, saved as (+) `rb-test-example.tree`
 
 * -3
 * -12 double black => restructure with subtree [4,5,7]
