@@ -6,11 +6,11 @@ step(() => {
 })
 
 step(() => {
-    setPosition(nodeIds[0], 2, 0);
-    setPosition(nodeIds[2], 0, 0);
+    setPosition(nodeIds[0], 2, 1);
+    setPosition(nodeIds[2], 0, 1);
 })
 
 step(() => {
-    setPosition(nodeIds[0], 1, 0);
-    setPosition(nodeIds[1], 2, 0);
+    setPosition(nodeIds[0], 1, 2);
+    setPosition(nodeIds[1], 2, 2);
 })

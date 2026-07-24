@@ -7,8 +7,6 @@ TODO:
 - merge dev into main and get rid of all console logs
 - publish version 3.0
 
-## Test for speed
-
 ## New release
 
 ### Steps
@@ -29,7 +27,7 @@ TODO:
 
 These tests should be carried out with the following platform/brower combinations. You may have to reload the main page or even clear browser history (Opera, in particular, forces you to do this). For most tests the Mac/Chrome combination is sufficient.
 All combinations should be tested for those marked with (!). These should be tested with keyboard shortcuts.
-Files marked with (+) are in the `src/testing` directory.
+Files not included in the examples are marked (+) and are in the `0-system-test-files` directory.
 
 Tests should be done in the dev branch with console.log's added as needed. The logs should be removed in the main branch before deployment.
 
@@ -51,7 +49,7 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 
 ### (!) Simple upload/download in editor window
 
-1. Upload a graph (e.g., (+) triangle).
+1. Upload a graph (e.g., triangle).
 2. Make a few minor changes in the `Edit` window: add a node and edge, change a position, color a node/edge, change shape, add a weight and label
 2'. Make some changes in the main window.
 3. Download to a different name/location, close the window, focus on a different graph, and upload again
@@ -78,6 +76,15 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 
 ## Testing: Running algorithms
  * (!) Run at least one algorithm on all platform/browser combinations; dfs-scc on g-12 is a good choice (see item 3 below)
+
+### Simple algorithms
+
+1. Run `set-positions.js` on (+) `position-test.js`
+- the first step lines up nodes 0, 1, 2 in the respective positions along the y = 0 line
+- second step puts nodes 2, 0 in positions 0, 2, respectively along y = 1
+- the third step puts nodes 0, 1 in positions 1, 2 along y = 2 
+
+2. Run `mark-targets.js` on any graph with more than three edges.
 
 ### Graph searches
 
