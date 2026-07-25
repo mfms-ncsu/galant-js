@@ -61,9 +61,9 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 
 ### (!) Saving graph after edits in main window
 
-1. Upload and load a graph, e.g., dt-11 from Examples
+1. Load a graph, e.g., dt-11 from Examples
 2. Do a sequence of edit operations that include an auto-layout followed by node move
-3. Make sure you can backtrack (z shortcut) from at least two auto-layouts with intervening node moves.
+3. Make sure you can undo (z shortcut) and redo (y shortcut) several times after at least two auto-layouts with intervening node moves.
 4. Set the label and set/change the weight of a node and of an edge.
 5. Save the result to the edit window, checking that changes took effect
 
@@ -75,7 +75,6 @@ Make sure there are tests that use keyboard shortcuts as well as buttons.
 4. Upload and load the exported graph and check that the export was correct
 
 ## Testing: Running algorithms
- * (!) Run at least one algorithm on all platform/browser combinations; dfs-scc on g-12 is a good choice (see item 3 below)
 
 ### Simple algorithms
 
@@ -92,7 +91,7 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 
 1. Run bfs on g-12; start at any node if undirected; at node 1 if directed; bfs does not have restart capability when some nodes are unreachable
 2. Run dfs on g-12; start anywhere if undirected; if directed, start at nodes 7, 4, and 1; also try an illegal starting point before choosing 4 (e.g. 11); dfs could be more informative about the edges it is exploring; and it could let you know when it's done (same for other search algorithms)
-3. Run dfs-scc on g-12, starting at node 3, then 1. Use the restart feature to do a second run with a different sequence. *Restart will ignore changes to the graph*, e.g., changing directedness of edges [restart does not work if you run the algorithm to the end; not clear why]
+3. (!) Run dfs-scc on g-12, starting at node 3, then 1. Use the restart feature to do a second run with a different sequence. *Restart will ignore changes to the graph*, e.g., changing directedness of edges [restart does not work if you run the algorithm to the end; not clear why]
 4. During at least one of these runs, move nodes to see if the positions are preserved.
 
 ### Shortest paths
@@ -189,9 +188,10 @@ Start with tree from insertion sequence, saved as (+) `rb-test-example.tree`
 
 ### Graph input
 
-1. (!) Load all of of the graphs with prefix `bad` in the `src/testing` directory (there are six). There should be error messages reflecting what's wrong with these graphs. You should be able to select and upload all of these at once. [!!! errors on layered graphs are not detected !!!]
-2. Load (+) same-coordinates. Instead of an error, node 3 will land on top of 0 and allow user to fix by moving 3.
+1. (!) Load all of of the (+) graphs with prefix `bad` (there are six). There should be error messages reflecting what's wrong with these graphs. You should be able to select and upload all of these at once.
+2. Load (+) same-coordinates. Instead of an error, node 3 will land on top of 0 and allow user to fix by moving 3. Ideally, node 3 should be marked in some way or a warning message be given. Detection requires iterating through all nodes with a set of known coordinates.
 3. Load (+) same-position. In this case nodes should shift appropriately: node 3 should end up in position 1 of layer 0. [!!! does not work !!!]
+4. Load (+) `edge-connecting-nonadjacent-layers` and `edge=on-same-layer`; should result in relevant error messages
 
 ### Algorithm execution
 
@@ -213,6 +213,5 @@ Start with tree from insertion sequence, saved as (+) `rb-test-example.tree`
 ### Error handling
 
 1. Parallel edges in opposite directions are rendered too close to each other.
-2. Nodes with the same coordinates should be highlighted; this is also an issue during editing,
-3. Layered graphs: edges connecting nodes on the same layer or on nonadjacent layers are not flagged as errors.
-4. Nodes with the same layer and position do not cause a shift as they do during editing.
+2. Nodes with the same coordinates should be highlighted or a warning issued; this is also an issue during editing,
+3. Nodes with the same layer and position do not cause a shift as they do during editing.
