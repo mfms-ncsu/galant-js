@@ -113,7 +113,7 @@ Run these on both undirected and directed graphs; dfs-scc forces the graph to be
 
 ### Sorting
 
-Load sorting_13 and run both insertion_sort and quicksort on it.\
+***(!) Load sorting_13*** and run both insertion_sort and ***(!)quicksort*** on it.
 
 ### Layered graphs
 
@@ -122,7 +122,7 @@ Load sorting_13 and run both insertion_sort and quicksort on it.\
 3. ***(!) Run layered-graph-stats on (+) two_unequal_layers***: crossings = 0, nonverticality and bottleneck verticality = 1; move node 4 to position 0: crossings = bottleneck = 2; nonverticality = 5, bottleneck = 4
 4. Run layered-graph-stats on n42-t48v150: total crossings = 48, bottleneck crossings = 7, nonverticality = 150, and bottleneck verticality = 16
 5. Move some nodes of n42-t48v150 to see if they shift correctly; do this both in edit mode and during algorithm execution; during algorithm execution, check that positions revert to those specified by algorithm at the next step, and see what happens on algorithm completion
-6. ***(!) Load (+) shift-test.*** Move node B into position 4, occupied by E. Then move node J into position 1, occupied by G.
+6. ***(!) Load (+) shift-test.*** Move node B into position 4, occupied by E. Then move node J into position 1, occupied by G. Move F into position occupied by H and D into position occupied by E. Try various other moves, both those resulting in shifts and moving into empy spaces.
 
 ## Trees
 
@@ -135,7 +135,7 @@ Load sorting_13 and run both insertion_sort and quicksort on it.\
 - the order is changed to 3, 1, 2
 - the order is changed to 3, 2, 1 (`setChildren` works with a subset of the children)
 - an error occurs: no edge from 1 to 0
-- it is still possible to step back (but not forward)
+- it is still possible to step back (but not necessarily forward)
 
 #### Preorder and postorder
 

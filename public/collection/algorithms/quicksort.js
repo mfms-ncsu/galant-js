@@ -18,6 +18,8 @@
 const HORIZONTAL_GAP = 1;
 const VERTICAL_GAP = 1;
 
+setWeightsInside(true)
+
 /**
  * @return a random element of an array/list
  */
@@ -56,7 +58,7 @@ function placePivot(pivot, level, index) {
     step(() => {
 //        display(`-> placePivot: ${pivot}, ${level}, ${index}`)
         setPosition(pivot, HORIZONTAL_GAP * index, (2 * level - 1) * VERTICAL_GAP)
-        color(pivot, "black")
+        color(pivot, "grey")
         setShape(pivot, "triangle")
     })
 }
@@ -92,18 +94,18 @@ function quicksort(list, left, right, depth) {
     for ( const node of list ) {
         if ( weight(node) < weight(pivot) ) {
             less.push(node)
-            placeNode(node, depth, lessEnd, "red", "diamond")
+            placeNode(node, depth, lessEnd, "pink", "diamond")
             lessEnd++
         }
         else if ( weight(node) > weight(pivot) ) {
             greater.push(node)
-            placeNode(node, depth, greaterEnd, "blue", "rhomboid")
+            placeNode(node, depth, greaterEnd, "cyan", "rhomboid")
             greaterEnd--;
         }
         else if ( node != pivot ) {
             equal.push(node)
             step(() => {
-                color(node, "black")
+                //color(node, "gray")
                 setShape(node, "triangle")
             })
         }

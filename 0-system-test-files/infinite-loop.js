@@ -2,7 +2,7 @@
  * This algorithm has an infinite loop
  */
  color("1", "blue")
- highlight("1,2")
+ highlight("2")
  let x = 0
  while ( true ) {
     x = x + 1
