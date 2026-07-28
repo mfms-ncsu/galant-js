@@ -23,10 +23,12 @@ and then edit the appropriate json file in `src/data/` to replace the entries fo
 # Production deployment
 
 Before deployment, do thorough testing in the branch where changes were made (typically `dev`),
-merge `dev` into `main` and, after committing in `main`,
+then merge `dev` into `main` using the `--no-ff` and `--no-commit` options, fixing the conflicts before committing.
+After committing in `main` do
 ```
 git push https://mfms-ncsu@github.com/mfms-ncsu/galant-js main
 ```
+Technically, you should do a pull request - if you're familiar.
 
 To deploy a change to the production server:
 - BOX currently refers to `galant.csc.ncsu.edu`, but can be replaced with any server, and UID to the login id on the box, unity id currently
