@@ -24,6 +24,11 @@ and then edit the appropriate json file in `src/data/` to replace the entries fo
 
 Before deployment, do thorough testing in the branch where changes were made (typically `dev`),
 then merge `dev` into `main` using the `--no-ff` and `--no-commit` options, fixing the conflicts before committing.
+Do a sanity check to make sure nothing was broken during the merge
+* `git diff dev` should not show any major changes
+* test, for example, dfs-scc on g-12
+* briefly test any newly added features
+
 After committing in `main` do
 ```
 git push https://mfms-ncsu@github.com/mfms-ncsu/galant-js main
