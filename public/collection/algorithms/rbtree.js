@@ -635,8 +635,6 @@ step(() => {
 let running = true;
 display("Red/black tree animation. To add nodes, give positive numbers; to remove, negative and to stop 0")
 while ( running ) {
-  // the following does not work; something is amiss with prompts and line feeds
-  const LF = "\n"
   const weight = promptNumber("Add (> 0), remove (< 0) or stop (0)")
   if (weight > 0) {
     display(`Adding node with key ${weight}`)
