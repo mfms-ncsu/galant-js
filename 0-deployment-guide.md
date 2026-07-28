@@ -1,20 +1,24 @@
 # Preparation
 
 To create json files of for the lists of graph and algorithm examples, do the following.
-* make sure all the graphs are listed in in the desired order in 0-file_list.txt in subdirectories (of `public/collection`)algorithms, graphs, trees and layered-graphs; one way to do this is `ls > 0-file_list.txt` and then move the files around into the desired order
+* make sure all the graphs are listed in in the desired order in 0-file_list.txt in subdirectories (of `public/collection`)algorithms, graphs, trees and layered-graphs; one way to do this is `ls > 0-file-list.txt` and then move the files around into the desired order
 * do the following in all three subdirectories
 ```
-conversion-scripts/dir2index.py -F json -f "`cat 0-file_list.txt`" "" > tmp.json
+~/Git/galant-js/conversion-scripts/dir2index.py -F json -f "`cat 0-file-list.txt`" "" > tmp.json
 ```
+**Note:** `dir2index.py` is quite useful in other ways - you may want to put it in your bin directory or add it to your path.
 * move `algorithms/tmp.json` to `../../src/data/algorithms.json`
-* Use a text editor to combine the three json files in `graphs`, `trees` and `layered-graphs` into a single list and move the result as `src/data/graphs.json`
-* delete the `tmp.json` files in `graphs`, `layered-graphs`, and the combined version, if any
+* Use a text editor to combine the json files in `graphs`, `trees` and `layered-graphs` into a single list and move the result as `src/data/graphs.json`
+Easiest way to do the combining is to cat the files together into, e.g., `tmp-combined.json` and replace the two occurrences of `][` (on separate lines) with a comma
+* delete the `tmp.json` files in `graphs`, `trees` and `layered-graphs`, and the combined version, if any
 
 If only a single or small number of files need to change, you can do, for example,
 ```
 conversion-scripts/dir2index.py -F json -f "file_1 file_2" "" > tmp.json
 ```
-and then edit the appropriate json file in `src/data/` to replace the entries for `file_1` and `file_2` 
+and then edit the appropriate json file in `src/data/` to replace the entries for `file_1` and `file_2`
+
+* Check to make sure the examples are updated. Do an `npm run build` and clear browser data first.
 
 # Production deployment
 

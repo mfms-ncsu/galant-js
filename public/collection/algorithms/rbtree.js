@@ -1,3 +1,8 @@
+/**
+Implementation of red/black trees, as described in the Goodrich, Tamassia and Goldwasser text,
+among others. Start with empty.tree or rb-example.tree (for deletion)
+ */
+
 // colors used for red and black nodes should not obscure the weights. so use lighter versions
 // also use heavy border for black nodes
 const BLACK_COLOR = "gray"

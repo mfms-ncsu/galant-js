@@ -15,9 +15,6 @@
 //      greater = quicksort(greater)
 //      return append less, equal, greater
 
-const HORIZONTAL_GAP = 1;
-const VERTICAL_GAP = 1;
-
 setWeightsInside(true)
 
 /**
@@ -38,7 +35,7 @@ function lineUpNodes(nodeList) {
     let level = 0; let index = 0
     step(() => {
         for ( const node of nodeIds ) {
-            setPosition(node, HORIZONTAL_GAP * index, 2 * level * VERTICAL_GAP)
+            setPosition(node, index, 2 * level)
             color(node, "white")
             setShape(node, "ellipse")
             index++;
@@ -48,7 +45,7 @@ function lineUpNodes(nodeList) {
 
 function placeNode(node, level, index, desiredColor, shape) {
     step(()=> {
-        setPosition(node, HORIZONTAL_GAP * index, 2 * level * VERTICAL_GAP)
+        setPosition(node, index, 2 * level)
         color(node, desiredColor)
         setShape(node, shape)
     })
@@ -57,16 +54,16 @@ function placeNode(node, level, index, desiredColor, shape) {
 function placePivot(pivot, level, index) {
     step(() => {
 //        display(`-> placePivot: ${pivot}, ${level}, ${index}`)
-        setPosition(pivot, HORIZONTAL_GAP * index, (2 * level - 1) * VERTICAL_GAP)
-        color(pivot, "grey")
-        setShape(pivot, "triangle")
+        setPosition(pivot, index, (2 * level - 1))
+        color(pivot, "white")
+        setShape(pivot, "square")
     })
 }
 
 function moveToSorted(node) {
     step(() => {
 //        display(`-> moveToSorted: ${node}`)
-        incrementPosition(node, 0, -2 * VERTICAL_GAP)
+        incrementPosition(node, 0, -2)
         color(node, "yellow")
         setShape(node, "star")
     })
@@ -105,8 +102,8 @@ function quicksort(list, left, right, depth) {
         else if ( node != pivot ) {
             equal.push(node)
             step(() => {
-                //color(node, "gray")
-                setShape(node, "triangle")
+                color(node, "white")
+                setShape(node, "square")
             })
         }
     }

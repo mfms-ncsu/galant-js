@@ -1,9 +1,9 @@
 /**
- * This is a simple guide illustrating some common API calls used in algorithm animation programs.
- * Programs are written in JavaScript. You can usually implement an algorithm in JavaScript
- * and add animation effects using API calls.
- * For more details, see the examples and the User Guide at
- * https://docs.google.com/document/d/1FEi-RJ97UxsDuxHQrGmyOUanNWrWdq84NKicSdswGDY/view
+This is a simple guide illustrating some common API calls used in algorithm animation programs.
+Programs are written in JavaScript. You can usually implement an algorithm in JavaScript
+and add animation effects using API calls.
+For more details, see the examples and the User Guide at
+https://docs.google.com/document/d/1FEi-RJ97UxsDuxHQrGmyOUanNWrWdq84NKicSdswGDY
  */
 
 // Assume the graph has node "1" and edge "1,2" - weighted_7 is an example.

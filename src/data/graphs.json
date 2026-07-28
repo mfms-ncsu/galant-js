@@ -16,8 +16,8 @@
 	},
 	{
 		"name": "du-16.gph",
-		"content": "c A Delaunay triangulation with 16 vertices and 24 edges\nn 1 400 400\nn 2 410 505\nn 3 304 378\nn 4 537 406\nn 5 480 340\nn 6 47 232\nn 7 500 220\nn 8 255 182\nn 9 431 118\nn 10 260 500\nn 11 -22 335\nn 12 148 497\nn 13 334 442\nn 14 358 75\nn 15 97 350\nn 16 396 279\ne 16 7 24\ne 4 5 18\ne 5 7 25\ne 6 8 43\ne 6 11 25\ne 1 3 20\ne 10 12 23\ne 3 6 60\ne 3 12 40\ne 10 2 31\ne 2 4 33\ne 7 9 25\ne 8 14 30\ne 4 13 42\ne 15 16 62\ne 1 2 22\ne 11 12 47\ne 1 5 21\ne 11 15 24\ne 13 15 51\ne 13 10 19\ne 9 14 17\ne 14 16 42\ne 8 9 38\n",
-		"description": " A Delaunay triangulation with 16 vertices and 24 edges"
+		"content": "c A weighted graph with 16 vertices and 24 edges\ng 16 24\nn 1 400 400\nn 2 410 505\nn 3 304 378\nn 4 537 406\nn 5 480 340\nn 6 47 232\nn 7 500 220\nn 8 255 182\nn 9 431 118\nn 10 260 500\nn 11 -22 335\nn 12 148 497\nn 13 334 442\nn 14 358 75\nn 15 97 350\nn 16 396 279\ne 16 7 24\ne 4 5 18\ne 5 7 25\ne 6 8 43\ne 6 11 25\ne 1 3 20\ne 10 12 23\ne 3 6 60\ne 3 12 40\ne 10 2 31\ne 2 4 33\ne 7 9 25\ne 8 14 30\ne 4 13 42\ne 15 16 62\ne 1 2 22\ne 11 12 47\ne 1 5 21\ne 11 15 24\ne 13 15 51\ne 13 10 19\ne 9 14 17\ne 14 16 42\ne 8 9 38\n",
+		"description": " A weighted graph with 16 vertices and 24 edges"
 	},
 	{
 		"name": "g-12.gph",
@@ -35,49 +35,14 @@
 		"description": " another example to use for shortest paths\n start at node 1 if directed, anywhere if undirected; end at node 3"
 	},
 	{
-		"name": "weighted_10.gph",
-		"content": "c A weighted graph with 10 nodes\ng 10 14\nn 0 91 56 1\nn 1 338 68 1\nn 2 181 245 1\nn 3 208 163 1\nn 4 431 77 1\nn 5 85 168 1\nn 6 188 66 1\nn 7 317 242 1\nn 8 324 159 1\nn 9 415 163 1\ne 0 6 4\ne 5 0 2\ne 6 5 3\ne 5 2 9\ne 6 3 4\ne 3 2 1\ne 2 7 5\ne 7 8 4\ne 8 3 3\ne 6 1 8\ne 8 1 6\ne 1 4 5\ne 4 9 7\ne 9 1 6\n",
-		"description": " A weighted graph with 10 nodes"
-	},
-	{
 		"name": "map.gph",
-		"content": "c A map of North Carolina with edges representing distances between cities\nn A 0 50 label:Ash\nn H 100 50 label:Hkr\nn S 200 0 label:W-S\nn G 250 0 label:Gre\nn D 350 0 label:Dur\nn R 400 50 label:Ral\nn C 161 104 label:Cha\nn F 350 100 label:Fay\nn W 500 200 label:Wil\ne A H 75\ne H S 72\ne A C 136\ne H C 64\ne S C 75\ne S G 33\ne C G 86\ne G D 53\ne R D 40\ne C F 169\ne R F 78\ne F W 105\ne R W 114\n",
-		"description": " A map of North Carolina with edges representing distances between cities"
-	},
-	{
-		"name": "g-10.gph",
-		"content": "c A geometric graph with 10 nodes and 21 edges\nn 1 50 20\nn 2 30 20\nn 3 5 60\nn 4 35 5\nn 5 20 50\nn 6 10 30\nn 7 25 30\nn 8 50 60\nn 9 40 35\nn 10 5 40\ne 1 9 4\ne 1 8 9\ne 1 4 5\ne 4 2 4\ne 2 6 5\ne 2 7 3\ne 2 9 4\ne 3 10 5\ne 3 8 10\ne 5 3 4\ne 4 9 7\ne 4 6 8\ne 5 7 5\ne 5 6 5\ne 10 5 4\ne 5 8 7\ne 6 10 3\ne 6 7 4\ne 7 8 8\ne 7 9 4\ne 8 9 6\n",
-		"description": " A geometric graph with 10 nodes and 21 edges"
-	},
-	{
-		"name": "g-20_48.sgf",
-		"content": "c a geometric graph with 20 nodes and 48 edges\ng 20 28\nn 1 788 15 \nn 2 480 333 \nn 3 57 432 \nn 4 327 349 \nn 5 36 555 \nn 6 627 308 \nn 7 404 565 \nn 8 867 267 \nn 9 253 238 \nn 10 936 404 \nn 11 579 187 \nn 12 781 72 \nn 13 843 545 \nn 14 585 13 \nn 15 438 154 \nn 16 210 565 \nn 17 661 136 \nn 18 99 275 \nn 19 318 31 \nn 20 784 433 \ne 8 12 97 \ne 8 17 39 \ne 12 17 79 \ne 6 8 132 \ne 6 12 157 \ne 6 17 171 \ne 7 8 147 \ne 7 17 164 \ne 2 4 61 \ne 2 9 25 \ne 2 18 109 \ne 4 9 87 \ne 4 18 48 \ne 9 18 98 \ne 9 15 209 \ne 2 7 204 \ne 2 16 199 \ne 4 7 143 \ne 4 16 138 \ne 9 16 185 \ne 7 18 131 \ne 16 18 90 \ne 3 4 202 \ne 3 18 154 \ne 12 15 135 \ne 15 17 215 \ne 6 15 189 \ne 6 7 191 \ne 6 20 207 \ne 7 16 87 \ne 3 16 190 \ne 3 5 156 \ne 10 13 11 \ne 10 20 122 \ne 13 20 132 \ne 1 14 135 \ne 11 14 112 \ne 11 19 221 \ne 8 11 213 \ne 11 17 202 \ne 2 11 166 \ne 4 11 200 \ne 9 11 192 \ne 2 19 77 \ne 4 19 138 \ne 9 19 91 \ne 18 19 187 \ne 15 19 180 \n",
-		"description": " a geometric graph with 20 nodes and 48 edges"
-	},
-	{
-		"name": "r-10-25.gph",
-		"content": "c a randomly generated graph with 10 nodes and 25 edges\nn 1 766 320 1\nn 2 768 176 1\nn 3 638 584 1\nn 4 385 381 1\nn 5 430 72 1\nn 6 253 137 1\nn 7 128 619 1\nn 8 442 294 1\nn 9 91 397 1\nn 10 414 490 1\ne 1 2 21\ne 3 1 42\ne 2 4 63\ne 4 5 45\ne 5 6 27\ne 3 7 74\ne 6 8 36\ne 6 9 44\ne 4 10 17\ne 4 7 51\ne 3 10 35\ne 7 9 33\ne 8 4 15\ne 1 6 78\ne 4 6 40\ne 2 5 51\ne 5 8 32\ne 7 10 45\ne 4 9 43\ne 2 8 50\ne 9 10 49\ne 10 1 56\ne 8 9 53\ne 3 4 47\ne 8 3 51\n",
-		"description": " a randomly generated graph with 10 nodes and 25 edges"
-	},
-	{
-		"name": "gm-10_16.gph",
-		"content": "c random geometric graph: 10 vertices, 21 (desired) edges, seed = 1\nc 16 actual edges\ng 10 16\n\nn 1 46 46 \nn 2 32 23 \nn 3 4 4 \nn 4 32 39 \nn 5 8 16 \nn 6 19 16 \nn 7 19 36 \nn 8 46 15 \nn 9 46 30 \nn 10 -1 29 \ne 1 4 23 \ne 1 9 14 \ne 2 6 27 \ne 2 7 12 \ne 2 4 22 \ne 2 9 36 \ne 3 5 37 \ne 4 7 33 \ne 4 9 23 \ne 5 6 34 \ne 5 10 31 \ne 5 7 32 \ne 6 10 15 \ne 6 7 19 \ne 7 10 31 \ne 8 9 55 \n",
-		"description": " random geometric graph: 10 vertices, 21 (desired) edges, seed = 1\n 16 actual edges"
+		"content": "c A map of North Carolina with edges representing distances between cities\nc Current Algorithm: No Algorithm Running\n\nn Ashville 0 50 \nn Hickory 100 50 \nn Winston-Salem 200 0 \nn Greensboro 276 15 \nn Durham 350 0 \nn Raleigh 400 50 \nn Charlotte 161 104 \nn Fayettville 350 100 \nn Wilmington 500 200 \ne Ashville Hickory 75 \ne Ashville Charlotte 136 \ne Hickory Winston-Salem 72 \ne Hickory Charlotte 64 \ne Winston-Salem Charlotte 75 \ne Winston-Salem Greensboro 33 \ne Greensboro Durham 53 \ne Raleigh Durham 40 \ne Raleigh Fayettville 78 \ne Raleigh Wilmington 114 \ne Charlotte Greensboro 86 \ne Charlotte Fayettville 169 \ne Fayettville Wilmington 105 \n",
+		"description": " A map of North Carolina with edges representing distances between cities\n Current Algorithm: No Algorithm Running"
 	},
 	{
 		"name": "dt-40.gph",
-		"content": "c a Delaunay triangulation with 40 vertices and 60 edges\ng 40 60\n\nn 29 871 537 1 \nn 38 643 361 1 \nn 7 755 159 1 \nn 10 407 83 1 \nn 31 584 256 1 \nn 33 846 186 1 \nn 23 1120 183 1 \nn 27 930 82 1 \nn 35 885 662 1 \nn 15 695 811 1 \nn 34 361 776 1 \nn 13 208 299 1 \nn 32 477 303 1 \nn 5 387 237 1 \nn 11 808 0 1 \nn 30 1116 317 1 \nn 36 891 324 1 \nn 4 455 641 1 \nn 8 247 680 1 \nn 1 506 583 1 \nn 2 372 453 1 \nn 3 246 417 1 \nn 9 488 857 1 \nn 37 163 597 1 \nn 39 363 591 1 \nn 19 797 742 1 \nn 21 32 795 1 \nn 22 144 830 1 \nn 25 -35 634 1 \nn 28 36 474 1 \nn 40 545 456 1 \nn 6 702 576 1 \nn 24 119 368 1 \nn 20 1034 647 1 \nn 26 1064 410 1 \nn 14 175 729 1 \nn 16 773 305 1 \nn 12 286 954 1 \nn 18 889 409 1 \nn 17 652 54 1 \ne 38 29 30 \ne 35 29 17 \ne 40 38 45 \ne 10 7 35 \ne 7 11 20 \ne 7 16 32 \ne 10 17 24 \ne 31 33 35 \ne 31 32 43 \ne 36 33 28 \ne 27 23 25 \ne 23 30 24 \ne 33 27 23 \ne 15 34 34 \ne 19 15 41 \ne 34 39 32 \ne 13 32 38 \ne 24 13 36 \ne 32 40 19 \ne 13 5 22 \ne 5 10 39 \ne 11 27 26 \ne 11 17 27 \ne 30 36 28 \ne 36 38 33 \ne 8 4 31 \ne 4 9 25 \ne 14 8 18 \ne 1 4 33 \ne 1 6 40 \ne 2 1 34 \ne 2 3 32 \ne 5 2 34 \ne 3 24 23 \ne 3 8 31 \ne 15 9 28 \ne 9 12 30 \ne 37 39 41 \ne 39 40 46 \ne 19 35 37 \ne 21 22 22 \ne 25 21 26 \ne 22 34 47 \ne 25 28 24 \ne 37 25 25 \ne 28 37 21 \ne 6 19 24 \ne 6 18 51 \ne 28 24 31 \ne 26 20 21 \ne 20 35 25 \ne 26 30 26 \ne 29 26 36 \ne 14 21 21 \ne 16 23 53 \ne 16 18 35 \ne 12 14 34 \ne 12 22 23 \ne 18 20 30 \ne 17 31 22 \n",
-		"description": " a Delaunay triangulation with 40 vertices and 60 edges"
-	},
-	{
-		"name": "valid_graph_ncsu.gph",
-		"content": "c A graph in the shape of the NCSU logo\nn a 10 0 color:black\nn b 20 0 color:black\nn c 6 4 color:black\nn d 24 4 color:black\nn e 24 8 color:black\nn f 6 10 color:black\nn g 20 8 color:black\nn h 24 12 color:black\nn i 10 14 color:black\nn j 6 14 color:black \nn k 6 18 color:black\nn l 24 18 color:black\nn m 10 22 color:black\nn n 20 22 color:black\ne a b\ne a c\ne b d\ne d e \ne c f \ne e g\ne g h\ne f i\ne i j\ne j k\ne h l\ne k m\ne l n\ne m n\nn o 12 4 color:red\nn p 18 4 color:red\nn q 12 9 color:red\nn r 18 9 color:red\ne q o color:red\ne o r color:red\ne r p color:red\nn s 12 13 color:red\nn t 18 13 color:red\nn u 12 18 color:red\nn v 18 18 color:red \ne t s color:red\ne s u color:red\ne u v color:red\ne i s color:blue\ne v n color:blue\ne u m color:blue\ne t h color:blue\ne r g color:blue\ne f q color:blue\ne a o color:blue\ne p b color:blue\n",
-		"description": " A graph in the shape of the NCSU logo"
-	},
-	{
-		"name": "dt-64.gph",
-		"content": "c A Delaunay triangulation with 64 vertices and 176 edges\ng 64 176\nn 1 1045 596 1\nn 2 592 555 1\nn 3 46 181 1\nn 4 833 589 1\nn 5 212 274 1\nn 6 119 463 1\nn 7 312 476 1\nn 8 909 254 1\nn 9 1010 522 1\nn 10 33 405 1\nn 11 1057 376 1\nn 12 443 94 1\nn 13 459 566 1\nn 14 968 322 1\nn 15 127 77 1\nn 16 237 493 1\nn 17 1094 525 1\nn 18 93 596 1\nn 19 174 527 1\nn 20 376 365 1\nn 21 767 285 1\nn 22 1109 336 1\nn 23 718 117 1\nn 24 568 40 1\nn 25 908 462 1\nn 26 975 397 1\nn 27 174 408 1\nn 28 85 342 1\nn 29 419 135 1\nn 30 995 266 1\nn 31 320 199 1\nn 32 1091 255 1\nn 33 1191 397 1\nn 34 127 276 1\nn 35 317 409 1\nn 36 776 212 1\nn 37 253 345 1\nn 38 853 531 1\nn 39 65 31 1\nn 40 571 215 1\nn 41 1179 203 1\nn 42 510 408 1\nn 43 714 564 1\nn 44 607 318 1\nn 45 294 148 1\nn 46 1184 525 1\nn 47 949 153 1\nn 48 692 485 1\nn 49 683 181 1\nn 50 335 68 1\nn 51 101 170 1\nn 52 341 527 1\nn 53 483 509 1\nn 54 773 385 1\nn 55 1162 44 1\nn 56 169 139 1\nn 57 134 214 1\nn 58 327 572 1\nn 59 162 335 1\nn 60 412 298 1\nn 61 260 98 1\nn 62 1128 479 1\nn 63 523 599 1\nn 64 838 40 1\ne 1 9 12\ne 1 17 13\ne 1 46 23\ne 1 4 31\ne 2 53 17\ne 2 48 18\ne 2 43 18\ne 2 63 12\ne 2 13 20\ne 3 39 22\ne 3 51 9\ne 3 57 14\ne 3 34 18\ne 3 28 24\ne 3 10 33\ne 4 38 9\ne 4 9 28\ne 4 63 45\ne 4 43 18\ne 5 59 12\ne 5 34 13\ne 5 57 15\ne 5 31 19\ne 5 60 29\ne 5 37 12\ne 6 18 20\ne 6 10 15\ne 6 27 12\ne 6 7 28\ne 6 16 18\ne 6 19 13\ne 7 35 10\ne 7 42 30\ne 7 53 25\ne 7 52 9\ne 7 16 11\ne 7 27 22\ne 8 21 21\ne 8 36 20\ne 8 47 16\ne 8 30 13\ne 8 14 13\ne 9 33 32\ne 9 62 18\ne 9 17 13\ne 9 38 23\ne 9 25 17\ne 10 28 12\ne 10 27 21\ne 10 18 29\ne 11 26 13\ne 11 14 15\ne 11 22 10\ne 11 33 20\ne 12 29 7\ne 12 50 16\ne 12 24 20\ne 13 63 11\ne 13 58 19\ne 13 52 18\ne 13 53 9\ne 14 30 9\ne 14 32 21\ne 14 22 21\ne 14 26 11\ne 14 54 30\ne 14 21 30\ne 15 51 14\ne 15 39 12\ne 15 50 30\ne 15 61 20\ne 15 56 11\ne 16 52 16\ne 16 19 11\ne 17 46 13\ne 17 62 9\ne 18 19 16\ne 18 58 34\ne 18 63 62\ne 19 52 24\ne 19 58 23\ne 20 37 18\ne 20 60 11\ne 20 42 21\ne 20 35 11\ne 21 44 24\ne 21 40 30\ne 21 36 11\ne 21 54 15\ne 22 33 15\ne 22 32 12\ne 22 41 22\ne 23 40 26\ne 23 24 25\ne 23 64 21\ne 23 47 34\ne 23 36 16\ne 23 49 11\ne 24 50 34\ne 24 39 72\ne 24 64 39\ne 24 40 26\ne 24 29 26\ne 25 38 13\ne 25 48 32\ne 25 54 23\ne 25 26 14\ne 25 33 42\ne 26 54 29\ne 26 33 31\ne 27 59 11\ne 27 37 15\ne 27 35 21\ne 27 28 16\ne 28 34 12\ne 28 59 12\ne 29 31 17\ne 29 45 18\ne 29 50 16\ne 29 40 25\ne 30 47 18\ne 30 32 14\ne 31 57 27\ne 31 56 24\ne 31 45 9\ne 31 40 36\ne 31 60 20\ne 32 47 25\ne 32 41 15\ne 33 41 28\ne 33 46 19\ne 33 62 15\ne 34 57 9\ne 34 59 10\ne 35 37 13\ne 35 42 28\ne 36 40 30\ne 36 49 15\ne 36 47 27\ne 37 59 14\ne 37 60 24\ne 38 43 21\ne 38 48 24\ne 39 50 39\ne 39 51 21\ne 40 60 26\ne 40 49 17\ne 40 44 16\ne 41 55 23\ne 41 47 34\ne 42 44 19\ne 42 54 38\ne 42 48 29\ne 42 53 15\ne 42 60 22\ne 43 48 12\ne 43 63 28\ne 44 54 26\ne 44 60 29\ne 45 61 9\ne 45 50 13\ne 45 56 18\ne 46 62 11\ne 47 64 23\ne 47 55 35\ne 48 53 31\ne 48 54 19\ne 50 61 12\ne 51 56 11\ne 51 57 8\ne 52 58 7\ne 52 53 21\ne 55 64 47\ne 56 61 15\ne 56 57 12\ne 58 63 29\n",
-		"description": " A Delaunay triangulation with 64 vertices and 176 edges"
+		"content": "c a weighted graph with 40 vertices and 60 edges\nc good for illustrating the A* search - shortest-path.js\nc you may want to hide the edge weights using the Edges menu\ng 40 60\n\nn 29 871 537 1 \nn 38 643 361 1 \nn 7 755 159 1 \nn 10 407 83 1 \nn 31 584 256 1 \nn 33 846 186 1 \nn 23 1120 183 1 \nn 27 930 82 1 \nn 35 885 662 1 \nn 15 695 811 1 \nn 34 361 776 1 \nn 13 208 299 1 \nn 32 477 303 1 \nn 5 387 237 1 \nn 11 808 0 1 \nn 30 1116 317 1 \nn 36 891 324 1 \nn 4 455 641 1 \nn 8 247 680 1 \nn 1 506 583 1 \nn 2 372 453 1 \nn 3 246 417 1 \nn 9 488 857 1 \nn 37 163 597 1 \nn 39 363 591 1 \nn 19 797 742 1 \nn 21 32 795 1 \nn 22 144 830 1 \nn 25 -35 634 1 \nn 28 36 474 1 \nn 40 545 456 1 \nn 6 702 576 1 \nn 24 119 368 1 \nn 20 1034 647 1 \nn 26 1064 410 1 \nn 14 175 729 1 \nn 16 773 305 1 \nn 12 286 954 1 \nn 18 889 409 1 \nn 17 652 54 1 \ne 38 29 30 \ne 35 29 17 \ne 40 38 45 \ne 10 7 35 \ne 7 11 20 \ne 7 16 32 \ne 10 17 24 \ne 31 33 35 \ne 31 32 43 \ne 36 33 28 \ne 27 23 25 \ne 23 30 24 \ne 33 27 23 \ne 15 34 34 \ne 19 15 41 \ne 34 39 32 \ne 13 32 38 \ne 24 13 36 \ne 32 40 19 \ne 13 5 22 \ne 5 10 39 \ne 11 27 26 \ne 11 17 27 \ne 30 36 28 \ne 36 38 33 \ne 8 4 31 \ne 4 9 25 \ne 14 8 18 \ne 1 4 33 \ne 1 6 40 \ne 2 1 34 \ne 2 3 32 \ne 5 2 34 \ne 3 24 23 \ne 3 8 31 \ne 15 9 28 \ne 9 12 30 \ne 37 39 41 \ne 39 40 46 \ne 19 35 37 \ne 21 22 22 \ne 25 21 26 \ne 22 34 47 \ne 25 28 24 \ne 37 25 25 \ne 28 37 21 \ne 6 19 24 \ne 6 18 51 \ne 28 24 31 \ne 26 20 21 \ne 20 35 25 \ne 26 30 26 \ne 29 26 36 \ne 14 21 21 \ne 16 23 53 \ne 16 18 35 \ne 12 14 34 \ne 12 22 23 \ne 18 20 30 \ne 17 31 22 \n",
+		"description": " a weighted graph with 40 vertices and 60 edges\n good for illustrating the A* search - shortest-path.js\n you may want to hide the edge weights using the Edges menu"
 	},
 	{
 		"name": "sorting_08.gph",
@@ -105,7 +70,37 @@
 		"description": " DFA for strings that contain ba as a substring and do not end in ab\n start state is 0, F = {4,6}"
 	},
 	{
-		"name": "0-template.sgf",
+		"name": "empty.tree",
+		"content": "c this is an empty tree\nc for use with algorithms that build trees from scratch\n",
+		"description": " this is an empty tree\n for use with algorithms that build trees from scratch"
+	},
+	{
+		"name": "bs-example.tree",
+		"content": "r bs-example\nc a binary search tree used as a starting point for illustrating deletion\nc in the Goodrich, Tamassia and Goldwasser data structures text\n\nn 0 0 0 7 \nn 1 0 0 1 \nn 2 0 0 8 weightInNode:true weightHidden:true\nn 4 0 0 dummy:true\nn 3 0 0 5 \nn 5 0 0 3 \nn 6 0 0 dummy:true\nn 7 0 0 2 \nn 8 0 0 4 weightInNode:true weightHidden:true\ne 0 1 \ne 0 2 \ne 1 3 \ne 1 4 \ne 3 5 \ne 3 6 \ne 5 7 \ne 5 8 \n",
+		"description": " a binary search tree used as a starting point for illustrating deletion\n in the Goodrich, Tamassia and Goldwasser data structures text"
+	},
+	{
+		"name": "rb-example.tree",
+		"content": "r rb-example\nc used as a starting point for illustrating deletion in a red/black tree\nc in the Goodrich, Tamassia and Goldwasser data structures text\n\nn 1 0 0 3 color:pink label:1 borderColor:red\nn 3 0 0 5 color:pink label:3 borderColor:red\nn 9 0 0 label:9 dummy:true\nn 10 0 0 label:10 dummy:true\nn 11 0 0 label:11 dummy:true\nn 12 0 0 label:12 dummy:true\nn 5 0 0 label:5 dummy:true\nn 13 0 0 label:13 dummy:true\nn 7 0 0 14 borderWidth:6 color:gray label:7 borderColor:black\nn 14 0 0 label:14 dummy:true\nn 17 0 0 label:17 dummy:true\nn 18 0 0 17 color:pink label:18 borderColor:red\nn 16 0 0 label:16 dummy:true\nn 19 0 0 label:19 dummy:true\nn 20 0 0 label:20 dummy:true\nn 2 0 0 7 color:pink label:2 borderColor:red\nn 15 0 0 16 color:pink label:15 borderColor:red\nn 0 0 0 4 borderWidth:6 color:gray label:0 borderColor:black\nn 4 0 0 12 borderWidth:6 color:gray label:4 borderColor:black\nn 6 0 0 15 borderWidth:6 color:gray label:6 borderColor:black\nn 8 0 0 18 borderWidth:6 color:gray label:8 borderColor:black\ne 0 1 \ne 0 3 \ne 1 9 \ne 1 10 \ne 2 0 \ne 2 4 \ne 3 11 \ne 3 12 \ne 4 5 \ne 4 13 \ne 6 14 \ne 6 17 \ne 7 2 \ne 7 15 \ne 8 18 \ne 8 16 \ne 15 6 \ne 15 8 \ne 18 19 \ne 18 20 \n",
+		"description": " used as a starting point for illustrating deletion in a red/black tree\n in the Goodrich, Tamassia and Goldwasser data structures text"
+	},
+	{
+		"name": "bst-unbalanced.tree",
+		"content": "r bst-unbalanced\nc a very unbalanced binary search tree\n\nn 0 0 0 6 \nn 1 0 0 4 \nn 2 0 0 7 weightInNode:true weightHidden:true\nn 4 0 0 dummy:true\nn 3 0 0 12 \nn 5 0 0 10 \nn 6 0 0 dummy:true\nn 7 0 0 1 \nn 8 0 0 5 weightInNode:true weightHidden:true\nn 10 0 0 8 weightInNode:true weightHidden:true\nn 9 0 0 11 \nn 12 0 0 dummy:true\nn 11 0 0 9 \nn 14 0 0 dummy:true\nn 13 0 0 2 \nn 16 0 0 dummy:true\nn 15 0 0 3 \ne 0 1 \ne 0 2 \ne 1 7 \ne 1 8 \ne 2 3 \ne 2 4 \ne 3 5 \ne 3 6 \ne 5 9 \ne 5 10 \ne 7 13 \ne 7 14 \ne 10 11 \ne 10 12 \ne 13 15 \ne 13 16 \n",
+		"description": " a very unbalanced binary search tree"
+	},
+	{
+		"name": "balanced-tree.tree",
+		"content": "b balanced-tree\nc a tree with height 3 in which every root-leaf path has the same length\nn 1 0 0\nn 2 0 0\nn 3 0 0\nn 4 0 0\nn 5 0 0\nn 6 0 0\nn 7 0 0\nn 8 0 0\nn 9 0 0\nn 10 0 0\nn 11 0 0\nn 12 0 0\nn 13 0 0\nn 14 0 0\ne 1 2\ne 1 3\ne 2 4\ne 2 5\ne 3 6\ne 3 7\ne 4 8\ne 4 9\ne 5 10\ne 6 11\ne 6 12\ne 6 13\ne 7 14",
+		"description": " a tree with height 3 in which every root-leaf path has the same length"
+	},
+	{
+		"name": "unbalanced.tree",
+		"content": "r unbalanced\nc an unbalanced, non-binary tree\nc nodes are sorted left to right by increasing weight\nn 13 0 0 -96\nn 5 0 0 -96\nn 7 0 0 -77\nn 14 0 0 -76\nn 2 0 0 -65\nn 1 0 0 -53\nn 3 0 0 -42\nn 10 0 0 -22\nn 12 0 0 -20\nn 4 0 0 -20\nn 8 0 0 -11\nn 6 0 0 -7\nn 11 0 0 -3\nn 9 0 0 \ne 2 4 0\ne 1 2 69 \ne 1 3 74 \ne 2 5 93 \ne 2 6 43 \ne 4 7 48 \ne 4 8 70 \ne 7 10 94 \ne 7 11 74 \ne 7 12 64 \ne 7 9 61 \ne 9 13 62 \ne 9 14 2 \n",
+		"description": " an unbalanced, non-binary tree\n nodes are sorted left to right by increasing weight"
+	},
+	{
+		"name": "lg-template.sgf",
 		"content": "c This is a template for a layered graph.\nc The only difference from that of an ordinary graph is a required title line starting with 't';\nc  it has the form 't NAME [#_nodes #_edges #_layers]'\nt graph_name\n",
 		"description": " This is a template for a layered graph.\n The only difference from that of an ordinary graph is a required title line starting with 't';\n  it has the form 't NAME [#_nodes #_edges #_layers]'"
 	},
@@ -128,16 +123,5 @@
 		"name": "n42-t48v150.sgf",
 		"content": "c A version of north42.32 with minimum total non-verticality,\nc i.e., edges deviate as little as possible from being vertical\nt  north42.32-total_48_vertical 42 64 6\nn  0 0 9\nn  1 0 2\nn  2 0 6\nn  3 1 11\nn  4 1 10\nn  5 1 6\nn  6 1 1\nn  7 1 9\nn  8 1 2\nn  9 1 8\nn  10 1 4\nn  11 1 7\nn  12 1 5\nn  13 1 0\nn  14 1 3\nn  15 2 2\nn  16 2 8\nn  17 2 7\nn  18 2 9\nn  19 2 3\nn  20 2 4\nn  21 2 6\nn  22 3 2\nn  23 3 8\nn  24 3 5\nn  25 3 9\nn  26 3 6\nn  27 3 3\nn  28 3 7\nn  29 3 4\nn  30 4 5\nn  31 4 4\nn  32 4 3\nn  33 4 2\nn  34 4 7\nn  35 4 9\nn  36 4 8\nn  37 4 6\nn  38 5 8\nn  39 5 4\nn  40 5 7\nn  41 5 3\ne  32 39\ne  26 30\ne  8 20\ne  5 21\ne  21 29\ne  23 37\ne  2 10\ne  1 6\ne  14 20\ne  7 16\ne  16 23\ne  2 5\ne  22 33\ne  2 12\ne  16 26\ne  18 25\ne  20 28\ne  37 40\ne  23 34\ne  27 37\ne  13 15\ne  1 14\ne  36 40\ne  34 38\ne  17 26\ne  25 36\ne  29 30\ne  15 27\ne  4 18\ne  30 39\ne  26 31\ne  15 22\ne  21 28\ne  0 4\ne  6 15\ne  12 19\ne  9 16\ne  17 24\ne  17 23\ne  25 35\ne  18 24\ne  20 29\ne  3 18\ne  1 8\ne  33 41\ne  29 31\ne  28 36\ne  0 3\ne  10 19\ne  1 13\ne  35 38\ne  31 41\ne  28 35\ne  0 7\ne  22 32\ne  19 22\ne  0 9\ne  19 27\ne  2 11\ne  17 25\ne  24 32\ne  27 34\ne  24 33\ne  11 21\n",
 		"description": " A version of north42.32 with minimum total non-verticality,\n i.e., edges deviate as little as possible from being vertical"
-	},
-	{
-		"name": "rome1178.29.sgf",
-		"content": "c Another layered version of a Rome graph, has 5 layers\nt rome1178.29_GKNV 33 34 5\n\nn 0 0 6 \nn 1 1 1 \nn 2 1 2 \nn 3 1 3 \nn 4 1 4 \nn 5 1 5 \nn 6 1 6 \nn 7 1 7 \nn 8 1 8 \nn 9 1 9 \nn 10 1 11 \nn 11 1 12 \nn 12 2 0 \nn 13 2 1 \nn 14 2 2 \nn 15 2 3 \nn 16 2 4 \nn 17 2 5 \nn 18 2 6 \nn 19 2 7 \nn 20 2 8 \nn 21 2 9 \nn 22 2 10 \nn 23 2 11 \nn 24 2 12 \nn 25 3 3 \nn 26 3 4 \nn 27 3 5 \nn 28 3 7 \nn 29 3 10 \nn 30 3 12 \nn 31 4 4 \nn 32 4 8 \ne 0 3 \ne 0 11 \ne 1 12 \ne 1 13 \ne 2 14 \ne 2 13 \ne 2 15 \ne 3 15 \ne 3 18 \ne 4 16 \ne 4 18 \ne 5 18 \ne 6 18 \ne 7 18 \ne 7 19 \ne 8 18 \ne 8 21 \ne 9 21 \ne 10 22 \ne 10 21 \ne 10 23 \ne 11 24 \ne 16 25 \ne 17 27 \ne 17 26 \ne 17 28 \ne 20 29 \ne 20 28 \ne 22 29 \ne 23 29 \ne 24 30 \ne 26 31 \ne 27 32 \ne 30 32 \n",
-		"description": " Another layered version of a Rome graph, has 5 layers"
-	},
-	{
-		"name": "example.tree",
-		"content": "c This is an example of a tree file\nc \"n id x y\" specifies a node should be created (x y is ignored)\nc \"e id1 id2\" specifies an edge should be created from id1 to id2  \nn 1 0 0\nn 2 0 0\nn 3 0 0\nn 4 0 0\nn 5 0 0\nn 6 0 0\nn 7 0 0\ne 1 2\ne 1 3\ne 2 4\ne 2 5\ne 3 6\ne 3 7",
-		"description": ""
 	}
 ]
-

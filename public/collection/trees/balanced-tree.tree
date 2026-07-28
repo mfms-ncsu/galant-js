@@ -1,3 +1,5 @@
+b balanced-tree
+c a tree with height 3 in which every root-leaf path has the same length
 n 1 0 0
 n 2 0 0
 n 3 0 0

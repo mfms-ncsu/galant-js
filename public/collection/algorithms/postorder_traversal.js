@@ -1,5 +1,5 @@
 /**
- * Post-order traversal algorithm for trees. Works for trees
+ * Post-order traversal algorithm for trees. Works for trees only (extension .tree)
  */
 
 setDirected(true);

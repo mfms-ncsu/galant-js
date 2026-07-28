@@ -1,5 +1,5 @@
 /**
- * Pre-order traversal algorithm for trees. Works for trees
+ * Pre-order traversal algorithm for trees. Works for trees only (extension .tree)
  */
 
 setDirected(true);
