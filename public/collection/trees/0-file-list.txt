@@ -1,0 +1,6 @@
+empty.tree
+bs-example.tree
+rb-example.tree
+bst-unbalanced.tree
+balanced-tree.tree
+unbalanced.tree

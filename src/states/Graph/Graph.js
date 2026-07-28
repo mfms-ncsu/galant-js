@@ -23,6 +23,7 @@ export default class Graph {
   showEdgeWeights = true;
   showNodeLabels = true;
   showNodeWeights = true;
+  weightsInside = false;
   /** Graph type */
   type;
   /** Store graph comments */
@@ -36,5 +37,6 @@ export default class Graph {
     this.name = name;
     this.nodes = new Map();
     this.comments = new Set();
+    this.weightsInside = false
   }
 }

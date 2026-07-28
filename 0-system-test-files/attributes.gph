@@ -1,0 +1,6 @@
+c This graph has a node with a label before a weight,
+c an edge with a highlight and color after weight,
+c and a node with a shape after weight.
+n 1 2 3 label:AA highlighted:true
+n 2 0 0 4 shape:star
+e 1 2 10 highlighted:true color:red

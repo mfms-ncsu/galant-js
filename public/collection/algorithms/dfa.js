@@ -38,7 +38,7 @@ let read_so_far = "";
 let current_state = start_state;
 let transition = null
 highlight(start_state)
-while (remaining_string.length > 0) {
+while ( remaining_string.length > 0 ) {
     step(() => {
         unhighlight(current_state)
         if (transition) {

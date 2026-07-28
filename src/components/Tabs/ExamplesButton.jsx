@@ -9,7 +9,7 @@ import PopupWindow from 'components/Tabs/PopupWindow';
 export default function ExamplesButton({examples, addNew}) {
   React.useEffect(() => {
         function onKeyPress(event) {
-            if (event.code === "KeyE" && (event.metaKey || event.ctrlKey)) {
+            if ( event.code === "KeyE" && event.ctrlKey && event.shiftKey ) {
               event.preventDefault();
               openPopup();
             }
@@ -46,7 +46,7 @@ export default function ExamplesButton({examples, addNew}) {
   return (
     <div>
       <PrimaryButton className="m-1">
-        <button onClick={() => openPopup(true)}>Examples (Ctrl-E)</button>
+        <button onClick={() => openPopup(true)}>Examples (Ctrl-Shift-E)</button>
       </PrimaryButton>
     </div>
   );

@@ -15,8 +15,7 @@
 //      greater = quicksort(greater)
 //      return append less, equal, greater
 
-const HORIZONTAL_GAP = 1;
-const VERTICAL_GAP = 1;
+setWeightsInside(true)
 
 /**
  * @return a random element of an array/list
@@ -36,11 +35,9 @@ function lineUpNodes(nodeList) {
     let level = 0; let index = 0
     step(() => {
         for ( const node of nodeIds ) {
-    //      to avoid multiple steps, we need to do this "manually"
-    //        placeNode(node, level, index, "white", "circle")
-            setPosition(node, HORIZONTAL_GAP * index, 2 * level * VERTICAL_GAP)
+            setPosition(node, index, 2 * level)
             color(node, "white")
-            setShape(node, "circle")
+            setShape(node, "ellipse")
             index++;
         }
     })
@@ -48,8 +45,7 @@ function lineUpNodes(nodeList) {
 
 function placeNode(node, level, index, desiredColor, shape) {
     step(()=> {
-//        display(`-> placeNode: ${node}, ${level}, ${index}`)
-        setPosition(node, HORIZONTAL_GAP * index, 2 * level * VERTICAL_GAP)
+        setPosition(node, index, 2 * level)
         color(node, desiredColor)
         setShape(node, shape)
     })
@@ -58,16 +54,16 @@ function placeNode(node, level, index, desiredColor, shape) {
 function placePivot(pivot, level, index) {
     step(() => {
 //        display(`-> placePivot: ${pivot}, ${level}, ${index}`)
-        setPosition(pivot, HORIZONTAL_GAP * index, (2 * level - 1) * VERTICAL_GAP)
-        color(pivot, "black")
-        setShape(pivot, "triangle")
+        setPosition(pivot, index, (2 * level - 1))
+        color(pivot, "white")
+        setShape(pivot, "square")
     })
 }
 
 function moveToSorted(node) {
     step(() => {
 //        display(`-> moveToSorted: ${node}`)
-        incrementPosition(node, 0, -2 * VERTICAL_GAP)
+        incrementPosition(node, 0, -2)
         color(node, "yellow")
         setShape(node, "star")
     })
@@ -95,19 +91,19 @@ function quicksort(list, left, right, depth) {
     for ( const node of list ) {
         if ( weight(node) < weight(pivot) ) {
             less.push(node)
-            placeNode(node, depth, lessEnd, "red", "trapezoid")
+            placeNode(node, depth, lessEnd, "pink", "diamond")
             lessEnd++
         }
         else if ( weight(node) > weight(pivot) ) {
             greater.push(node)
-            placeNode(node, depth, greaterEnd, "blue", "rhomboid")
+            placeNode(node, depth, greaterEnd, "cyan", "rhomboid")
             greaterEnd--;
         }
         else if ( node != pivot ) {
             equal.push(node)
             step(() => {
-                color(node, "black")
-                setShape(node, "triangle")
+                color(node, "white")
+                setShape(node, "square")
             })
         }
     }

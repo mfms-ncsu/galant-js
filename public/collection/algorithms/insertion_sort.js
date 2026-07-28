@@ -1,8 +1,8 @@
 /**
  * An animation of insertion sort
  */
-const HORIZONTAL_GAP = 1;
-const VERTICAL_GAP = 1;
+
+setWeightsInside(true)
 
 let nodeIds = getNodes();
 
@@ -11,13 +11,13 @@ let i = 0; let j = 0
 step(() => {
     for ( const nodeId of nodeIds) {
         setPosition(nodeId, i, j);
-        i += HORIZONTAL_GAP;
+        i++;
     }
 })
 
 let firstElement = nodeIds.shift(); // remove first element
 step(() => {
-    setPosition(firstElement, 0, 2 * VERTICAL_GAP)
+    setPosition(firstElement, 0, 2)
     setShape(firstElement, "star")
     color(firstElement, "yellow")
 })
@@ -28,19 +28,19 @@ while ( nodeIds.length > 0 ) {
     let index = sorted.length
     step(() => {
         display(`toInsert = ${toInsert}, weight = ${weight(toInsert)}`)
-        setPosition(toInsert, index * HORIZONTAL_GAP, VERTICAL_GAP)
+        setPosition(toInsert, index, 1)
         setShape(toInsert, "vee")
-        color(toInsert, "blue")
+        color(toInsert, "cyan")
     })
     while ( index > 0 && weight(toInsert) < weight(sorted[index - 1]) ) {
         index--;
         step(() => {
-            color(sorted[index], "red")
+            color(sorted[index], "pink")
             setShape(sorted[index], "triangle")
         })
         step(() => {
-            incrementPosition(sorted[index], HORIZONTAL_GAP, 0)
-            incrementPosition(toInsert, -HORIZONTAL_GAP, 0)
+            incrementPosition(sorted[index], 1, 0)
+            incrementPosition(toInsert, -1, 0)
             color(sorted[index], "yellow")
             setShape(sorted[index], "star")
         })
@@ -53,7 +53,7 @@ while ( nodeIds.length > 0 ) {
     }
     sorted.splice(index, 0, toInsert)
     step(() => {
-        incrementPosition(toInsert, 0, VERTICAL_GAP)
+        incrementPosition(toInsert, 0, 1)
         setShape(toInsert, "star")
         color(toInsert, "yellow")
         display(`inserting: index = ${index}, weight = ${weight(toInsert)}`)
@@ -62,13 +62,13 @@ while ( nodeIds.length > 0 ) {
 display("Done: nodes are sorted by weight")
 
 // for ( const nodeId of nodeIds) {
-    // move it up by VERTICAL_GAP
+    // move it up by one unit
     // insert it into sorted list (see below)
 // }
 
 // insert function, takes node and inserts it into sorted list, traversed in backwards order;
 //      currentNode is current node in already sorted list
 // while weight(node) < weight(currentNode)
-//      move node left by HORIZONTAL_GAP
-//      move currentNode right by HORIZONTAL_GAP
-// move node down by VERTICAL_GAP
+//      move node left by one unit
+//      move currentNode right by one unit
+// move node down by one unit

@@ -24,6 +24,12 @@ lerna-debug.log*
 # production
 /build
 
+# editor backups
+*~
+~*
+\#*
+*.bak
+
 # misc
 .DS_Store
 .env.local

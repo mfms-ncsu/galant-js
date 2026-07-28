@@ -1,0 +1,45 @@
+r rb-example
+c used as a starting point for illustrating deletion in a red/black tree
+c in the Goodrich, Tamassia and Goldwasser data structures text
+
+n 1 0 0 3 color:pink label:1 borderColor:red
+n 3 0 0 5 color:pink label:3 borderColor:red
+n 9 0 0 label:9 dummy:true
+n 10 0 0 label:10 dummy:true
+n 11 0 0 label:11 dummy:true
+n 12 0 0 label:12 dummy:true
+n 5 0 0 label:5 dummy:true
+n 13 0 0 label:13 dummy:true
+n 7 0 0 14 borderWidth:6 color:gray label:7 borderColor:black
+n 14 0 0 label:14 dummy:true
+n 17 0 0 label:17 dummy:true
+n 18 0 0 17 color:pink label:18 borderColor:red
+n 16 0 0 label:16 dummy:true
+n 19 0 0 label:19 dummy:true
+n 20 0 0 label:20 dummy:true
+n 2 0 0 7 color:pink label:2 borderColor:red
+n 15 0 0 16 color:pink label:15 borderColor:red
+n 0 0 0 4 borderWidth:6 color:gray label:0 borderColor:black
+n 4 0 0 12 borderWidth:6 color:gray label:4 borderColor:black
+n 6 0 0 15 borderWidth:6 color:gray label:6 borderColor:black
+n 8 0 0 18 borderWidth:6 color:gray label:8 borderColor:black
+e 0 1 
+e 0 3 
+e 1 9 
+e 1 10 
+e 2 0 
+e 2 4 
+e 3 11 
+e 3 12 
+e 4 5 
+e 4 13 
+e 6 14 
+e 6 17 
+e 7 2 
+e 7 15 
+e 8 18 
+e 8 16 
+e 15 6 
+e 15 8 
+e 18 19 
+e 18 20 

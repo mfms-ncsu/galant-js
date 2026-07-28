@@ -3,6 +3,7 @@ import { algorithmChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import PromptInterface from "interfaces/PromptInterface/PromptInterface";
 import LayeredGraphInterface from "interfaces/GraphInterface/LayeredGraphInterface";
+import TreeInterface from "interfaces/GraphInterface/TreeInterface";
 
 /**
  * AlgorithmInterface contains functions to check and augment the algorithm.
@@ -197,6 +198,10 @@ function onMessage(algorithm, message) {
             newGraph = GraphInterface.setDirected(graph, message.isDirected);
             store.set(graphAtom, newGraph);
             break;
+        case "setWeightsInside":
+            newGraph = GraphInterface.setWeightsInside(graph, message.weightsInside)
+            store.set(graphAtom, newGraph)
+            break
         case "addNode":
             [newGraph, newChangeManager] = GraphInterface.addNode(graph, changeManager, message.x, message.y);
             updateState(newGraph, newChangeManager);
@@ -265,6 +270,10 @@ function onMessage(algorithm, message) {
             [newGraph, newChangeManager] = LayeredGraphInterface.setChannelProperty(graph, changeManager, message.channel, message.attribute, message.value);
             updateState(newGraph, newChangeManager);
             break;
+        case "setWeights":
+            [newGraph, newChangeManager] = LayeredGraphInterface.setWeights(graph, changeManager, message.layer, message.type);
+            updateState(newGraph, newChangeManager);
+            break;
         case "setWeightsUp":
             [newGraph, newChangeManager] = LayeredGraphInterface.setWeightsUp(graph, changeManager, message.layer, message.type);
             updateState(newGraph, newChangeManager);
@@ -297,6 +306,10 @@ function onMessage(algorithm, message) {
             [newGraph, newChangeManager] = LayeredGraphInterface.applyNodePositions(graph, changeManager, message.savedPositions);
             updateState(newGraph, newChangeManager);
             break;
+        case "setChildren":
+            [newGraph, newChangeManager] = TreeInterface.setChildren(graph, changeManager, message.parent, message.children)
+            updateState(newGraph, newChangeManager)
+            break
         case "startRecording":
             newChangeManager = GraphInterface.startRecording(changeManager);
             store.set(algorithmChangeManagerAtom, newChangeManager);

@@ -22,10 +22,7 @@ export default function CytoscapeComponent() {
     useEffect(() => {
         // Return if window.cytoscape has already been mounted
 
-        // TODO: To get the Node HTML labels to update properly, we need to
-        // restart cytoscape with each change. There must be a more efficient
-        // way to do this.
-        if (!Cytoscape.container()) {
+        if ( ! Cytoscape.container() ) {
         
             // Initialize the cytoscape instance
             Cytoscape.mount(cytoscapeElement.current);
@@ -35,7 +32,9 @@ export default function CytoscapeComponent() {
             Cytoscape.maxZoom(10);
             Cytoscape.autounselectify(true); // Disable multi-select for now (until supported in ChangeRecords)
         }
-        
+
+        // Since the "label" of a node is its id in Cytoscape
+        // we need to handle labels and weights of a node as html labels
         Cytoscape.nodeHtmlLabel([{
             query: "node",
             valign: "top",
@@ -43,31 +42,30 @@ export default function CytoscapeComponent() {
             halign: "center",
             halignBox: "center",
             tpl: (data) => {
-                const showWeights = graph.showNodeWeights;
-                const showLabels = graph.showNodeLabels;
+               // Determine whether or not there is anything to render:
+               //  if both the weight and label of the node are empty,
+               //  then we should not draw the label
+                const hasWeight = data.weight !== undefined && data.weight !== "" && ! data.weightHidden;
+                const hasLabel = data.label !== undefined && data.label !== "" && ! data.labelHidden;
+                const hasWeightOrLabel = hasWeight || hasLabel;
+                const textStyle = {
+                    fontSize: data.labelFontSize
+                }
 
-                if ((showWeights && !data.weightHidden) || (showLabels && !data.labelHidden)) {
-                    // This flag determines whether or not there is anything to render. If both the weight
-                    // and label of the node are empty, then we should not draw the label
-                    let hasWeight = data.weight !== undefined && data.weight !== "" && showWeights && !data.weightHidden;
-                    let hasLabel = data.label !== undefined && data.label !== "" && showLabels && !data.labelHidden;
-                    let hasWeightOrLabel = hasWeight || hasLabel;
-
-                    return renderToString(
-                        <div className=
-                            {`flex flex-col items-center justify-center border bg-white border-black  ${(data.hidden || !hasWeightOrLabel) && "hidden"}`
-                            }>
-                            <p className="leading-none">
-                                {(!data.weightHidden && showWeights) ? data.weight : ""}
-                            </p>
-                            <p className="leading-none">
-                                {(!data.labelHidden && showLabels) ? data.label : ""}
-                            </p>
-                        </div>
+                return renderToString(
+                    <div style={textStyle} className=
+                        {`flex flex-col items-center justify-center border bg-white border-black ${(data.hidden || ! hasWeightOrLabel) && "hidden"}`}>
+                        <p className="leading-none">
+                            { hasWeight ? data.weight : "" }
+                        </p>
+                        <p className="leading-none">
+                            { hasLabel ? data.label : "" }
+                        </p>
+                    </div>
                     );
                 }
             }
-        }]);
+        ]);
 
         // Allows cypress to access cytoscape via window.cytoscape and read the graph state
         // Also allows this cytoscape instance to be referenced across the application
@@ -80,10 +78,45 @@ export default function CytoscapeComponent() {
      * Create a function to call whenever cytoscape needs to be updated
      */
     useEffect(() => {
+        Cytoscape.startBatch(); //Pauses rendering
         Cytoscape.elements().remove();// Remove elements
         Cytoscape.add(CytoscapeInterface.getElements(graph)); // Get new elements
         Cytoscape.style().resetToDefault(); // Reset style
         Cytoscape.style(CytoscapeInterface.getStyle(graph)).update(); // Update style
+        Cytoscape.endBatch(); //Resumes rendering
+
+        // If the graph type is "tree", do a layout appropriate for trees - https://www.npmjs.com/package/cytoscape-dagre
+        // In other cases, layout depends on user-specified node positions; Cytoscape is called on only for auto-layout - see ControlSettingsPopover 
+        if ( graph.type === 'tree' ) {
+            // Important Notes:
+            // 1. Switched from dagre to Elkjs due to limited sorting functionality
+            // 2. "fit: false" prevents issues with resizing during algorithms
+            // 3. considerModelOrder allows us to use file-order for tree building and can be configured to use edge order or node order
+            //    - The default behavior optimizes trees based on sizing.
+            //    - Highly recommend reviewing documentation on Elkjs. 
+            // 4. Prevents cytoscape from rendering the container until the layout is finished running
+
+            // Pause redraws during layout
+            Cytoscape.startBatch(); 
+
+            // Define the ELK layout
+            const layout = Cytoscape.layout({ name: 'elk', animate: false, fit: false,
+                elk: {"elk.algorithm": "layered", "elk.layered.considerModelOrder.strategy": "PREFER_NODES", 'elk.direction': 'DOWN', 'elk.edgeRouting': 'SPLINES'} });
+            
+            // Run the layout and resume rendering on completion
+            layout.run();
+            
+            layout.once('layoutstop', () => {
+                Cytoscape.endBatch(); // resume redraws
+                Cytoscape.fit(Cytoscape.elements(), 100);
+            });
+        }
+
+        // If it's a tree, clear the background grid immediately
+        if (graph.type === "tree" && backgroundCanvas.current) {
+            const ctx = backgroundCanvas.current.getContext("2d");
+            ctx.clearRect(0, 0, backgroundCanvas.current.width, backgroundCanvas.current.height);
+        }
 
         // Define a function to handle window resize events
         const handleResize = () => {
@@ -110,6 +143,11 @@ export default function CytoscapeComponent() {
     }, [graph, algorithmChangeManager]);
 
     useEffect(() => {
+        //If there is a tree, do not draw the grid
+        if ( graph.type === 'tree'){ 
+            return;
+        }
+        
         // Draw the background grid once and add an event listener to re-draw it when the viewport changes
         const graphScalar = GraphInterface.getScalar(graph);
         drawGrid(graphScalar.x, graphScalar.y);
