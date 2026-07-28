@@ -115,7 +115,7 @@ def get_file_type(filename):
         return 'makefile'
     elif extension == 'graphml':
         return 'graphml'
-    elif extension == 'gph' or extension == 'sgf' or extension == 'cnf':
+    elif extension == 'gph' or extension == 'sgf' or extension == 'tree' or extension == 'cnf':
         return 'dimacs'
     elif extension == 'snap':
         return 'snap'

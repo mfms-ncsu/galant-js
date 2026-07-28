@@ -1,23 +1,25 @@
 c A map of North Carolina with edges representing distances between cities
-n A 0 50 label:Ash
-n H 100 50 label:Hkr
-n S 200 0 label:W-S
-n G 250 0 label:Gre
-n D 350 0 label:Dur
-n R 400 50 label:Ral
-n C 161 104 label:Cha
-n F 350 100 label:Fay
-n W 500 200 label:Wil
-e A H 75
-e H S 72
-e A C 136
-e H C 64
-e S C 75
-e S G 33
-e C G 86
-e G D 53
-e R D 40
-e C F 169
-e R F 78
-e F W 105
-e R W 114
+c Current Algorithm: No Algorithm Running
+
+n Ashville 0 50 
+n Hickory 100 50 
+n Winston-Salem 200 0 
+n Greensboro 276 15 
+n Durham 350 0 
+n Raleigh 400 50 
+n Charlotte 161 104 
+n Fayettville 350 100 
+n Wilmington 500 200 
+e Ashville Hickory 75 
+e Ashville Charlotte 136 
+e Hickory Winston-Salem 72 
+e Hickory Charlotte 64 
+e Winston-Salem Charlotte 75 
+e Winston-Salem Greensboro 33 
+e Greensboro Durham 53 
+e Raleigh Durham 40 
+e Raleigh Fayettville 78 
+e Raleigh Wilmington 114 
+e Charlotte Greensboro 86 
+e Charlotte Fayettville 169 
+e Fayettville Wilmington 105 

@@ -14,6 +14,7 @@ step(() => {
     clearNodeMarks();
     clearNodeHighlights();
     clearNodeLabels();
+    clearNodeWeights();
     clearEdgeHighlights();
     clearEdgeColors();
     clearEdgeLabels();

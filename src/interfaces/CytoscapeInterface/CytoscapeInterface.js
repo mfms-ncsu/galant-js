@@ -1,5 +1,4 @@
 import GraphInterface from "../GraphInterface/GraphInterface"
-import Graph from "../../states/Graph/Graph"
 
 /**
  * CytoscapeInterface returns the graph represented in cytoscape 
@@ -15,16 +14,34 @@ import Graph from "../../states/Graph/Graph"
  ***********
  */
 
+// minimum size text of a label, independent of node radius
+const MIN_LABEL_FONT_SIZE = 14
+// this will be the standard size for both nodes and edges - see below
+// idea is to use a size based on node radius unless that is smaller than the min
+// !!! this idea works only when user changes node radius
+//     labels will grow and shrink unconditionally as user zooms in and out
+// !!!
+let labelFontSize
+
  function parseAndRound(input) {
     const num = Number(input);
     
-    if (isNaN(num)) {
+    if ( isNaN(num) ) {
         return null;
     }
-  
+
+    // @todo use the symbol for infinity
+    if ( num === Infinity ) {
+        return 'Inf'
+    }
+
+    if ( num === -Infinity ) {
+        return '-Inf'
+    }
+
     // Check if it needs to be rounded
     const parts = num.toString().split(".");
-    if (parts.length === 2 && parts[1].length > 2) {
+    if ( parts.length === 2 && parts[1].length > 2 ) {
       return Math.round(num * 100) / 100;
     }
   
@@ -32,14 +49,14 @@ import Graph from "../../states/Graph/Graph"
   }
 
 /**
- * Returns true if the given attribute in the ege is not undefined, not 
+ * Returns true if the given attribute of the edge is not undefined, not 
  * an empty string, and is not hidden.
  */
 function edgeHasAttribute(edge, attribute) {
     return edge.attributes.has(attribute) &&
            edge.attributes.get(attribute) !== "" &&
            edge.attributes.get(attribute) !== undefined &&
-           !edge.attributes.get(attribute + "Hidden");
+           ! edge.attributes.get(attribute + "Hidden");
 }
 
 /**
@@ -64,19 +81,18 @@ function parseEdge(graph, edge) {
     let text = "";
     let addedWeight = false;
 
-    if (edgeHasAttribute(edge, "weight") && graph.showEdgeWeights) {
+    if ( edgeHasAttribute(edge, "weight") && graph.showEdgeWeights ) {
         addedWeight = true;
-        if (parseAndRound(edge.attributes.get("weight"))) {
+        if ( parseAndRound(edge.attributes.get("weight")) ) {
             text += parseAndRound(edge.attributes.get("weight"));
         }
     }
     
-    if (edgeHasAttribute(edge, "label") && graph.showEdgeLabels) {
+    if ( edgeHasAttribute(edge, "label") && graph.showEdgeLabels ) {
         // If we added a weight, separate the label and weight with a newline
-        if (addedWeight) {
+        if ( addedWeight ) {
             text += "\n";
         }
-
         text += edge.attributes.get("label");
     }
 
@@ -84,10 +100,9 @@ function parseEdge(graph, edge) {
 
     // If either the source or target nodes are hidden, then this edge should 
     // also be hidden
-    if (GraphInterface.getNodeAttribute(graph, edge.source, "hidden") || GraphInterface.getNodeAttribute(graph, edge.target, "hidden")) {
+    if ( GraphInterface.getNodeAttribute(graph, edge.source, "hidden") || GraphInterface.getNodeAttribute(graph, edge.target, "hidden") ) {
         element.data["hidden"] = true;
     }
-
     return element;
 }
 
@@ -97,7 +112,6 @@ function parseEdge(graph, edge) {
  * @returns Cytoscape node element
  */
 function parseNode(graph, node) {
-    //TODO: round node weight
     let scalar = graph.scalar;
 
     // Identifying data
@@ -112,19 +126,42 @@ function parseNode(graph, node) {
 
     // Add attributes
     node.attributes.forEach((value, name) => {
-
-        if (name === "weight" && parseAndRound(value)) {
-            element.data[name] = parseAndRound(value);
-        }
-        else {
+        if ( name === "weight" ) {
+            const numericalValue = parseAndRound(value)
+            if ( numericalValue ) {
+                element.data[name] = numericalValue;
+            }
+        } else {
             element.data[name] = value;
         }
     });
 
+    // !!! labels and weights for nodes are handled in Cytoscape.jsx
+    // They require an html element !!!
+
+    if ( graph.weightsInside ) {
+        element.data["weightInNode"] = true
+        element.data["weightHidden"] = true
+    }
+
+    // transmits information about desired size of node labels and weights
+    //  to Cytoscape.jsx
+    // Note: this does not work as intended when user zooms in and out
+    //  - measures such as px, mm, etc. expand and contract with the zoom
+    //    and there is no easy way to get around this, so don't even try
+    element.data["labelFontSize"] = `${labelFontSize}px`
+    // Need the following because Cytoscape.jsx does not handle
+    //  graph.showNodeLabels and graph.showNodeWeights correctly
+    if ( ! graph.showNodeLabels ) {
+        element.data["labelHidden"] = true
+    }
+
+    if ( ! graph.showNodeWeights ) {
+        element.data["weightHidden"] = true
+    }
+
     return element;
 }
-
-
 
 /**
  ***********
@@ -137,22 +174,32 @@ function parseNode(graph, node) {
  * @returns Array of cytoscape elements to display
  */
 function getElements(graph) {
-    // Create an array of elements
-    let elements = [];
+  // define label font size for both nodes and edges
+  const standardLabelFontSize = graph.nodeSize / 2
+  labelFontSize = standardLabelFontSize > MIN_LABEL_FONT_SIZE ? standardLabelFontSize : MIN_LABEL_FONT_SIZE
 
-    // Loop over each node
-    GraphInterface.getNodes(graph).forEach(node => {
-        elements.push(parseNode(graph, node));
+  // Create an array of elements
+  let elements = [];
 
-        // Loop over each edge sourced at this node
-        node.edges.forEach(edge => {
-            if (node.id === edge.source) {
-                elements.push(parseEdge(graph, edge));
-            }
-        });
+  // use sequence numbers to determine the order of appearance for nodes
+  let idSequenceNumberPairs = [] 
+  graph.nodes.entries().forEach((entry) => {
+    idSequenceNumberPairs.push([entry[0], entry[1].sequenceNumber])
+  })
+  const idSequenceNumberPairsSorted = idSequenceNumberPairs.sort((a, b) => a[1] - b[1]);
+
+  idSequenceNumberPairsSorted.forEach(pair => {
+    const node = graph.nodes.get(pair[0]);
+    elements.push(parseNode(graph, node));
+
+    // Loop over each edge sourced at this node
+    node.edges.forEach(edge => {
+      if ( node.id === edge.source ) {
+        elements.push(parseEdge(graph, edge));
+      }
     });
-
-    return elements;
+  });
+  return elements;
 }
 
 /**
@@ -160,17 +207,18 @@ function getElements(graph) {
  * @returns Cytoscape stylesheet
  */
 function getStyle(graph) {
-    return [
+    const style =  [
         {
             "selector": "node",
             "style": {
-                "width": `${graph.nodeSize}px`,
-                "height": `${graph.nodeSize}px`,
+                "width": "label",
+                "height": "label",
+                "padding": `${graph.nodeSize / 4}px`,
                 "backgroundColor": "#FFFFFF",
                 "color": "#000000",
                 "borderWidth": `${graph.nodeSize / 10}px`,
                 "borderStyle": "solid",
-                "borderColor": "#AAAAAA",
+                "borderColor": "#000000",
                 "backgroundOpacity": 1,
                 "shape": "ellipse",
                 "textValign": "center",
@@ -201,8 +249,7 @@ function getStyle(graph) {
         {
             "selector": "node[?highlighted]",
             "style": {
-                "borderWidth": `${graph.nodeSize / 6}px`,
-                "borderColor": "red",
+                "borderWidth": `${graph.nodeSize / 5}px`,
             }
         },
         {
@@ -220,14 +267,14 @@ function getStyle(graph) {
         {
             "selector": "edge[?highlighted]",
             "style": {
-                "width": `6px`
+                "width": `${graph.nodeSize / 5}px`
             }
         },
         {
             "selector": "edge[label]",
             "style": {
                 "label": "data(textToDisplay)",
-                "fontSize": `${graph.nodeSize / 2}px`,
+                "fontSize": `${labelFontSize}px`,
                 "textWrap": "wrap",
                 "textBackgroundColor": "white",
                 "textBackgroundOpacity": "1.0",
@@ -252,14 +299,20 @@ function getStyle(graph) {
         },
         {
             "selector": "node[id]",
-            "style": {
+                "style": {
                 "label": "data(id)"
+            }
+        },
+        {
+            "selector": "node[weightInNode]",
+            "style": {
+                "label": "data(weight)"
             }
         },
         {
             "selector": "node[shape]",
             "style": {
-                "shape": "data(shape)"
+                "shape": "data(shape)" ? "data(shape)" : "ellipse"
             }
         },
         {
@@ -301,6 +354,27 @@ function getStyle(graph) {
             }
         }
     ];
+
+    if ( graph.type === "tree" ) {
+        // Add tree specific styles
+        style.push(
+            {
+                "selector": "node[?dummy]",
+                "style": {
+                    "shape": "square",
+                    "backgroundColor": "black",
+                    "label": "",
+                    "color": "black",
+                    "borderColor": "gray",
+                    "borderWidth": `${graph.nodeSize / 25}px`,
+                    "width": `${graph.nodeSize / 20}px`,
+                    "height": `${graph.nodeSize / 20}px`
+                }
+            }
+        );
+    }
+
+    return style
 }
 
 const CytoscapeInterface = {

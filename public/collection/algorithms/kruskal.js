@@ -37,7 +37,7 @@ step(() => {
     for ( const edge of getEdges() ) {
         if ( ! hasWeight(edge) ) {
             // setWeight(edge, euclidian(edge));
-            display("*** edge ${edge} has no weight, setting to 1 ***")
+            display(`*** edge ${edge} has no weight, setting to 1 ***`)
             setWeight(edge, 1)
         }
     }
@@ -78,8 +78,8 @@ for ( const edge of edgeList ) {
             union(s, t)
             display(`current forest has weight ${totalWeight}`)
         }
-        setShape(s, "circle")
-        setShape(t, "circle")
+        setShape(s, "ellipse")
+        setShape(t, "ellipse")
         color(s, "white")
         color(t, "white")
     })

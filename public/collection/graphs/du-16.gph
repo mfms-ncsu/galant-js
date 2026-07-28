@@ -1,4 +1,5 @@
-c A Delaunay triangulation with 16 vertices and 24 edges
+c A weighted graph with 16 vertices and 24 edges
+g 16 24
 n 1 400 400
 n 2 410 505
 n 3 304 378

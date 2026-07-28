@@ -1,0 +1,22 @@
+r empty.tree
+c this is an empty tree
+c for use with algorithms that build trees from scratch
+c Current Algorithm: bstree.js
+
+n 0 0 0 7 
+n 1 0 0 1 
+n 2 0 0 8 weightInNode:true weightHidden:true
+n 4 0 0 dummy:true
+n 3 0 0 5 
+n 5 0 0 3 
+n 6 0 0 dummy:true
+n 7 0 0 2 
+n 8 0 0 4 weightInNode:true weightHidden:true
+e 0 1 
+e 0 2 
+e 1 3 
+e 1 4 
+e 3 5 
+e 3 6 
+e 5 7 
+e 5 8 

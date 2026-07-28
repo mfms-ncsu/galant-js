@@ -10,7 +10,7 @@ A web implementation of [Galant](https://github.com/mfms-ncsu/galant), a **g**ra
 
 See the site at https://galant.csc.ncsu.edu.
 
-Developer and User documentation can be found [here](https://galant.csc.ncsu.edu/documentation).
+Developer and User documentation is [in a Google drive folder](https://drive.google.com/drive/u/0/folders/1SRZX459UkFdBCt8Kfa-g840eBEly6t2Z).
 
 ### Development
 - Clone repo, run `npm install` in repo directory.
@@ -27,7 +27,7 @@ Developer and User documentation can be found [here](https://galant.csc.ncsu.edu
 - a comprehensive list of front end tests is in system-test-plan.md
 
 - Total Coverage:
-  - Results are found under /total-coverage directory.
+  - Results are in the /total-coverage directory.
 
 ### Deployment
 

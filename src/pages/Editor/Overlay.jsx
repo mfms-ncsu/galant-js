@@ -16,7 +16,7 @@ function LoadButton({ tab, editorType }) {
     // Effect hook to handle keyboard shortcut for loading graph/algorithm
     useEffect(() => {
         function onKeyPress(event) {
-            if (event.code === "KeyL" && event.ctrlKey && event.shiftKey) {
+            if ( event.code === "KeyL" && event.ctrlKey && event.shiftKey ) {
                 event.preventDefault();
                 load();
             }
@@ -44,7 +44,7 @@ function LoadButton({ tab, editorType }) {
             // parses it again.
 
             if (editorType === "Graph") {
-                let temp = FileParser.loadGraph(tab.name, tab.content);
+                FileParser.loadGraph(tab.name, tab.content);
             }
 
             // Send the message using shared worker
@@ -63,7 +63,7 @@ function LoadButton({ tab, editorType }) {
                 setShowLoadedMessage(false);
             }, 3000);
         } catch (e) {
-            setLoadError("Failed to load " + editorType.toLowerCase() + ": " + e.message);
+            setLoadError("Error in line " + e.message);
         }
     }
 
@@ -103,7 +103,7 @@ function DownloadButton({ editorType, tab }) {
     // Register the cmd/ctrl-S keyboard shortcut
     useEffect(() => {
         function handleKeydown(event) {
-            if (event.code === "KeyS" && event.ctrlKey && event.shiftKey) {
+            if ( event.code === "KeyS" && event.ctrlKey && event.shiftKey ) {
                 event.preventDefault();
                 TabInterface.downloadTab(tab, editorType);
             }

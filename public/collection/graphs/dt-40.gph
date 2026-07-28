@@ -1,4 +1,6 @@
-c a Delaunay triangulation with 40 vertices and 60 edges
+c a weighted graph with 40 vertices and 60 edges
+c good for illustrating the A* search - shortest-path.js
+c you may want to hide the edge weights using the Edges menu
 g 40 60
 
 n 29 871 537 1 

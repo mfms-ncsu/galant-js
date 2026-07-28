@@ -9,7 +9,7 @@ import PopupWindow from 'components/Tabs/PopupWindow';
 export default function ExamplesButton({examples, addNew}) {
   React.useEffect(() => {
         function onKeyPress(event) {
-            if (event.code === "KeyE" && event.ctrlKey && event.shiftKey) {
+            if ( event.code === "KeyE" && event.ctrlKey && event.shiftKey ) {
               event.preventDefault();
               openPopup();
             }

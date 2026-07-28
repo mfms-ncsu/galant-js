@@ -56,13 +56,12 @@ export default function Graph() {
 
             // Load the graph
             setGraph(FileParser.loadGraph(graphName, graphText));
+            // @todo should get rid of any messages from a running algorithm
             setUserChangeManager(new ChangeManager());
-
-            // !!! need to reset the edit change manager here !!!
-            // could actually reset both change managers
 
             // We have to wait for cytoscape to read graph changes, and add graph.
             if (isInit) setTimeout(() => Cytoscape.fit(Cytoscape.elements(), 100), 25);
+            
         }
 
         // Load a new algorithm
