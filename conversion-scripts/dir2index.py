@@ -26,16 +26,15 @@ def parse_arguments():
                   + ' Output is a list of json items with attributes name, content, and description,\n'
                   + ' corresponding to filename, file contents, and comments to be displayed, respectively.'
     )
-    parser.add_argument("title", help="title for the index file")
-    parser.add_argument("-f", "--files",
-                        help="a string specifying the files to be indexed; can contain Unix wildcards")
+    parser.add_argument("-t", "--title", help="title for the index file")
     parser.add_argument("-d", "--directories", action="store_true",
                         help="add an entry for each subdirectory, with a link to its index file, if any")
     parser.add_argument("-o", "--output", help="output file, stdout if not specified")
     parser.add_argument("-c", "--comments",
                         help="comment file - file containing text to be inserted before the list")
-    parser.add_argument("-F", "--format", help="output format, one of html (default), md, txt, or json",
+    parser.add_argument("-f", "--format", help="output format, one of html (default), md, txt, or json",
                         default="html")
+    parser.add_argument("files", nargs='+', help="files to be included in the index; can use unix wildcards")
     return parser.parse_args()
 
 def get_date():
@@ -115,7 +114,7 @@ def get_file_type(filename):
         return 'makefile'
     elif extension == 'graphml':
         return 'graphml'
-    elif extension == 'gph' or extension == 'sgf' or extension == 'tree' or extension == 'cnf':
+    elif extension == 'gph' or extension == 'sgf' or extension == 'cnf':
         return 'dimacs'
     elif extension == 'snap':
         return 'snap'
@@ -217,14 +216,18 @@ def write_comments(out_stream, comment_list):
 def write_preamble(out_stream):
     if _args.format == "html":
         out_stream.write('<html> <head>\n')
-        out_stream.write('<title>{}</title>\n'.format(_args.title))
+        if _args.title:
+            out_stream.write('<title>{}</title>\n'.format(_args.title))
         out_stream.write('</head>\n\n')
         out_stream.write('<body>\n')
-        out_stream.write('<h2 align="center">{}</h2>\n\n'.format(_args.title))
+        if _args.title:
+            out_stream.write('<h2 align="center">{}</h2>\n\n'.format(_args.title))
     elif _args.format == "md":
-        out_stream.write("# {}\n\n".format(_args.title))
+        if _args.title:
+            out_stream.write("# {}\n\n".format(_args.title))
     elif _args.format == "txt":
-        out_stream.write("** {} **\n\n".format(_args.title))
+        if _args.title:
+            out_stream.write("** {} **\n\n".format(_args.title))
 
 first_json_item = True
 
@@ -325,13 +328,10 @@ def write_output(out_stream, comment_list, dir_list, filenames_with_comments):
 if __name__ == "__main__":
     global _args
     _args = parse_arguments()
-    if _args.files:
-        file_specs = _args.files.split()
-        name_list = []
-        for spec in file_specs:
-            name_list.extend(glob.glob(spec))
-    else:
-        name_list = os.listdir()
+    file_specs = _args.files
+    name_list = []
+    for spec in file_specs:
+        name_list.extend(glob.glob(spec))
     file_list, dir_list = filter_files(name_list)
     if _args.directories:
         dir_list = filter_directories(dir_list)
