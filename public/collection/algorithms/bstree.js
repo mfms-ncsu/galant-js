@@ -1,6 +1,10 @@
 /**
-Allows the user to create a binary search tree using a series of prompts.
-They will be prompted to enter a number -->
+Allows the user to create a binary search tree with numerical keys using a series of prompts.
+Start with empty.tree or bs-example.tree (for testing deletion)
+*/
+
+/**
+The user will be prompted to enter a number -->
    - If the number is positive, it is added to the tree
    - If the number is negative, it is deleted from the tree
    - If the number is 0, the algorithm stops
@@ -12,7 +16,6 @@ A node has at most one dummy child. Thus, there are these cases for non-dummy no
   - node is a leaf; it has no children, *not* two dummy children as in the textbooks
   - node has one real child and one dummy child
   - node has two real children
-Start with empty.tree or bs-example.tree (for testing deletion)
 */
 
 /**
