@@ -4,7 +4,7 @@ To create json files of for the lists of graph and algorithm examples, do the fo
 * make sure all the graphs are listed in in the desired order in 0-file_list.txt in subdirectories (of `public/collection`)algorithms, graphs, trees and layered-graphs; one way to do this is `ls > 0-file-list.txt` and then move the files around into the desired order
 * do the following in all three subdirectories
 ```
-~/Git/galant-js/conversion-scripts/dir2index.py -F json -f "`cat 0-file-list.txt`" "" > tmp.json
+~/Git/galant-js/conversion-scripts/dir2index.py -f json `cat 0-file-list.txt` > tmp.json
 ```
 **Note:** `dir2index.py` is quite useful in other ways - you may want to put it in your bin directory or add it to your path.
 * move `algorithms/tmp.json` to `../../src/data/algorithms.json`
@@ -14,7 +14,7 @@ Easiest way to do the combining is to cat the files together into, e.g., `tmp-co
 
 If only a single or small number of files need to change, you can do, for example,
 ```
-conversion-scripts/dir2index.py -F json -f "file_1 file_2" "" > tmp.json
+conversion-scripts/dir2index.py -f json file_1 file_2 > tmp.json
 ```
 and then edit the appropriate json file in `src/data/` to replace the entries for `file_1` and `file_2`
 
@@ -24,6 +24,11 @@ and then edit the appropriate json file in `src/data/` to replace the entries fo
 
 Before deployment, do thorough testing in the branch where changes were made (typically `dev`),
 then merge `dev` into `main` using the `--no-ff` and `--no-commit` options, fixing the conflicts before committing.
+Do a sanity check to make sure nothing was broken during the merge
+* `git diff dev` should not show any major changes
+* test, for example, dfs-scc on g-12
+* briefly test any newly added features
+
 After committing in `main` do
 ```
 git push https://mfms-ncsu@github.com/mfms-ncsu/galant-js main

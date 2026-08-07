@@ -5,6 +5,10 @@ import { immerable } from "immer";
  * algorithm or a user to modify the graph representation. ChangeManager
  * maintains a list of ChangeObjects and an index pointing to the current
  * state between changes.
+ * References to ChangeManager objects are in AlgorithmInterface and GraphInterface.
+ * There are two change managers
+ *  - the user or editor change manager, used to record changes made by the user in edit mode; during algorithm execution, changes in node positions only are recorded
+ * - the algorithm change manager, used to record changes made by the algorithm during execution; this one is not active in edit mode
  * 
  * @author Henry Morris
  * @author Krisjian Smith

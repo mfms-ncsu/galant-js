@@ -1,5 +1,13 @@
 # Version history of galant-js
 
+Version 3.0
+
+(1) added trees as a new graph type with file extension `.tree`
+(2) implemented natural rendering of trees using cytoscape-elk
+(3) implemented several tree algorithms, including traversals, binary search trees and red-black trees
+
+-----------------
+
 Version 2.2.1
 
 (1) added ability to restart algorithm without reloading

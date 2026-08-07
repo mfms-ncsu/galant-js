@@ -1,12 +1,8 @@
 /**
  * An implementation of the Prim-Jarnik minimum spanning tree algorithm;
- * this an almost exact copy of Dijkstra's shortest path algorithm:
- * the only difference is that weight of a node is its distance to the closest node in the tree
- * rather than the distance from the start node
- * Edges turn yellow when being explored, then
- *  - red if other end seen for the first time
- *  - green if relax yields improvement
- *  - blue when edge becomes part of the tree
+ * this an almost exact copy of Dijkstra's shortest path algorithm
+ * with only one difference: node weights are distances to the closest node in the tree
+ * rather than distances from the start node
  */
 
 

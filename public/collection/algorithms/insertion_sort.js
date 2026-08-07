@@ -1,5 +1,6 @@
 /**
- * An animation of insertion sort
+ * An animation of insertion sort; use one of the example sorting graphs
+ * or use them as models to create your own.
  */
 
 setWeightsInside(true)
