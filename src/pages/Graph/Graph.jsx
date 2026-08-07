@@ -84,6 +84,8 @@ export default function Graph() {
             myAlgorithm = new Algorithm(data.name, data.payload);
             setAlgorithm(myAlgorithm);
             setAlgorithmChangeManager(new ChangeManager());
+            const whatToSay = new SpeechSynthesisUtterance("startting algorithm")
+            window.speechSynthesis.speak(whatToSay);
             myAlgorithm.start();
         }
 

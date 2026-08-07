@@ -447,7 +447,12 @@ function getMessage(changeManager) {
     if (changeManager.changes[i]) {
       for (const change of changeManager.changes[i]) {
         if (change.action === "message") {
-          return change.current.message;
+          const theMessage = change.current.message;
+          // const utterance = new SpeechSynthesisUtterance(theMessage);
+          // console.log("ready to speak", theMessage)
+          // window.speechSynthesis.speak(utterance);
+          // console.log("spoken")
+          return theMessage;
         }
       }
     }

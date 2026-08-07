@@ -224,6 +224,10 @@ function onMessage(algorithm, message) {
             break;
         case "message":
             newChangeManager = GraphInterface.addMessage(changeManager, message.message);
+            const utterance = new SpeechSynthesisUtterance(message.message);
+            console.log("ready to speak", message.message)
+            window.speechSynthesis.speak(utterance);
+            console.log("spoken")
             updateState(graph, newChangeManager);
             break;
         case "print":
