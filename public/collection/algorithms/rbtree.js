@@ -468,6 +468,11 @@ function removeNodeRBT(root, weightToRemove) {
   display(`Removing node with key ${weightToRemove}`)
   // first identify the actual node to remove, which may be the one holding the inorder predecessor
   const nodeToRemove = findNodeToRemove(root, weightToRemove)
+  if ( nodeToRemove === null ) {
+    display(`no node with key ${weightToRemove} exists in the tree`)
+    return
+  }
+
   // then remove it and iteratively, bottom-up recolor and/or restructure as needed
 
   // the node to remove has at most one real child,
