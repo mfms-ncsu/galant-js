@@ -459,6 +459,72 @@ function getRedChild(node) {
   return undefined
 }
 
+function remedyDoubleBlack(node) {
+  // The three cases outlined in Goodrich and Tamassia depend on the sibling of the replacement after the replacement
+  const parent = getParent(node)
+  const sibling = getSibling(node)
+  console.log(`[[]] -> remedyDoubleBlack, node = ${node}, parent = ${parent}, sibling = ${sibling}`)
+  // Case 1: newSibling is black and has a red child => restructure
+  const redChild = getRedChild(sibling)
+  if ( isBlack(sibling) && redChild !== undefined ) {
+    step(() => {
+      display(`Found red child of sibling with key ${weight(redChild)}, so restructure`)
+      clearDoubleBlack(node)
+    })
+    const newParent = restructure(redChild)
+    step(() => {
+      makeRed(newParent)
+      makeBlack(getLeft(newParent))
+      makeBlack(getRight(newParent))
+    })
+    console.log(`[[]] <- remedyDoubleBlack, sibling was black with a red child`)
+    return
+  }
+
+  // Case 2: sibling is black and both of its children are black
+  //  At this point a black sibling cannot have a red child - that was handled above
+  if ( isBlack(sibling) ) {
+    // information for later; parent will turn black later in this case;
+    // the recursive call outside the step should not happen unless parent was black 
+    const parentWasRed = isRed(parent)
+    step(() => {
+      clearDoubleBlack(node)
+      makeRed(sibling)
+      if ( isRed(parent) ) {
+        display(`black sibling and parent is red: make parent black and sibling red`)
+        makeBlack(parent)
+      }
+      else if ( ! isRoot(parent) ) {
+        makeDoubleBlack(parent)
+        display(`black sibling and parent is neither red nor the root, continue looking to remedy double black`)
+      } else {
+        display(`black sibling and parent is root, no need to do anything`)
+      }
+    })
+    if ( ! parentWasRed && ! isRoot(parent) ) {
+      remedyDoubleBlack(parent)
+    }
+    console.log(`[[]] <- remedied double black, parent was black`)
+    return
+  }
+
+  // Case 3: sibling is red
+  // Here we need to rotate so that the sibling becomes the new subtree root.
+  // It will always be a single rotation, centered on the sibling
+  display(`Red sibling: rotate sibling upward and continue looking for double black`)
+  step(() => {
+    if ( isLeftChild(sibling) ) {
+      restructure(getLeft(sibling))
+    } else {
+      restructure(getRight(sibling))
+    }
+    makeBlack(sibling)
+    makeRed(parent)
+  })
+  remedyDoubleBlack(node)
+  console.log(`[[]] <- remedied double black, sibling was red`)
+}
+
 /**
  * Removes the node that has the given weight and adjust coloring and and/or restructure as needed
  * @param root the root of the tree
@@ -559,72 +625,6 @@ function removeNodeRBT(root, weightToRemove) {
     makeDoubleBlack(replacement)
   })
   remedyDoubleBlack(replacement)
-}
-
-function remedyDoubleBlack(node) {
-  // The three cases outlined in Goodrich and Tamassia depend on the sibling of the replacement after the replacement
-  const parent = getParent(node)
-  const sibling = getSibling(node)
-  console.log(`[[]] -> remedyDoubleBlack, node = ${node}, parent = ${parent}, sibling = ${sibling}`)
-  // Case 1: newSibling is black and has a red child => restructure
-  const redChild = getRedChild(sibling)
-  if ( isBlack(sibling) && redChild !== undefined ) {
-    step(() => {
-      display(`Found red child of sibling with key ${weight(redChild)}, so restructure`)
-      clearDoubleBlack(node)
-    })
-    const newParent = restructure(redChild)
-    step(() => {
-      makeRed(newParent)
-      makeBlack(getLeft(newParent))
-      makeBlack(getRight(newParent))
-    })
-    console.log(`[[]] <- remedyDoubleBlack, sibling was black with a red child`)
-    return
-  }
-
-  // Case 2: sibling is black and both of its children are black
-  //  At this point a black sibling cannot have a red child - that was handled above
-  if ( isBlack(sibling) ) {
-    // information for later; parent will turn black later in this case;
-    // the recursive call outside the step should not happen unless parent was black 
-    const parentWasRed = isRed(parent)
-    step(() => {
-      clearDoubleBlack(node)
-      makeRed(sibling)
-      if ( isRed(parent) ) {
-        display(`black sibling and parent is red: make parent black and sibling red`)
-        makeBlack(parent)
-      }
-      else if ( ! isRoot(parent) ) {
-        makeDoubleBlack(parent)
-        display(`black sibling and parent is neither red nor the root, continue looking to remedy double black`)
-      } else {
-        display(`black sibling and parent is root, no need to do anything`)
-      }
-    })
-    if ( ! parentWasRed && ! isRoot(parent) ) {
-      remedyDoubleBlack(parent)
-    }
-    console.log(`[[]] <- remedied double black, parent was black`)
-    return
-  }
-
-  // Case 3: sibling is red
-  // Here we need to rotate so that the sibling becomes the new subtree root.
-  // It will always be a single rotation, centered on the sibling
-  display(`Red sibling: rotate sibling upward and continue looking for double black`)
-  step(() => {
-    if ( isLeftChild(sibling) ) {
-      restructure(getLeft(sibling))
-    } else {
-      restructure(getRight(sibling))
-    }
-    makeBlack(sibling)
-    makeRed(parent)
-  })
-  remedyDoubleBlack(node)
-  console.log(`[[]] <- remedied double black, sibling was red`)
 }
 
 /// --- END REMOVAL

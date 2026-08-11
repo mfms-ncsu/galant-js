@@ -448,10 +448,6 @@ function getMessage(changeManager) {
       for (const change of changeManager.changes[i]) {
         if (change.action === "message") {
           const theMessage = change.current.message;
-          // const utterance = new SpeechSynthesisUtterance(theMessage);
-          // console.log("ready to speak", theMessage)
-          // window.speechSynthesis.speak(utterance);
-          // console.log("spoken")
           return theMessage;
         }
       }

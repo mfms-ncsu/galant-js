@@ -139,12 +139,7 @@ export default function CytoscapeComponent() {
      */
     useEffect(() => {
         const newMessage = GraphInterface.getMessage(algorithmChangeManager);
-        console.log("getMessage returns", newMessage)
         setMessage(newMessage);
-        // const utterance = new SpeechSynthesisUtterance(newMessage);
-        // console.log("ready to speak", newMessage)
-        // window.speechSynthesis.speak(utterance);
-        // console.log("spoken")
     }, [graph, algorithmChangeManager]);
 
     useEffect(() => {
