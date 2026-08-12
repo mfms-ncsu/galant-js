@@ -724,6 +724,14 @@ function getSource(graph, edge) {
 }
 
 /**
+ * @returns the text stored in the banner, for display and/or speaking
+ */
+function getBannerText(graph) {
+  verifyGraph(graph);
+  return graph.banner.text;
+}
+
+/**
  ***********
  * SETTERS *
  ***********
@@ -1080,9 +1088,9 @@ function redo(graph, changeManager) {
             console.log(`Redoing changeSequenceNumber, id = ${change.current.id}, seq# =${change.current.number}`);
             draft.nodes.get(change.current.id).sequenceNumber = change.current.number
             break
-          case "message":
-            // message is a special case
-            //  - messages are retrieved for display via getMessage()
+          case "setBannerText":
+            console.log(`redoing setBannerText, text = ${change.current.text}, previous = ${change.previous.text}`);
+            draft.banner.text = change.current.text;
             break
           default:
             throw new Error(`unrecognized redo action ${change.action}`)
@@ -1526,6 +1534,64 @@ function setNodeSize(graph, nodeSize) {
 }
 
 /**
+ * sets the banner text; called via display() in Thread.js
+ * creates an appropriate change object
+ */
+function setBannerText(graph, changeManager, text) {
+  console.log(`-> setBannerText to ${text}, was was ${graph.banner.text}`);
+  verifyGraphChangeManager(graph, changeManager);
+
+  const newGraph = produce(graph, (draft) => {
+    // Delete the edge in the nodes
+    draft.banner.text = text;
+  });
+
+  // Add the change object to the changeManager
+  const newChangeManager = recordChange(changeManager, [
+    new ChangeObject(
+      "setBannerText",
+      {
+        text: graph.banner.text
+      },
+      {
+        text: text
+      }
+    ),
+  ]);
+  // Return mutated graph and change manager to trigger re-render
+  return [newGraph, newChangeManager];
+}
+
+/**
+ * clears the banner text; called as clearBanner in Thread.js
+ * creates an appropriate change object
+ */
+function clearBannerText(graph, changeManager) {
+  console.log(`-> clearBannerText, text was ${graph.banner.text}`);
+  verifyGraphChangeManager(graph, changeManager);
+
+  const newGraph = produce(graph, (draft) => {
+    // Delete the edge in the nodes
+    draft.banner.text = null;
+  });
+
+  // Add the change object to the changeManager
+  const newChangeManager = recordChange(changeManager, [
+    new ChangeObject(
+      "setBannerText",
+      {
+        text: graph.banner.text
+      },
+      {
+        text: null
+      }
+    ),
+  ]);
+  // Return mutated graph and change manager to trigger re-render
+  return [newGraph, newChangeManager];
+}
+
+/**
  * Sets a new value for showEdgeLabels within the graph.
  * @param {Graph} graph Graph on which to operate
  * @param {Boolean} showEdgeLabels Flag for whether to show edge labels
@@ -1821,9 +1887,9 @@ function undo(graph, changeManager) {
             console.log(`Undoing changeSequenceNumber, id = ${change.previous.id}, seq# = ${change.previous.number}`);
             draft.nodes.get(change.previous.id).sequenceNumber = change.previous.number
             break
-          case "message":
-              // message is a special case
-              //  - messages are retrieved for display via getMessage()
+          case "setBannerText":
+            console.log(`undoing setBannerText, text = ${change.current.text}, previous = ${change.previous.text}`);
+            draft.banner.text = change.previous.text;
             break
           default:
             throw new Error(`unrecognized undo action ${change.action}`)
