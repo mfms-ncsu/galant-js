@@ -238,7 +238,15 @@ function getAttribute(id, name) {
  */
 function display(message) {
     if (stepDepth === 0) { postMessage({ action: "step" }) }
-    postMessage({ action: "message", message: message });
+    [graph, changeManager] = GraphInterface.setBannerText(graph, changeManager, message);
+    postMessage({ action: "setBannerText", text: message });
+    waitIfNeeded();
+}
+
+function clearDisplay() {
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = GraphInterface.clearBannerText(graph, changeManager);
+    postMessage({ action: "clearBannerText" });
     waitIfNeeded();
 }
 

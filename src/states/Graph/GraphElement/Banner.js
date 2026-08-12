@@ -4,6 +4,9 @@
  * 
  * @author Henry Morris
  */
+
+import GraphElement from "./GraphElement.js";
+
 export default class Banner extends GraphElement {
     /**
      * Creates a new Banner with no text and a map of attributes.

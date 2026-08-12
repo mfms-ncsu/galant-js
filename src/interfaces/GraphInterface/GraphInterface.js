@@ -54,6 +54,10 @@ let currentSequenceNumber = 0
  */
 let speakText = true;
 
+function spoken() {
+  return speakText;
+}
+
 /**
  * Records a new change in the given change manager.
  * @param {ChangeManager} changeManager Change manager to which to add
@@ -445,28 +449,6 @@ function getIncomingNodes(graph, target) {
 }
 
 /**
- * Gets the most recent message from the current index in the given change manager.
- * @param {ChangeManager} changeManager ChangeManager from which to retrieve the message
- */
-function getMessage(changeManager) {
-  for (let i = changeManager.index; i >= 0; i--) {
-    if (changeManager.changes[i]) {
-      for (const change of changeManager.changes[i]) {
-        if (change.action === "message") {
-          const theMessage = change.current.message;
-          // const utterance = new SpeechSynthesisUtterance(theMessage);
-          // console.log("ready to speak", theMessage)
-          // window.speechSynthesis.speak(utterance);
-          // console.log("spoken")
-          return theMessage;
-        }
-      }
-    }
-  }
-  return null;
-}
-
-/**
  * Gets the value of the given node's attribute.
  * @param {Graph} graph Graph on which to operate
  * @param {String} nodeId Node to check
@@ -783,23 +765,6 @@ function addEdge(graph, changeManager, source, target, attributes) {
 }
 
 /**
- * Adds a new message to the given change manager.
- * @param {ChangeManager} changeManager ChangeManager to which to push the change
- * @param {String} message New message
- * @returns Updated change manager
- */
-function addMessage(changeManager, message) {
-  
-  const newChangeManager = recordChange(changeManager, [
-    new ChangeObject("message", null, {
-      message: message,
-    }),
-  ]);
-
-  return newChangeManager;
-}
-
-/**
  * Adds a new node at the specified position.
  * @param {Graph} graph Graph on which to operate
  * @param {ChangeManager} changeManager ChangeManager to which to push the change
@@ -1013,7 +978,7 @@ function endRecording(changeManager) {
  */
 function redo(graph, changeManager) {
   // Check if there are any changes to redo
-  if (changeManager.index < changeManager.changes.length) {
+  if ( changeManager.index < changeManager.changes.length ) {
     // Get the next step
     const step = changeManager.changes[changeManager.index];
 
@@ -1089,7 +1054,7 @@ function redo(graph, changeManager) {
             draft.nodes.get(change.current.id).sequenceNumber = change.current.number
             break
           case "setBannerText":
-            console.log(`redoing setBannerText, text = ${change.current.text}, previous = ${change.previous.text}`);
+            console.log(`redoing setBannerText, text = "${change.current.text}", previous = "${change.previous.text}"`);
             draft.banner.text = change.current.text;
             break
           default:
@@ -1538,13 +1503,23 @@ function setNodeSize(graph, nodeSize) {
  * creates an appropriate change object
  */
 function setBannerText(graph, changeManager, text) {
-  console.log(`-> setBannerText to ${text}, was was ${graph.banner.text}`);
+  console.log(`-> setBannerText to "${text}", was was "${graph.banner.text}"`);
   verifyGraphChangeManager(graph, changeManager);
 
   const newGraph = produce(graph, (draft) => {
     // Delete the edge in the nodes
     draft.banner.text = text;
   });
+
+  // ** Oddly, the following gives an undefined error for SpeechSynthesisUtterance
+
+            // if ( spoken() ) {
+            //     const utterance = new SpeechSynthesisUtterance(text);
+            //     console.log("ready to speak", text)
+            //     window.speechSynthesis.speak(utterance);
+            //     console.log("spoken")
+            // }
+
 
   // Add the change object to the changeManager
   const newChangeManager = recordChange(changeManager, [
@@ -1567,7 +1542,7 @@ function setBannerText(graph, changeManager, text) {
  * creates an appropriate change object
  */
 function clearBannerText(graph, changeManager) {
-  console.log(`-> clearBannerText, text was ${graph.banner.text}`);
+  console.log(`-> clearBannerText, text was "${graph.banner.text}"`);
   verifyGraphChangeManager(graph, changeManager);
 
   const newGraph = produce(graph, (draft) => {
@@ -1924,7 +1899,9 @@ const GraphInterface = {
   getIncidentEdges,
   getIncomingEdges,
   getIncomingNodes,
-  getMessage,
+  getBannerText,
+  setBannerText,
+  clearBannerText,
   getNodeAttribute,
   getNodeIds,
   getNodePosition,
@@ -1938,7 +1915,6 @@ const GraphInterface = {
   getSource,
   getTarget,
   addEdge,
-  addMessage,
   addNode,
   deleteEdge,
   deleteNode,
@@ -1962,5 +1938,6 @@ const GraphInterface = {
   toString,
   undo,
   recordChange,
+  spoken,
 };
 export default GraphInterface;

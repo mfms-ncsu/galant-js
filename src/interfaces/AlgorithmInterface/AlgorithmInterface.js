@@ -129,10 +129,10 @@ function stepBack(algorithm) {
  */
 function stepForward(algorithm) {
     // Immediately return if the algorithm cannot continue
-    if (!canStepForward(algorithm)) return;
+    if ( ! canStepForward(algorithm) ) return;
 
     // If we are at the end of the list of changes, we need to wake up the thread to generate a new step
-    if (changeManager.index === changeManager.changes.length) {
+    if ( changeManager.index === changeManager.changes.length ) {
         algorithm.fetchingSteps = true;
 
         resumeThread(algorithm); // Resume the thread
@@ -222,14 +222,21 @@ function onMessage(algorithm, message) {
             );
             store.set(promptQueueAtom, newQueue);
             break;
-        case "message":
-            newChangeManager = GraphInterface.addMessage(changeManager, message.message);
-            const utterance = new SpeechSynthesisUtterance(message.message);
-            console.log("ready to speak", message.message)
-            window.speechSynthesis.speak(utterance);
-            console.log("spoken")
-            updateState(graph, newChangeManager);
+        case "setBannerText":
+            [newGraph, newChangeManager] = GraphInterface.setBannerText(graph,changeManager, message.text);
+            if ( GraphInterface.spoken() ) {
+                // works only in the forward direction
+                const utterance = new SpeechSynthesisUtterance(message.text);
+                console.log("ready to speak", message.text)
+                window.speechSynthesis.speak(utterance);
+                console.log("spoken")
+            }
+            updateState(newGraph, newChangeManager);
             break;
+        case "clearBannerText":
+            [newGraph, newChangeManager] = GraphInterface.clearBannerText(graph,changeManager);
+            updateState(newGraph, newChangeManager);
+            break
         case "print":
             // !!! do not remove; this is the print() function in the algorithm !!! 
             console.log(message.message);

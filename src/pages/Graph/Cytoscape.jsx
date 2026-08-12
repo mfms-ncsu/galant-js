@@ -138,9 +138,11 @@ export default function CytoscapeComponent() {
      * Function to call whenever the messages need to be updated
      */
     useEffect(() => {
-        const newMessage = GraphInterface.getMessage(algorithmChangeManager);
-        console.log("getMessage returns", newMessage)
-        setMessage(newMessage);
+        const newMessage = GraphInterface.getBannerText(graph, algorithmChangeManager);
+        console.log("getBannerText returns", newMessage)
+        if ( newMessage ) {
+            setMessage(newMessage);
+        }
         // const utterance = new SpeechSynthesisUtterance(newMessage);
         // console.log("ready to speak", newMessage)
         // window.speechSynthesis.speak(utterance);

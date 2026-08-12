@@ -118,6 +118,17 @@ Redo is similar. The only difference is that we use `current` instead of `previo
 
 ### Thread and algorithm
 
+#### Initiating an algorithm
+
+An algorithm is started when user presses the `Load` button, or its keyboard shortcut `Ctrl-Shift-L`, in the algorithm editor. This is handled in `pages/Editor/Overlay.jsx`. The sequence of events is then
+- an "algo-init" message is posted by the shared worker
+- this is intercepted in `pages/Graph/Graph.jsx`
+- the function `onAlgorithmLoad` is called
+- `AlgorithmInterface.revert()` undoes any changes from a previous algorithm execution
+- the prompt queue is initialized to be empty
+- new instances of Algorithm and ChangeManager are created
+- the new algorithm is started with the `start()` method 
+
 #### Thread
 
 `Thread.js` is the point of contact for functions called from an animation implementation. All possible functions are collected here in an organized fashion.
