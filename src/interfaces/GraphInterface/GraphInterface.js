@@ -49,6 +49,12 @@ function resetSequenceNumbers() {
 let currentSequenceNumber = 0
 
 /**
+ * Controls whether text will be spoken
+ * @todo allow this value to be controlled by the user
+ */
+let speakText = true;
+
+/**
  * Records a new change in the given change manager.
  * @param {ChangeManager} changeManager Change manager to which to add
  * @param {ChangeObject[]} change Changes to log
