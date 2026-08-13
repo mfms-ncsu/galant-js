@@ -15,6 +15,7 @@ export default function CytoscapeComponent() {
     const cytoscapeElement = useRef();
     const backgroundCanvas = useRef();
     const [message, setMessage] = useState(null);
+    let previousMessage = null;
 
     /**
      * Initialize Cytoscape on mount or update it otherwise
@@ -140,13 +141,16 @@ export default function CytoscapeComponent() {
     useEffect(() => {
         const newMessage = GraphInterface.getBannerText(graph, algorithmChangeManager);
         console.log("getBannerText returns", newMessage)
-        if ( newMessage ) {
-            setMessage(newMessage);
-        }
-        // const utterance = new SpeechSynthesisUtterance(newMessage);
-        // console.log("ready to speak", newMessage)
-        // window.speechSynthesis.speak(utterance);
-        // console.log("spoken")
+        setMessage(newMessage);
+
+        // ** does not work - banner text is spoken multiple times
+        // if ( newMessage && newMessage != previousMessage ) {
+        //     previousMessage = newMessage;
+        //     const utterance = new SpeechSynthesisUtterance(newMessage);
+        //     console.log("ready to speak", newMessage)
+        //     window.speechSynthesis.speak(utterance);
+        //     console.log("spoken")
+        // }
     }, [graph, algorithmChangeManager]);
 
     useEffect(() => {
