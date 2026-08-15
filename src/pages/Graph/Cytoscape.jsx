@@ -15,7 +15,6 @@ export default function CytoscapeComponent() {
     const cytoscapeElement = useRef();
     const backgroundCanvas = useRef();
     const [message, setMessage] = useState(null);
-    let previousMessage = null;
 
     /**
      * Initialize Cytoscape on mount or update it otherwise
