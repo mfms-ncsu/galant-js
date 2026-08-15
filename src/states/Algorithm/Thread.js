@@ -238,7 +238,15 @@ function getAttribute(id, name) {
  */
 function display(message) {
     if (stepDepth === 0) { postMessage({ action: "step" }) }
-    postMessage({ action: "message", message: message });
+    [graph, changeManager] = GraphInterface.setBannerText(graph, changeManager, message);
+    postMessage({ action: "setBannerText", text: message });
+    waitIfNeeded();
+}
+
+function clearDisplay() {
+    if (stepDepth === 0) { postMessage({ action: "step" }) }
+    [graph, changeManager] = GraphInterface.clearBannerText(graph, changeManager);
+    postMessage({ action: "clearBannerText" });
     waitIfNeeded();
 }
 
@@ -463,13 +471,6 @@ function clearNodeHighlights() {
 function clearEdgeHighlights() {
     setAttributeAll("edges", "highlighted", false);
 }
-
-/*
- * COLORS
- * @todo nomenclature of coloring is reverse of that for weights, so either
- *  - rename color -> setColor and getColor -> color
- *  - or, see if Javascript allows overloading
- */
 
 function color(id, color) {
     if ( arguments.length === 1 ) {

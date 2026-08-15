@@ -2,7 +2,7 @@
 
 To create json files of for the lists of graph and algorithm examples, do the following.
 * make sure all the graphs are listed in in the desired order in 0-file_list.txt in subdirectories (of `public/collection`)algorithms, graphs, trees and layered-graphs; one way to do this is `ls > 0-file-list.txt` and then move the files around into the desired order
-* do the following in all three subdirectories
+* do the following in all four subdirectories
 ```
 ~/Git/galant-js/conversion-scripts/dir2index.py -f json `cat 0-file-list.txt` > tmp.json
 ```

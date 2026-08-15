@@ -87,14 +87,6 @@ export default function Graph() {
             myAlgorithm.start();
         }
 
-        function onAlgorithmStart(data) {
-            if (myAlgorithm) {
-                myAlgorithm.start();
-            } else {
-                console.error("No algorithm loaded to start");
-            }
-        }
-
         // Register the functions in shared worker
         SharedWorker.on("graph-init", data => onGraphLoad(data, true));
         SharedWorker.on("graph-rename", onGraphLoad);

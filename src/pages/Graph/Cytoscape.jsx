@@ -15,6 +15,7 @@ export default function CytoscapeComponent() {
     const cytoscapeElement = useRef();
     const backgroundCanvas = useRef();
     const [message, setMessage] = useState(null);
+    let previousMessage = null;
 
     /**
      * Initialize Cytoscape on mount or update it otherwise
@@ -138,7 +139,7 @@ export default function CytoscapeComponent() {
      * Function to call whenever the messages need to be updated
      */
     useEffect(() => {
-        const newMessage = GraphInterface.getMessage(algorithmChangeManager);
+        const newMessage = GraphInterface.getBannerText(graph);
         setMessage(newMessage);
     }, [graph, algorithmChangeManager]);
 

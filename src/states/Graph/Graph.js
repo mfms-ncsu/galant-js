@@ -1,4 +1,5 @@
 import { immerable } from "immer";
+import Banner from "states/Graph/GraphElement/Banner"
 
 /**
  * Graph stores the representation of the current graph.
@@ -37,6 +38,7 @@ export default class Graph {
     this.name = name;
     this.nodes = new Map();
     this.comments = new Set();
-    this.weightsInside = false
+    this.weightsInside = false;
+    this.banner = new Banner();
   }
 }

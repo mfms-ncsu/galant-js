@@ -55,10 +55,12 @@ let currentSequenceNumber = 0
  * @returns Updated change manager
  */
 function recordChange(changeManager, change) {
+  console.log("-> recordChange", change, "manager =", changeManager)
     
     // If the change manager is not recording, save the change to the
     // main list of changes
-    if (!changeManager.isRecording) {
+    if ( ! changeManager.isRecording ) {
+        console.log("<- recordChange, not recording")
         return produce(changeManager, (draft) => {
             // Remove all changes after the current index
             draft.changes = draft.changes.slice(0, draft.index);
@@ -73,6 +75,7 @@ function recordChange(changeManager, change) {
     
     // If the change manager is recording, save the change to the
     // temporary list of changes, and return
+    console.log("<- recordChange, recording")
     return produce(changeManager, (draft) => {
         
         change.forEach( (changeObj) => {
@@ -439,24 +442,6 @@ function getIncomingNodes(graph, target) {
 }
 
 /**
- * Gets the most recent message from the current index in the given change manager.
- * @param {ChangeManager} changeManager ChangeManager from which to retrieve the message
- */
-function getMessage(changeManager) {
-  for (let i = changeManager.index; i >= 0; i--) {
-    if (changeManager.changes[i]) {
-      for (const change of changeManager.changes[i]) {
-        if (change.action === "message") {
-          const theMessage = change.current.message;
-          return theMessage;
-        }
-      }
-    }
-  }
-  return null;
-}
-
-/**
  * Gets the value of the given node's attribute.
  * @param {Graph} graph Graph on which to operate
  * @param {String} nodeId Node to check
@@ -714,6 +699,14 @@ function getSource(graph, edge) {
 }
 
 /**
+ * @returns the text stored in the banner, for display
+ */
+function getBannerText(graph) {
+  verifyGraph(graph);
+  return graph.banner.text;
+}
+
+/**
  ***********
  * SETTERS *
  ***********
@@ -762,23 +755,6 @@ function addEdge(graph, changeManager, source, target, attributes) {
 
   // Return mutated graph and change manager to trigger re-render
   return [newGraph, newChangeManager];
-}
-
-/**
- * Adds a new message to the given change manager.
- * @param {ChangeManager} changeManager ChangeManager to which to push the change
- * @param {String} message New message
- * @returns Updated change manager
- */
-function addMessage(changeManager, message) {
-  
-  const newChangeManager = recordChange(changeManager, [
-    new ChangeObject("message", null, {
-      message: message,
-    }),
-  ]);
-
-  return newChangeManager;
 }
 
 /**
@@ -995,7 +971,7 @@ function endRecording(changeManager) {
  */
 function redo(graph, changeManager) {
   // Check if there are any changes to redo
-  if (changeManager.index < changeManager.changes.length) {
+  if ( changeManager.index < changeManager.changes.length ) {
     // Get the next step
     const step = changeManager.changes[changeManager.index];
 
@@ -1070,9 +1046,9 @@ function redo(graph, changeManager) {
             console.log(`Redoing changeSequenceNumber, id = ${change.current.id}, seq# =${change.current.number}`);
             draft.nodes.get(change.current.id).sequenceNumber = change.current.number
             break
-          case "message":
-            // message is a special case
-            //  - messages are retrieved for display via getMessage()
+          case "setBannerText":
+            console.log(`redoing setBannerText, text = "${change.current.text}", previous = "${change.previous.text}"`);
+            draft.banner.text = change.current.text;
             break
           default:
             throw new Error(`unrecognized redo action ${change.action}`)
@@ -1250,7 +1226,7 @@ function setWeightsInside(graph, weightsInside) {
  */
 function setNodeAttribute(graph, changeManager, nodeId, name, value) {
   verifyGraphChangeManager(graph, changeManager);
-  console.log(`Setting attribute for node ${nodeId}, attribute ${name}, value) ${value}`);
+  console.log(`-> setNodeAttribute, node = ${nodeId}, attribute = ${name}, value = ${value}`);
   if ( ! graph.nodes.has(nodeId) ) {
     throw new Error(
       "Cannot set attribute of node " +
@@ -1285,6 +1261,7 @@ function setNodeAttribute(graph, changeManager, nodeId, name, value) {
     ),
   ]);
 
+  console.log(`<- setNodeAttribute`)
   // Return mutated graph and change manager to trigger re-render
   return [newGraph, newChangeManager];
 }
@@ -1513,6 +1490,64 @@ function setNodeSize(graph, nodeSize) {
     draft.nodeSize = nodeSize;
   });
   return newGraph;
+}
+
+/**
+ * sets the banner text; called via display() in Thread.js
+ * creates an appropriate change object
+ */
+function setBannerText(graph, changeManager, text) {
+  console.log(`-> setBannerText to "${text}", was was "${graph.banner.text}"`);
+  verifyGraphChangeManager(graph, changeManager);
+
+  const newGraph = produce(graph, (draft) => {
+    // Delete the edge in the nodes
+    draft.banner.text = text;
+  });
+
+  // Add the change object to the changeManager
+  const newChangeManager = recordChange(changeManager, [
+    new ChangeObject(
+      "setBannerText",
+      {
+        text: graph.banner.text
+      },
+      {
+        text: text
+      }
+    ),
+  ]);
+  // Return mutated graph and change manager to trigger re-render
+  return [newGraph, newChangeManager];
+}
+
+/**
+ * clears the banner text; called as clearBanner in Thread.js
+ * creates an appropriate change object
+ */
+function clearBannerText(graph, changeManager) {
+  console.log(`-> clearBannerText, text was "${graph.banner.text}"`);
+  verifyGraphChangeManager(graph, changeManager);
+
+  const newGraph = produce(graph, (draft) => {
+    // Delete the edge in the nodes
+    draft.banner.text = null;
+  });
+
+  // Add the change object to the changeManager
+  const newChangeManager = recordChange(changeManager, [
+    new ChangeObject(
+      "setBannerText",
+      {
+        text: graph.banner.text
+      },
+      {
+        text: null
+      }
+    ),
+  ]);
+  // Return mutated graph and change manager to trigger re-render
+  return [newGraph, newChangeManager];
 }
 
 /**
@@ -1811,9 +1846,9 @@ function undo(graph, changeManager) {
             console.log(`Undoing changeSequenceNumber, id = ${change.previous.id}, seq# = ${change.previous.number}`);
             draft.nodes.get(change.previous.id).sequenceNumber = change.previous.number
             break
-          case "message":
-              // message is a special case
-              //  - messages are retrieved for display via getMessage()
+          case "setBannerText":
+            console.log(`undoing setBannerText, text = ${change.current.text}, previous = ${change.previous.text}`);
+            draft.banner.text = change.previous.text;
             break
           default:
             throw new Error(`unrecognized undo action ${change.action}`)
@@ -1848,7 +1883,9 @@ const GraphInterface = {
   getIncidentEdges,
   getIncomingEdges,
   getIncomingNodes,
-  getMessage,
+  getBannerText,
+  setBannerText,
+  clearBannerText,
   getNodeAttribute,
   getNodeIds,
   getNodePosition,
@@ -1862,7 +1899,6 @@ const GraphInterface = {
   getSource,
   getTarget,
   addEdge,
-  addMessage,
   addNode,
   deleteEdge,
   deleteNode,
