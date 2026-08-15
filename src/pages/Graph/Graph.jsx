@@ -84,17 +84,9 @@ export default function Graph() {
             myAlgorithm = new Algorithm(data.name, data.payload);
             setAlgorithm(myAlgorithm);
             setAlgorithmChangeManager(new ChangeManager());
-            const whatToSay = new SpeechSynthesisUtterance("startting algorithm")
-            window.speechSynthesis.speak(whatToSay);
+            // const whatToSay = new SpeechSynthesisUtterance("startting algorithm")
+            // window.speechSynthesis.speak(whatToSay);
             myAlgorithm.start();
-        }
-
-        function onAlgorithmStart(data) {
-            if (myAlgorithm) {
-                myAlgorithm.start();
-            } else {
-                console.error("No algorithm loaded to start");
-            }
         }
 
         // Register the functions in shared worker

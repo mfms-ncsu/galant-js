@@ -65,7 +65,7 @@ step(() => {
     for ( const edge of getEdges() ) {
         if ( ! hasWeight(edge) ) {
             const weight = averageWeight()
-            display(`*** edge ${edge} has no weight, setting to average weight ${weight} ***`)
+            display(`edge ${edge} has no weight, setting to average weight ${weight} ***`)
             setWeight(edge, weight)
         }
     }
@@ -84,10 +84,6 @@ nodePQ[start_node] = 0
 while ( PQsize() > 0 ) {
     const current_node = removeMin()
     inTree[current_node] = true
-    if ( ! current_node ) {
-        display("*** there are unreachable nodes ***")
-        break
-    }
     print(current_node)
     step(() => {
         color(current_node, "yellow");

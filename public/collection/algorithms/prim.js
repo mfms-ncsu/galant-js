@@ -58,7 +58,7 @@ step(() => {
 
     for ( const edge of getEdges() ) {
         if ( ! hasWeight(edge) ) {
-            display("*** edge ${edge} has no weight, setting to 1, Euclidian distance does not work ***")
+            display("edge ${edge} has no weight, setting to 1, Euclidian distance does not work ***")
             setWeight(edge, 1)
         }
     }
@@ -78,9 +78,6 @@ let total_weight = 0
 while ( PQsize() > 0 ) {
     const current_node = removeMin()
     inTree[current_node] = true
-    if ( ! current_node ) {
-        display("*** there are unreachable nodes ***")
-    }
     print(current_node)
     step(() => {
         color(current_node, "yellow");

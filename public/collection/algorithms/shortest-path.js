@@ -90,10 +90,6 @@ let destination_reached = false
 while ( PQsize() > 0 ) {
     const current_node = removeMin()
     inTree[current_node] = true
-    if ( ! current_node ) {
-        display("*** there are unreachable nodes ***")
-        break
-    }
     step(() => {
         if ( current_node == start ) {
             color(current_node, START_COLOR)

@@ -472,13 +472,6 @@ function clearEdgeHighlights() {
     setAttributeAll("edges", "highlighted", false);
 }
 
-/*
- * COLORS
- * @todo nomenclature of coloring is reverse of that for weights, so either
- *  - rename color -> setColor and getColor -> color
- *  - or, see if Javascript allows overloading
- */
-
 function color(id, color) {
     if ( arguments.length === 1 ) {
         return getAttribute(id, "color");

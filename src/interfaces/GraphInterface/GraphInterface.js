@@ -65,10 +65,12 @@ function spoken() {
  * @returns Updated change manager
  */
 function recordChange(changeManager, change) {
+  console.log("-> recordChange", change, "manager =", changeManager)
     
     // If the change manager is not recording, save the change to the
     // main list of changes
-    if (!changeManager.isRecording) {
+    if ( ! changeManager.isRecording ) {
+        console.log("<- recordChange, not recording")
         return produce(changeManager, (draft) => {
             // Remove all changes after the current index
             draft.changes = draft.changes.slice(0, draft.index);
@@ -83,6 +85,7 @@ function recordChange(changeManager, change) {
     
     // If the change manager is recording, save the change to the
     // temporary list of changes, and return
+    console.log("<- recordChange, recording")
     return produce(changeManager, (draft) => {
         
         change.forEach( (changeObj) => {
@@ -1233,7 +1236,7 @@ function setWeightsInside(graph, weightsInside) {
  */
 function setNodeAttribute(graph, changeManager, nodeId, name, value) {
   verifyGraphChangeManager(graph, changeManager);
-  console.log(`Setting attribute for node ${nodeId}, attribute ${name}, value) ${value}`);
+  console.log(`-> setNodeAttribute, node = ${nodeId}, attribute = ${name}, value = ${value}`);
   if ( ! graph.nodes.has(nodeId) ) {
     throw new Error(
       "Cannot set attribute of node " +
@@ -1268,6 +1271,7 @@ function setNodeAttribute(graph, changeManager, nodeId, name, value) {
     ),
   ]);
 
+  console.log(`<- setNodeAttribute`)
   // Return mutated graph and change manager to trigger re-render
   return [newGraph, newChangeManager];
 }

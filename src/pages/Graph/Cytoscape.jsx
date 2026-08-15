@@ -143,7 +143,10 @@ export default function CytoscapeComponent() {
         console.log("getBannerText returns", newMessage)
         setMessage(newMessage);
 
-        // ** does not work - banner text is spoken multiple times
+        // This implementation speaks the the banner text correctly
+        // in both forward and backward steps,
+        // *** but ***
+        // the banner text is spoken multiple times
         // if ( newMessage && newMessage != previousMessage ) {
         //     previousMessage = newMessage;
         //     const utterance = new SpeechSynthesisUtterance(newMessage);
