@@ -37,7 +37,7 @@ let stepDepth = 0;
  * This thread's copy of the graph and its change manager.
  */
 let graph;
-let changeManager = new ChangeManager("Thread.js");
+let changeManager = new ChangeManager();
 
 /**
  * This function uses Atomics to cause the algorithm to wait for user input before continuing

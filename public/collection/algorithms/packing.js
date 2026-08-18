@@ -86,7 +86,7 @@ while ( PQsize() > 0 ) {
     step(() => {
         for ( const edge of outgoing(next_node) ) {
             color(edge, "green")
-            setEdgeWidth(edge, 5)
+            highlight(edge)
             const neighbor = other(next_node, edge)
             hideNodeWeight(neighbor)
             color(neighbor, "green")

@@ -10,19 +10,11 @@ const RED_COLOR = "pink"
 const HEAVY_BORDER_WIDTH = 7
 
 function accentNode(node) {
-  // step(() => {
-    label(node, "V")
-  //   const parent = getParent(node)
-  //   if ( parent !== undefined && parent !== null ) {
-  //     unaccent(parent)
-  //   }
-  // })
+  label(node, "V")
 }
 
 function unaccent(node) {
   unlabel(node)
-  // for debugging
-  // label(node, node)
 }
 
 /**
@@ -105,8 +97,6 @@ function clearDoubleRed(node) {
 function createDummy() {
   const dummy = addNode()
   setAttribute(dummy, "dummy", true);
-  // for debugging
-  // label(dummy, dummy)
   return dummy;
 }
 
@@ -268,8 +258,6 @@ function addNodeRBT(subroot, newWeight) {
   if ( subroot === null || subroot === undefined ) {
     step(() => {
       const newNode = addNode()
-      // for debugging
-      // label(newNode, newNode)
       display("Empty tree, creating a new root")
       replaceLeaf(newNode, newWeight)
       makeBlack(newNode)
