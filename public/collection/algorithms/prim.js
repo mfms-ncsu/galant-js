@@ -84,7 +84,7 @@ while ( PQsize() > 0 ) {
         setShape(current_node, "star")
         if ( predecessorEdge[current_node] ) {
             color(predecessorEdge[current_node], "blue")
-            setEdgeWidth(predecessorEdge[current_node], 6)
+            highlight(predecessorEdge[current_node])
             total_weight += weight(predecessorEdge[current_node])
             display(`added edge ${predecessorEdge[current_node]}, total_weight = ${total_weight}`)
         }
@@ -101,7 +101,7 @@ while ( PQsize() > 0 ) {
                 if ( predecessorEdge[next_node] ) {
                     color(predecessorEdge[next_node], "yellow")
                     color(edge, "green")
-                    setEdgeWidth(edge, 4)
+                    highlight(edge)
                 }
                 else {
                     color(edge, "red")
