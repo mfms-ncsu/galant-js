@@ -28,7 +28,10 @@ export default class ChangeManager {
     /**
      * Constucts a new ChangeManager.
      */
-    constructor() {
+    constructor(type = "") {
+        console.log(`-> ChangeManager(${type})`)
+        // for tracing of change managers
+        this.type = type;
         // Create an empty representation of changes
         this.changes = [];
         this.index = 0;

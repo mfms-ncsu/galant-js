@@ -5,8 +5,8 @@ import ChangeManager from "states/ChangeManager/ChangeManager";
 
 export const graphAtom = atom(new StandardGraph());
 
-export const algorithmChangeManagerAtom = atom(new ChangeManager());
-export const userChangeManagerAtom = atom(new ChangeManager());
+export const algorithmChangeManagerAtom = atom(new ChangeManager("atoms.js-algorithm"));
+export const userChangeManagerAtom = atom(new ChangeManager("atoms.js-user"));
 
 export const algorithmAtom = atom(null);
 

@@ -60,8 +60,8 @@ function recordChange(changeManager, change) {
     // If the change manager is not recording, save the change to the
     // main list of changes
     if ( ! changeManager.isRecording ) {
-        console.log("<- recordChange, not recording")
-        return produce(changeManager, (draft) => {
+        let returnValue =
+        produce(changeManager, (draft) => {
             // Remove all changes after the current index
             draft.changes = draft.changes.slice(0, draft.index);
 
@@ -71,17 +71,20 @@ function recordChange(changeManager, change) {
             // Increment the index
             draft.index++;
         });
+        console.log("<- recordChange", returnValue);
+        return returnValue;
     }
     
     // If the change manager is recording, save the change to the
     // temporary list of changes, and return
-    console.log("<- recordChange, recording")
-    return produce(changeManager, (draft) => {
-        
+    let returnValue =
+      produce(changeManager, (draft) => {
         change.forEach( (changeObj) => {
             draft.recordedChanges.push(changeObj);
         });
     });
+    console.log("<- recordChange", returnValue);
+    return returnValue;
 }
 
 /**

@@ -57,7 +57,7 @@ export default function Graph() {
             // Load the graph
             setGraph(FileParser.loadGraph(graphName, graphText));
             // @todo should get rid of any messages from a running algorithm
-            setUserChangeManager(new ChangeManager());
+            setUserChangeManager(new ChangeManager("Graph.jsx-user"));
 
             // We have to wait for cytoscape to read graph changes, and add graph.
             if (isInit) setTimeout(() => Cytoscape.fit(Cytoscape.elements(), 100), 25);
@@ -83,7 +83,7 @@ export default function Graph() {
             // But this way we can handle errors more gracefully.
             myAlgorithm = new Algorithm(data.name, data.payload);
             setAlgorithm(myAlgorithm);
-            setAlgorithmChangeManager(new ChangeManager());
+            setAlgorithmChangeManager(new ChangeManager("Graph.jsx-algorithm"));
             myAlgorithm.start();
         }
 

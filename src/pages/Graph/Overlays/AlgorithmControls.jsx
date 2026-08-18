@@ -112,7 +112,7 @@ export default function AlgorithmControls() {
         // Set the algorithm to null and reset its changeManager
         setAlgorithm(null);
         setAlgorithmChangeManager(null);
-        setAlgorithmChangeManager(new ChangeManager());
+        setAlgorithmChangeManager(new ChangeManager("AlgorithmControls.jsx-terminate"));
     }
 
     function restartAlgorithm() {
@@ -123,7 +123,7 @@ export default function AlgorithmControls() {
 
         // Reset the algorithm change manager
         setAlgorithmChangeManager(null);
-        setAlgorithmChangeManager(new ChangeManager());
+        setAlgorithmChangeManager(new ChangeManager("AlgorithmControls.jsx-restart"));
         // Restart the algorithm
         algorithm.start();
     }
