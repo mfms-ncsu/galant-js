@@ -94,7 +94,7 @@ export default function EdgeContextMenu() {
         event.target.blur();
     }
 
-    return !algorithm && (visible && 
+    return ! algorithm && (visible && 
         // This div contains the position settings, and onClick, to stop propagation to document.
         <div id="edge-context-menu" className="p-4 rounded-xl bg-white shadow-lg"  onClick={(event) => event.stopPropagation()} style={{position: 'fixed', top: renderedPosition.y + 'px', left: renderedPosition.x + 'px'}}>
             <div>
