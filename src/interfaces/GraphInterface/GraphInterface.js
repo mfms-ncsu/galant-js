@@ -1507,7 +1507,7 @@ function setNodeSize(graph, nodeSize) {
  * creates an appropriate change object
  */
 function setBannerText(graph, changeManager, text) {
-  console.log(`-> setBannerText to "${text}", was was "${graph.banner.text}"`);
+  console.log(`-> setBannerText to "${text}", was "${graph.banner.text}"`);
   verifyGraphChangeManager(graph, changeManager);
 
   const newGraph = produce(graph, (draft) => {
@@ -1517,12 +1517,13 @@ function setBannerText(graph, changeManager, text) {
 
   // ** Oddly, the following gives an undefined error for SpeechSynthesisUtterance
 
-            // if ( spoken() ) {
-            //     const utterance = new SpeechSynthesisUtterance(text);
-            //     console.log("ready to speak", text)
-            //     window.speechSynthesis.speak(utterance);
-            //     console.log("spoken")
-            // }
+//            if ( spoken() ) {
+  if ( text ) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    console.log("ready to speak", text)
+    window.speechSynthesis.speak(utterance);
+    console.log("spoken")
+  }
 
 
   // Add the change object to the changeManager

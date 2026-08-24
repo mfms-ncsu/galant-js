@@ -225,7 +225,7 @@ function onMessage(algorithm, message) {
         case "setBannerText":
             [newGraph, newChangeManager] = GraphInterface.setBannerText(graph,changeManager, message.text);
             if ( GraphInterface.spoken() ) {
-                // works only in the forward direction
+                // speak works only in the forward direction
                 // const utterance = new SpeechSynthesisUtterance(message.text);
                 // console.log("ready to speak", message.text)
                 // window.speechSynthesis.speak(utterance);
