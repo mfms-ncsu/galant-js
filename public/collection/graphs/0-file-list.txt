@@ -1,5 +1,6 @@
 blank.gph
 template.gph
+speech-test.gph
 dt-11.gph
 du-16.gph
 g-12.gph

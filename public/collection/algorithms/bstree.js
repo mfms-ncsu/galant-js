@@ -85,6 +85,7 @@ function dummify(nodeId) {
  */
 function undummify(nodeId, weight) {
   step(() => {
+    display(`replacing dummy node with node that has weight ${weight}`)
     setAttribute(nodeId, "dummy", false);
     setWeight(nodeId, weight);
     setAttribute(nodeId, "weightInNode", true);
@@ -118,7 +119,7 @@ function addNodeBST(x, k) {
     step(() => {
       const newNode = addNode();
       setWeight(newNode, k);
-      display(`Created root with weight ${k}`);
+      display(`done: created root with weight ${k}`);
     })
     return;
   }
@@ -145,11 +146,13 @@ function addNodeBST(x, k) {
       addEdge(x, newNode);
       addEdge(x, dummy)
       if ( k < weight(x) ) {
+        display(`at a leaf with weight ${weight(x)}, adding left child with weight ${k}, dummy right child`)
         setChildren(x, [newNode, dummy])
       } else {
+        display(`at a leaf with weight ${weight(x)}, adding right child with weight ${k}, dummy left child`)
         setChildren(x, [dummy, newNode])
       } 
-      display(`Added node with weight ${k}`)
+      display(`done: added node with weight ${k}`)
     });
     unaccent(x)
     return;
@@ -158,10 +161,16 @@ function addNodeBST(x, k) {
   // Not a leaf, keep searching
   console.log(`Not a leaf, key ${k} at subroot with key ${weight(x)}`);
   if ( k < weight(x) ) {
-    unaccent(x)
+    step(() => {
+      unaccent(x)
+      display(`at node with weight ${weight(x)} greater than ${k}, take left branch`)
+    })
     return addNodeBST(getLeft(x), k);
   } else {
-    unaccent(x)
+    step(() => {
+      unaccent(x)
+      display(`at node with weight ${weight(x)} less than ${k}, take right branch`)
+    })
     return addNodeBST(getRight(x), k);
   }
 }
@@ -195,7 +204,10 @@ function isRightChild(nodeId) {
  * @param currentNode the node whose in-order predecessor we are finding
  */
 function findInOrderPredecessor(currentNode) {
-  accentNode(currentNode)
+  step(() => {
+    display(`looking for inorder predecessor of node with weight ${weight(currentNode)}`)
+    accentNode(currentNode)
+  })
   // While there is a real right child, go right
   if ( getRight(currentNode) && ! getAttribute(getRight(currentNode), "dummy") ) {
     // If a real right child exists, recur
@@ -204,7 +216,7 @@ function findInOrderPredecessor(currentNode) {
   }
 
   // If I have no real right child, I am the predecessor
-  display(`Found predecessor at node with weight ${weight(currentNode)}`)
+  display(`no right child, found predecessor at node with weight ${weight(currentNode)}`)
   return currentNode
 }
 
@@ -220,19 +232,18 @@ function terminalNodeDeletion(x, isPredecessor) {
     if ( parent === null || parent === undefined ) {
       // Deleting the root node which is the only node in the tree
       deleteNode(x);
-      display(`The tree is now empty`);
+      display(`Deleted the root: the tree is now empty`);
       return;
     }
     // not the root, so has a parent
     const sibling = getSibling(x);
     if ( isDummy(sibling) ) {
       // delete x and its sibling dummy
-      const weightX = weight(x)
       step(() => {
         if ( isPredecessor ) {
-          display("Deleting predecessor node and its dummy sibling")
+          display(`deleting inorder predecessor with weight ${weight(x)} and its dummy sibling`)
         } else {
-          display(`Deleting node with weight ${weight(x)} and its dummy sibling`)
+          display(`deleting node with weight ${weight(x)} and its dummy sibling`)
         }
         deleteNode(x);
         deleteNode(sibling);
@@ -246,9 +257,9 @@ function terminalNodeDeletion(x, isPredecessor) {
     // and put a dummy node on the other side
     step(() => {
       if ( isPredecessor ) {
-        display("Deleting predecessor node, turning it into a dummy")
+        display(`deleting predecessor node with weight ${weight(x)}, by turning it into a dummy`)
       } else {
-        display(`Deleting node with weight ${weight(x)}, turning it into a dummy`)
+        display(`deleting node with weight ${weight(x)}, by turning it into a dummy`)
       }
       dummify(x);
     })
@@ -266,7 +277,8 @@ function terminalNodeDeletion(x, isPredecessor) {
     // if x is the root, there is no parent,
     //  so no need to delete edge nor figure out if x is left or right child
     // simply delete it and the real child becomes the new root automatically
-    display(`Deleted root node, new root has weight ${weight(theRealChild)}`);
+    display(`node with weight ${weight(x)} is the root, so delete it`);
+    display(`new root has weight ${weight(theRealChild)}`);
     deleteNode(x);
     return;
   }
@@ -277,10 +289,12 @@ function terminalNodeDeletion(x, isPredecessor) {
   const sibling = getSibling(x);
   step(()=> {
     if ( isPredecessor ) {
-      display("Deleting predecessor node, replacing it with its child")
+      display(`delete predecessor node with weight ${weight(x)}`)
     } else {
-      display(`Deleting node with weight ${weight(x)}, replacing it with its child`)
+      display(`delete node with weight ${weight(x)}`)
     }
+    display(`shift its ${xIsRightChild ? "right" : "left"} child with weight ${weight(theRealChild)} into its place`)
+
     deleteNode(x);
     addEdge(parent, theRealChild);
     // at this point the parent has edges to the sibling and the real child
@@ -306,7 +320,7 @@ function deleteNodeBST(x, k) {
     return;
   }
 
-  //Not a leaf, and weight(x) not k, keep searching
+  // Not a leaf, and weight(x) not k, keep searching
   accentNode(x);
   if ( k < weight(x) ) {
     unaccent(x)
@@ -325,7 +339,7 @@ function deleteNodeBST(x, k) {
 
   // Find in-order predecessor
   step(() => {
-    display("Looking for in-order predecessor")
+    display(`Looking for inorder predecessor of node with weight ${weight(x)}`)
     color(x, "black")
   })
   const predecessor = findInOrderPredecessor(getLeft(x));
@@ -333,13 +347,14 @@ function deleteNodeBST(x, k) {
   // Replace deleted node weight with in-order predecessor weight
   const predWeight = weight(predecessor);
   step(() => {
+    display(`change weight of node to be deleted to that of predecessor`)
     setWeight(x, predWeight);
     uncolor(x)
     color(predecessor, "black");
   })
   // Now delete the predecessor node, which has at most one child
   terminalNodeDeletion(predecessor, true);
-  display(`Deleted node with weight ${k} by replacing with predecessor`);
+  display(`deleted node with weight ${k}, replacing it with its predecessor`);
   return
 }
 
@@ -357,12 +372,13 @@ let running = true;
 display("Binary search tree animation. To add nodes, give positive weights; to remove, negative and to stop 0")
 while ( running ) {
   // the following does not work; something is amiss with prompts and line feeds
+  display("enter another number")
   const weight = promptNumber("Add (weight > 0), remove (-weight) or stop (0)")
   if (weight > 0) {
-    display(`Adding node with weight ${weight}`)
+    display(`Add node with weight ${weight}`)
     addNodeBST(getRoot(), weight);
   } else if (weight < 0){
-    display(`Deleting node with weight ${-weight}`)
+    display(`Delete node with weight ${-weight}`)
     deleteNodeBST(getRoot(), -weight);  
   } else {
     running = false; 

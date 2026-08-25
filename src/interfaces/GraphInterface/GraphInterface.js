@@ -1517,13 +1517,12 @@ function setBannerText(graph, changeManager, text) {
 
   // ** Oddly, the following gives an undefined error for SpeechSynthesisUtterance
 
-//            if ( spoken() ) {
-  if ( text ) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    console.log("ready to speak", text)
-    window.speechSynthesis.speak(utterance);
-    console.log("spoken")
-  }
+  // if ( spoken() ) {
+  //   console.log("ready to speak", text)
+  //   const utterance = new SpeechSynthesisUtterance(text);
+  //   window.speechSynthesis.speak(utterance);
+  //   console.log("spoken")
+  // }
 
 
   // Add the change object to the changeManager

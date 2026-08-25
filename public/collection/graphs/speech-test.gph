@@ -1,0 +1,16 @@
+c a graph for testing sonification of depth-first search: start at node alpha
+c Current Algorithm: No Algorithm Running
+
+n alpha 3 1 
+n beta 1 2 
+n charly 2 3 
+n delta 0 4 
+n edward 2 2 
+e alpha beta 
+e alpha charly 
+e beta charly 
+e beta edward 
+e charly delta 
+e edward charly
+e delta beta 
+e edward alpha 

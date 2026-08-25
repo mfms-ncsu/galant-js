@@ -226,10 +226,10 @@ function onMessage(algorithm, message) {
             [newGraph, newChangeManager] = GraphInterface.setBannerText(graph,changeManager, message.text);
             if ( GraphInterface.spoken() ) {
                 // speak works only in the forward direction
-                // const utterance = new SpeechSynthesisUtterance(message.text);
-                // console.log("ready to speak", message.text)
-                // window.speechSynthesis.speak(utterance);
-                // console.log("spoken")
+                const utterance = new SpeechSynthesisUtterance(message.text);
+                console.log("ready to speak", message.text)
+                window.speechSynthesis.speak(utterance);
+                console.log("spoken")
             }
             updateState(newGraph, newChangeManager);
             break;
