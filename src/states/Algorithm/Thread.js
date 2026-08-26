@@ -240,6 +240,9 @@ function display(message) {
     if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = GraphInterface.setBannerText(graph, changeManager, message);
     postMessage({ action: "setBannerText", text: message });
+    if ( GraphInterface.spoken() ) {
+        postMessage( {action: "speak", text: message});
+    }
     waitIfNeeded();
 }
 

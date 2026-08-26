@@ -2,6 +2,7 @@ import produce, { enableMapSet } from "immer";
 import ChangeObject from "states/ChangeManager/ChangeObject";
 import Edge from "states/Graph/GraphElement/Edge";
 import Node from "states/Graph/GraphElement/Node";
+import AlgorithmInterface from "../AlgorithmInterface/AlgorithmInterface";
 
 /** Enable maps in immer */
 enableMapSet();
@@ -1059,6 +1060,9 @@ function redo(graph, changeManager) {
           case "setBannerText":
             console.log(`redoing setBannerText, text = "${change.current.text}", previous = "${change.previous.text}"`);
             draft.banner.text = change.current.text;
+            if ( spoken() ) {
+              AlgorithmInterface.speakText(`undoing ${change.current.text}`)
+            }
             break
           default:
             throw new Error(`unrecognized redo action ${change.action}`)
@@ -1079,9 +1083,12 @@ function redo(graph, changeManager) {
 }
 
 function revert(graph, changeManager) {
+  // annoying to speak all the undo's
+  speakText = false;
   while (changeManager.index > 0) {
     [graph, changeManager] = undo(graph, changeManager);
   }
+  speakText = true;
   latestIdNumber = 0
   currentSequenceNumber = 0
   return [graph, changeManager];
@@ -1869,6 +1876,10 @@ function undo(graph, changeManager) {
           case "setBannerText":
             console.log(`undoing setBannerText, text = ${change.current.text}, previous = ${change.previous.text}`);
             draft.banner.text = change.previous.text;
+            // does nothing - have to yield to the thread running the algorithm
+            if ( spoken() ) {
+              AlgorithmInterface.speakText(`undoing ${change.current.text}`)
+            }
             break
           default:
             throw new Error(`unrecognized undo action ${change.action}`)

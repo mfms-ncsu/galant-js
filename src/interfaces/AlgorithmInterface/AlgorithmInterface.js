@@ -183,6 +183,13 @@ function revert() {
     store.set(algorithmChangeManagerAtom, newChangeManager);
 }
 
+function speakText(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    console.log("ready to speak", text)
+    window.speechSynthesis.speak(utterance);
+    console.log("spoken")
+}
+
 /**
  * Handles messages from thread.
  * @param algorithm Algorithm on which to operate
@@ -224,14 +231,11 @@ function onMessage(algorithm, message) {
             break;
         case "setBannerText":
             [newGraph, newChangeManager] = GraphInterface.setBannerText(graph,changeManager, message.text);
-            if ( GraphInterface.spoken() ) {
-                // speak works only in the forward direction
-                const utterance = new SpeechSynthesisUtterance(message.text);
-                console.log("ready to speak", message.text)
-                window.speechSynthesis.speak(utterance);
-                console.log("spoken")
-            }
             updateState(newGraph, newChangeManager);
+            break;
+        case "speak":
+            // speak works only in the forward direction
+            speakText(message.text);
             break;
         case "clearBannerText":
             [newGraph, newChangeManager] = GraphInterface.clearBannerText(graph,changeManager);
@@ -368,6 +372,7 @@ const AlgorithmInterface = {
     stepBack,
     stepForward,
     toggleDebugMode,
-    revert
+    revert,
+    speakText
 };
 export default AlgorithmInterface;
