@@ -53,7 +53,7 @@ let currentSequenceNumber = 0
  * Controls whether text will be spoken
  * @todo allow this value to be controlled by the user
  */
-let spokenText = false;
+let spokenText = true;
 
 function setSpeech(toSpeak) {
   console.log(`-> setSpeech, spokenText = ${spokenText}, toSpeak = ${toSpeak}`)
@@ -1066,7 +1066,7 @@ function redo(graph, changeManager) {
             console.log(`redoing setBannerText, text = "${change.current.text}", previous = "${change.previous.text}"`);
             draft.banner.text = change.current.text;
             if ( spoken() ) {
-              AlgorithmInterface.speakText(`undoing ${change.current.text}`)
+              AlgorithmInterface.speakText(`${change.current.text}`)
             }
             break
           default:
