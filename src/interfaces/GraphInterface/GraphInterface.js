@@ -53,10 +53,15 @@ let currentSequenceNumber = 0
  * Controls whether text will be spoken
  * @todo allow this value to be controlled by the user
  */
-let speakText = true;
+let spokenText = false;
+
+function setSpeech(toSpeak) {
+  console.log(`-> setSpeech, spokenText = ${spokenText}, toSpeak = ${toSpeak}`)
+  spokenText = toSpeak;
+}
 
 function spoken() {
-  return speakText;
+  return spokenText;
 }
 
 /**
@@ -1084,11 +1089,13 @@ function redo(graph, changeManager) {
 
 function revert(graph, changeManager) {
   // annoying to speak all the undo's
-  speakText = false;
+  let speechFlag = spoken();
+  setSpeech(false);
   while (changeManager.index > 0) {
     [graph, changeManager] = undo(graph, changeManager);
   }
-  speakText = true;
+  // revert to the current speech setting
+  setSpeech(speechFlag);
   latestIdNumber = 0
   currentSequenceNumber = 0
   return [graph, changeManager];
@@ -1954,5 +1961,6 @@ const GraphInterface = {
   undo,
   recordChange,
   spoken,
+  setSpeech
 };
 export default GraphInterface;
