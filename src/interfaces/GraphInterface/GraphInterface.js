@@ -144,6 +144,7 @@ function verifyGraphChangeManager(graph, changeManager) {
  * @param {Number} nodeIndex Number pointing to the current node in sortedLayer to evaluate (check for overlap)
  * @param {Boolean} shiftRight Boolean used to determine if the nodes need to shift right or left (based on the direction the node was moved initially)
  * @returns Updated graph and change manager
+ * @todo !!! this should be in LayeredGraphInterface !!!
  */
 function shiftNodes(graph, changeManager, sortedLayer, nodeIndex, shiftRight) {
     // Determine the shift "offset" (move one to the right or one to the left)
