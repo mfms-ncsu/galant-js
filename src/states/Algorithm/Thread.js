@@ -3,6 +3,7 @@ import FileParser from 'interfaces/FileParser/FileParser';
 import ChangeManager from 'states/ChangeManager/ChangeManager';
 import LayeredGraphInterface from 'interfaces/GraphInterface/LayeredGraphInterface';
 import TreeInterface from 'interfaces/GraphInterface/TreeInterface';
+import AlgorithmInterface from '../../interfaces/AlgorithmInterface/AlgorithmInterface';
 
 /**
  * Execution environment for algorithms. This file provides all necessary functions
@@ -240,7 +241,7 @@ function display(message) {
     if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = GraphInterface.setBannerText(graph, changeManager, message);
     postMessage({ action: "setBannerText", text: message });
-    if ( GraphInterface.spoken() ) {
+    if ( AlgorithmInterface.shouldSpeak() ) {
         postMessage( {action: "speak", text: message});
     }
     waitIfNeeded();

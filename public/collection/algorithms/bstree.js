@@ -212,7 +212,7 @@ function findInOrderPredecessor(currentNode) {
   if ( getRight(currentNode) && ! getAttribute(getRight(currentNode), "dummy") ) {
     // If a real right child exists, recur
     unaccent(currentNode)
-    currentNode = findInOrderPredecessor(getRight(currentNode));
+    return findInOrderPredecessor(getRight(currentNode));
   }
 
   // If I have no real right child, I am the predecessor
@@ -241,7 +241,7 @@ function terminalNodeDeletion(x, isPredecessor) {
       // delete x and its sibling dummy
       step(() => {
         if ( isPredecessor ) {
-          display(`deleting inorder predecessor with weight ${weight(x)} and its dummy sibling`)
+          display(`deleting inorder predecessor node and its dummy sibling`)
         } else {
           display(`deleting node with weight ${weight(x)} and its dummy sibling`)
         }
@@ -321,6 +321,7 @@ function deleteNodeBST(x, k) {
   }
 
   // Not a leaf, and weight(x) not k, keep searching
+  display(`looking for node with weight ${k}, weight of current node is ${weight(x)}`)
   accentNode(x);
   if ( k < weight(x) ) {
     unaccent(x)

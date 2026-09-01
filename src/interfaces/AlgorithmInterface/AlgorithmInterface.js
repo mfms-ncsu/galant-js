@@ -25,6 +25,20 @@ store.sub(graphAtom, () => { graph = store.get(graphAtom) });
 store.sub(algorithmChangeManagerAtom, () => { changeManager = store.get(algorithmChangeManagerAtom) });
 store.sub(promptQueueAtom, () => { promptQueue = store.get(promptQueueAtom) });
 
+/**
+ * Controls whether text will be spoken
+ * @todo allow this value to be controlled by the user
+ */
+let spokenText = true;
+
+function setSpeech(toSpeak) {
+  console.log(`-> setSpeech, spokenText = ${spokenText}, toSpeak = ${toSpeak}`)
+  spokenText = toSpeak;
+}
+
+function shouldSpeak() {
+  return spokenText;
+}
 
 /**
  * Updates the state of the graph and changeManager, as long as we are
@@ -183,11 +197,24 @@ function revert() {
     store.set(algorithmChangeManagerAtom, newChangeManager);
 }
 
+function toggleSpeech() {
+    if ( shouldSpeak() ) {
+        speakText("turning off speech")
+        setSpeech(false)
+    } else {
+        setSpeech(true)
+        speakText("speech is turned on")
+    }
+}
+
 function speakText(text) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    console.log("ready to speak", text)
-    window.speechSynthesis.speak(utterance);
-    console.log("spoken")
+    console.log(`-> speakText ${text}`)
+    if ( shouldSpeak() ) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        console.log("ready to speak", text)
+        window.speechSynthesis.speak(utterance);
+        console.log("spoken")
+    }
 }
 
 /**
@@ -373,6 +400,9 @@ const AlgorithmInterface = {
     stepForward,
     toggleDebugMode,
     revert,
-    speakText
+    speakText,
+    setSpeech,
+    toggleSpeech,
+    shouldSpeak
 };
 export default AlgorithmInterface;

@@ -20,9 +20,13 @@ export default class Algorithm {
     timeoutId;
     /** The number of miliseconds before a timeout happens. DONT CHANGE THIS */
     timeoutPeriod = 5000;
-    /** A flag that determines if the algorithm is in debug mode */
+    /** A flag that determines if the algorithm is in debug mode 
+     * @todo Explain debug mode !!
+     */
     debugMode = false;
-    /** Status flags */
+    /** Status flags
+     * @todo What do these mean ?!
+     */
     fetchingSteps = false;
     completed = false;
 

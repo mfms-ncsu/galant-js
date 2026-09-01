@@ -52,14 +52,15 @@ export default function EditControls() {
         setUserChangeManager(newChangeManager);
     }
 
+    /**
+     * This function is supposed to turn speech on and off
+     * - the speakText calls to the AlgorithmInterface work
+     * - but the setSpeech call to the GraphInterface does not
+     * @todo once a SpeechInterface is defined,
+     *  it may be possible to get this to work
+     */
     function toggleSpeech() {
-        if ( GraphInterface.spoken() ) {
-            GraphInterface.setSpeech(false);
-            AlgorithmInterface.speakText("speech turned off")
-        } else {
-            GraphInterface.setSpeech(true);
-            AlgorithmInterface.speakText("turning on speech");
-        }
+        AlgorithmInterface.toggleSpeech();
     }
 
     // Add event listener for keyboard shortcuts
@@ -72,7 +73,7 @@ export default function EditControls() {
             else if (key === "y") redo();
             else if (key === "r") revert();
             else if (key === "s") save();
-            else if (key === "v") toggleSpeech();
+            else if (key === "+") toggleSpeech();
         }
 
         document.addEventListener("keydown", onKeyDown);
