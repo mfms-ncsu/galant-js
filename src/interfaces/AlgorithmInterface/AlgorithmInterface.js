@@ -186,7 +186,11 @@ function enterPromptResult(algorithm, promptResult) {
  * This method undoes all changes that the current Algorithm did
  */
 function revert() {
+    const speechSetting = shouldSpeak();
+    AlgorithmInterface.speakText("ending algorithm execution");
+    setSpeech(false) 
     let [newGraph, newChangeManager] = GraphInterface.revert(graph, changeManager);
+    setSpeech(speechSetting)
 
     // cause memory to be reclaimed? no such luck
     changeManager = null;

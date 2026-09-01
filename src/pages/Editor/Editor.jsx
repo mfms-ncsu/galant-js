@@ -62,6 +62,9 @@ function InnerEditor({ tab, editorType, onChange }) {
 export default function Editor({ editorType, tabsAtom }) {
     const [tabs, setTabs] = useAtom(tabsAtom); // State for managing tabs
     const selectedTab = TabInterface.getSelectedTab(tabs); // Get the currently selected tab
+    // @todo this does not do anything useful as far as I can tell
+    //       ideally it should set and clear a "dirty" marker
+    //       and or prompt the user to save before closing a tab or exiting
     const [saved, setSaved] = useState(true); // State for tracking whether changes are saved
 
     // Handler for editor content change
@@ -81,6 +84,7 @@ export default function Editor({ editorType, tabsAtom }) {
         setSaved(true);
     }, [tabs]);
 
+    // The examples are in json files in the data directory
     return (
         <div className="flex flex-col h-full">
             <TabList

@@ -69,11 +69,11 @@ export default function EditControls() {
             const key = event.key;
             if (event.target.tagName.toLowerCase() === "input") return;
 
-            if (key === "z") undo();
-            else if (key === "y") redo();
-            else if (key === "r") revert();
-            else if (key === "s") save();
-            else if (key === "+") toggleSpeech();
+            if ( key === "z" ) undo();
+            else if ( key === "y" ) redo();
+            else if ( key === "r" ) revert();
+            else if ( key === "s" ) save();
+            else if ( key === "v" ) toggleSpeech();
         }
 
         document.addEventListener("keydown", onKeyDown);

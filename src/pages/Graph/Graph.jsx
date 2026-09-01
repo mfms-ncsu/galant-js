@@ -71,7 +71,7 @@ export default function Graph() {
             // Undo any changes the old algorithm made
             // @todo this should happen when the algorithm is terminated
             //       and the algorithm change manager should be set to null
-            AlgorithmInterface.revert();
+            // AlgorithmInterface.revert();
 
             // Clear the PromptQueue if one exists
             setPromptQueue([]);
@@ -84,8 +84,7 @@ export default function Graph() {
             myAlgorithm = new Algorithm(data.name, data.payload);
             setAlgorithm(myAlgorithm);
             setAlgorithmChangeManager(new ChangeManager());
-            // const whatToSay = new SpeechSynthesisUtterance("startting algorithm")
-            // window.speechSynthesis.speak(whatToSay);
+            AlgorithmInterface.speakText("starting algorithm")
             myAlgorithm.start();
         }
 

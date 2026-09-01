@@ -19,6 +19,7 @@ export default function ControlSettingsPopover() {
     const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
 
     // Function to handle auto camera action
+    // What does the 100 mean?
     function autoCamera() {
         Cytoscape.fit(Cytoscape.elements(), 100);
     }
@@ -78,8 +79,8 @@ export default function ControlSettingsPopover() {
    
     return (
         <Popover className="relative">
-            <PreferenceButton shortcut="v" callback={toggle} buttonRef={button}>
-                Layout (v)
+            <PreferenceButton callback={toggle} buttonRef={button}>
+                Layout
             </PreferenceButton>
 
             <Popover.Panel className="absolute right-0 z-10 w-64 p-4 pt-2 rounded-xl bg-white shadow-lg pointer-events-auto">

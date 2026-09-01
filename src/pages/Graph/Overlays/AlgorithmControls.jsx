@@ -132,8 +132,8 @@ export default function AlgorithmControls() {
     useEffect(() => {
         function handleKeyPress(event) {
             if (event.target.tagName.toLowerCase() === 'input') return;
-            if (event.key === 'ArrowLeft') backButtonPress();
-            else if (!event.metaKey && event.key === 'ArrowRight') frontButtonPress();
+            if ( event.key === 'ArrowLeft' || event.key === 'j' ) backButtonPress();
+            else if ( event.key === 'ArrowRight' || event.key === 'k' ) frontButtonPress();
             else if (event.key === 'q') terminateAlgorithm();
             else if (event.key === ';') restartAlgorithm();
             else if (event.key === 'x') exportGraph();
@@ -148,7 +148,7 @@ export default function AlgorithmControls() {
     }, [algorithmChangeManager]);
 
     // Return if no algorithm is available
-    if (!algorithm) return null;
+    if ( ! algorithm ) return null;
 
     return (
         <div className="absolute left-0 bottom-0 w-full p-1 flex flex-row items-center justify-between">

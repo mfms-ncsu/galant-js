@@ -38,6 +38,7 @@ export default function Tab({tab, onClick, onRename, onRemove}) {
         onClick(tab);
     }
 
+    // @todo the PencilIcon does not do anything useful
     return(
         <div tabIndex={0} className="flex bg-transparent" onClick={() => onClick(tab)} onKeyDown={onTabSelectByKey}>
             <div className={`flex items-center py-1 ps-2 pe-1 rounded-t-lg text-xl font-semibold ${tab.selected ? "bg-white" : "bg-neutral-300"}`}>
