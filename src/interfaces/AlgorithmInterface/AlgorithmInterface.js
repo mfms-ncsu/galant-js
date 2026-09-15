@@ -4,6 +4,7 @@ import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import PromptInterface from "interfaces/PromptInterface/PromptInterface";
 import LayeredGraphInterface from "interfaces/GraphInterface/LayeredGraphInterface";
 import TreeInterface from "interfaces/GraphInterface/TreeInterface";
+import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 
 /**
  * AlgorithmInterface contains functions to check and augment the algorithm.
@@ -183,13 +184,6 @@ function revert() {
     store.set(algorithmChangeManagerAtom, newChangeManager);
 }
 
-function speakText(text) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    console.log("ready to speak", text)
-    window.speechSynthesis.speak(utterance);
-    console.log("spoken")
-}
-
 /**
  * Handles messages from thread.
  * @param algorithm Algorithm on which to operate
@@ -235,7 +229,7 @@ function onMessage(algorithm, message) {
             break;
         case "speak":
             // speak works only in the forward direction
-            speakText(message.text);
+            SpeechInterface.speakText(message.text);
             break;
         case "clearBannerText":
             [newGraph, newChangeManager] = GraphInterface.clearBannerText(graph,changeManager);
@@ -372,7 +366,6 @@ const AlgorithmInterface = {
     stepBack,
     stepForward,
     toggleDebugMode,
-    revert,
-    speakText
+    revert
 };
 export default AlgorithmInterface;
