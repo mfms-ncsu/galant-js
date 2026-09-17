@@ -84,6 +84,7 @@ function log(...data) {
           '../src/pages/GraphView/GraphOverlay/GraphControls/Components/ControlSettingsPopover.jsx',
           '../src/pages/GraphView/GraphOverlay/GraphControls/Components/EdgeSettingsPopover.jsx',
           '../src/pages/GraphView/GraphOverlay/GraphControls/Components/NodeSettingsPopover.jsx',
+          '../src/pages/GraphView/GraphOverlay/GraphControls/Components/SpeechSettingsPopover.jsx',
           '../src/pages/GraphView/GraphOverlay/GraphControls/Components/PrefencesPopover.jsx',
           '../src/pages/GraphView/GraphOverlay/GraphControls/GraphControlsComponent.jsx',
           '../src/pages/GraphView/GraphOverlay/Prompts/AlgorithmErrorPrompt.jsx',
