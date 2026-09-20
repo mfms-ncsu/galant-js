@@ -4,7 +4,7 @@ import { graphAtom, graphTabsAtom, userChangeManagerAtom } from "states/_atoms/a
 import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from "@heroicons/react/24/solid";
 
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
-import AlgorithmInterface from "interfaces/AlgorithmInterface/AlgorithmInterface";
+import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 import PrimaryButton from "components/Buttons/PrimaryButton";
 import TabInterface from "interfaces/TabInterface/TabInterface";
 
@@ -53,12 +53,12 @@ export default function EditControls() {
     }
 
     function toggleSpeech() {
-        if ( GraphInterface.spoken() ) {
-            GraphInterface.setSpeech(false);
-            AlgorithmInterface.speakText("speech turned off")
+        if ( SpeechInterface.spoken() ) {
+            SpeechInterface.setSpeech(false);
+            SpeechInterface.speakText("speech turned off")
         } else {
-            GraphInterface.setSpeech(true);
-            AlgorithmInterface.speakText("turning on speech");
+            SpeechInterface.setSpeech(true);
+            SpeechInterface.speakText("turning on speech");
         }
     }
 

@@ -2,7 +2,7 @@ import produce, { enableMapSet } from "immer";
 import ChangeObject from "states/ChangeManager/ChangeObject";
 import Edge from "states/Graph/GraphElement/Edge";
 import Node from "states/Graph/GraphElement/Node";
-import AlgorithmInterface from "../AlgorithmInterface/AlgorithmInterface";
+import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 
 /** Enable maps in immer */
 enableMapSet();
@@ -48,21 +48,6 @@ function resetSequenceNumbers() {
 }
 
 let currentSequenceNumber = 0
-
-/**
- * Controls whether text will be spoken
- * @todo allow this value to be controlled by the user
- */
-let spokenText = true;
-
-function setSpeech(toSpeak) {
-  console.log(`-> setSpeech, spokenText = ${spokenText}, toSpeak = ${toSpeak}`)
-  spokenText = toSpeak;
-}
-
-function spoken() {
-  return spokenText;
-}
 
 /**
  * Records a new change in the given change manager.
@@ -1065,8 +1050,8 @@ function redo(graph, changeManager) {
           case "setBannerText":
             console.log(`redoing setBannerText, text = "${change.current.text}", previous = "${change.previous.text}"`);
             draft.banner.text = change.current.text;
-            if ( spoken() ) {
-              AlgorithmInterface.speakText(`${change.current.text}`)
+            if ( SpeechInterface.spoken() ) {
+              SpeechInterface.speakText(`${change.current.text}`)
             }
             break
           default:
@@ -1089,13 +1074,13 @@ function redo(graph, changeManager) {
 
 function revert(graph, changeManager) {
   // annoying to speak all the undo's
-  let speechFlag = spoken();
-  setSpeech(false);
+  let speechFlag = SpeechInterface.spoken();
+  SpeechInterface.setSpeech(false);
   while (changeManager.index > 0) {
     [graph, changeManager] = undo(graph, changeManager);
   }
   // revert to the current speech setting
-  setSpeech(speechFlag);
+  SpeechInterface.setSpeech(speechFlag);
   latestIdNumber = 0
   currentSequenceNumber = 0
   return [graph, changeManager];
@@ -1884,8 +1869,8 @@ function undo(graph, changeManager) {
             console.log(`undoing setBannerText, text = ${change.current.text}, previous = ${change.previous.text}`);
             draft.banner.text = change.previous.text;
             // does nothing - have to yield to the thread running the algorithm
-            if ( spoken() ) {
-              AlgorithmInterface.speakText(`undoing ${change.current.text}`)
+            if ( SpeechInterface.spoken() ) {
+              SpeechInterface.speakText(`undoing ${change.current.text}`)
             }
             break
           default:
@@ -1959,8 +1944,6 @@ const GraphInterface = {
   startRecording,
   toString,
   undo,
-  recordChange,
-  spoken,
-  setSpeech
+  recordChange
 };
 export default GraphInterface;
