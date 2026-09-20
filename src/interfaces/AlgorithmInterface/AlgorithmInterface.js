@@ -229,7 +229,9 @@ function onMessage(algorithm, message) {
             break;
         case "speak":
             // speak works only in the forward direction
-            SpeechInterface.speakText(message.text);
+            if (SpeechInterface.spoken()) {
+                SpeechInterface.speakText(message.text);
+            }
             break;
         case "clearBannerText":
             [newGraph, newChangeManager] = GraphInterface.clearBannerText(graph,changeManager);
