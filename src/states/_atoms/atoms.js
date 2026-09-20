@@ -17,3 +17,6 @@ export const promptAtom = atom(
 
 export const graphTabsAtom = atomWithStorage('graphTabs', []);
 export const algorithmTabsAtom = atomWithStorage('algorithmTabs', []);
+
+export const speechEnabledAtom = atomWithStorage('speechEnabled', true);
+export const speechSpeedAtom = atomWithStorage('speechSpeed', 1.0);
