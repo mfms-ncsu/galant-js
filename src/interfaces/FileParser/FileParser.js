@@ -96,9 +96,10 @@ function isNumeric(str) {
 
 /**
  * Loads the given file text into the graph.
+ * @param {String} name Graph file name, or an empty string for an unnamed graph
  * @param {String} file File text
  */
-function loadGraph(name, file) {
+function loadGraph(name = "", file) {
     console.log("-> loadGraph:", name, file);
     lineNumber = 0
 
