@@ -4,7 +4,6 @@ import { graphAtom, graphTabsAtom, userChangeManagerAtom } from "states/_atoms/a
 import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from "@heroicons/react/24/solid";
 
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
-import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 import PrimaryButton from "components/Buttons/PrimaryButton";
 import TabInterface from "interfaces/TabInterface/TabInterface";
 
@@ -52,16 +51,6 @@ export default function EditControls() {
         setUserChangeManager(newChangeManager);
     }
 
-    function toggleSpeech() {
-        if ( SpeechInterface.spoken() ) {
-            SpeechInterface.setSpeech(false);
-            SpeechInterface.speakText("speech turned off")
-        } else {
-            SpeechInterface.setSpeech(true);
-            SpeechInterface.speakText("turning on speech");
-        }
-    }
-
     // Add event listener for keyboard shortcuts
     useEffect(() => {
         function onKeyDown(event) {
@@ -72,7 +61,6 @@ export default function EditControls() {
             else if (key === "y") redo();
             else if (key === "r") revert();
             else if (key === "s") save();
-            else if (key === "v") toggleSpeech();
         }
 
         document.addEventListener("keydown", onKeyDown);

@@ -13,4 +13,13 @@ export default class Speech {
         window.speechSynthesis.speak(utterance);
         console.log("spoken")
     }
+
+    /**
+     * Stops the current speech and clears queued speech.
+     */
+    cancel() {
+        if (typeof window !== "undefined" && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+    }
 }
