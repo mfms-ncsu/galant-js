@@ -5,10 +5,12 @@
 export default class Speech {
     constructor() {
         this.enabled = true;
+        this.rate = 1.0;
     }
 
     speak(text) {
         const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = this.rate;
         console.log("ready to speak", text)
         window.speechSynthesis.speak(utterance);
         console.log("spoken")

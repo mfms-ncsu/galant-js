@@ -1,6 +1,6 @@
 import Speech from "states/Speech/Speech";
 import { getDefaultStore } from "jotai";
-import { speechEnabledAtom } from "states/_atoms/atoms";
+import { speechEnabledAtom, speechSpeedAtom } from "states/_atoms/atoms";
 
 /**
  * SpeechInterface is the API for enabling, disabling, and speaking text.
@@ -12,6 +12,8 @@ const store = getDefaultStore();
 // Follow the user's setting without saving temporary changes made during revert.
 store.sub(speechEnabledAtom, () => setSpeech(store.get(speechEnabledAtom)));
 setSpeech(store.get(speechEnabledAtom));
+store.sub(speechSpeedAtom, () => setRate(store.get(speechSpeedAtom)));
+setRate(store.get(speechSpeedAtom));
 
 /**
  * Controls whether text will be spoken
@@ -24,6 +26,13 @@ function setSpeech(toSpeak) {
 
 function spoken() {
     return speech.enabled;
+}
+
+/**
+ * Sets the speech rate multiplier (0.25–2 in 0.25 steps from the popover).
+ */
+function setRate(rate) {
+    speech.rate = rate;
 }
 
 function speakText(text) {
