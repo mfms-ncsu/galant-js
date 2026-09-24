@@ -46,11 +46,20 @@ function cancelSpeech() {
     speech.cancel();
 }
 
+/**
+ * Announces the current setting, including when speech is turned off.
+ */
+function announceSpeechState() {
+    cancelSpeech();
+    speech.speak(spoken() ? "Speech on" : "Speech off");
+}
+
 const SpeechInterface = {
     spoken,
     setSpeech,
     speakText,
-    cancelSpeech
+    cancelSpeech,
+    announceSpeechState
 };
 
 export default SpeechInterface;

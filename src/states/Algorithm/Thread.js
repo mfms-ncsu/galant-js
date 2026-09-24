@@ -3,7 +3,6 @@ import FileParser from 'interfaces/FileParser/FileParser';
 import ChangeManager from 'states/ChangeManager/ChangeManager';
 import LayeredGraphInterface from 'interfaces/GraphInterface/LayeredGraphInterface';
 import TreeInterface from 'interfaces/GraphInterface/TreeInterface';
-import SpeechInterface from 'interfaces/SpeechInterface/SpeechInterface';
 
 /**
  * Execution environment for algorithms. This file provides all necessary functions
@@ -241,9 +240,8 @@ function display(message) {
     if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = GraphInterface.setBannerText(graph, changeManager, message);
     postMessage({ action: "setBannerText", text: message });
-    if ( SpeechInterface.spoken() ) {
-        postMessage( {action: "speak", text: message});
-    }
+    // The main window checks whether speech is enabled.
+    postMessage( {action: "speak", text: message});
     waitIfNeeded();
 }
 
