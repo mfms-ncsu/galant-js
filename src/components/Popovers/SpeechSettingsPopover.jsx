@@ -43,8 +43,8 @@ export default function SpeechSettingsPopover() {
     
     return (
         <Popover className="relative">
-            <PreferenceButton shortcut="v" callback={toggle} buttonRef={button}>
-                Speech (v)
+            <PreferenceButton callback={toggle} buttonRef={button}>
+                Speech
             </PreferenceButton>
 
             <Popover.Panel unmount={false} className="absolute right-0 z-10 w-72 p-4 pt-2 rounded-xl bg-white shadow-lg pointer-events-auto">
