@@ -15,6 +15,15 @@ function setSpeech(toSpeak) {
     speech.enabled = toSpeak;
 }
 
+/**
+ * Controls to change the speed of the speech
+ * @todo allow this value to be controlled by the user
+ */
+function setSpeechSpeed(speed) {
+    console.log(`-> setSpeechSpeed, new speed = ${speed}`);
+    speech.speed = speed;
+}
+
 function spoken() {
     return speech.enabled;
 }
@@ -26,7 +35,8 @@ function speakText(text) {
 const SpeechInterface = {
     spoken,
     setSpeech,
-    speakText
+    speakText,
+    setSpeechSpeed
 };
 
 export default SpeechInterface;
