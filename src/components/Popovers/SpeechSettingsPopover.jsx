@@ -3,7 +3,6 @@ import { useAtom } from 'jotai';
 import { speechEnabledAtom, speechSpeedAtom } from 'states/_atoms/atoms';
 import { Popover, Switch } from '@headlessui/react';
 import PreferenceButton from 'components/Buttons/PreferenceButton';
-import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 
 /**
  * Binary switch component.
@@ -44,8 +43,8 @@ export default function SpeechSettingsPopover() {
     
     return (
         <Popover className="relative">
-            <PreferenceButton callback={toggle} buttonRef={button}>
-                Speech
+            <PreferenceButton shortcut="v" callback={toggle} buttonRef={button}>
+                Speech (v)
             </PreferenceButton>
 
             <Popover.Panel unmount={false} className="absolute right-0 z-10 w-72 p-4 pt-2 rounded-xl bg-white shadow-lg pointer-events-auto">
@@ -53,9 +52,10 @@ export default function SpeechSettingsPopover() {
 
                 <div className="flex flex-col space-y-2 mt-2">
                     <div className='flex justify-between align-middle'>
-                        <span className='text-gray-700 font-medium'>Speech On/Off</span>
+                        <span className='text-gray-700 font-medium'>Speech On</span>
                         <BinarySwitchComponent enabled={speechEnabled} setEnabled={val => setSpeechEnabled(val)} />
                     </div>
+
                     <div>
                         <div>
                             <div className="flex justify-between align-middle mb-2">
@@ -69,10 +69,9 @@ export default function SpeechSettingsPopover() {
                                 {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map(speed => (
                                     <button
                                         key={speed}
-                                        onClick={() => {
-                                            setSpeechSpeed(speed);
-                                            SpeechInterface.setSpeechSpeed(speed);
-                                        }}
+                                        onClick={() =>
+                                            setSpeechSpeed(speed)
+                                        }
                                         className={`flex-1 px-1 py-1 text-sm border ${
                                             speechSpeed === speed
                                                 ? 'bg-blue-500 text-white'

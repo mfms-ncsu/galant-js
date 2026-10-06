@@ -4,7 +4,6 @@ import { graphAtom, graphTabsAtom, userChangeManagerAtom, speechSpeedAtom } from
 import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from "@heroicons/react/24/solid";
 
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
-import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 import PrimaryButton from "components/Buttons/PrimaryButton";
 import TabInterface from "interfaces/TabInterface/TabInterface";
 
@@ -53,28 +52,14 @@ export default function EditControls() {
         setUserChangeManager(newChangeManager);
     }
 
-    function toggleSpeech() {
-        if ( SpeechInterface.spoken() ) {
-            SpeechInterface.setSpeech(false);
-            SpeechInterface.speakText("speech turned off")
-        } else {
-            SpeechInterface.setSpeech(true);
-            SpeechInterface.speakText("turning on speech");
-        }
-    }
-
+     // Increase speech speed by 0.25x, up to 2x
     function increaseSpeechSpeed() {
-        const newSpeed = Math.min(speechSpeed + 0.25, 2);
-
-        setSpeechSpeed(newSpeed);
-        SpeechInterface.setSpeechSpeed(newSpeed);
+        setSpeechSpeed(currentSpeed => Math.min(currentSpeed + 0.25, 2));
     }
 
+    // Decrease speech speed by 0.25x, down to 0.25x
     function decreaseSpeechSpeed() {
-        const newSpeed = Math.max(speechSpeed - 0.25, 0.25);
-
-        setSpeechSpeed(newSpeed);
-        SpeechInterface.setSpeechSpeed(newSpeed);
+        setSpeechSpeed(currentSpeed => Math.max(currentSpeed - 0.25, 0.25));
     }
 
     // Add event listener for keyboard shortcuts
@@ -87,16 +72,21 @@ export default function EditControls() {
             else if (key === "y") redo();
             else if (key === "r") revert();
             else if (key === "s") save();
-            else if (key === "v") toggleSpeech();
-            else if (key === "ArrowUp") increaseSpeechSpeed();
-            else if (key === "ArrowDown") decreaseSpeechSpeed();
+            else if (key === "ArrowUp") {
+                event.preventDefault();
+                increaseSpeechSpeed();
+            }
+            else if (key === "ArrowDown") {
+                event.preventDefault();
+                decreaseSpeechSpeed();
+            }
         }
 
         document.addEventListener("keydown", onKeyDown);
         return () => {
             document.removeEventListener("keydown", onKeyDown);
         }
-    }, [graph, speechSpeed]);
+    }, [graph]);
 
     return userChangeManager.changes.length > 0 && (
         <div id="edit-overlay" className="absolute left-0 right-0 bottom-1 flex flex-col items-center pointer-events-none">
