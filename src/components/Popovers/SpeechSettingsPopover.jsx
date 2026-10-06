@@ -1,8 +1,8 @@
-import { useRef } from 'react';
 import { useAtom } from 'jotai';
 import { speechEnabledAtom, speechSpeedAtom } from 'states/_atoms/atoms';
 import { Popover, Switch } from '@headlessui/react';
 import PreferenceButton from 'components/Buttons/PreferenceButton';
+import SpeechInterface from 'interfaces/SpeechInterface/SpeechInterface';
 
 /**
  * Binary switch component.
@@ -33,18 +33,16 @@ export default function SpeechSettingsPopover() {
     const [speechEnabled, setSpeechEnabled] = useAtom(speechEnabledAtom);
     const [speechSpeed, setSpeechSpeed] = useAtom(speechSpeedAtom);
 
-    // Ref for popover button
-    const button = useRef(null);
-
-    // Function to toggle the popover menu
+    // Function to toggle speech
     function toggle() {
-        button.current && button.current.click();
+        setSpeechEnabled(enabled => !enabled);
+        SpeechInterface.announceSpeechState();
     }
     
     return (
         <Popover className="relative">
-            <PreferenceButton shortcut="v" callback={toggle} buttonRef={button}>
-                Speech (v)
+            <PreferenceButton callback={toggle} buttonRef={button}>
+                Speech
             </PreferenceButton>
 
             <Popover.Panel unmount={false} className="absolute right-0 z-10 w-72 p-4 pt-2 rounded-xl bg-white shadow-lg pointer-events-auto">

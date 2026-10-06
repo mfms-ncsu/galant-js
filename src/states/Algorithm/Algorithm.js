@@ -37,6 +37,9 @@ export default class Algorithm {
     }
 
     start() {
+        this.completed = false;
+        this.fetchingSteps = false;
+        this.debugMode = false;
         // Shared array used to pass wake messages and prompt results to the Thread
         this.array = new Int32Array(new SharedArrayBuffer(1024));
         this.array[1] = 0;
@@ -49,7 +52,11 @@ export default class Algorithm {
 
         // Initialize the thread worker
         this.worker = new Worker(new URL("./Thread.js", import.meta.url));
-        let handleMessage = (message) => { AlgorithmInterface.onMessage(this, message.data) };
+        const worker = this.worker;
+        let handleMessage = (message) => {
+            // Ignore messages from a worker replaced by restart or exit.
+            if (this.worker === worker) AlgorithmInterface.onMessage(this, message.data);
+        };
         this.worker.onmessage = handleMessage;
         this.worker.postMessage(["shared", this.array, this.flags]);
         this.worker.postMessage(["graph/algorithm", GraphInterface.toString(graph), graph.isDirected, this.code, graph.name]);

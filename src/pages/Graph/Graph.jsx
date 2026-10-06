@@ -30,6 +30,10 @@ export default function Graph() {
     const sentAliveMessage = useRef();
     let algorithmLoading = false;
     let myAlgorithm = null;
+
+    useEffect(() => {
+        return () => AlgorithmInterface.stop();
+    }, []);
     
     /**
      * Creates SharedWorker instance on mount. Whenever graph updates, onMessage 
@@ -52,6 +56,7 @@ export default function Graph() {
             if (!graphText) return;
 
             // Remove any running algorithm
+            AlgorithmInterface.stop();
             setAlgorithm(null);
 
             // Load the graph
@@ -90,10 +95,11 @@ export default function Graph() {
         }
 
         // Register the functions in shared worker
-        SharedWorker.on("graph-init", data => onGraphLoad(data, true));
+        const onGraphInit = data => onGraphLoad(data, true);
+        SharedWorker.on("graph-init", onGraphInit);
         SharedWorker.on("graph-rename", onGraphLoad);
         SharedWorker.on("algo-init", onAlgorithmLoad);
-        return () => SharedWorker.remove(onGraphLoad, onAlgorithmLoad);
+        return () => SharedWorker.remove(onGraphInit, onGraphLoad, onAlgorithmLoad);
     }, [graph]);
 
     return (

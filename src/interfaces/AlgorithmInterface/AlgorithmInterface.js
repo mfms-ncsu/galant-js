@@ -1,5 +1,5 @@
 import { getDefaultStore } from "jotai";
-import { algorithmChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_atoms/atoms";
+import { algorithmAtom, algorithmChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_atoms/atoms";
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import PromptInterface from "interfaces/PromptInterface/PromptInterface";
 import LayeredGraphInterface from "interfaces/GraphInterface/LayeredGraphInterface";
@@ -50,6 +50,7 @@ function setupTimeout(algorithm) {
     algorithm.timeoutId = setTimeout(() => {
         // Kill the thread
         killThread(algorithm);
+        SpeechInterface.cancelSpeech();
         
         // Create an error
         var err = new Error("Timeout has occurred.");
@@ -88,9 +89,24 @@ function resumeThread(algorithm) {
  * @param algorithm Algorithm on which to operate
  */
 function killThread(algorithm) {
+    clearTimeout(algorithm.timeoutId);
     if (algorithm.worker) {
+        algorithm.worker.onmessage = null;
         algorithm.worker.terminate();
+        algorithm.worker = null;
     }
+    algorithm.completed = true;
+    algorithm.fetchingSteps = false;
+    algorithm.onStepAdded = null;
+}
+
+/**
+ * Stops the current algorithm and its speech.
+ */
+function stop() {
+    const algorithm = store.get(algorithmAtom);
+    if (algorithm) killThread(algorithm);
+    SpeechInterface.cancelSpeech();
 }
 
 /**
@@ -118,6 +134,7 @@ function canStepForward(algorithm) {
  */
 function stepBack(algorithm) {
     if (!canStepBack()) return;
+    SpeechInterface.cancelSpeech();
     let [newGraph, newChangeManager] = GraphInterface.undo(graph, changeManager);
     store.set(graphAtom, newGraph);
     store.set(algorithmChangeManagerAtom, newChangeManager);
@@ -131,6 +148,7 @@ function stepBack(algorithm) {
 function stepForward(algorithm) {
     // Immediately return if the algorithm cannot continue
     if ( ! canStepForward(algorithm) ) return;
+    SpeechInterface.cancelSpeech();
 
     // If we are at the end of the list of changes, we need to wake up the thread to generate a new step
     if ( changeManager.index === changeManager.changes.length ) {
@@ -173,6 +191,7 @@ function enterPromptResult(algorithm, promptResult) {
  * This method undoes all changes that the current Algorithm did
  */
 function revert() {
+    stop();
     let [newGraph, newChangeManager] = GraphInterface.revert(graph, changeManager);
 
     // cause memory to be reclaimed? no such luck
@@ -345,6 +364,8 @@ function onMessage(algorithm, message) {
             algorithm.completed = true;
             break;
         case "error":
+            killThread(algorithm);
+            SpeechInterface.cancelSpeech();
             newQueue = PromptInterface.queuePrompt(
                 promptQueue,
                 { type: "algorithmError", errorObject: message.error, algorithmCode: algorithm.code },
@@ -368,6 +389,7 @@ const AlgorithmInterface = {
     stepBack,
     stepForward,
     toggleDebugMode,
+    stop,
     revert
 };
 export default AlgorithmInterface;
