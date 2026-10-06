@@ -4,7 +4,7 @@
  */
 export default class Speech {
     constructor() {
-        this.enabled = false;
+        this.enabled = true;
         this.rate = 1.0;
     }
 

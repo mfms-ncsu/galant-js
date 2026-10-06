@@ -1,6 +1,6 @@
 import { React, useEffect } from "react";
 import { useAtom } from "jotai";
-import { graphAtom, graphTabsAtom, userChangeManagerAtom } from "states/_atoms/atoms";
+import { graphAtom, graphTabsAtom, userChangeManagerAtom, speechSpeedAtom } from "states/_atoms/atoms";
 import { ArrowUturnLeftIcon, ArrowUturnRightIcon } from "@heroicons/react/24/solid";
 
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
@@ -15,6 +15,7 @@ export default function EditControls() {
     const [graph, setGraph] = useAtom(graphAtom);
     const [tabs, setTabs] = useAtom(graphTabsAtom);
     const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
+    const [speechSpeed, setSpeechSpeed] = useAtom(speechSpeedAtom);
 
     // Function to save the graph state
     function save() {
@@ -51,6 +52,16 @@ export default function EditControls() {
         setUserChangeManager(newChangeManager);
     }
 
+     // Increase speech speed by 0.25x, up to 2x
+    function increaseSpeechSpeed() {
+        setSpeechSpeed(currentSpeed => Math.min(currentSpeed + 0.25, 2));
+    }
+
+    // Decrease speech speed by 0.25x, down to 0.25x
+    function decreaseSpeechSpeed() {
+        setSpeechSpeed(currentSpeed => Math.max(currentSpeed - 0.25, 0.25));
+    }
+
     // Add event listener for keyboard shortcuts
     useEffect(() => {
         function onKeyDown(event) {
@@ -61,6 +72,14 @@ export default function EditControls() {
             else if (key === "y") redo();
             else if (key === "r") revert();
             else if (key === "s") save();
+            else if (key === "ArrowUp") {
+                event.preventDefault();
+                increaseSpeechSpeed();
+            }
+            else if (key === "ArrowDown") {
+                event.preventDefault();
+                decreaseSpeechSpeed();
+            }
         }
 
         document.addEventListener("keydown", onKeyDown);
