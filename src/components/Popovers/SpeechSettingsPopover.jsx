@@ -41,7 +41,7 @@ export default function SpeechSettingsPopover() {
     
     return (
         <Popover className="relative">
-            <PreferenceButton callback={toggle} buttonRef={button}>
+            <PreferenceButton callback={toggle}>
                 Speech
             </PreferenceButton>
 
