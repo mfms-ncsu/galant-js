@@ -1,4 +1,5 @@
 import { useAtom } from 'jotai';
+import shortcuts from 'config/keyboardShortcuts';
 import { speechEnabledAtom, speechSpeedAtom } from 'states/_atoms/atoms';
 import { Popover, Switch } from '@headlessui/react';
 import PreferenceButton from 'components/Buttons/PreferenceButton';
@@ -34,14 +35,14 @@ export default function SpeechSettingsPopover() {
     const [speechSpeed, setSpeechSpeed] = useAtom(speechSpeedAtom);
 
     // Function to toggle speech
-    function toggle() {
+    function toggleSpeech() {
         setSpeechEnabled(enabled => !enabled);
         SpeechInterface.announceSpeechState();
     }
     
     return (
         <Popover className="relative">
-            <PreferenceButton callback={toggle}>
+            <PreferenceButton shortcut={shortcuts.toggleSpeech} callback={toggleSpeech}>
                 Speech
             </PreferenceButton>
 
@@ -64,7 +65,7 @@ export default function SpeechSettingsPopover() {
                             </div>
 
                             <div className="flex w-full">
-                                {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map(speed => (
+                                {[1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5].map(speed => (
                                     <button
                                         key={speed}
                                         onClick={() =>

@@ -1,6 +1,7 @@
 import { ArrowUpTrayIcon } from '@heroicons/react/24/solid';
 import PrimaryButton from 'components/Buttons/PrimaryButton';
 import React, { useEffect, useRef } from "react";
+import shortcuts, { matchesShortcut, shortcutHint } from "config/keyboardShortcuts";
 
 export default function UploadButton({onFileUpload, acceptFileType}) {
   const fileInputRef = useRef(null);
@@ -11,9 +12,7 @@ export default function UploadButton({onFileUpload, acceptFileType}) {
 
   useEffect(() => {
     function onKeyPress(event) {
-        console.log("key press", event)
-        if ( event.code === "KeyO" && event.ctrlKey && event.shiftKey ) {
-            console.log("Ctrl-Shift-O")
+        if (matchesShortcut(event, shortcuts.openFile)) {
             event.preventDefault();
             openFileDialog()
         }
@@ -46,7 +45,7 @@ export default function UploadButton({onFileUpload, acceptFileType}) {
         <PrimaryButton className="m-1" onClick={openFileDialog}>
             <label className="cursor-pointer flex items-center"> 
                 <ArrowUpTrayIcon className="inline h-4 me-2 fill-black stroke stroke-black"/>
-                Open (Ctrl-Shift-O)
+                Open{shortcutHint(shortcuts.openFile)}
             </label>
             <input ref={fileInputRef} type="file" accept={acceptFileType} multiple className="hidden" onChange={onUploadEvent}></input>
         </PrimaryButton>

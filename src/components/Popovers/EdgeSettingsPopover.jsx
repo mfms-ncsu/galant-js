@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import shortcuts, { shortcutHint } from 'config/keyboardShortcuts';
 import { useAtom } from 'jotai';
 import { graphAtom } from 'states/_atoms/atoms';
 import { Popover, Switch } from '@headlessui/react';
@@ -43,8 +44,8 @@ export default function EdgeSettingsPopover() {
    
     return (
         <Popover className="relative">
-            <PreferenceButton shortcut="e" callback={toggle} buttonRef={button}>
-                Edges (e)
+            <PreferenceButton shortcut={shortcuts.openEdgeSettings} callback={toggle} buttonRef={button}>
+                Edges{shortcutHint(shortcuts.openEdgeSettings)}
             </PreferenceButton>
 
             <Popover.Panel className="absolute right-0 z-10 w-64 p-4 pt-2 rounded-xl bg-white shadow-lg pointer-events-auto">

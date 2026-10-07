@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import shortcuts, { shortcutHint } from 'config/keyboardShortcuts';
 import { useAtom } from 'jotai';
 import { graphAtom } from 'states/_atoms/atoms';
 import { Popover, Switch } from '@headlessui/react';
@@ -45,8 +46,8 @@ export default function NodeSettingsPopover() {
     
     return (
         <Popover className="relative">
-            <PreferenceButton shortcut="n" callback={toggle} buttonRef={button}>
-                Nodes (n)
+            <PreferenceButton shortcut={shortcuts.openNodeSettings} callback={toggle} buttonRef={button}>
+                Nodes{shortcutHint(shortcuts.openNodeSettings)}
             </PreferenceButton>
 
             <Popover.Panel unmount={false} className="absolute right-0 z-10 w-64 p-4 pt-2 rounded-xl bg-white shadow-lg pointer-events-auto">

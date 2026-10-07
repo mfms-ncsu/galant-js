@@ -1,4 +1,5 @@
 import { useState } from "react"
+import shortcuts, { matchesShortcut } from "config/keyboardShortcuts";
 import PrimaryButton from "components/Buttons/PrimaryButton";
 
 
@@ -9,7 +10,10 @@ export default function InputPrompt({prompt, callback, promptRef}) {
     const [inputValue, setInputValue] = useState('');
 
     function onEnterPressed(event) {
-        if (event.key !== 'Enter') return;
+        if (!matchesShortcut(event, shortcuts.submitPrompt)) {
+            return;
+        }
+        event.preventDefault();
         callback(inputValue);
     }
 

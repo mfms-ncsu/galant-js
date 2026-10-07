@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import shortcuts, { matchesShortcut, shortcutHint } from "config/keyboardShortcuts";
 import TabInterface from "interfaces/TabInterface/TabInterface";
 import SharedWorker from "globals/SharedWorker";
 import PrimaryButton from "components/Buttons/PrimaryButton";
@@ -16,7 +17,7 @@ function LoadButton({ tab, editorType }) {
     // Effect hook to handle keyboard shortcut for loading graph/algorithm
     useEffect(() => {
         function onKeyPress(event) {
-            if ( event.code === "KeyL" && event.ctrlKey && event.shiftKey ) {
+            if (matchesShortcut(event, shortcuts.loadFile)) {
                 event.preventDefault();
                 load();
             }
@@ -90,7 +91,7 @@ function LoadButton({ tab, editorType }) {
 
             <PrimaryButton onClick={load}>
                 <ArrowUpRightIcon className="inline h-4 me-2 stroke-2 stroke-black"/>
-                Load {editorType} (Ctrl-Shift-L)
+                Load {editorType}{shortcutHint(shortcuts.loadFile)}
             </PrimaryButton>
         </>
     );
@@ -103,19 +104,19 @@ function DownloadButton({ editorType, tab }) {
     // Register the cmd/ctrl-S keyboard shortcut
     useEffect(() => {
         function handleKeydown(event) {
-            if ( event.code === "KeyS" && event.ctrlKey && event.shiftKey ) {
+            if (matchesShortcut(event, shortcuts.downloadFile)) {
                 event.preventDefault();
                 TabInterface.downloadTab(tab, editorType);
             }
         }
         document.addEventListener("keydown", handleKeydown);
         return () => document.removeEventListener("keydown", handleKeydown);
-    }, [tab]);
+    }, [tab, editorType]);
 
     return tab && tab.content.length >= 0 && (
         <PrimaryButton onClick={() => TabInterface.downloadTab(tab, editorType)}>
             <ArrowDownTrayIcon className="inline h-4 me-2 stroke-2 stroke-black" />
-            Download File (Ctrl-Shift-S)
+            Download File{shortcutHint(shortcuts.downloadFile)}
         </PrimaryButton>
     );
 }
