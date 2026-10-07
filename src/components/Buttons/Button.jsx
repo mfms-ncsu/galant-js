@@ -1,14 +1,18 @@
 import { useEffect } from "react";
+import { matchesShortcut } from "config/keyboardShortcuts";
 
 export default function Button({ shortcut, callback, onClick, className, children }) {
     useEffect(() => {
         function onKeyDown(event) {
-            if (event.target.tagName.toLowerCase() === 'input') return;
-            if (event.key === shortcut) callback();
+            if (!matchesShortcut(event, shortcut)) {
+                return;
+            }
+            event.preventDefault();
+            callback();
         }
         shortcut && window.addEventListener("keydown", onKeyDown);
         return(() => window.removeEventListener("keydown", onKeyDown));
-    }, []);
+    }, [shortcut, callback]);
 
     return(
         <div

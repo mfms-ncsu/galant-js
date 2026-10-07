@@ -29,7 +29,7 @@ function spoken() {
 }
 
 /**
- * Sets the speech rate multiplier (0.25–2 in 0.25 steps from the popover).
+ * Sets the speech speed from 1x to 4.5x.
  */
 function setRate(rate) {
     speech.rate = rate;
@@ -46,11 +46,37 @@ function cancelSpeech() {
     speech.cancel();
 }
 
+/**
+ * Announces whether speech is on or off.
+ */
+function announceSpeechState() {
+    cancelSpeech();
+    if (spoken()) {
+        speech.speak("Speech on");
+    } else {
+        speech.speak("Speech off");
+    }
+}
+
+/**
+ * Announces GSK mode even when narration is off.
+ */
+function announceGskState(enabled) {
+    cancelSpeech();
+    if (enabled) {
+        speech.speak("GSK on");
+    } else {
+        speech.speak("GSK off");
+    }
+}
+
 const SpeechInterface = {
     spoken,
     setSpeech,
     speakText,
-    cancelSpeech
+    cancelSpeech,
+    announceSpeechState,
+    announceGskState
 };
 
 export default SpeechInterface;

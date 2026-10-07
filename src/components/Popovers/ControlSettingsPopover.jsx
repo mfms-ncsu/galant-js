@@ -1,4 +1,5 @@
 import Cytoscape from 'globals/Cytoscape';
+import shortcuts from 'config/keyboardShortcuts';
 import { useAtom } from "jotai";
 import { graphAtom, userChangeManagerAtom } from 'states/_atoms/atoms';
 import GraphInterface from "interfaces/GraphInterface/GraphInterface.js";
@@ -78,7 +79,7 @@ export default function ControlSettingsPopover() {
    
     return (
         <Popover className="relative">
-            <PreferenceButton shortcut="" callback={toggle} buttonRef={button}>
+            <PreferenceButton shortcut={shortcuts.openLayoutSettings} callback={toggle} buttonRef={button}>
                 Layout
             </PreferenceButton>
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import shortcuts, { matchesShortcut, shortcutHint } from 'config/keyboardShortcuts';
 import ReactDOM from 'react-dom/client';
 import PrimaryButton from 'components/Buttons/PrimaryButton';
 import PopupWindow from 'components/Tabs/PopupWindow';
@@ -9,14 +10,14 @@ import PopupWindow from 'components/Tabs/PopupWindow';
 export default function ExamplesButton({examples, addNew}) {
   React.useEffect(() => {
         function onKeyPress(event) {
-            if ( event.code === "KeyE" && event.ctrlKey && event.shiftKey ) {
+            if (matchesShortcut(event, shortcuts.openExamples)) {
               event.preventDefault();
               openPopup();
             }
         }
         document.addEventListener("keydown", onKeyPress);
         return () => document.removeEventListener("keydown", onKeyPress);
-    }, []);
+    });
 
   const openPopup = () => {
     const popupWindow = window.open(
@@ -46,7 +47,7 @@ export default function ExamplesButton({examples, addNew}) {
   return (
     <div>
       <PrimaryButton className="m-1">
-        <button onClick={() => openPopup(true)}>Examples (Ctrl-Shift-E)</button>
+        <button onClick={() => openPopup(true)}>Examples{shortcutHint(shortcuts.openExamples)}</button>
       </PrimaryButton>
     </div>
   );
