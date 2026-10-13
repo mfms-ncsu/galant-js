@@ -71,6 +71,11 @@ export default function GskExplorer() {
     useEffect(() => {
     function onKeyDown(event) {
         if (!gskMode) return;
+        if (matchesShortcut(event, shortcuts.gskStopSpeech)) {
+            event.preventDefault();
+            SpeechInterface.cancelSpeech();
+            return;
+        }
 
         const next = matchesShortcut(event, shortcuts.gskNextConnection);
         const previous = matchesShortcut(event, shortcuts.gskPreviousConnection);
@@ -132,7 +137,7 @@ export default function GskExplorer() {
                 SpeechInterface.speakText(`${parts.join(", ")}.`);
                 return;
             }
-            
+
         if (!connections.length) {
             SpeechInterface.cancelSpeech();
             SpeechInterface.speakText("No connections.");

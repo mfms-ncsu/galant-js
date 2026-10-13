@@ -63,6 +63,10 @@ const keyboardShortcuts = {
     key: " ",
     mode: "gsk"
     },
+    gskStopSpeech: {
+    key: "Escape",
+    mode: "gsk"
+    },
 };
 
 let activeShortcutMode = "default";
