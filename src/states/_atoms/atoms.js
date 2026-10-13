@@ -19,6 +19,9 @@ export const graphTabsAtom = atomWithStorage('graphTabs', []);
 export const algorithmTabsAtom = atomWithStorage('algorithmTabs', []);
 
 export const speechEnabledAtom = atom(false);
+export const gskModeAtom = atomWithStorage('gskMode', false);
+export const gskCurrentNodeIdAtom = atom(null);
+
 const storedSpeechSpeedAtom = atomWithStorage('speechSpeed', 1.0);
 
 // Round older saved speeds to the new range.

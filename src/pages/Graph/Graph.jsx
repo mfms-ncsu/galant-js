@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
-import { algorithmAtom, algorithmChangeManagerAtom, userChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_atoms/atoms";
+import { algorithmAtom, algorithmChangeManagerAtom, userChangeManagerAtom, graphAtom, promptQueueAtom, gskCurrentNodeIdAtom } from "states/_atoms/atoms";
 import Cytoscape from "globals/Cytoscape";
 import SharedWorker from "globals/SharedWorker";
 import Algorithm from "states/Algorithm/Algorithm";
@@ -15,6 +15,7 @@ import EdgeContextMenu from "components/ContextMenus/EdgeContextMenu";
 import EditControls from "./Overlays/EditControls";
 import AlgorithmControls from "./Overlays/AlgorithmControls";
 import AlgorithmInterface from "interfaces/AlgorithmInterface/AlgorithmInterface"
+import GskExplorer from "components/Accessibility/GskExplorer";
 
 /**
  * Graph component is responsible for rendering and managing the main view of the application.
@@ -27,6 +28,7 @@ export default function Graph() {
     const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
     const [algorithm, setAlgorithm] = useAtom(algorithmAtom);
     const [promptQueue, setPromptQueue] = useAtom(promptQueueAtom);
+    const [, setGskCurrentNodeId] = useAtom(gskCurrentNodeIdAtom);
     const sentAliveMessage = useRef();
     let algorithmLoading = false;
     let myAlgorithm = null;
@@ -58,7 +60,7 @@ export default function Graph() {
             // Remove any running algorithm
             AlgorithmInterface.stop();
             setAlgorithm(null);
-
+            setGskCurrentNodeId(null);
             // Load the graph
             setGraph(FileParser.loadGraph(graphName, graphText));
             // @todo should get rid of any messages from a running algorithm
@@ -109,6 +111,7 @@ export default function Graph() {
             <div className="relative w-full h-full">
                 <PromptComponent />
                 <CytoscapeComponent />
+                <GskExplorer />
                 <AlgorithmControls />
                 <EditControls />
                 <ContextMenu />

@@ -1,12 +1,14 @@
 import HelpButton from "components/Buttons/HelpButton";
 import { useEffect } from "react";
-import shortcuts, { matchesShortcut, shortcutHint, toggleShortcutMode } from "config/keyboardShortcuts";
+import shortcuts, { matchesShortcut, shortcutHint, setShortcutMode } from "config/keyboardShortcuts";
 import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 import EditorButton from "components/Buttons/EditorButton";
 import ControlSettingsPopover from "components/Popovers/ControlSettingsPopover"
 import NodeSettingsPopover from "components/Popovers/NodeSettingsPopover"
 import EdgeSettingsPopover from "components/Popovers/EdgeSettingsPopover"
 import SpeechSettingsPopover from "components/Popovers/SpeechSettingsPopover";
+import { useAtom } from "jotai";
+import { gskModeAtom } from "states/_atoms/atoms";
 
 /**
  * Opens the graph editor in a new window.
@@ -35,18 +37,34 @@ function openInstructionsPage() {
  * Header component for Graph containing menu buttons and popovers.
  */
 export default function Header() {
+    const [gskMode, setGskMode] = useAtom(gskModeAtom);
+
+    // Keep keyboard mode synchronized with the saved setting.
+    useEffect(() => {
+        setShortcutMode(gskMode ? "gsk" : "default");
+    }, [gskMode]);
+
+    // Shift+G updates the same setting as the popover toggle.
     useEffect(() => {
         function onKeyDown(event) {
             if (!matchesShortcut(event, shortcuts.toggleGskMode)) {
                 return;
             }
+
             event.preventDefault();
-            const mode = toggleShortcutMode();
-            SpeechInterface.announceGskState(mode === "gsk");
+            const next = !gskMode;
+            setGskMode(next);
+            SpeechInterface.announceGskState(next);
         }
+
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
+    }, [gskMode, setGskMode]);
+
+    useEffect(() => {
+        return () => setShortcutMode("default");
     }, []);
+
 
     return (
         <header className="absolute top-1 left-1 right-1 z-10 flex justify-between pointer-events-none">
