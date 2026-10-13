@@ -50,12 +50,32 @@ export default function GskExplorer() {
         let description = "No nodes available.";
 
         if (currentNode) {
-            const label = currentNode.attributes.get("label");
-            const hasLabel = label && !currentNode.attributes.get("labelHidden");
+            const parts = [`Node ${currentNode.id}`];
 
-            description = hasLabel
-                ? `Node ${currentNode.id}, label ${label}.`
-                : `Node ${currentNode.id}.`;
+            for (const attribute of ["label", "weight", "color", "shape"]) {
+                const value = currentNode.attributes.get(attribute);
+
+                if (
+                    value !== undefined &&
+                    value !== null &&
+                    value !== "" &&
+                    !currentNode.attributes.get(`${attribute}Hidden`)
+                ) {
+                    parts.push(`${attribute} ${value}`);
+                }
+            }
+
+            parts.push(
+                currentNode.attributes.get("marked") ? "marked" : "not marked"
+            );
+            parts.push(
+            currentNode.attributes.get("highlighted")
+                ? "highlighted"
+                : "not highlighted"
+            );
+
+            description = `${parts.join(", ")}.`;
+
         } else if (currentNodeId !== null) {
             setCurrentNodeId(null);
         }
@@ -107,10 +127,10 @@ export default function GskExplorer() {
             });
 
         
-            if (describe) {
+            if (describe && !connections[connectionIndex]) {
                 const parts = [`Node ${node.id}`];
 
-                for (const attribute of ["label", "weight"]) {
+                for (const attribute of ["label", "weight", "color", "shape"]) {
                     const value = node.attributes.get(attribute);
 
                     if (
@@ -165,12 +185,16 @@ export default function GskExplorer() {
     return;
 }
 
-        const index = connectionIndex < 0
-            ? (next ? 0 : connections.length - 1)
-            : (connectionIndex + (next ? 1 : -1) + connections.length)
-                % connections.length;
+        const index = describe
+            ? connectionIndex
+            : connectionIndex < 0
+                ? (next ? 0 : connections.length - 1)
+                : (connectionIndex + (next ? 1 : -1) + connections.length)
+                    % connections.length;
 
-        setConnectionIndex(index);
+        if (!describe) {
+            setConnectionIndex(index);
+        }
 
         const edge = connections[index];
         const neighborId = edge.source === currentNodeId
@@ -188,10 +212,11 @@ export default function GskExplorer() {
         }
 
         let description =
+            `${direction} node ${neighborId}. ` +
             `Connection ${index + 1} of ${connections.length}. ` +
-            `${direction} node ${neighborId}`;
+            `Endpoints ${edge.source} and ${edge.target}`;
 
-        for (const attribute of ["label", "weight"]) {
+        for (const attribute of ["label", "weight", "color"]) {
             const value = edge.attributes.get(attribute);
 
             if (
@@ -203,6 +228,10 @@ export default function GskExplorer() {
                 description += `, ${attribute} ${value}`;
             }
         }
+
+        description += edge.attributes.get("highlighted")
+            ? ", highlighted"
+            : ", not highlighted";
 
         SpeechInterface.cancelSpeech();
         SpeechInterface.speakText(`${description}.`);
