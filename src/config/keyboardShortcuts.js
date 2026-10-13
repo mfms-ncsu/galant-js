@@ -55,12 +55,14 @@ const keyboardShortcuts = {
     mode: "gsk",
     repeat: true
     },
-
     gskMoveToNeighbor: {
     key: "Enter",
     mode: "gsk"
     },
-
+    gskDescribeNode: {
+    key: " ",
+    mode: "gsk"
+    },
 };
 
 let activeShortcutMode = "default";

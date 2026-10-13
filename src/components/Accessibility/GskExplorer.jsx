@@ -75,8 +75,9 @@ export default function GskExplorer() {
         const next = matchesShortcut(event, shortcuts.gskNextConnection);
         const previous = matchesShortcut(event, shortcuts.gskPreviousConnection);
         const move = matchesShortcut(event, shortcuts.gskMoveToNeighbor);
+        const describe = matchesShortcut(event, shortcuts.gskDescribeNode);
 
-        if (!next && !previous && !move) return;
+        if (!next && !previous && !move && !describe) return;
         event.preventDefault();
 
         const node = graph.nodes.get(currentNodeId);
@@ -100,6 +101,38 @@ export default function GskExplorer() {
                     !neighbor.attributes.get("dummy");
             });
 
+        
+            if (describe) {
+                const parts = [`Node ${node.id}`];
+
+                for (const attribute of ["label", "weight"]) {
+                    const value = node.attributes.get(attribute);
+
+                    if (
+                        value !== undefined &&
+                        value !== null &&
+                        value !== "" &&
+                        !node.attributes.get(`${attribute}Hidden`)
+                    ) {
+                        parts.push(`${attribute} ${value}`);
+                    }
+                }
+
+                parts.push(node.attributes.get("marked") ? "marked" : "not marked");
+                parts.push(
+                    node.attributes.get("highlighted")
+                    ? "highlighted"
+                    : "not highlighted"
+                );
+                parts.push(
+                    `${connections.length} connection${connections.length === 1 ? "" : "s"}`
+                );
+
+                SpeechInterface.cancelSpeech();
+                SpeechInterface.speakText(`${parts.join(", ")}.`);
+                return;
+            }
+            
         if (!connections.length) {
             SpeechInterface.cancelSpeech();
             SpeechInterface.speakText("No connections.");
