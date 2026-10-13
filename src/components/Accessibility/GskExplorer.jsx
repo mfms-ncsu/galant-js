@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import {
     graphAtom,
@@ -7,6 +7,7 @@ import {
     speechEnabledAtom
 } from "states/_atoms/atoms";
 import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
+import shortcuts, { matchesShortcut } from "config/keyboardShortcuts";
 
 export default function GskExplorer() {
     const graph = useAtomValue(graphAtom);
@@ -14,6 +15,12 @@ export default function GskExplorer() {
     const gskMode = useAtomValue(gskModeAtom);
     const [currentNodeId, setCurrentNodeId] = useAtom(gskCurrentNodeIdAtom);
     const lastAnnouncement = useRef(null);
+    const [connectionIndex, setConnectionIndex] = useState(-1);
+
+    // Reset connection selection when the node, graph, or mode changes.
+    useEffect(() => {
+        setConnectionIndex(-1);
+    }, [currentNodeId, graph, gskMode]);
 
     useEffect(() => {
         if (!gskMode) {
@@ -60,5 +67,115 @@ export default function GskExplorer() {
         }
     }, [gskMode, graph, currentNodeId, setCurrentNodeId, speechEnabled]);
 
-    return null;
+
+    useEffect(() => {
+    function onKeyDown(event) {
+        if (!gskMode) return;
+
+        const next = matchesShortcut(event, shortcuts.gskNextConnection);
+        const previous = matchesShortcut(event, shortcuts.gskPreviousConnection);
+        const move = matchesShortcut(event, shortcuts.gskMoveToNeighbor);
+
+        if (!next && !previous && !move) return;
+        event.preventDefault();
+
+        const node = graph.nodes.get(currentNodeId);
+
+        if (!node) {
+            SpeechInterface.cancelSpeech();
+            SpeechInterface.speakText("No current node available.");
+            return;
+        }
+
+        const connections = [...new Set(node.edges.values())]
+            .filter(edge => {
+                const neighborId = edge.source === currentNodeId
+                    ? edge.target
+                    : edge.source;
+                const neighbor = graph.nodes.get(neighborId);
+
+                return neighbor &&
+                    !edge.attributes.get("hidden") &&
+                    !neighbor.attributes.get("hidden") &&
+                    !neighbor.attributes.get("dummy");
+            });
+
+        if (!connections.length) {
+            SpeechInterface.cancelSpeech();
+            SpeechInterface.speakText("No connections.");
+            return;
+        }
+
+        if (move) {
+        const selectedEdge = connections[connectionIndex];
+
+        if (!selectedEdge) {
+            SpeechInterface.cancelSpeech();
+            SpeechInterface.speakText(
+                "Choose a connection with Up or Down before moving."
+                );
+            return;
+        }
+
+    const neighborId = selectedEdge.source === currentNodeId
+        ? selectedEdge.target
+        : selectedEdge.source;
+
+    SpeechInterface.cancelSpeech();
+    setConnectionIndex(-1);
+    setCurrentNodeId(neighborId);
+    return;
+}
+
+        const index = connectionIndex < 0
+            ? (next ? 0 : connections.length - 1)
+            : (connectionIndex + (next ? 1 : -1) + connections.length)
+                % connections.length;
+
+        setConnectionIndex(index);
+
+        const edge = connections[index];
+        const neighborId = edge.source === currentNodeId
+            ? edge.target
+            : edge.source;
+
+        let direction = "Edge to";
+
+        if (edge.source === edge.target) {
+            direction = "Self-loop at";
+        } else if (graph.isDirected) {
+            direction = edge.source === currentNodeId
+                ? "Outgoing edge to"
+                : "Incoming edge from";
+        }
+
+        let description =
+            `Connection ${index + 1} of ${connections.length}. ` +
+            `${direction} node ${neighborId}`;
+
+        for (const attribute of ["label", "weight"]) {
+            const value = edge.attributes.get(attribute);
+
+            if (
+                value !== undefined &&
+                value !== null &&
+                value !== "" &&
+                !edge.attributes.get(`${attribute}Hidden`)
+            ) {
+                description += `, ${attribute} ${value}`;
+            }
+        }
+
+        SpeechInterface.cancelSpeech();
+        SpeechInterface.speakText(`${description}.`);
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+        document.removeEventListener("keydown", onKeyDown);
+    };
+}, [gskMode, graph, currentNodeId, connectionIndex, setCurrentNodeId]);
+
+return null;
 }

@@ -45,7 +45,22 @@ const keyboardShortcuts = {
     selectTab: [{ key: "Enter" }, { key: " " }],
 
     // Add GSK actions here with mode: "gsk".
-    // Example: gskNextNode: { key: "ArrowRight", mode: "gsk", repeat: true },
+    gskNextConnection: {
+    key: "ArrowDown",
+    mode: "gsk",
+    repeat: true
+    },
+    gskPreviousConnection: {
+    key: "ArrowUp",
+    mode: "gsk",
+    repeat: true
+    },
+
+    gskMoveToNeighbor: {
+    key: "Enter",
+    mode: "gsk"
+    },
+
 };
 
 let activeShortcutMode = "default";
