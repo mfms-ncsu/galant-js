@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
-import { algorithmAtom, algorithmChangeManagerAtom, userChangeManagerAtom, graphAtom, promptQueueAtom, gskCurrentNodeIdAtom } from "states/_atoms/atoms";
+import { algorithmAtom, algorithmChangeManagerAtom, userChangeManagerAtom, graphAtom, promptQueueAtom, gskCurrentNodeIdAtom, gskNavigationResetAtom } from "states/_atoms/atoms";
 import Cytoscape from "globals/Cytoscape";
 import SharedWorker from "globals/SharedWorker";
 import Algorithm from "states/Algorithm/Algorithm";
@@ -29,6 +29,7 @@ export default function Graph() {
     const [algorithm, setAlgorithm] = useAtom(algorithmAtom);
     const [promptQueue, setPromptQueue] = useAtom(promptQueueAtom);
     const [, setGskCurrentNodeId] = useAtom(gskCurrentNodeIdAtom);
+    const [, resetGskNavigation] = useAtom(gskNavigationResetAtom);
     const sentAliveMessage = useRef();
     let algorithmLoading = false;
     let myAlgorithm = null;
@@ -60,6 +61,7 @@ export default function Graph() {
             // Remove any running algorithm
             AlgorithmInterface.stop();
             setAlgorithm(null);
+            resetGskNavigation(value => value + 1);
             setGskCurrentNodeId(null);
             // Load the graph
             setGraph(FileParser.loadGraph(graphName, graphText));

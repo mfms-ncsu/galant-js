@@ -21,6 +21,7 @@ export const algorithmTabsAtom = atomWithStorage('algorithmTabs', []);
 export const speechEnabledAtom = atom(false);
 export const gskModeAtom = atomWithStorage('gskMode', false);
 export const gskCurrentNodeIdAtom = atom(null);
+export const gskNavigationResetAtom = atom(0);
 
 const storedSpeechSpeedAtom = atomWithStorage('speechSpeed', 1.0);
 

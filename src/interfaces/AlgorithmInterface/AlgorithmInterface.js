@@ -1,5 +1,5 @@
 import { getDefaultStore } from "jotai";
-import { algorithmAtom, algorithmChangeManagerAtom, graphAtom, promptQueueAtom, gskCurrentNodeIdAtom } from "states/_atoms/atoms";
+import { algorithmAtom, algorithmChangeManagerAtom, graphAtom, promptQueueAtom, gskCurrentNodeIdAtom, gskNavigationResetAtom } from "states/_atoms/atoms";
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import PromptInterface from "interfaces/PromptInterface/PromptInterface";
 import LayeredGraphInterface from "interfaces/GraphInterface/LayeredGraphInterface";
@@ -231,6 +231,7 @@ function onMessage(algorithm, message) {
             updateState(newGraph, newChangeManager);
             break;
         case "gskNodeSelected":
+            store.set(gskNavigationResetAtom, value => value + 1);
             store.set(gskCurrentNodeIdAtom, message.nodeId);
             break;
         case "prompt":

@@ -4,23 +4,70 @@ import {
     graphAtom,
     gskModeAtom,
     gskCurrentNodeIdAtom,
+    gskNavigationResetAtom,
     speechEnabledAtom
 } from "states/_atoms/atoms";
 import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 import shortcuts, { matchesShortcut } from "config/keyboardShortcuts";
 
+function getConnections(graph, nodeId) {
+    const node = graph.nodes.get(nodeId);
+    if (!node) return [];
+
+    return [...new Set(node.edges.values())].filter(edge => {
+        const neighborId = edge.source === nodeId
+            ? edge.target
+            : edge.source;
+        const neighbor = graph.nodes.get(neighborId);
+
+        return neighbor &&
+            !edge.attributes.get("hidden") &&
+            !neighbor.attributes.get("hidden") &&
+            !neighbor.attributes.get("dummy");
+    });
+}
 export default function GskExplorer() {
     const graph = useAtomValue(graphAtom);
     const speechEnabled = useAtomValue(speechEnabledAtom);
     const gskMode = useAtomValue(gskModeAtom);
+    const navigationReset = useAtomValue(gskNavigationResetAtom);
     const [currentNodeId, setCurrentNodeId] = useAtom(gskCurrentNodeIdAtom);
     const lastAnnouncement = useRef(null);
+    const navigationHistory = useRef([]);
+    const pendingReturn = useRef(null);
     const [connectionIndex, setConnectionIndex] = useState(-1);
 
-    // Reset connection selection when the node, graph, or mode changes.
     useEffect(() => {
+        navigationHistory.current = [];
+        pendingReturn.current = null;
+        lastAnnouncement.current = null;
         setConnectionIndex(-1);
-    }, [currentNodeId, graph, gskMode]);
+    }, [navigationReset]);
+
+    // Restore the crossed edge after returning to a previous node.
+    useEffect(() => {
+        const entry = pendingReturn.current;
+        pendingReturn.current = null;
+
+        if (gskMode && entry && entry.nodeId === currentNodeId) {
+            const connections = getConnections(graph, currentNodeId);
+
+            const index = connections.findIndex(edge =>
+                edge.source === entry.edgeSource &&
+                edge.target === entry.edgeTarget
+            );
+
+            setConnectionIndex(index);
+
+            if (index === -1) {
+                SpeechInterface.speakText(
+                    "The previously crossed edge is no longer available."
+                );
+            }
+            } else {
+                setConnectionIndex(-1);
+            }
+        }, [currentNodeId, graph, gskMode]);
 
     useEffect(() => {
         if (!gskMode) {
@@ -85,7 +132,7 @@ export default function GskExplorer() {
             lastAnnouncement.current = description;
             SpeechInterface.speakText(description);
         }
-    }, [gskMode, graph, currentNodeId, setCurrentNodeId, speechEnabled]);
+    }, [gskMode, graph, currentNodeId, setCurrentNodeId, speechEnabled, navigationReset]);
 
 
     useEffect(() => {
@@ -94,6 +141,46 @@ export default function GskExplorer() {
         if (matchesShortcut(event, shortcuts.gskStopSpeech)) {
             event.preventDefault();
             SpeechInterface.cancelSpeech();
+            return;
+        }
+
+        if (matchesShortcut(event, shortcuts.gskGoBack)) {
+            event.preventDefault();
+            SpeechInterface.cancelSpeech();
+
+            let skipped = false;
+
+            while (navigationHistory.current.length > 0) {
+                const entry = navigationHistory.current.pop();
+                const previousNode = graph.nodes.get(entry.nodeId);
+
+            if (
+                !previousNode ||
+                previousNode.attributes.get("hidden") ||
+                previousNode.attributes.get("dummy")
+            ) {
+                skipped = true;
+                continue;
+            }
+
+            if (skipped) {
+                SpeechInterface.speakText(
+                "Unavailable nodes were skipped."
+                );
+            }
+
+            pendingReturn.current = entry;
+            lastAnnouncement.current = null;
+            setConnectionIndex(-1);
+            setCurrentNodeId(entry.nodeId);
+            return;
+        }
+
+        SpeechInterface.speakText(
+            skipped
+                ? "Previous nodes are no longer available."
+                : "No previous node."
+            );
             return;
         }
 
@@ -113,18 +200,7 @@ export default function GskExplorer() {
             return;
         }
 
-        const connections = [...new Set(node.edges.values())]
-            .filter(edge => {
-                const neighborId = edge.source === currentNodeId
-                    ? edge.target
-                    : edge.source;
-                const neighbor = graph.nodes.get(neighborId);
-
-                return neighbor &&
-                    !edge.attributes.get("hidden") &&
-                    !neighbor.attributes.get("hidden") &&
-                    !neighbor.attributes.get("dummy");
-            });
+        const connections = getConnections(graph, currentNodeId);
 
         
             if (describe && !connections[connectionIndex]) {
@@ -179,6 +255,11 @@ export default function GskExplorer() {
         ? selectedEdge.target
         : selectedEdge.source;
 
+    navigationHistory.current.push({
+        nodeId: currentNodeId,
+        edgeSource: selectedEdge.source,
+        edgeTarget: selectedEdge.target
+    });
     SpeechInterface.cancelSpeech();
     setConnectionIndex(-1);
     setCurrentNodeId(neighborId);

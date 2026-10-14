@@ -56,7 +56,11 @@ const keyboardShortcuts = {
     repeat: true
     },
     gskMoveToNeighbor: {
-    key: "Enter",
+    key: "ArrowRight",
+    mode: "gsk"
+    },
+    gskGoBack: {
+    key: "ArrowLeft",
     mode: "gsk"
     },
     gskDescribeNode: {
