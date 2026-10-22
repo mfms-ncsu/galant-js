@@ -6,7 +6,7 @@ import EditorButton from "components/Buttons/EditorButton";
 import ControlSettingsPopover from "components/Popovers/ControlSettingsPopover"
 import NodeSettingsPopover from "components/Popovers/NodeSettingsPopover"
 import EdgeSettingsPopover from "components/Popovers/EdgeSettingsPopover"
-import SpeechSettingsPopover from "components/Popovers/SpeechSettingsPopover";
+import UserPreferencesPopover from "components/Popovers/UserPreferencesPopover";
 
 /**
  * Opens the graph editor in a new window.
@@ -68,7 +68,7 @@ export default function Header() {
                 <ControlSettingsPopover />
                 <NodeSettingsPopover />
                 <EdgeSettingsPopover />
-                <SpeechSettingsPopover />
+                <UserPreferencesPopover />
             </div>
         </header>
     );
