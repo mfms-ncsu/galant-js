@@ -55,12 +55,12 @@ export default function EditControls() {
 
     // Increase speech speed up to 4.5x.
     function increaseSpeechSpeed() {
-        setSpeechSpeed(currentSpeed => Math.min(currentSpeed + 0.5, 4.5));
+        setSpeechSpeed(currentSpeed => Math.min(currentSpeed + 0.25, 10));
     }
 
     // Decrease speech speed down to 1x.
     function decreaseSpeechSpeed() {
-        setSpeechSpeed(currentSpeed => Math.max(currentSpeed - 0.5, 1));
+        setSpeechSpeed(currentSpeed => Math.max(currentSpeed - 0.25, 0.25));
     }
 
     // Add event listener for keyboard shortcuts

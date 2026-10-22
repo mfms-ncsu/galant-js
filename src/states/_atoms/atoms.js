@@ -27,7 +27,7 @@ const storedSpeechSpeedAtom = atomWithStorage('speechSpeed', 1.0);
 
 // Round older saved speeds to the new range.
 export const speechSpeedAtom = atom(
-    (get) => Math.min(4.5, Math.max(1, Math.round(get(storedSpeechSpeedAtom) * 2) / 2)),
+    (get) => Math.min(10, Math.max(0.25, Math.round(get(storedSpeechSpeedAtom) * 4) / 4)),
     (get, set, speed) => {
         if (typeof speed === 'function') {
             speed = speed(get(speechSpeedAtom));
