@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import shortcuts from 'config/keyboardShortcuts';
-import { speechEnabledAtom, speechSpeedAtom } from 'states/_atoms/atoms';
+import { speechEnabledAtom, speechSpeedAtom, gskModeAtom  } from 'states/_atoms/atoms';
 import { Popover, Switch } from '@headlessui/react';
 import PreferenceButton from 'components/Buttons/PreferenceButton';
 import SpeechInterface from 'interfaces/SpeechInterface/SpeechInterface';
@@ -8,7 +8,7 @@ import SpeechInterface from 'interfaces/SpeechInterface/SpeechInterface';
 /**
  * Binary switch component.
  */
-function BinarySwitchComponent({enabled, setEnabled}) {
+function BinarySwitchComponent({enabled, setEnabled,label = 'Speech'}) {
     return (
         <Switch
             checked={enabled}
@@ -17,7 +17,7 @@ function BinarySwitchComponent({enabled, setEnabled}) {
                 enabled ? 'bg-blue-500' : 'bg-gray-200'
             } relative inline-flex h-6 w-11 items-center rounded-full`}
         >
-            <span className="sr-only">Toggle</span>
+            <span className="sr-only">{label}</span>
             <span
                 className={`${
                 enabled ? 'translate-x-6' : 'translate-x-1'
@@ -33,6 +33,12 @@ function BinarySwitchComponent({enabled, setEnabled}) {
 export default function SpeechSettingsPopover() {
     const [speechEnabled, setSpeechEnabled] = useAtom(speechEnabledAtom);
     const [speechSpeed, setSpeechSpeed] = useAtom(speechSpeedAtom);
+    const [gskMode, setGskMode] = useAtom(gskModeAtom);
+
+    function changeGskMode(enabled) {
+        setGskMode(enabled);
+        SpeechInterface.announceGskState(enabled);
+    }
 
     // Function to toggle speech
     function toggleSpeech() {
@@ -48,6 +54,15 @@ export default function SpeechSettingsPopover() {
 
             <Popover.Panel unmount={false} className="absolute right-0 z-10 w-72 p-4 pt-2 rounded-xl bg-white shadow-lg pointer-events-auto">
                 <p className='text-lg font-semibold text-center'>Speech Settings</p>
+
+                <div className="flex justify-between align-middle">
+                    <span className="text-gray-700 font-medium">GSK Mode</span>
+                    <BinarySwitchComponent
+                        label="GSK mode"
+                        enabled={gskMode}
+                        setEnabled={changeGskMode}
+                    />
+                </div>
 
                 <div className="flex flex-col space-y-2 mt-2">
                     <div className='flex justify-between align-middle'>

@@ -64,9 +64,9 @@ function announceSpeechState() {
 function announceGskState(enabled) {
     cancelSpeech();
     if (enabled) {
-        speech.speak("GSK on");
+        speech.speak("GSK mode on");
     } else {
-        speech.speak("GSK off");
+        speech.speak("GSK mode off");
     }
 }
 

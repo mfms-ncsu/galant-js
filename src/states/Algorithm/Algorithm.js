@@ -1,7 +1,9 @@
 import { getDefaultStore } from "jotai";
-import { graphAtom } from "../_atoms/atoms";
+import { graphAtom, gskModeAtom } from "../_atoms/atoms";
 import AlgorithmInterface from "interfaces/AlgorithmInterface/AlgorithmInterface";
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
+import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
+import { setShortcutMode } from "config/keyboardShortcuts";
 
 /** Get the graph atom outside a React component */
 const store = getDefaultStore(); // Get the store with the atoms to access them outside of React
@@ -37,6 +39,14 @@ export default class Algorithm {
     }
 
     start() {
+        const wasGskEnabled = store.get(gskModeAtom);
+
+        store.set(gskModeAtom, false);
+        setShortcutMode("default");
+
+        if (wasGskEnabled) {
+            SpeechInterface.announceGskState(false);
+        }
         this.completed = false;
         this.fetchingSteps = false;
         this.debugMode = false;
