@@ -9,6 +9,10 @@ const keyboardShortcuts = {
     openAlgorithmEditor: { key: "a" },
     openGraphEditor: { key: "g" },
     openHelp: { key: "h" },
+    helpClose: { key: "h", mode: "help" },
+    helpPreviousSection: { key: "ArrowUp", mode: "help", repeat: true },
+    helpNextSection: { key: "ArrowDown", mode: "help", repeat: true },
+    helpRepeatSection: { key: " ", mode: "help" },
     openNodeSettings: { key: "n" },
     openEdgeSettings: { key: "e" },
     openLayoutSettings: null,
@@ -76,13 +80,17 @@ const keyboardShortcuts = {
 let activeShortcutMode = "default";
 
 /**
- * Switch shortcuts between default and GSK mode for this window.
+ * Switch shortcuts between default, GSK, and help modes for this window.
  */
 export function setShortcutMode(mode) {
-    if (mode !== "default" && mode !== "gsk") {
+    if (mode !== "default" && mode !== "gsk" && mode !== "help") {
         throw new Error(`Unknown shortcut mode: ${mode}`);
     }
     activeShortcutMode = mode;
+}
+
+export function getShortcutMode() {
+    return activeShortcutMode;
 }
 
 export function toggleShortcutMode() {
@@ -111,6 +119,10 @@ export function matchesShortcut(event, shortcut) {
         return shortcut.some(value => matchesShortcut(event, value));
     }
     if (!shortcut || event.defaultPrevented || event.isComposing) {
+        return false;
+    }
+    // Help owns the keyboard while the help popup is open.
+    if (activeShortcutMode === "help" && shortcut.mode !== "help") {
         return false;
     }
     if (shortcut.mode && shortcut.mode !== activeShortcutMode) {

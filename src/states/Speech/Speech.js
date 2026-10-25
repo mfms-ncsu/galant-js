@@ -6,6 +6,7 @@ export default class Speech {
     constructor() {
         this.enabled = true;
         this.rate = 1.0;
+        this.pendingSpeak = null;
     }
 
     speak(text) {
@@ -17,9 +18,33 @@ export default class Speech {
     }
 
     /**
+     * Stops current speech, then speaks text. A short delay avoids a browser
+     * bug where cancel() also drops an utterance queued in the same turn.
+     */
+    interruptAndSpeak(text) {
+        this.cancel();
+        if (typeof window === "undefined" || !window.speechSynthesis) {
+            return;
+        }
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = this.rate;
+        this.pendingSpeak = window.setTimeout(() => {
+            this.pendingSpeak = null;
+            console.log("ready to speak", text);
+            window.speechSynthesis.speak(utterance);
+            console.log("spoken");
+        }, 50);
+    }
+
+    /**
      * Stops the current speech and clears queued speech.
      */
     cancel() {
+        if (this.pendingSpeak) {
+            window.clearTimeout(this.pendingSpeak);
+            this.pendingSpeak = null;
+        }
         if (typeof window !== "undefined" && window.speechSynthesis) {
             window.speechSynthesis.cancel();
         }

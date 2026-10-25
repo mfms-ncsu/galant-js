@@ -1,6 +1,5 @@
-import HelpButton from "components/Buttons/HelpButton";
 import { useEffect } from "react";
-import shortcuts, { matchesShortcut, shortcutHint, setShortcutMode } from "config/keyboardShortcuts";
+import shortcuts, { matchesShortcut, shortcutHint, setShortcutMode, getShortcutMode } from "config/keyboardShortcuts";
 import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 import EditorButton from "components/Buttons/EditorButton";
 import ControlSettingsPopover from "components/Popovers/ControlSettingsPopover"
@@ -9,6 +8,7 @@ import EdgeSettingsPopover from "components/Popovers/EdgeSettingsPopover"
 import { useAtom } from "jotai";
 import { gskModeAtom } from "states/_atoms/atoms";
 import UserPreferencesPopover from "components/Popovers/UserPreferencesPopover";
+import HelpPopover from "components/Popovers/HelpPopover";
 
 /**
  * Opens the graph editor in a new window.
@@ -27,13 +27,6 @@ function openAlgorithmEditor() {
 }
 
 /**
- * Opens the instructions page in an external window.
- */
-function openInstructionsPage() {
-    window.open('https://docs.google.com/document/d/1_CX-rv_dFlnWL3BacHnernQ4tapzhmhPUzUx2cWaBc0/view', '_blank');
-}
-
-/**
  * Header component for Graph containing menu buttons and popovers.
  */
 export default function Header() {
@@ -41,6 +34,9 @@ export default function Header() {
 
     // Keep keyboard mode synchronized with the saved setting.
     useEffect(() => {
+        if (getShortcutMode() === "help") {
+            return;
+        }
         setShortcutMode(gskMode ? "gsk" : "default");
     }, [gskMode]);
 
@@ -76,9 +72,7 @@ export default function Header() {
                 <EditorButton shortcut={shortcuts.openGraphEditor} callback={openGraphEditor} onClick={openGraphEditor}>
                     Graph{shortcutHint(shortcuts.openGraphEditor)}
                 </EditorButton>
-                <HelpButton shortcut={shortcuts.openHelp} callback={openInstructionsPage} onClick={openInstructionsPage}>
-                    Help{shortcutHint(shortcuts.openHelp)}
-                </HelpButton>
+                <HelpPopover />
             </div>
 
             <div className="flex-col space-y-1 whitespace-nowrap">
