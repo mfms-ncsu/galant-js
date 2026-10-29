@@ -1,4 +1,5 @@
 import GraphInterface from "../GraphInterface/GraphInterface"
+import { defaultAppearance } from "states/_atoms/atoms";
 
 /**
  * CytoscapeInterface returns the graph represented in cytoscape 
@@ -206,7 +207,7 @@ function getElements(graph) {
  * Gets the cytoscape stylesheet for the graph.
  * @returns Cytoscape stylesheet
  */
-function getStyle(graph) {
+function getStyle(graph, appearance = defaultAppearance) {
     const style =  [
         {
             "selector": "node",
@@ -214,11 +215,11 @@ function getStyle(graph) {
                 "width": "label",
                 "height": "label",
                 "padding": `${graph.nodeSize / 4}px`,
-                "backgroundColor": "#FFFFFF",
-                "color": "#000000",
+                "backgroundColor": appearance.node,
+                "color": appearance.text,
                 "borderWidth": `${graph.nodeSize / 10}px`,
                 "borderStyle": "solid",
-                "borderColor": "#000000",
+                "borderColor": appearance.text,
                 "backgroundOpacity": 1,
                 "shape": "ellipse",
                 "textValign": "center",
@@ -232,9 +233,9 @@ function getStyle(graph) {
             "style": {
                 "label": "data(id)",
                 "width": graph.nodeSize / 10,
-                "lineColor": "#444444",
-                "color": "#AA0000",
-                "targetArrowColor": "#444444",
+                "lineColor": appearance.edge,
+                "color": appearance.text,
+                "targetArrowColor": appearance.edge,
                 "targetArrowShape": (graph.isDirected) ? "triangle" : "none",
                 "curveStyle": "bezier",
                 "overlay-padding": `${graph.nodeSize / 5}px`
@@ -276,13 +277,13 @@ function getStyle(graph) {
                 "label": "data(textToDisplay)",
                 "fontSize": `${labelFontSize}px`,
                 "textWrap": "wrap",
-                "textBackgroundColor": "white",
+                "textBackgroundColor": appearance.background,
                 "textBackgroundOpacity": "1.0",
                 "textBackgroundPadding": `${graph.nodeSize / 12.5}px`,
                 "textBorderOpacity": "1.0",
                 "textBorderStyle": "solid",
                 "textBorderWidth": `${graph.nodeSize / 25}px`,
-                "textBorderColor": "black"
+                "textBorderColor": appearance.text
             }
         },
         {

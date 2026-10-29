@@ -35,3 +35,40 @@ export const speechSpeedAtom = atom(
         set(storedSpeechSpeedAtom, speed);
     }
 );
+
+export const graphThemePresets = {
+    light: {
+        background: "#ffffff",
+        text: "#000000",
+        node: "#ffffff",
+        edge: "#444444"
+    },
+    dark: {
+        background: "#111827",
+        text: "#f9fafb",
+        node: "#374151",
+        edge: "#d1d5db"
+    }
+};
+
+export const defaultAppearance = {
+    theme: "light",
+    ...graphThemePresets.light
+};
+
+export const appearanceAtom = atomWithStorage(
+    "galantAppearance",
+    defaultAppearance
+);
+
+export const defaultEditorPreferences = {
+    fontFamily: "monospace",
+    fontSize: 14,
+    foreground: "#000000",
+    background: "#ffffff"
+};
+
+export const editorPreferencesAtom = atomWithStorage(
+    "galantEditorPreferences",
+    defaultEditorPreferences
+);

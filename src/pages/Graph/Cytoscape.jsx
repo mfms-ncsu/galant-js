@@ -1,6 +1,6 @@
 import { React, useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
-import { algorithmChangeManagerAtom, graphAtom } from "states/_atoms/atoms";
+import { algorithmChangeManagerAtom, graphAtom, appearanceAtom } from "states/_atoms/atoms";
 import CytoscapeInterface from "interfaces/CytoscapeInterface/CytoscapeInterface";
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import Cytoscape from "globals/Cytoscape";
@@ -12,6 +12,7 @@ import { renderToString } from "react-dom/server";
 export default function CytoscapeComponent() {
     const [graph, setGraph] = useAtom(graphAtom);
     const [algorithmChangeManager] = useAtom(algorithmChangeManagerAtom)
+    const [appearance] = useAtom(appearanceAtom);
     const cytoscapeElement = useRef();
     const backgroundCanvas = useRef();
     const [message, setMessage] = useState(null);
@@ -28,7 +29,9 @@ export default function CytoscapeComponent() {
             // Initialize the cytoscape instance
             Cytoscape.mount(cytoscapeElement.current);
             Cytoscape.add(CytoscapeInterface.getElements(graph));
-            Cytoscape.style(CytoscapeInterface.getStyle(graph)).update();
+            Cytoscape.style(
+                CytoscapeInterface.getStyle(graph, appearance)
+                ).update();      
             Cytoscape.minZoom(0.1);
             Cytoscape.maxZoom(10);
             Cytoscape.autounselectify(true); // Disable multi-select for now (until supported in ChangeRecords)
@@ -50,8 +53,11 @@ export default function CytoscapeComponent() {
                 const hasLabel = data.label !== undefined && data.label !== "" && ! data.labelHidden;
                 const hasWeightOrLabel = hasWeight || hasLabel;
                 const textStyle = {
-                    fontSize: data.labelFontSize
-                }
+                    fontSize: data.labelFontSize,
+                    color: "var(--graph-text)",
+                    backgroundColor: "var(--graph-background)",
+                    borderColor: "var(--graph-text)"
+                };
 
                 return renderToString(
                     <div style={textStyle} className=
@@ -82,8 +88,9 @@ export default function CytoscapeComponent() {
         Cytoscape.startBatch(); //Pauses rendering
         Cytoscape.elements().remove();// Remove elements
         Cytoscape.add(CytoscapeInterface.getElements(graph)); // Get new elements
-        Cytoscape.style().resetToDefault(); // Reset style
-        Cytoscape.style(CytoscapeInterface.getStyle(graph)).update(); // Update style
+        Cytoscape.style()
+            .fromJson(CytoscapeInterface.getStyle(graph, appearance))
+            .update();        
         Cytoscape.endBatch(); //Resumes rendering
 
         // If the graph type is "tree", do a layout appropriate for trees - https://www.npmjs.com/package/cytoscape-dagre
@@ -134,6 +141,12 @@ export default function CytoscapeComponent() {
             window.onresize = null;
         };
     }, [graph]);
+
+    useEffect(() => {
+    Cytoscape.style()
+        .fromJson(CytoscapeInterface.getStyle(graph, appearance))
+        .update();
+}, [graph, appearance]);
 
     /**
      * Function to call whenever the messages need to be updated
@@ -245,7 +258,12 @@ export default function CytoscapeComponent() {
     };
 
     return (
-        <div className="relative w-full h-full">
+            <div className="relative w-full h-full"
+            style={{
+                backgroundColor: appearance.background,
+                "--graph-text": appearance.text,
+                "--graph-background": appearance.background
+            }}>
             <canvas ref={backgroundCanvas} className="absolute top-0 left-0 pointer-events-none"/>
             <div className="flex justify-center">
                 {message && <p className="absolute z-10 px-2 py-1 rounded-b-lg bg-black text-white text-lg font-semibold">{message}</p>}
