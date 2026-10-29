@@ -40,6 +40,13 @@ function speakText(text) {
 }
 
 /**
+ * Cancels current speech and starts new text when narration is enabled.
+ */
+function interruptAndSpeak(text) {
+    if (spoken()) speech.interruptAndSpeak(text);
+}
+
+/**
  * Stops speech without changing whether future text will be spoken.
  */
 function cancelSpeech() {
@@ -74,6 +81,7 @@ const SpeechInterface = {
     spoken,
     setSpeech,
     speakText,
+    interruptAndSpeak,
     cancelSpeech,
     announceSpeechState,
     announceGskState

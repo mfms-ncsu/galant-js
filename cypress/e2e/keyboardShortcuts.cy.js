@@ -59,14 +59,24 @@ describe('Tests shortcut keys and preferences buttons', () => {
 		});
 	});
 
-	it('Ensure Help (h) shortcut triggers appropriate event', () => {
-		// Simulate 'h' shortcut keypress
+	it('Ensure Help (h) shortcut opens in-app instructions', () => {
 		cy.get('body').type('h');
-		
-		// Ensure each shortcut key goes to the appropriate editor
-		cy.get('@windowOpen').then((stub) => {
-			expect(stub.getCall(0)).to.be.calledWith('/instructions');
-		});
+		cy.contains('Galant User Instructions').should('be.visible');
+		cy.contains('Load a Graph').should('be.visible');
+		cy.get('[data-help-section="overview"]').should('have.attr', 'aria-current', 'true');
+	});
+
+	it('Ensure Help arrow keys move between sections', () => {
+		cy.get('body').type('h');
+		cy.contains('Galant User Instructions').should('be.visible');
+		cy.get('[data-help-section="overview"]').should('have.attr', 'aria-current', 'true');
+
+		cy.get('body').type('{downarrow}');
+		cy.get('[data-help-section="load-graph"]').should('have.attr', 'aria-current', 'true');
+		cy.get('[data-help-section="overview"]').should('not.have.attr', 'aria-current');
+
+		cy.get('body').type('{uparrow}');
+		cy.get('[data-help-section="overview"]').should('have.attr', 'aria-current', 'true');
 	});
 
 });
