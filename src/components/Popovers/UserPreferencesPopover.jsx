@@ -290,6 +290,66 @@ export default function UserPreferencesPopover() {
                                         <span className="text-sm font-medium">Dark</span>
                                     </button>
                                 </div>
+
+                                {/* Show five graph palettes as circles with colored slices. */}
+                                <fieldset>
+                                    <legend className="mb-3 text-sm font-medium text-gray-700">
+                                        Color palettes
+                                    </legend>
+
+                                    <div className="grid grid-cols-5 gap-2">
+                                        {[
+                                            ["blueOrange", "Blue–Orange"],
+                                            ["ocean", "Ocean"],
+                                            ["forest", "Forest"],
+                                            ["plum", "Plum"],
+                                            ["sand", "Sand"]
+                                        ].map(([key, name]) => {
+                                            const palette = graphThemePresets[key];
+                                            const selected = appearance.theme === key;
+
+                                            return (
+                                                <button
+                                                    key={key}
+                                                    type="button"
+                                                    onClick={() => selectTheme(key)}
+                                                    aria-label={`${name} graph palette`}
+                                                    aria-pressed={selected}
+                                                    className={`flex min-w-0 flex-col items-center gap-2 rounded-lg p-1
+                                                        focus-visible:outline focus-visible:outline-2
+                                                        focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
+                                                            selected ? "bg-blue-50" : "hover:bg-gray-100"
+                                                        }`}
+                                                    >
+                                                        <span
+                                                            aria-hidden="true"
+                                                            className={`h-10 w-10 rounded-full border-2 ${
+                                                                selected
+                                                                    ? "border-blue-600 ring-2 ring-blue-600 ring-offset-2"
+                                                                    : "border-gray-400"
+                                                            }`}
+                                                            style={{
+                                                                background: `conic-gradient(
+                                                                ${palette.background} 0deg 90deg,
+                                                                ${palette.node} 90deg 180deg,
+                                                                ${palette.edge} 180deg 270deg,
+                                                                ${palette.text} 270deg 360deg
+                                                            )`
+                                                        }}
+                                                    />
+                                                    <span className="text-center text-xs text-gray-700">
+                                                        {name}
+                                                    </span>
+                                                    {selected && (
+                                                        <span className="text-xs font-semibold text-blue-700">
+                                                            ✓
+                                                        </span>
+                                                    )}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </fieldset>
                                 {/* Collapsible Advanced Settings */}
                                 <div className="overflow-hidden rounded-lg border border-gray-200">
                                     <button
