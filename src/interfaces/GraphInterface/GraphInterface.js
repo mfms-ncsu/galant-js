@@ -1050,7 +1050,7 @@ function redo(graph, changeManager) {
           case "setBannerText":
             console.log(`redoing setBannerText, text = "${change.current.text}", previous = "${change.previous.text}"`);
             draft.banner.text = change.current.text;
-            if ( SpeechInterface.spoken() ) {
+            if (change.current.shouldSpeak && SpeechInterface.spoken()) {
               SpeechInterface.speakText(`${change.current.text}`)
             }
             break
@@ -1505,7 +1505,7 @@ function setNodeSize(graph, nodeSize) {
  * sets the banner text; called via display() in Thread.js
  * creates an appropriate change object
  */
-function setBannerText(graph, changeManager, text) {
+function setBannerText(graph, changeManager, text, shouldSpeak = false) {
   console.log(`-> setBannerText to "${text}", was "${graph.banner.text}"`);
   verifyGraphChangeManager(graph, changeManager);
 
@@ -1532,7 +1532,8 @@ function setBannerText(graph, changeManager, text) {
         text: graph.banner.text
       },
       {
-        text: text
+        text: text,
+        shouldSpeak: shouldSpeak
       }
     ),
   ]);
@@ -1869,7 +1870,7 @@ function undo(graph, changeManager) {
             console.log(`undoing setBannerText, text = ${change.current.text}, previous = ${change.previous.text}`);
             draft.banner.text = change.previous.text;
             // does nothing - have to yield to the thread running the algorithm
-            if ( SpeechInterface.spoken() ) {
+            if (change.current.shouldSpeak && SpeechInterface.spoken()) {
               SpeechInterface.speakText(`undoing ${change.current.text}`)
             }
             break

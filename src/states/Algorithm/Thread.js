@@ -236,12 +236,50 @@ function getAttribute(id, name) {
 /*
  * USER INTERFACE AND GRAPH SETTINGS
  */
+/**
+ * Shows text in the banner without speaking it.
+ * @param {string} message Text to display.
+ */
 function display(message) {
-    if (stepDepth === 0) { postMessage({ action: "step" }) }
-    [graph, changeManager] = GraphInterface.setBannerText(graph, changeManager, message);
+    if (stepDepth === 0) {
+        postMessage({ action: "step" });
+    }
+
+    [graph, changeManager] =
+        GraphInterface.setBannerText(graph, changeManager, message);
+
     postMessage({ action: "setBannerText", text: message });
-    // The main window checks whether speech is enabled.
-    postMessage( {action: "speak", text: message});
+    waitIfNeeded();
+}
+
+/**
+ * Speaks text without changing the banner.
+ * The main window checks whether speech is enabled.
+ * @param {string} message Text to speak.
+ */
+function speak(message) {
+    if (stepDepth === 0) {
+        postMessage({ action: "step" });
+    }
+
+    postMessage({ action: "speak", text: message });
+    waitIfNeeded();
+}
+
+/**
+ * Shows text in the banner and speaks it when speech is enabled.
+ * @param {string} message Text to display and speak.
+ */
+function announce(message) {
+    if (stepDepth === 0) {
+        postMessage({ action: "step" });
+    }
+
+    [graph, changeManager] =
+        GraphInterface.setBannerText(graph, changeManager, message, true);
+
+    postMessage({ action: "setBannerText", text: message, shouldSpeak: true });
+    postMessage({ action: "speak", text: message });
     waitIfNeeded();
 }
 
@@ -1161,8 +1199,10 @@ export {
     setAttributeAll,
     getAttribute,
     
-    // Display functions
+    // Output functions
     display,
+    speak,
+    announce,
     print,
     setDirected,
     
