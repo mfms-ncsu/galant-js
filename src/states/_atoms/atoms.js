@@ -88,6 +88,7 @@ export const graphThemePresets = {
 /** default color of the graph */
 export const defaultAppearance = {
     theme: "light", //start with the light theme
+    palette: null, // Track the graph palette separately from Light/Dark.
     ...graphThemePresets.light //Use the light theme colors
 };
 

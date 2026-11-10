@@ -14,6 +14,48 @@ import {
 } from 'states/_atoms/atoms';
 import SpeechInterface from 'interfaces/SpeechInterface/SpeechInterface';
 
+/**
+ * Shows speech, GSK, graph appearance, and editor settings.
+ *
+ * HOW SETTINGS WORK
+ * Controls update the shared atoms defined in atoms.js.
+ * Graph and editor components read those atoms and apply changes.
+ * Appearance, editor settings, and speech speed use browser storage.
+ * Speech starts off when the application opens.
+ *
+ * PANEL LAYOUT
+ * max-h-[85vh] limits the panel to 85% of the browser window height.
+ * max-w-lg limits its width.
+ * The settings area scrolls while the title and action buttons stay visible.
+ * Tailwind p-, m-, gap-, and space- classes control spacing.
+ *
+ * SPEECH SPEED
+ * The supported range is 0.25 to 10, in steps of 0.25.
+ * Multiplying by 4, rounding, and dividing by 4 gives quarter steps.
+ * Keep these values consistent with speechSpeedAtom and speed shortcuts.
+ *
+ * GRAPH COLORS
+ * graphThemePresets in atoms.js defines Light, Dark, and palette colors.
+ * Light/Dark also updates editor colors.
+ * Palette circles change graph colors without changing Light/Dark mode.
+ * Each circle has four 90-degree slices: background, node, edge, and text.
+ * Individual color changes mark the palette as custom.
+ *
+ * EDITORS
+ * Font sizes are listed in pixels in the editor-size dropdown.
+ * Font names use fonts available on the user's device.
+ * Custom editor text color is under Advanced editor settings.
+ * Editor.jsx applies these settings to both Monaco editor windows.
+ *
+ * ICONS
+ * SVG paths draw the sun, moon, and expand/collapse icons.
+ * viewBox sets their drawing area; h- and w- classes set display size.
+ * Icon coordinates do not control graph colors or settings.
+ *
+ * RESET
+ * Restores default graph and editor settings, turns speech off,
+ * and sets speech speed to 1.
+ */
 export default function UserPreferencesPopover() {
     const [isOpen, setIsOpen] = useState(false);
     const [advancedOpen, setAdvancedOpen] = useState(false);
@@ -21,49 +63,90 @@ export default function UserPreferencesPopover() {
     const [speechSpeed, setSpeechSpeed] = useAtom(speechSpeedAtom);
     const [gskMode, setGskMode] = useAtom(gskModeAtom);
     const [speechSpeedInput, setSpeechSpeedInput] = useState(String(speechSpeed));
+    // Read the saved graph colors and selected theme.
     const [appearance, setAppearance] = useAtom(appearanceAtom);
+    // Share font, size, and color settings with both editor windows.
     const [editorPreferences, setEditorPreferences] =
         useAtom(editorPreferencesAtom);
 
+    /**
+    * Changes one editor setting.
+    * Called by the editor font, size, and text-color controls.
+    * @param {string} property Setting to change.
+    * @param {string|number} value New value.
+    */
     function changeEditorPreference(property, value) {
         setEditorPreferences(current => ({
-            ...current,
-            [property]: value
+            ...current,//keep other editing settings
+            [property]: value//update the selected setting
         }));
     }
 
+    /**
+    * Applies Light or Dark to the graph and editor colors.
+    * @param {string} theme Selected mode: light or dark.
+    */
     function selectTheme(theme) {
+        const colors = graphThemePresets[theme];// Get this theme's colors
+
         setAppearance({
-            theme,
-            ...graphThemePresets[theme]
+            theme,// Save Light or Dark as the selected mode
+            palette: null,// Clear the previous palette selection
+            ...colors// Apply the theme's default graph colors
         });
+
+        // Keep the editor font and size; update its colors.
+        setEditorPreferences(current => ({
+            ...current,// Keep the editor font and size
+            foreground: colors.text,// Apply the theme's text color
+            background: colors.background// Apply the theme's background
+        }));
     }
 
+    /**
+    * Changes graph colors without changing the selected Light/Dark mode.
+    * @param {string} palette Name of the selected graph palette.
+    */
+    function selectPalette(palette) {
+        setAppearance(current => ({
+            ...current,// Keep the selected Light/Dark mode
+            palette,// Save the selected palette name
+            ...graphThemePresets[palette]// Apply its graph colors
+        }));
+    }
+
+    /** Changes one graph color without changing Light/Dark mode. */
     function changeColor(property, value) {
         setAppearance(current => ({
-            ...current,
-            theme: "custom",
-            [property]: value
+            ...current, // Keep the other appearance settings
+            palette: "custom", // The colors no longer match a preset
+            [property]: value // Update the selected color
         }));
     }
-
+    // Update the input when speech speed changes elsewhere, such as a shortcut.
     useEffect(() => {
-        setSpeechSpeedInput(String(speechSpeed));
-    }, [speechSpeed]);
-
+        setSpeechSpeedInput(String(speechSpeed));// Show the current speed as text
+    }, [speechSpeed]);// Run again when the saved speed changes
+    // Keep the V shortcut available even when the preferences panel is closed.
+    
     useEffect(() => {
+        /**
+        * Toggles speech when its shortcut is pressed.
+        * The shortcut matcher ignores typing in input fields.
+        * @param {KeyboardEvent} event Keyboard event from the window.
+        */
         function onKeyDown(event) {
             if (matchesShortcut(event, shortcuts.toggleSpeech)) {
-                event.preventDefault();
-                setSpeechEnabled(enabled => !enabled);
-                SpeechInterface.announceSpeechState();
-                return;
+                event.preventDefault();// Stop the key's normal browser action
+                setSpeechEnabled(enabled => !enabled);// Switch speech on or off
+                SpeechInterface.announceSpeechState();// Say the new speech state
+                return;// Finish handling this key
             }
         }
 
-        window.addEventListener("keydown", onKeyDown);
-        return () => window.removeEventListener("keydown", onKeyDown);
-    }, [setSpeechEnabled, setGskMode]);
+        window.addEventListener("keydown", onKeyDown);// Listen for the shortcut
+        return () => window.removeEventListener("keydown", onKeyDown);// Remove the listener during cleanup
+    }, [setSpeechEnabled, setGskMode]);// Reattach if a listed setter changes
 
     function changeGskMode(enabled) {
         setGskMode(enabled);
@@ -96,13 +179,13 @@ export default function UserPreferencesPopover() {
         setSpeechSpeedInput(String(roundedSpeed));
     }
 
-    /** Rests the prefrences to their default values. */
+    /** Restores the default speech, graph, and editor settings. */
     function handleReset() {
         setSpeechEnabled(false);
         setSpeechSpeed(1);
         setSpeechSpeedInput('1');
-        setAppearance(defaultAppearance);
-        setEditorPreferences(defaultEditorPreferences);
+        setAppearance(defaultAppearance);// Restore default graph colors
+        setEditorPreferences(defaultEditorPreferences);// Restore default editor settings
         SpeechInterface.announceSpeechState();
     }
 
@@ -296,7 +379,7 @@ export default function UserPreferencesPopover() {
                                     <legend className="mb-3 text-sm font-medium text-gray-700">
                                         Color palettes
                                     </legend>
-
+                                    {/* Keep all five palette choices in one row. */}
                                     <div className="grid grid-cols-5 gap-2">
                                         {[
                                             ["blueOrange", "Blue–Orange"],
@@ -305,14 +388,14 @@ export default function UserPreferencesPopover() {
                                             ["plum", "Plum"],
                                             ["sand", "Sand"]
                                         ].map(([key, name]) => {
-                                            const palette = graphThemePresets[key];
-                                            const selected = appearance.theme === key;
+                                            const palette = graphThemePresets[key]; // Get the colors for this circle.
+                                            const selected = appearance.palette === key; // Check whether this palette is selected.
 
                                             return (
                                                 <button
                                                     key={key}
                                                     type="button"
-                                                    onClick={() => selectTheme(key)}
+                                                    onClick={() => selectPalette(key)} // Apply and save this palette.
                                                     aria-label={`${name} graph palette`}
                                                     aria-pressed={selected}
                                                     className={`flex min-w-0 flex-col items-center gap-2 rounded-lg p-1
@@ -329,6 +412,7 @@ export default function UserPreferencesPopover() {
                                                                     : "border-gray-400"
                                                             }`}
                                                             style={{
+                                                                // Split the circle into four equal color previews.
                                                                 background: `conic-gradient(
                                                                 ${palette.background} 0deg 90deg,
                                                                 ${palette.node} 90deg 180deg,
@@ -447,6 +531,7 @@ export default function UserPreferencesPopover() {
                             </h2>
 
                             <div className="ml-4 space-y-4">
+                                {/* Use a font available on the user's computer in both editor windows. */}
                                 <label className="flex items-center justify-between gap-4">
                                     <span>Font</span>
                                     <select
@@ -462,7 +547,7 @@ export default function UserPreferencesPopover() {
                                         <option value="Courier New">Courier New</option>
                                     </select>
                                 </label>
-
+                                {/* Font size applies to both editors; dropdown text is converted to a number. */}
                                 <label className="flex items-center justify-between gap-4">
                                     <span>Font size</span>
                                     <select
@@ -472,13 +557,25 @@ export default function UserPreferencesPopover() {
                                         }
                                         className="rounded border p-2"
                                     >
+                                        {/* Available editor font sizes, measured in pixels. */}
                                         {[12, 14, 16, 18, 20, 24, 28, 32].map(size => (
                                             <option key={size} value={size}>{size}px</option>
                                         ))}
                                     </select>
                                 </label>
 
-                                <label className="flex items-center justify-between gap-4">
+                               {/* Custom text color is optional; the theme sets the background. */}
+                                <details className="rounded-lg border border-gray-200 p-3">
+                                    <summary className="cursor-pointer text-sm font-medium text-gray-700">
+                                        Advanced editor settings
+                                </summary>
+
+                                <p className="mt-3 text-xs text-gray-600">
+                                    Editor colors follow Light/Dark. Changing themes restores
+                                    the default text color.
+                                </p>
+
+                                <label className="mt-3 flex items-center justify-between gap-4">
                                     <span>Text color</span>
                                     <input
                                         type="color"
@@ -488,22 +585,12 @@ export default function UserPreferencesPopover() {
                                         }
                                     />
                                 </label>
-
-                                <label className="flex items-center justify-between gap-4">
-                                    <span>Background color</span>
-                                    <input
-                                        type="color"
-                                        value={editorPreferences.background}
-                                        onChange={event =>
-                                            changeEditorPreference("background", event.target.value)
-                                        }
-                                    />
-                                </label>
+                            </details>
                             </div>
                         </section>
                     </div>
                         {/* Reset and Done buttons */}
-                        <div className="mt-4 flex shrink-0items-center justify-between border-t pt-4">
+                        <div className="mt-4 flex shrink-0 items-center justify-between border-t pt-4">
                             <button
                                 type="button"
                                 onClick={handleReset}

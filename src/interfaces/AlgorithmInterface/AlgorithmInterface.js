@@ -251,7 +251,7 @@ function onMessage(algorithm, message) {
                 graph,
                 changeManager,
                 message.text,
-                message.shouldSpeak === true
+                message.shouldSpeak === true // Record speech only for announce() messages.
             );
             updateState(newGraph, newChangeManager);
             break;

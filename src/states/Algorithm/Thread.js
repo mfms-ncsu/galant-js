@@ -242,14 +242,14 @@ function getAttribute(id, name) {
  */
 function display(message) {
     if (stepDepth === 0) {
-        postMessage({ action: "step" });
+        postMessage({ action: "step" });// Begin a step when called outside step()
     }
 
     [graph, changeManager] =
-        GraphInterface.setBannerText(graph, changeManager, message);
+        GraphInterface.setBannerText(graph, changeManager, message);// Save the banner change in local history
 
-    postMessage({ action: "setBannerText", text: message });
-    waitIfNeeded();
+    postMessage({ action: "setBannerText", text: message });// Ask the main window to update the banner
+    waitIfNeeded();// Wait if execution needs to pause
 }
 
 /**
@@ -259,11 +259,11 @@ function display(message) {
  */
 function speak(message) {
     if (stepDepth === 0) {
-        postMessage({ action: "step" });
+        postMessage({ action: "step" });// Begin a step when called outside step()
     }
 
-    postMessage({ action: "speak", text: message });
-    waitIfNeeded();
+    postMessage({ action: "speak", text: message });// Ask the main window to speak without changing the banner
+    waitIfNeeded();// Wait if execution needs to pause
 }
 
 /**
@@ -272,15 +272,15 @@ function speak(message) {
  */
 function announce(message) {
     if (stepDepth === 0) {
-        postMessage({ action: "step" });
+        postMessage({ action: "step" });// Begin a step when called outside step()
     }
 
     [graph, changeManager] =
-        GraphInterface.setBannerText(graph, changeManager, message, true);
+        GraphInterface.setBannerText(graph, changeManager, message, true);// Mark this banner change for speech during replay
 
-    postMessage({ action: "setBannerText", text: message, shouldSpeak: true });
-    postMessage({ action: "speak", text: message });
-    waitIfNeeded();
+    postMessage({ action: "setBannerText", text: message, shouldSpeak: true });// Send the banner text and speech flag to the main window
+    postMessage({ action: "speak", text: message });// Speak the message during its first execution
+    waitIfNeeded();// Wait if execution needs to pause
 }
 
 function clearDisplay() {
