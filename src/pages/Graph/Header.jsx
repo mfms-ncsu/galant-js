@@ -15,7 +15,12 @@ import HelpPopover from "components/Popovers/HelpPopover";
  * Preferred over a Link to ensure only one instance open at a time. 
  */
 function openGraphEditor() {
-    window.open('/grapheditor', 'Graph Editor', `width=${window.screen.width / 2}, height=${window.screen.height}`);
+    const editor = window.open('/grapheditor', 'Graph Editor', `width=${window.screen.width / 2}, height=${window.screen.height}`);
+    if (editor) {
+        SpeechInterface.interruptAndSpeak("Welcome to the Graph editor. Open or edit a graph, then choose Load Graph. Close this window to return to the graph view.");
+    } else {
+        SpeechInterface.interruptAndSpeak("The Graph editor could not open. Allow popups for GALANT and try again.");
+    }
 }
 
 /**
@@ -23,7 +28,12 @@ function openGraphEditor() {
  * Preferred over a Link to ensure only one instance open at a time. 
  */
 function openAlgorithmEditor() {
-    window.open('/algorithmeditor', 'Algorithm Editor', `width=${window.screen.width / 2}, height=${window.screen.height}`);
+    const editor = window.open('/algorithmeditor', 'Algorithm Editor', `width=${window.screen.width / 2}, height=${window.screen.height}`);
+    if (editor) {
+        SpeechInterface.interruptAndSpeak("Welcome to the Algorithm editor. Open or edit an algorithm, then choose Load Algorithm. Close this window to return to the graph view.");
+    } else {
+        SpeechInterface.interruptAndSpeak("The Algorithm editor could not open. Allow popups for GALANT and try again.");
+    }
 }
 
 /**

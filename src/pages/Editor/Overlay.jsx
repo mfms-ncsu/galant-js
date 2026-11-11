@@ -64,7 +64,9 @@ function LoadButton({ tab, editorType }) {
                 setShowLoadedMessage(false);
             }, 3000);
         } catch (e) {
-            setLoadError("Error in line " + e.message);
+            const message = "The file could not be loaded. Check its contents in the editor, then choose Load again.";
+            setLoadError(message + " Details: " + e.message);
+            SharedWorker.postMessage({ message: "load-error", payload: message });
         }
     }
 

@@ -240,9 +240,22 @@ function display(message) {
     if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = GraphInterface.setBannerText(graph, changeManager, message);
     postMessage({ action: "setBannerText", text: message });
-    // The main window checks whether speech is enabled.
-    postMessage( {action: "speak", text: message});
     waitIfNeeded();
+}
+
+// Speak without changing the banner.
+function speech(message) {
+    if (stepDepth === 0) {
+        postMessage({ action: "step" });
+    }
+    postMessage({ action: "speak", text: String(message) });
+    waitIfNeeded();
+}
+
+// Pause for a graph introduction.
+function description(message) {
+    postMessage({ action: "description", text: String(message) });
+    wait();
 }
 
 function clearDisplay() {
@@ -1163,6 +1176,8 @@ export {
     
     // Display functions
     display,
+    speech,
+    description,
     print,
     setDirected,
     

@@ -102,7 +102,7 @@ export default function UserPreferencesPopover() {
                 />
 
                 <div className="fixed inset-0 flex items-center justify-center overflow-y-auto p-4">
-                    <Dialog.Panel className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white p-6 shadow-xl">
+                    <Dialog.Panel data-focus-summary="Welcome to User Preferences. Use Tab to explore the settings." className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white p-6 shadow-xl">
                         <div className="mb-6 flex shrink-0 items-center justify-between">
                             <Dialog.Title className="text-xl font-bold text-gray-900">
                                 User Preferences
