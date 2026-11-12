@@ -129,13 +129,15 @@ export default function HelpPopover() {
                 <div className="fixed inset-0 bg-black/40" aria-hidden="true" />
 
                 <div className="fixed inset-0 flex items-center justify-center overflow-y-auto p-4">
-                    <Dialog.Panel data-focus-introduction="Welcome to Help. Use up and down arrows to move between sections." className="flex max-h-[90vh] w-full max-w-4xl flex-col rounded-2xl bg-white shadow-xl">
+                    <Dialog.Panel 
+                        data-focus-introduction="Welcome to Help. Use up and down arrows to move between sections." 
+                        className="flex max-h-[90vh] w-full max-w-4xl flex-col rounded-2xl bg-white shadow-xl dark:bg-gray-900 dark:text-gray-100">
                         <div className="flex items-center justify-between border-b px-6 py-4">
                             <div>
-                                <Dialog.Title className="text-xl font-bold text-gray-900">
+                                <Dialog.Title className="text-xl font-bold text-gray-900 dark:text-gray-100">
                                     {helpTitle}
                                 </Dialog.Title>
-                                <p className="mt-1 text-sm text-gray-600">
+                                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                                     Up and down arrows move between sections. Space repeats the current section.
                                     Space activates a focused button.
                                 </p>
@@ -143,7 +145,7 @@ export default function HelpPopover() {
                             <button
                                 type="button"
                                 onClick={() => setIsOpen(false)}
-                                className="rounded-md p-2 text-gray-500 hover:bg-gray-100"
+                                className="rounded-md p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
                                 aria-label="Close help"
                             >
                                 ✕
@@ -152,10 +154,10 @@ export default function HelpPopover() {
 
                         <div className="flex min-h-0 flex-1">
                             <nav
-                                className="w-56 shrink-0 overflow-y-auto border-r bg-gray-50 p-3"
+                                className="w-56 shrink-0 overflow-y-auto border-r bg-gray-50 p-3 dark:bg-gray-800"
                                 aria-label="Help sections"
                             >
-                                <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                                     Section {activeIndex + 1} of {helpSections.length}
                                 </p>
                                 <ul className="space-y-1">
@@ -170,7 +172,7 @@ export default function HelpPopover() {
                                                     className={`w-full rounded-lg px-3 py-2 text-left text-sm ${
                                                         selected
                                                             ? "bg-blue-600 font-semibold text-white"
-                                                            : "text-gray-800 hover:bg-gray-200"
+                                                            : "text-gray-800 hover:bg-gray-200 dark:text-gray-100 dark:hover:bg-gray-700"
                                                     }`}
                                                 >
                                                     {section.title}
@@ -182,7 +184,7 @@ export default function HelpPopover() {
                             </nav>
 
                             <div
-                                className="min-w-0 flex-1 overflow-y-auto px-6 py-4 text-gray-800"
+                                className="min-w-0 flex-1 overflow-y-auto px-6 py-4 text-gray-800 dark:text-gray-100"
                                 tabIndex={0}
                                 aria-label="Galant user instructions"
                             >
@@ -198,11 +200,11 @@ export default function HelpPopover() {
                                             aria-current={selected ? "true" : undefined}
                                             className={`mb-4 rounded-xl border p-4 ${
                                                 selected
-                                                    ? "border-blue-500 bg-blue-50"
+                                                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
                                                     : "border-transparent"
                                             }`}
                                         >
-                                            <h2 className="mb-2 text-lg font-semibold text-gray-900">
+                                            <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
                                                 {section.title}
                                             </h2>
                                             {section.paragraphs?.map((paragraph) => (
@@ -223,7 +225,7 @@ export default function HelpPopover() {
                             </div>
                         </div>
 
-                        <div className="flex justify-end border-t px-6 py-4">
+                        <div className="flex justify-end border-t px-6 py-4 dark:border-gray-700">
                             <button
                                 type="button"
                                 onClick={() => setIsOpen(false)}
