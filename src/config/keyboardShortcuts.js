@@ -13,6 +13,8 @@ const keyboardShortcuts = {
     helpPreviousSection: { key: "ArrowUp", mode: "help", repeat: true },
     helpNextSection: { key: "ArrowDown", mode: "help", repeat: true },
     helpRepeatSection: { key: " ", mode: "help" },
+    helpIncreaseSpeechSpeed: { key: "ArrowUp", shift: true, mode: "help", repeat: true },
+    helpDecreaseSpeechSpeed: { key: "ArrowDown", shift: true, mode: "help", repeat: true },
     openNodeSettings: { key: "n" },
     openEdgeSettings: { key: "e" },
     openLayoutSettings: null,
@@ -121,8 +123,11 @@ export function matchesShortcut(event, shortcut) {
     if (!shortcut || event.defaultPrevented || event.isComposing) {
         return false;
     }
-    // Help owns the keyboard while the help popup is open.
-    if (activeShortcutMode === "help" && shortcut.mode !== "help") {
+    if (typeof document !== "undefined" && document.querySelector('[data-workflow-dialog]') && shortcut !== keyboardShortcuts.toggleSpeech) {
+        return false;
+    }
+    // Help keeps navigation keys and allows the speech toggle.
+    if (activeShortcutMode === "help" && shortcut.mode !== "help" && shortcut !== keyboardShortcuts.toggleSpeech) {
         return false;
     }
     if (shortcut.mode && shortcut.mode !== activeShortcutMode) {

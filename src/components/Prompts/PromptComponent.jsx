@@ -1,3 +1,4 @@
+import DescriptionPrompt from "./DescriptionPrompt";
 import { useState, useRef } from "react"
 import { useAtom } from "jotai";
 import { promptAtom, promptQueueAtom } from "states/_atoms/atoms";
@@ -8,6 +9,7 @@ import ConfirmationPrompt from "./ConfirmationPrompt";
 
 // Mapping of prompt types to their corresponding components
 const typeMapping = {
+    'description': DescriptionPrompt,
     'input': InputPrompt,
     'algorithmError': AlgorithmErrorPrompt,
     'confirmation': ConfirmationPrompt

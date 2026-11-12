@@ -46,7 +46,16 @@ export const helpSections = [
         title: "Run additional algorithms or use different graphs",
         items: [
             "To run a different algorithm on the same graph, go to the algorithm editor, choose another algorithm, and load it.",
-            "To run the same algorithm on a different graph, go to the graph editor, choose and load another graph, and then reload the algorithm.",
+            "To run the same algorithm on a different graph, load another graph. The selected algorithm is retained and starts again from the beginning.",
+        ],
+    },
+    {
+        id: "algorithm-output",
+        title: "Algorithm text and speech",
+        paragraphs: [
+            "Use display(text) to update the banner without speaking. Use speech(text) to speak when speech is enabled. To show and speak the same text together, put both calls inside step(() => { ... }).",
+            "Use description(text) for a graph introduction. It opens a text dialog and pauses the algorithm. Continue or Escape closes it and stops its narration.",
+            "Existing algorithms that use only display(text) no longer speak automatically. Add speech(text) where narration is wanted.",
         ],
     },
     {

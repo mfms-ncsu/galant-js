@@ -1,26 +1,40 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Dialog } from "@headlessui/react";
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import shortcuts, { matchesShortcut, shortcutHint, setShortcutMode } from "config/keyboardShortcuts";
 import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 import HelpButton from "components/Buttons/HelpButton";
-import { gskModeAtom } from "states/_atoms/atoms";
+import { gskModeAtom, speechEnabledAtom, speechSpeedAtom } from "states/_atoms/atoms";
 import { helpSections, helpTitle, speakHelpSection } from "content/userInstructions";
 
 /**
  * In-app help dialog with section navigation for text-to-speech.
- * While open, only help shortcuts apply. Up and down arrows move between sections.
+ * Arrow keys move between sections.
  */
 export default function HelpPopover() {
     const gskMode = useAtomValue(gskModeAtom);
+    const [, setSpeechEnabled] = useAtom(speechEnabledAtom);
+    const [, setSpeechSpeed] = useAtom(speechSpeedAtom);
     const [isOpen, setIsOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
     const sectionRefs = useRef([]);
     const announcedOpen = useRef(false);
-    const narrateHelp = useRef(false);
+
+    const toggleSpeech = useCallback(() => {
+        setSpeechEnabled(enabled => !enabled);
+        SpeechInterface.announceSpeechState();
+    }, [setSpeechEnabled]);
 
     const toggleHelp = useCallback(() => {
         setIsOpen((open) => !open);
+    }, []);
+
+    useEffect(() => {
+        function openHelp() {
+            setIsOpen(true);
+        }
+        window.addEventListener("open-help", openHelp);
+        return () => window.removeEventListener("open-help", openHelp);
     }, []);
 
     const selectSection = useCallback((index) => {
@@ -31,11 +45,9 @@ export default function HelpPopover() {
         if (!isOpen) {
             setActiveIndex(0);
             announcedOpen.current = false;
-            narrateHelp.current = false;
             return undefined;
         }
 
-        narrateHelp.current = SpeechInterface.spoken();
         setShortcutMode("help");
         return () => {
             SpeechInterface.cancelSpeech();
@@ -48,13 +60,11 @@ export default function HelpPopover() {
             return;
         }
 
-        const prefix = announcedOpen.current
-            ? ""
-            : "Help. Use up and down arrows to move between sections. ";
+        const firstOpen = !announcedOpen.current;
         announcedOpen.current = true;
 
-        if (narrateHelp.current) {
-            SpeechInterface.interruptAndSpeak(`${prefix}${speakHelpSection(activeIndex)}`);
+        if (!firstOpen && SpeechInterface.spoken()) {
+            SpeechInterface.interruptAndSpeak(speakHelpSection(activeIndex));
         }
         sectionRefs.current[activeIndex]?.scrollIntoView({
             block: "nearest",
@@ -68,7 +78,19 @@ export default function HelpPopover() {
         }
 
         function onKeyDown(event) {
-            if (matchesShortcut(event, shortcuts.helpPreviousSection)) {
+            if (matchesShortcut(event, shortcuts.toggleSpeech)) {
+                event.preventDefault();
+                event.stopPropagation();
+                toggleSpeech();
+            } else if (matchesShortcut(event, shortcuts.helpIncreaseSpeechSpeed)) {
+                event.preventDefault();
+                event.stopPropagation();
+                setSpeechSpeed(speed => Math.min(10, speed + 0.25));
+            } else if (matchesShortcut(event, shortcuts.helpDecreaseSpeechSpeed)) {
+                event.preventDefault();
+                event.stopPropagation();
+                setSpeechSpeed(speed => Math.max(0.25, speed - 0.25));
+            } else if (matchesShortcut(event, shortcuts.helpPreviousSection)) {
                 event.preventDefault();
                 event.stopPropagation();
                 selectSection(activeIndex - 1);
@@ -77,9 +99,13 @@ export default function HelpPopover() {
                 event.stopPropagation();
                 selectSection(activeIndex + 1);
             } else if (matchesShortcut(event, shortcuts.helpRepeatSection)) {
+                // Let Space activate the focused control.
+                if (event.target.closest('button, a, [role="button"], [role="switch"]')) {
+                    return;
+                }
                 event.preventDefault();
                 event.stopPropagation();
-                if (narrateHelp.current) {
+                if (SpeechInterface.spoken()) {
                     SpeechInterface.interruptAndSpeak(speakHelpSection(activeIndex));
                 }
             } else if (matchesShortcut(event, shortcuts.helpClose)) {
@@ -91,7 +117,7 @@ export default function HelpPopover() {
 
         window.addEventListener("keydown", onKeyDown, true);
         return () => window.removeEventListener("keydown", onKeyDown, true);
-    }, [isOpen, activeIndex, selectSection]);
+    }, [isOpen, activeIndex, selectSection, toggleSpeech, setSpeechSpeed]);
 
     return (
         <>
@@ -103,7 +129,7 @@ export default function HelpPopover() {
                 <div className="fixed inset-0 bg-black/40" aria-hidden="true" />
 
                 <div className="fixed inset-0 flex items-center justify-center overflow-y-auto p-4">
-                    <Dialog.Panel className="flex max-h-[90vh] w-full max-w-4xl flex-col rounded-2xl bg-white shadow-xl">
+                    <Dialog.Panel data-focus-introduction="Welcome to Help. Use up and down arrows to move between sections." className="flex max-h-[90vh] w-full max-w-4xl flex-col rounded-2xl bg-white shadow-xl">
                         <div className="flex items-center justify-between border-b px-6 py-4">
                             <div>
                                 <Dialog.Title className="text-xl font-bold text-gray-900">
@@ -111,6 +137,7 @@ export default function HelpPopover() {
                                 </Dialog.Title>
                                 <p className="mt-1 text-sm text-gray-600">
                                     Up and down arrows move between sections. Space repeats the current section.
+                                    Space activates a focused button.
                                 </p>
                             </div>
                             <button

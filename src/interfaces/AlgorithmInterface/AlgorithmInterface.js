@@ -134,7 +134,7 @@ function canStepForward(algorithm) {
  */
 function stepBack(algorithm) {
     if (!canStepBack()) return;
-    SpeechInterface.cancelSpeech();
+    SpeechInterface.interruptAndSpeak("Previous step.");
     let [newGraph, newChangeManager] = GraphInterface.undo(graph, changeManager);
     store.set(graphAtom, newGraph);
     store.set(algorithmChangeManagerAtom, newChangeManager);
@@ -149,6 +149,7 @@ function stepForward(algorithm) {
     // Immediately return if the algorithm cannot continue
     if ( ! canStepForward(algorithm) ) return;
     SpeechInterface.cancelSpeech();
+    SpeechInterface.speakText("Next step.");
 
     // If we are at the end of the list of changes, we need to wake up the thread to generate a new step
     if ( changeManager.index === changeManager.changes.length ) {
@@ -233,6 +234,19 @@ function onMessage(algorithm, message) {
         case "gskNodeSelected":
             store.set(gskNavigationResetAtom, value => value + 1);
             store.set(gskCurrentNodeIdAtom, message.nodeId);
+            break;
+        case "description":
+            clearTimeout(algorithm.timeoutId);
+            newQueue = PromptInterface.queuePrompt(
+                promptQueue,
+                { type: 'description', text: message.text },
+                () => {
+                    SpeechInterface.cancelSpeech();
+                    setupTimeout(algorithm);
+                    resumeThread(algorithm);
+                }
+            );
+            store.set(promptQueueAtom, newQueue);
             break;
         case "prompt":
             clearTimeout(algorithm.timeoutId); // Cancel the timer while the prompt is up
