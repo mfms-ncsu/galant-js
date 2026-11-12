@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import shortcuts, {matchesShortcut} from 'config/keyboardShortcuts';
 import { useAtom } from 'jotai';
 import { Dialog, Switch } from '@headlessui/react';
@@ -68,6 +68,11 @@ export default function UserPreferencesPopover() {
     // Share font, size, and color settings with both editor windows.
     const [editorPreferences, setEditorPreferences] =
         useAtom(editorPreferencesAtom);
+    // Tracks User Preferences panel's position.
+    const [panelPosition, setPanelPosition] = useState({ x: 0, y: 0 });
+    // Stores the starting position while dragging the panel.
+    const dragStart = useRef(null);
+    
 
     /**
     * Changes one editor setting.
@@ -108,10 +113,16 @@ export default function UserPreferencesPopover() {
     * @param {string} palette Name of the selected graph palette.
     */
     function selectPalette(palette) {
+        const colors = graphThemePresets[palette];
+
         setAppearance(current => ({
-            ...current,// Keep the selected Light/Dark mode
-            palette,// Save the selected palette name
-            ...graphThemePresets[palette]// Apply its graph colors
+            ...current,
+            palette,
+            text: colors.text,
+            node: colors.node,
+            edge: colors.edge,
+            // Keep the background from the selected Light/Dark theme.
+            background: graphThemePresets[current.theme].background
         }));
     }
 
@@ -187,6 +198,40 @@ export default function UserPreferencesPopover() {
         setSpeechSpeedInput(String(roundedSpeed));
     }
 
+    /** Start moving the preferences panel. */
+    function handleDragStart(event) {
+        // Don't start dragging when clicking the close button.
+        if (event.target.closest("button")) return;
+
+        event.preventDefault();
+
+        dragStart.current = {
+            mouseX: event.clientX,
+            mouseY: event.clientY,
+            panelX: panelPosition.x,
+            panelY: panelPosition.y
+        };
+
+        event.currentTarget.setPointerCapture(event.pointerId);
+    }
+
+    /** Update the panel position while dragging. */
+    function handleDragMove(event) {
+        if (!dragStart.current) return;
+
+        const { mouseX, mouseY, panelX, panelY } = dragStart.current;
+
+        setPanelPosition({
+            x: panelX + event.clientX - mouseX,
+            y: panelY + event.clientY - mouseY
+        });
+    }
+
+    /** Stop moving the panel. */
+    function handleDragEnd() {
+        dragStart.current = null;
+    }
+
     /** Restores the default speech, graph, and editor settings. */
     function handleReset() {
         setSpeechEnabled(false);
@@ -214,13 +259,20 @@ export default function UserPreferencesPopover() {
                 className="relative z-50"
             >
                 <div
-                    className="fixed inset-0 bg-black/40"
+                    className="pointer-events-none fixed inset-0 bg-black/40"
                     aria-hidden="true"
                 />
 
-                <div className="fixed inset-0 flex items-center justify-center overflow-y-auto p-4">
-                    <Dialog.Panel className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 dark:text-gray-100">
-                        <div className="mb-6 flex shrink-0 items-center justify-between">
+                <div className="pointer-events-none fixed inset-0 flex items-center justify-center overflow-y-auto p-4">
+                    <Dialog.Panel 
+                        style={{ transform: `translate(${panelPosition.x}px, ${panelPosition.y}px)` }}
+                        className="pointer-events-auto flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 dark:text-gray-100">
+                        <div 
+                            onPointerDown={handleDragStart}
+                            onPointerMove={handleDragMove}
+                            onPointerUp={handleDragEnd}
+                            onPointerCancel={handleDragEnd} 
+                            className="mb-6 flex shrink-0 cursor-move items-center justify-between">
                             <Dialog.Title className="text-xl font-bold text-gray-900 dark:text-gray-100">
                                 User Preferences
                             </Dialog.Title>
@@ -381,14 +433,13 @@ export default function UserPreferencesPopover() {
                                         <span className="text-sm font-medium">Dark</span>
                                     </button>
                                 </div>
-
-                                {/* Show five graph palettes as circles with colored slices. */}
+                                {/* Show each graph palette with a circle and individual color previews. */}
                                 <fieldset>
                                     <legend className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-200">
-                                        Color palettes
+                                        Color Palettes
                                     </legend>
-                                    {/* Keep all five palette choices in one row. */}
-                                    <div className="grid grid-cols-5 gap-2 dark:text-gray-200">
+
+                                    <div className="space-y-2">
                                         {[
                                             ["blueOrange", "Blue–Orange"],
                                             ["ocean", "Ocean"],
@@ -396,44 +447,68 @@ export default function UserPreferencesPopover() {
                                             ["plum", "Plum"],
                                             ["sand", "Sand"]
                                         ].map(([key, name]) => {
-                                            const palette = graphThemePresets[key]; // Get the colors for this circle.
-                                            const selected = appearance.palette === key; // Check whether this palette is selected.
+                                            const palette = graphThemePresets[key];
+                                            const selected = appearance.palette === key;
 
                                             return (
                                                 <button
                                                     key={key}
                                                     type="button"
-                                                    onClick={() => selectPalette(key)} // Apply and save this palette.
+                                                    onClick={() => selectPalette(key)}
                                                     aria-label={`${name} graph palette`}
                                                     aria-pressed={selected}
-                                                    className={`flex min-w-0 flex-col items-center gap-2 rounded-lg p-1
-                                                        focus-visible:outline focus-visible:outline-2
-                                                        focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
-                                                            selected ? "bg-blue-50" : "hover:bg-gray-100"
+                                                    className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left transition
+                                                        ${
+                                                            selected
+                                                                ? "border-blue-500 bg-blue-50 dark:bg-gray-800"
+                                                                : "border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
                                                         }`}
-                                                    >
-                                                        <span
-                                                            aria-hidden="true"
-                                                            className={`h-10 w-10 rounded-full border-2 ${
-                                                                selected
-                                                                    ? "border-blue-600 ring-2 ring-blue-600 ring-offset-2"
-                                                                    : "border-gray-400"
-                                                            }`}
+                                                >
+                                                    {/* Palette circle and name */}
+                                                    <div className="flex w-20 shrink-0 flex-col items-center gap-1">
+                                                        <div
+                                                            className="h-12 w-12 overflow-hidden rounded-full border border-gray-300 dark:border-gray-600"
                                                             style={{
-                                                                // Split the circle into four equal color previews.
                                                                 background: `conic-gradient(
-                                                                ${palette.background} 0deg 90deg,
-                                                                ${palette.node} 90deg 180deg,
-                                                                ${palette.edge} 180deg 270deg,
-                                                                ${palette.text} 270deg 360deg
-                                                            )`
-                                                        }}
-                                                    />
-                                                    <span className="text-center text-xs text-gray-700">
-                                                        {name}
-                                                    </span>
+                                                                    ${appearance.theme === "dark" ? "#111827" : "#ffffff"} 0deg 90deg,
+                                                                    ${palette.node} 90deg 180deg,
+                                                                    ${palette.edge} 180deg 270deg,
+                                                                    ${palette.text} 270deg 360deg
+                                                                )`
+                                                            }}
+                                                        />
+
+                                                        <span className="text-center text-xs font-medium text-gray-700 dark:text-gray-200">
+                                                            {name}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Individual color previews */}
+                                                    <div className="grid flex-1 grid-cols-3 gap-2">
+                                                        {[
+                                                            ["Labels", palette.text],
+                                                            ["Nodes", palette.node],
+                                                            ["Edges", palette.edge]
+                                                        ].map(([label, color]) => (
+                                                            <div
+                                                                key={label}
+                                                                className="flex flex-col items-center gap-2"
+                                                            >
+                                                                <span
+                                                                    className="h-10 w-10 rounded-md border border-gray-300 dark:border-gray-600"
+                                                                    style={{ backgroundColor: color }}
+                                                                />
+
+                                                                <span className="text-center text-xs text-gray-600 dark:text-gray-300">
+                                                                    {label}
+                                                                </span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+
+                                                    {/* Selected indicator */}
                                                     {selected && (
-                                                        <span className="text-xs font-semibold text-blue-700">
+                                                        <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
                                                             ✓
                                                         </span>
                                                     )}
