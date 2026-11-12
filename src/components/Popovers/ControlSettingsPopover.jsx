@@ -83,8 +83,8 @@ export default function ControlSettingsPopover() {
                 Layout
             </PreferenceButton>
 
-            <Popover.Panel className="absolute right-0 z-10 w-64 p-4 pt-2 rounded-xl bg-white shadow-lg pointer-events-auto">
-                <p className='text-lg font-semibold text-center'>Controls</p>
+            <Popover.Panel className="absolute right-0 z-10 w-64 p-4 pt-2 rounded-xl bg-white shadow-lg pointer-events-auto dark:bg-gray-800">
+                <p className='text-lg font-semibold text-center text-gray-800 dark:text-gray-100'>Controls</p>
                 <SecondaryButton onClick={(e) => autoCamera()} className="mb-2">Auto Camera</SecondaryButton>
                 <SecondaryButton onClick={(e) => autoLayout()} className="mb-2">Auto Layout</SecondaryButton>
                 <SecondaryButton onClick={(e) => evenlySpacedLayout()}>Evenly-Spaced Layout</SecondaryButton>

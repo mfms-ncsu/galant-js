@@ -261,7 +261,12 @@ function onMessage(algorithm, message) {
             store.set(promptQueueAtom, newQueue);
             break;
         case "setBannerText":
-            [newGraph, newChangeManager] = GraphInterface.setBannerText(graph,changeManager, message.text);
+            [newGraph, newChangeManager] = GraphInterface.setBannerText(
+                graph,
+                changeManager,
+                message.text,
+                message.shouldSpeak === true // Record speech only for announce() messages.
+            );
             updateState(newGraph, newChangeManager);
             break;
         case "speak":

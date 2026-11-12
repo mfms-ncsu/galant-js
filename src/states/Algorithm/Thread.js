@@ -236,11 +236,51 @@ function getAttribute(id, name) {
 /*
  * USER INTERFACE AND GRAPH SETTINGS
  */
+/**
+ * Shows text in the banner without speaking it.
+ * @param {string} message Text to display.
+ */
 function display(message) {
-    if (stepDepth === 0) { postMessage({ action: "step" }) }
-    [graph, changeManager] = GraphInterface.setBannerText(graph, changeManager, message);
-    postMessage({ action: "setBannerText", text: message });
-    waitIfNeeded();
+    if (stepDepth === 0) {
+        postMessage({ action: "step" });// Begin a step when called outside step()
+    }
+
+    [graph, changeManager] =
+        GraphInterface.setBannerText(graph, changeManager, message);// Save the banner change in local history
+
+    postMessage({ action: "setBannerText", text: message });// Ask the main window to update the banner
+    waitIfNeeded();// Wait if execution needs to pause
+}
+
+/**
+ * Speaks text without changing the banner.
+ * The main window checks whether speech is enabled.
+ * @param {string} message Text to speak.
+ */
+function speak(message) {
+    if (stepDepth === 0) {
+        postMessage({ action: "step" });// Begin a step when called outside step()
+    }
+
+    postMessage({ action: "speak", text: message });// Ask the main window to speak without changing the banner
+    waitIfNeeded();// Wait if execution needs to pause
+}
+
+/**
+ * Shows text in the banner and speaks it when speech is enabled.
+ * @param {string} message Text to display and speak.
+ */
+function announce(message) {
+    if (stepDepth === 0) {
+        postMessage({ action: "step" });// Begin a step when called outside step()
+    }
+
+    [graph, changeManager] =
+        GraphInterface.setBannerText(graph, changeManager, message, true);// Mark this banner change for speech during replay
+
+    postMessage({ action: "setBannerText", text: message, shouldSpeak: true });// Send the banner text and speech flag to the main window
+    postMessage({ action: "speak", text: message });// Speak the message during its first execution
+    waitIfNeeded();// Wait if execution needs to pause
 }
 
 // Speak without changing the banner.
@@ -1174,10 +1214,10 @@ export {
     setAttributeAll,
     getAttribute,
     
-    // Display functions
+    // Output functions
     display,
-    speech,
-    description,
+    speak,
+    announce,
     print,
     setDirected,
     
