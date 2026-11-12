@@ -148,6 +148,14 @@ export default function UserPreferencesPopover() {
         return () => window.removeEventListener("keydown", onKeyDown);// Remove the listener during cleanup
     }, [setSpeechEnabled, setGskMode]);// Reattach if a listed setter changes
 
+    // Apply the dark class to the document root when the dark theme is selected.
+    useEffect(() => {
+        document.documentElement.classList.toggle(
+            'dark',
+            appearance.theme === 'dark'
+        );
+    }, [appearance.theme]);
+
     function changeGskMode(enabled) {
         setGskMode(enabled);
         SpeechInterface.announceGskState(enabled);
@@ -211,16 +219,16 @@ export default function UserPreferencesPopover() {
                 />
 
                 <div className="fixed inset-0 flex items-center justify-center overflow-y-auto p-4">
-                    <Dialog.Panel className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white p-6 shadow-xl">
+                    <Dialog.Panel className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 dark:text-gray-100">
                         <div className="mb-6 flex shrink-0 items-center justify-between">
-                            <Dialog.Title className="text-xl font-bold text-gray-900">
+                            <Dialog.Title className="text-xl font-bold text-gray-900 dark:text-gray-100">
                                 User Preferences
                             </Dialog.Title>
 
                             <button
                                 type="button"
                                 onClick={() => setIsOpen(false)}
-                                className="rounded-md p-2 text-gray-500 hover:bg-gray-100"
+                                className="rounded-md p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
                                 aria-label="Close user preferences"
                             >
                                 ✕
@@ -229,13 +237,13 @@ export default function UserPreferencesPopover() {
                         <div className="min-h-0 flex-1 overflow-y-auto pr-2">
                             {/* Speech settings */}
                             <section className="mb-6">
-                                <h2 className="mb-4 border-b pb-2 text-lg font-semibold text-gray-800">
+                                <h2 className="mb-4 border-b pb-2 text-lg font-semibold text-gray-800 dark:text-gray-100">
                                     Speech
                                 </h2>
                                 <div className="ml-4 space-y-5">
                                     {/* Speech Enabled */}
                                     <div className="flex items-center justify-between gap-4">
-                                        <span className="font-medium text-gray-700">
+                                        <span className="font-medium text-gray-700 dark:text-gray-200">
                                             Enabled
                                         </span>
 
@@ -258,7 +266,7 @@ export default function UserPreferencesPopover() {
                                     <div className="flex items-start justify-between gap-4">
                                         <label
                                             htmlFor="speech-speed"
-                                            className="pt-1 font-medium text-gray-700"
+                                            className="pt-1 font-medium text-gray-700 dark:text-gray-200"
                                         >
                                             Speed
                                         </label>
@@ -282,7 +290,7 @@ export default function UserPreferencesPopover() {
                                                             event.currentTarget.blur();
                                                         }
                                                     }}
-                                                    className="speech-speed-input w-16 rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    className="speech-speed-input w-16 rounded-md border border-gray-300 px-2 py-1.5 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                                                 />
                                                 <span className="text-sm text-gray-600">x</span>
                                             </div>
@@ -294,7 +302,7 @@ export default function UserPreferencesPopover() {
                                     </div>
                                     {/* GSK Mode */}
                                     <div className="flex items-center justify-between gap-4">
-                                        <span className="font-medium text-gray-700">
+                                        <span className="font-medium text-gray-700 dark:text-gray-200">
                                             GSK Mode
                                         </span>
 
@@ -318,11 +326,11 @@ export default function UserPreferencesPopover() {
                             
                         {/* Appearance settings */}
                         <section className="mb-6">
-                            <h2 className="mb-4 border-b pb-2 text-lg font-semibold text-gray-800">
+                            <h2 className="mb-4 border-b pb-2 text-lg font-semibold text-gray-800 dark:text-gray-100">
                                 Appearance
                             </h2>
                             <div className="ml-4 space-y-4">
-                                <p className="text-sm font-medium text-gray-700">
+                                <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
                                     Theme
                                 </p>
                                 {/* Theme options */}
@@ -332,8 +340,8 @@ export default function UserPreferencesPopover() {
                                         type="button"
                                         onClick={() => selectTheme("light")}
                                         aria-pressed={appearance.theme === "light"}
-                                        className={`flex flex-col items-center gap-2 rounded-lg border-2 bg-white p-3 text-gray-700 ${
-                                            appearance.theme === "light" ? "border-blue-500" : "border-gray-300"
+                                        className={`flex flex-col items-center gap-2 rounded-lg border-2 p-3 bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-200 ${
+                                            appearance.theme === "light" ? "border-blue-500" : "border-gray-300 dark:border-gray-700"
                                         }`}
 >
                                         <svg
@@ -355,8 +363,8 @@ export default function UserPreferencesPopover() {
                                         type="button"
                                         onClick={() => selectTheme("dark")}
                                         aria-pressed={appearance.theme === "dark"}
-                                        className={`flex flex-col items-center gap-2 rounded-lg border-2 bg-white p-3 text-gray-700 ${
-                                            appearance.theme === "dark" ? "border-blue-500" : "border-gray-300"
+                                        className={`flex flex-col items-center gap-2 rounded-lg border-2 p-3 bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-200 ${
+                                            appearance.theme === "dark" ? "border-blue-500" : "border-gray-300 dark:border-gray-700"
                                         }`}
 >
                                         <svg
@@ -376,11 +384,11 @@ export default function UserPreferencesPopover() {
 
                                 {/* Show five graph palettes as circles with colored slices. */}
                                 <fieldset>
-                                    <legend className="mb-3 text-sm font-medium text-gray-700">
+                                    <legend className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-200">
                                         Color palettes
                                     </legend>
                                     {/* Keep all five palette choices in one row. */}
-                                    <div className="grid grid-cols-5 gap-2">
+                                    <div className="grid grid-cols-5 gap-2 dark:text-gray-200">
                                         {[
                                             ["blueOrange", "Blue–Orange"],
                                             ["ocean", "Ocean"],
@@ -440,7 +448,7 @@ export default function UserPreferencesPopover() {
                                         type="button"
                                         onClick={() => setAdvancedOpen(open => !open)}
                                         aria-expanded={advancedOpen}
-                                        className="flex w-full items-center justify-between px-4 py-3 text-left font-medium text-gray-800 hover:bg-gray-50"
+                                        className="flex w-full items-center justify-between px-4 py-3 text-left font-medium text-gray-800 dark:text-gray-200"
                                     >
                                         <span>Advanced Settings</span>
 
@@ -461,13 +469,13 @@ export default function UserPreferencesPopover() {
 
                                     {advancedOpen && (
                                         <div className="space-y-4 border-t border-gray-200 px-4 py-4">
-                                            <p className="text-xs text-gray-500">
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">
                                                 Customize the colors used in the graph.
                                             </p>
 
                                             {/* Background */}
                                             <div className="flex items-center justify-between gap-3">
-                                                <label htmlFor="background-color" className="text-sm text-gray-700">
+                                                <label htmlFor="background-color" className="text-sm text-gray-700 dark:text-gray-200">
                                                     Background
                                                 </label>
                                                 <input
@@ -481,7 +489,7 @@ export default function UserPreferencesPopover() {
 
                                             {/* Labels */}
                                             <div className="flex items-center justify-between gap-3">
-                                                <label htmlFor="label-color" className="text-sm text-gray-700">
+                                                <label htmlFor="label-color" className="text-sm text-gray-700 dark:text-gray-200">
                                                     Labels (text)
                                                 </label>
                                                 <input
@@ -495,7 +503,7 @@ export default function UserPreferencesPopover() {
 
                                             {/* Nodes */}
                                             <div className="flex items-center justify-between gap-3">
-                                                <label htmlFor="node-color" className="text-sm text-gray-700">
+                                                <label htmlFor="node-color" className="text-sm text-gray-700 dark:text-gray-200">
                                                     Nodes
                                                 </label>
                                                 <input
@@ -509,7 +517,7 @@ export default function UserPreferencesPopover() {
 
                                             {/* Edges */}
                                             <div className="flex items-center justify-between gap-3">
-                                                <label htmlFor="edge-color" className="text-sm text-gray-700">
+                                                <label htmlFor="edge-color" className="text-sm text-gray-700 dark:text-gray-200">
                                                     Edges (Lines)
                                                 </label>
                                                 <input
@@ -526,20 +534,20 @@ export default function UserPreferencesPopover() {
                             </div>
                         </section>
                         <section className="mb-6">
-                            <h2 className="mb-4 border-b pb-2 text-lg font-semibold text-gray-800">
+                            <h2 className="mb-4 border-b pb-2 text-lg font-semibold text-gray-800 dark:text-gray-200">
                                 Editor Windows
                             </h2>
 
                             <div className="ml-4 space-y-4">
                                 {/* Use a font available on the user's computer in both editor windows. */}
                                 <label className="flex items-center justify-between gap-4">
-                                    <span>Font</span>
+                                    <span className="dark:text-gray-200">Font</span>
                                     <select
                                         value={editorPreferences.fontFamily}
                                         onChange={event =>
                                             changeEditorPreference("fontFamily", event.target.value)
                                         }
-                                        className="rounded border p-2"
+                                        className="rounded border border-gray-300 bg-white p-2 text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                                     >
                                         <option value="monospace">Monospace</option>
                                         <option value="Menlo">Menlo</option>
@@ -549,13 +557,13 @@ export default function UserPreferencesPopover() {
                                 </label>
                                 {/* Font size applies to both editors; dropdown text is converted to a number. */}
                                 <label className="flex items-center justify-between gap-4">
-                                    <span>Font size</span>
+                                    <span className="dark:text-gray-200">Font size</span>
                                     <select
                                         value={editorPreferences.fontSize}
                                         onChange={event =>
                                             changeEditorPreference("fontSize", Number(event.target.value))
                                         }
-                                        className="rounded border p-2"
+                                        className="rounded border border-gray-300 bg-white p-2 text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                                     >
                                         {/* Available editor font sizes, measured in pixels. */}
                                         {[12, 14, 16, 18, 20, 24, 28, 32].map(size => (
@@ -565,18 +573,18 @@ export default function UserPreferencesPopover() {
                                 </label>
 
                                {/* Custom text color is optional; the theme sets the background. */}
-                                <details className="rounded-lg border border-gray-200 p-3">
-                                    <summary className="cursor-pointer text-sm font-medium text-gray-700">
+                                <details className="rounded-lg border border-gray-200 p-3 dark:border-gray-700">
+                                    <summary className="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-200">
                                         Advanced editor settings
                                 </summary>
 
-                                <p className="mt-3 text-xs text-gray-600">
+                                <p className="mt-3 text-xs text-gray-600 dark:text-gray-400">
                                     Editor colors follow Light/Dark. Changing themes restores
                                     the default text color.
                                 </p>
 
                                 <label className="mt-3 flex items-center justify-between gap-4">
-                                    <span>Text color</span>
+                                    <span className="dark:text-gray-200">Text color</span>
                                     <input
                                         type="color"
                                         value={editorPreferences.foreground}
@@ -594,7 +602,7 @@ export default function UserPreferencesPopover() {
                             <button
                                 type="button"
                                 onClick={handleReset}
-                                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                             >
                                 Reset
                             </button>
