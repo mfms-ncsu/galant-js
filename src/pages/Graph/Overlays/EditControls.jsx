@@ -1,3 +1,4 @@
+import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 import { React, useEffect } from "react";
 import shortcuts, { matchesShortcut, shortcutLabel, shortcutHint } from "config/keyboardShortcuts";
 import { useAtom } from "jotai";
@@ -28,6 +29,7 @@ export default function EditControls() {
 
         //Update the EditorTabs
         setTabs(TabInterface.updateTab(tabs, graphData));
+        SpeechInterface.interruptAndSpeak("Graph copied to the editor. Download it there to save a file.");
         // !!! solved the problem of not updating correctly !!!
         window.open('/grapheditor', 'Graph Editor', `width=${window.screen.width / 2}, height=${window.screen.height}`);
     }
@@ -37,20 +39,31 @@ export default function EditControls() {
         let [newGraph, newChangeManager] = GraphInterface.revert(graph, userChangeManager);
         setGraph(newGraph);
         setUserChangeManager(newChangeManager);
+        SpeechInterface.interruptAndSpeak("Graph edits reverted.");
     }
 
     // Function to perform undo operation
     function undo() {
+        if (userChangeManager.index === 0) {
+            SpeechInterface.interruptAndSpeak("No edit to undo.");
+            return;
+        }
         let [newGraph, newChangeManager] = GraphInterface.undo(graph, userChangeManager);
         setGraph(newGraph);
         setUserChangeManager(newChangeManager);
+        SpeechInterface.interruptAndSpeak("Edit undone.");
     }
 
     // Function to perform redo operation
     function redo() {
+        if (userChangeManager.index >= userChangeManager.changes.length) {
+            SpeechInterface.interruptAndSpeak("No edit to redo.");
+            return;
+        }
         let [newGraph, newChangeManager] = GraphInterface.redo(graph, userChangeManager);
         setGraph(newGraph);
         setUserChangeManager(newChangeManager);
+        SpeechInterface.interruptAndSpeak("Edit restored.");
     }
 
     // Increase speech speed up to 4.5x.

@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 import PrimaryButton from "components/Buttons/PrimaryButton";
 
 /**
@@ -6,10 +8,16 @@ import PrimaryButton from "components/Buttons/PrimaryButton";
  * @author Julian Madrigal
  */
 export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
+    const guidance = prompt.errorObject.lineNumber === -1
+        ? "The algorithm took too long to respond. Check for a loop that does not end, then load the corrected algorithm."
+        : "The algorithm could not continue. Check the algorithm and selected graph, then load the corrected algorithm.";
+    useEffect(() => {
+        SpeechInterface.interruptAndSpeak(guidance);
+    }, [guidance]);
     // Error object and name
     const errorObject = prompt.errorObject;
     let errorString = `${errorObject.name}: ${errorObject.message}`;
-    let title, code;
+    let title, code = "";
 
     // This next code is from a previous team, but no author reference was found. 
     // if its a timeout error, we've set the line number to -1. And we don't need to do put the line here.
@@ -48,6 +56,7 @@ export default function AlgorithmErrorPrompt({prompt, callback, promptRef}) {
     return (
         <div className="flex flex-col min-w-[600px] min-h-[400px] max-h-full bg-white shadow-lg p-4 rounded-xl" ref={promptRef}>
             <span className="block text-left text-red-900 font-semibold pointer-events-none select-none text-xl">{title}</span>
+            <p role="alert" className="my-3">{guidance} If the app stops responding, save your work before refreshing the page.</p>
             <pre className="overflow-auto text-wrap my-4 text-l flex-1">{code}</pre>
             <PrimaryButton className="mt-auto" onClick={callback}>Okay</PrimaryButton>
         </div>

@@ -32,11 +32,22 @@ function spoken() {
  * Sets the speech speed from 1x to 4.5x.
  */
 function setRate(rate) {
+    const changed = speech.rate !== rate;
     speech.rate = rate;
+    if (changed) {
+        interruptAndSpeak("Speech speed " + rate);
+    }
 }
 
 function speakText(text) {
     if (spoken()) speech.speak(text);
+}
+
+/**
+ * Cancels current speech and starts new text when narration is enabled.
+ */
+function interruptAndSpeak(text) {
+    if (spoken()) speech.interruptAndSpeak(text);
 }
 
 /**
@@ -74,6 +85,7 @@ const SpeechInterface = {
     spoken,
     setSpeech,
     speakText,
+    interruptAndSpeak,
     cancelSpeech,
     announceSpeechState,
     announceGskState

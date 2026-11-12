@@ -283,6 +283,21 @@ function announce(message) {
     waitIfNeeded();// Wait if execution needs to pause
 }
 
+// Speak without changing the banner.
+function speech(message) {
+    if (stepDepth === 0) {
+        postMessage({ action: "step" });
+    }
+    postMessage({ action: "speak", text: String(message) });
+    waitIfNeeded();
+}
+
+// Pause for a graph introduction.
+function description(message) {
+    postMessage({ action: "description", text: String(message) });
+    wait();
+}
+
 function clearDisplay() {
     if (stepDepth === 0) { postMessage({ action: "step" }) }
     [graph, changeManager] = GraphInterface.clearBannerText(graph, changeManager);

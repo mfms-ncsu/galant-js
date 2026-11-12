@@ -1,3 +1,4 @@
+import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 import { useEffect, useState } from "react";
 import shortcuts, { matchesShortcut, shortcutHint } from "config/keyboardShortcuts";
 import { useAtom } from "jotai";
@@ -84,21 +85,28 @@ export default function AlgorithmControls() {
      */
     function debugMode() {
         if (algorithm) {
-            let newAlgorithm = AlgorithmInterface.toggleDebugMode(algorithm);
-            setAlgorithm(newAlgorithm);
+            AlgorithmInterface.toggleDebugMode(algorithm);
+            setAlgorithm(algorithm);
             setDebug(algorithm.debugMode);
+            SpeechInterface.interruptAndSpeak(algorithm.debugMode ? "Debug mode on" : "Debug mode off");
         }
     }
 
     // Function to handle pressing the forward button
     function frontButtonPress() {
-        if (!algorithm || !AlgorithmInterface.canStepForward(algorithm)) return;
+        if (!algorithm || !AlgorithmInterface.canStepForward(algorithm)) {
+            SpeechInterface.interruptAndSpeak("No next step is available.");
+            return;
+        }
         AlgorithmInterface.stepForward(algorithm);
     } 
 
     // Function to handle pressing the backward button
     function backButtonPress() {
-        if (!algorithm || !AlgorithmInterface.canStepBack()) return;
+        if (!algorithm || !AlgorithmInterface.canStepBack()) {
+            SpeechInterface.interruptAndSpeak("Already at the first step.");
+            return;
+        }
         AlgorithmInterface.stepBack(algorithm);
     }
 
@@ -112,6 +120,7 @@ export default function AlgorithmControls() {
 
         // Set the algorithm to null and reset its changeManager
         setAlgorithm(null);
+        SpeechInterface.interruptAndSpeak("Algorithm exited.");
         setAlgorithmChangeManager(null);
         setAlgorithmChangeManager(new ChangeManager());
     }
@@ -129,6 +138,7 @@ export default function AlgorithmControls() {
         setAlgorithmChangeManager(new ChangeManager());
         // Restart the algorithm
         algorithm.start();
+        SpeechInterface.interruptAndSpeak("Algorithm restarted.");
     }
 
     // Effect hook to handle keyboard shortcuts for stepping through the algorithm
@@ -172,10 +182,12 @@ export default function AlgorithmControls() {
                 <p id="algorithm-name" className="text-black whitespace-nowrap">{algorithm.name}</p>
                 <div className="flex justify-center items-center space-x-4 mt-1">
                     <PrimaryButton onClick={() => backButtonPress()}>
+                        <span className="sr-only">Previous step</span>
                         <ArrowLeftIcon className="h-5 fill-white stroke-1 stroke-black" />
                     </PrimaryButton>
                     <p className="select-none">Step {algorithmChangeManager.index}</p>
                     <PrimaryButton onClick={() => frontButtonPress()}>
+                        <span className="sr-only">Next step</span>
                         {!algorithm.fetchingSteps ?
                             <ArrowRightIcon className="h-5 fill-white stroke-1 stroke-black"/>
                         :

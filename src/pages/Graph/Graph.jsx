@@ -1,5 +1,7 @@
+import WelcomeDialog from "components/Accessibility/WelcomeDialog";
+import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 import { useEffect, useRef } from "react";
-import { useAtom } from "jotai";
+import { useAtom, getDefaultStore } from "jotai";
 import { algorithmAtom, algorithmChangeManagerAtom, userChangeManagerAtom, graphAtom, promptQueueAtom, gskCurrentNodeIdAtom, gskNavigationResetAtom } from "states/_atoms/atoms";
 import Cytoscape from "globals/Cytoscape";
 import SharedWorker from "globals/SharedWorker";
@@ -23,93 +25,84 @@ import GskExplorer from "components/Accessibility/GskExplorer";
  */
 export default function Graph() {
     // Define state variables using React hooks
-    const [graph, setGraph] = useAtom(graphAtom);
-    const [algorithmChangeManager, setAlgorithmChangeManager] = useAtom(algorithmChangeManagerAtom);
-    const [userChangeManager, setUserChangeManager] = useAtom(userChangeManagerAtom);
-    const [algorithm, setAlgorithm] = useAtom(algorithmAtom);
-    const [promptQueue, setPromptQueue] = useAtom(promptQueueAtom);
     const [, setGskCurrentNodeId] = useAtom(gskCurrentNodeIdAtom);
     const [, resetGskNavigation] = useAtom(gskNavigationResetAtom);
     const sentAliveMessage = useRef();
-    let algorithmLoading = false;
-    let myAlgorithm = null;
+    useEffect(() => {
+        const store = getDefaultStore();
 
-    useEffect(() => {
-        return () => AlgorithmInterface.stop();
-    }, []);
-    
-    /**
-     * Creates SharedWorker instance on mount. Whenever graph updates, onMessage 
-     * is rewritten to allow reading of most current graph.
-     */
-    useEffect(() => {
+        function startAlgorithm(name, code) {
+            const nextAlgorithm = new Algorithm(name, code);
+            store.set(algorithmAtom, nextAlgorithm);
+            store.set(algorithmChangeManagerAtom, new ChangeManager());
+            nextAlgorithm.start();
+        }
+
+        function reportLoadError() {
+            store.set(promptQueueAtom, [{
+                data: { type: "algorithmError", errorObject: new Error("Could not load this file."), algorithmCode: "" },
+                callback: () => {}
+            }]);
+        }
+
+        function onGraphLoad(data) {
+            if (!data.payload) {
+                return;
+            }
+            try {
+                const nextGraph = FileParser.loadGraph(data.name, data.payload);
+                const selectedAlgorithm = store.get(algorithmAtom);
+                AlgorithmInterface.stop();
+                store.set(promptQueueAtom, []);
+                store.set(graphAtom, nextGraph);
+                store.set(userChangeManagerAtom, new ChangeManager());
+                store.set(algorithmChangeManagerAtom, new ChangeManager());
+                resetGskNavigation(value => value + 1);
+                setGskCurrentNodeId(null);
+                if (selectedAlgorithm) {
+                    startAlgorithm(selectedAlgorithm.name, selectedAlgorithm.code);
+                }
+                SpeechInterface.interruptAndSpeak("Graph loaded. " + data.name);
+                setTimeout(() => Cytoscape.fit(Cytoscape.elements(), 100), 25);
+            } catch (error) {
+                reportLoadError();
+            }
+        }
+
+        function onAlgorithmLoad(data) {
+            try {
+                AlgorithmInterface.revert();
+                store.set(promptQueueAtom, []);
+                startAlgorithm(data.name, data.payload);
+                SpeechInterface.interruptAndSpeak("Algorithm loaded. " + data.name);
+            } catch (error) {
+                reportLoadError();
+            }
+        }
+
+        SharedWorker.on("graph-init", onGraphLoad);
+        SharedWorker.on("graph-rename", onGraphLoad);
+        SharedWorker.on("algo-init", onAlgorithmLoad);
+        function onLoadError(data) {
+            SpeechInterface.interruptAndSpeak(data.payload);
+        }
+        SharedWorker.on("load-error", onLoadError);
+        SharedWorker.on("ui-feedback", onLoadError);
         if (!sentAliveMessage.current) {
             sentAliveMessage.current = true;
             SharedWorker.postMessage({ message: "alive" });
         }
-
-        // Load a new graph
-        function onGraphLoad(data, isInit) {
-            if ( algorithmLoading ) {
-                algorithmLoading = false;
-                return;
-            }
-            // Get the name and graph text from the data
-            const { name: graphName, payload: graphText } = data;
-            if (!graphText) return;
-
-            // Remove any running algorithm
+        return () => {
+            SharedWorker.remove(onGraphLoad, onAlgorithmLoad, onLoadError);
             AlgorithmInterface.stop();
-            setAlgorithm(null);
-            resetGskNavigation(value => value + 1);
-            setGskCurrentNodeId(null);
-            // Load the graph
-            setGraph(FileParser.loadGraph(graphName, graphText));
-            // @todo should get rid of any messages from a running algorithm
-            setUserChangeManager(new ChangeManager());
-
-            // We have to wait for cytoscape to read graph changes, and add graph.
-            if (isInit) setTimeout(() => Cytoscape.fit(Cytoscape.elements(), 100), 25);
-            
-        }
-
-        // Load a new algorithm
-        function onAlgorithmLoad(data) {
-            algorithmLoading = true
-            
-            // Undo any changes the old algorithm made
-            // @todo this should happen when the algorithm is terminated
-            //       and the algorithm change manager should be set to null
-            AlgorithmInterface.revert();
-
-            // Clear the PromptQueue if one exists
-            setPromptQueue([]);
-            
-            // Load the algorithm and reset the ChangeManager
-            // The following might also work:
-            //   setAlgorithm(new Algorithm(data.name, data.payload));
-            //   algorithm.start();
-            // But this way we can handle errors more gracefully.
-            myAlgorithm = new Algorithm(data.name, data.payload);
-            setAlgorithm(myAlgorithm);
-            setAlgorithmChangeManager(new ChangeManager());
-            // const whatToSay = new SpeechSynthesisUtterance("startting algorithm")
-            // window.speechSynthesis.speak(whatToSay);
-            myAlgorithm.start();
-        }
-
-        // Register the functions in shared worker
-        const onGraphInit = data => onGraphLoad(data, true);
-        SharedWorker.on("graph-init", onGraphInit);
-        SharedWorker.on("graph-rename", onGraphLoad);
-        SharedWorker.on("algo-init", onAlgorithmLoad);
-        return () => SharedWorker.remove(onGraphInit, onGraphLoad, onAlgorithmLoad);
-    }, [graph]);
+        };
+    }, [resetGskNavigation, setGskCurrentNodeId]);
 
     return (
         <>
             <link rel="manifest" id="manifest-placeholder" href="./manifest.webmanifest" />
             <Header />
+            <WelcomeDialog />
             <div className="relative w-full h-full">
                 <PromptComponent />
                 <CytoscapeComponent />
