@@ -20,6 +20,10 @@ export default function HelpPopover() {
     const sectionRefs = useRef([]);
     const announcedOpen = useRef(false);
 
+    /**
+     * Toggles speech while Help is open.
+     * @author Henry Tavares
+     */
     const toggleSpeech = useCallback(() => {
         setSpeechEnabled(enabled => !enabled);
         SpeechInterface.announceSpeechState();
@@ -30,6 +34,10 @@ export default function HelpPopover() {
     }, []);
 
     useEffect(() => {
+        /**
+         * Opens Help from the welcome dialog.
+         * @author Henry Tavares
+         */
         function openHelp() {
             setIsOpen(true);
         }

@@ -1,3 +1,7 @@
+/**
+ * Shows a keyboard-accessible introduction.
+ * @author Henry Tavares
+ */
 import { useEffect, useRef } from "react";
 import { Dialog } from "@headlessui/react";
 import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";

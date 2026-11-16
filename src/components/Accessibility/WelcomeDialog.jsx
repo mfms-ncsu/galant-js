@@ -1,3 +1,7 @@
+/**
+ * Welcomes users and opens Help.
+ * @author Henry Tavares
+ */
 import { useState } from "react";
 import IntroductionDialog from "./IntroductionDialog";
 import shortcuts, { shortcutLabel } from "config/keyboardShortcuts";

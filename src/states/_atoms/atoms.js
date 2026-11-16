@@ -28,7 +28,10 @@ export const gskNavigationResetAtom = atom(0);
 
 const storedSpeechSpeedAtom = atomWithStorage('speechSpeed', 1.0);
 
-// Round older saved speeds to the new range.
+/**
+ * Rounds saved speech speeds to the supported range.
+ * @author Henry Tavares
+ */
 export const speechSpeedAtom = atom(
     (get) => Math.min(10, Math.max(0.25, Math.round(get(storedSpeechSpeedAtom) * 4) / 4)),
     (get, set, speed) => {

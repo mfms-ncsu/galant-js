@@ -52,6 +52,7 @@ function interruptAndSpeak(text) {
 
 /**
  * Stops speech without changing whether future text will be spoken.
+ * @author Henry Tavares
  */
 function cancelSpeech() {
     speech.cancel();
@@ -59,6 +60,7 @@ function cancelSpeech() {
 
 /**
  * Announces whether speech is on or off.
+ * @author Henry Tavares
  */
 function announceSpeechState() {
     cancelSpeech();
@@ -71,6 +73,7 @@ function announceSpeechState() {
 
 /**
  * Announces GSK mode even when narration is off.
+ * @author Henry Tavares
  */
 function announceGskState(enabled) {
     cancelSpeech();

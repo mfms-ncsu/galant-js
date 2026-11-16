@@ -31,6 +31,10 @@ export default function Graph() {
     useEffect(() => {
         const store = getDefaultStore();
 
+        /**
+         * Starts the selected algorithm.
+         * @author Henry Tavares
+         */
         function startAlgorithm(name, code) {
             const nextAlgorithm = new Algorithm(name, code);
             store.set(algorithmAtom, nextAlgorithm);
@@ -38,6 +42,10 @@ export default function Graph() {
             nextAlgorithm.start();
         }
 
+        /**
+         * Reports a file-loading error.
+         * @author Henry Tavares
+         */
         function reportLoadError() {
             store.set(promptQueueAtom, [{
                 data: { type: "algorithmError", errorObject: new Error("Could not load this file."), algorithmCode: "" },
@@ -83,6 +91,10 @@ export default function Graph() {
         SharedWorker.on("graph-init", onGraphLoad);
         SharedWorker.on("graph-rename", onGraphLoad);
         SharedWorker.on("algo-init", onAlgorithmLoad);
+        /**
+         * Reads feedback from an editor window.
+         * @author Henry Tavares
+         */
         function onLoadError(data) {
             SpeechInterface.interruptAndSpeak(data.payload);
         }

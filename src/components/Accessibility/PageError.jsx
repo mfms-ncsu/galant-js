@@ -1,3 +1,7 @@
+/**
+ * Shows recovery guidance when a page fails.
+ * @author Henry Tavares
+ */
 import { useEffect } from "react";
 import { useRouteError } from "react-router-dom";
 import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";

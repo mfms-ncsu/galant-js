@@ -1,3 +1,7 @@
+/**
+ * Announces controls and dialog introductions.
+ * @author Henry Tavares
+ */
 import { useEffect, useRef } from "react";
 import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 import SharedWorker from "globals/SharedWorker";
