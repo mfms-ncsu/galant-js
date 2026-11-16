@@ -3,6 +3,7 @@
  * Add ctrl or shift for modifiers. Use null to disable a shortcut.
  * Bindings without a mode are shared. Mode bindings take priority.
  * Avoid duplicate keys within a mode. Browser and Monaco shortcuts are separate.
+ * @author Henry Tavares
  */
 const keyboardShortcuts = {
     // Graph window

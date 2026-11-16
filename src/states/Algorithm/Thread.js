@@ -283,7 +283,10 @@ function announce(message) {
     waitIfNeeded();// Wait if execution needs to pause
 }
 
-// Speak without changing the banner.
+/**
+ * Speaks without changing the banner.
+ * @author Henry Tavares
+ */
 function speech(message) {
     if (stepDepth === 0) {
         postMessage({ action: "step" });
@@ -292,7 +295,10 @@ function speech(message) {
     waitIfNeeded();
 }
 
-// Pause for a graph introduction.
+/**
+ * Pauses for a graph introduction.
+ * @author Henry Tavares
+ */
 function description(message) {
     postMessage({ action: "description", text: String(message) });
     wait();

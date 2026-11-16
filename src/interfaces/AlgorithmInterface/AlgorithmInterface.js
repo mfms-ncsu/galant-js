@@ -102,6 +102,7 @@ function killThread(algorithm) {
 
 /**
  * Stops the current algorithm and its speech.
+ * @author Henry Tavares
  */
 function stop() {
     const algorithm = store.get(algorithmAtom);

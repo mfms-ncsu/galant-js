@@ -1,3 +1,7 @@
+/**
+ * Shows the graph introduction from an algorithm.
+ * @author Henry Tavares
+ */
 import IntroductionDialog from "components/Accessibility/IntroductionDialog";
 
 export default function DescriptionPrompt({ prompt, callback }) {

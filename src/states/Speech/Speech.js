@@ -39,6 +39,7 @@ export default class Speech {
 
     /**
      * Stops the current speech and clears queued speech.
+     * @author Henry Tavares
      */
     cancel() {
         if (this.pendingSpeak) {

@@ -63,6 +63,10 @@ export default class Algorithm {
         // Initialize the thread worker
         this.worker = new Worker(new URL("./Thread.js", import.meta.url));
         const worker = this.worker;
+        /**
+         * Ignores messages from an old worker.
+         * @author Henry Tavares
+         */
         let handleMessage = (message) => {
             // Ignore messages from a worker replaced by restart or exit.
             if (this.worker === worker) AlgorithmInterface.onMessage(this, message.data);
