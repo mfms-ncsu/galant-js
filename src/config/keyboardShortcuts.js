@@ -42,6 +42,10 @@ const keyboardShortcuts = {
     downloadFile: { key: "s", ctrl: true, shift: true, allowInInput: true },
     openFile: { key: "o", ctrl: true, shift: true, allowInInput: true },
     openExamples: { key: "e", ctrl: true, shift: true, allowInInput: true },
+    examplesPreviousSection: { key: "ArrowUp", mode: "examples", repeat: true },
+    examplesNextSection: { key: "ArrowDown", mode: "examples", repeat: true },
+    examplesSelect: { key: "Enter", mode: "examples", allowInInput: true },
+    examplesClose: { key: "Escape", mode: "examples" },
 
     // These shortcuts apply to the focused control.
     submitPrompt: { key: "Enter", allowInInput: true },
@@ -82,10 +86,10 @@ const keyboardShortcuts = {
 let activeShortcutMode = "default";
 
 /**
- * Switch shortcuts between default, GSK, and help modes for this window.
+ * Switch shortcuts between default, GSK, help, and examples modes for this window.
  */
 export function setShortcutMode(mode) {
-    if (mode !== "default" && mode !== "gsk" && mode !== "help") {
+    if (mode !== "default" && mode !== "gsk" && mode !== "help" && mode !== "examples") {
         throw new Error(`Unknown shortcut mode: ${mode}`);
     }
     activeShortcutMode = mode;
@@ -126,8 +130,13 @@ export function matchesShortcut(event, shortcut) {
     if (typeof document !== "undefined" && document.querySelector('[data-workflow-dialog]') && shortcut !== keyboardShortcuts.toggleSpeech) {
         return false;
     }
-    // Help keeps navigation keys and allows the speech toggle.
+    // Help and examples keep navigation keys and allow the speech toggle.
     if (activeShortcutMode === "help" && shortcut.mode !== "help" && shortcut !== keyboardShortcuts.toggleSpeech) {
+        return false;
+    }
+    if (activeShortcutMode === "examples" && shortcut.mode !== "examples"
+        && shortcut !== keyboardShortcuts.toggleSpeech
+        && shortcut !== keyboardShortcuts.openExamples) {
         return false;
     }
     if (shortcut.mode && shortcut.mode !== activeShortcutMode) {
