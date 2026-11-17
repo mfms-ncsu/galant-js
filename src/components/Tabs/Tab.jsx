@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import shortcuts, { matchesShortcut } from "config/keyboardShortcuts";
 import { PencilIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
 /**
@@ -22,7 +23,9 @@ export default function Tab({tab, onClick, onRename, onRemove}) {
     }
 
     function onEnter(event) {
-        if (event.key !== 'Enter') return;
+        if (!matchesShortcut(event, shortcuts.renameTab)) {
+            return;
+        }
         onRename(tab, intermediateName.trim());
         setEditMode(false);
     }
@@ -34,7 +37,10 @@ export default function Tab({tab, onClick, onRename, onRemove}) {
 
     // Too long to be inline of HTML, so placed here.
     function onTabSelectByKey(event) {
-        if (event.keyCode !== 13 && event.keyCode !== 32) return;
+        if (event.target !== event.currentTarget || !matchesShortcut(event, shortcuts.selectTab)) {
+            return;
+        }
+        event.preventDefault();
         onClick(tab);
     }
 

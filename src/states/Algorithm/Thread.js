@@ -237,14 +237,72 @@ function getAttribute(id, name) {
 /*
  * USER INTERFACE AND GRAPH SETTINGS
  */
+/**
+ * Shows text in the banner without speaking it.
+ * @param {string} message Text to display.
+ */
 function display(message) {
-    if (stepDepth === 0) { postMessage({ action: "step" }) }
-    [graph, changeManager] = GraphInterface.setBannerText(graph, changeManager, message);
-    postMessage({ action: "setBannerText", text: message });
-    if ( AlgorithmInterface.shouldSpeak() ) {
-        postMessage( {action: "speak", text: message});
+    if (stepDepth === 0) {
+        postMessage({ action: "step" });// Begin a step when called outside step()
     }
+
+    [graph, changeManager] =
+        GraphInterface.setBannerText(graph, changeManager, message);// Save the banner change in local history
+
+    postMessage({ action: "setBannerText", text: message });// Ask the main window to update the banner
+    waitIfNeeded();// Wait if execution needs to pause
+}
+
+/**
+ * Speaks text without changing the banner.
+ * The main window checks whether speech is enabled.
+ * @param {string} message Text to speak.
+ */
+function speak(message) {
+    if (stepDepth === 0) {
+        postMessage({ action: "step" });// Begin a step when called outside step()
+    }
+
+    postMessage({ action: "speak", text: message });// Ask the main window to speak without changing the banner
+    waitIfNeeded();// Wait if execution needs to pause
+}
+
+/**
+ * Shows text in the banner and speaks it when speech is enabled.
+ * @param {string} message Text to display and speak.
+ */
+function announce(message) {
+    if (stepDepth === 0) {
+        postMessage({ action: "step" });// Begin a step when called outside step()
+    }
+
+    [graph, changeManager] =
+        GraphInterface.setBannerText(graph, changeManager, message, true);// Mark this banner change for speech during replay
+
+    postMessage({ action: "setBannerText", text: message, shouldSpeak: true });// Send the banner text and speech flag to the main window
+    postMessage({ action: "speak", text: message });// Speak the message during its first execution
+    waitIfNeeded();// Wait if execution needs to pause
+}
+
+/**
+ * Speaks without changing the banner.
+ * @author Henry Tavares
+ */
+function speech(message) {
+    if (stepDepth === 0) {
+        postMessage({ action: "step" });
+    }
+    postMessage({ action: "speak", text: String(message) });
     waitIfNeeded();
+}
+
+/**
+ * Pauses for a graph introduction.
+ * @author Henry Tavares
+ */
+function description(message) {
+    postMessage({ action: "description", text: String(message) });
+    wait();
 }
 
 function clearDisplay() {
@@ -827,7 +885,9 @@ function promptNode(message, error) {
     if (nodes.length === 0) {
         throw new Error("Cannot prompt for a node when no valid nodes exist.");
     }
-    return promptFrom(message, nodes, error);
+    const nodeId = promptFrom(message, nodes, error);
+    postMessage({ action: "gskNodeSelected", nodeId });
+    return nodeId;
 }
 
 function promptNodeFrom(message, nodes) {
@@ -839,7 +899,13 @@ function promptNodeFrom(message, nodes) {
     if (nodes.length === 0) {
         throw new Error("Cannot prompt for a node when no valid nodes exist.");
     }
-    return promptFrom(message, nodes, "Node must be from {" + nodes.join(",") + "}");
+    const nodeId = promptFrom(
+        message,
+        nodes,
+        "Node must be from {" + nodes.join(",") + "}"
+    );
+    postMessage({ action: "gskNodeSelected", nodeId });
+    return nodeId;
 }
 
 function promptEdge(message) {
@@ -1155,8 +1221,10 @@ export {
     setAttributeAll,
     getAttribute,
     
-    // Display functions
+    // Output functions
     display,
+    speak,
+    announce,
     print,
     setDirected,
     

@@ -1,3 +1,5 @@
+import PageError from "components/Accessibility/PageError";
+import ControlFeedback from "components/Accessibility/ControlFeedback";
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -44,14 +46,17 @@ if ('serviceWorker' in navigator) {
  */
 const router = createBrowserRouter([
     {
+        errorElement: <PageError />,
         path: "/",
         element: <Graph />,
     },
     {
+        errorElement: <PageError />,
         path: '/algorithmeditor',
         element: <Editor editorType="Algorithm" tabsAtom={algorithmTabsAtom} />
     },
     {
+        errorElement: <PageError />,
         path: '/grapheditor',
         element: <Editor editorType="Graph" tabsAtom={graphTabsAtom} />
     }
@@ -61,6 +66,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
     <React.StrictMode>
         <Provider store={getDefaultStore()}>
+            <ControlFeedback />
             <RouterProvider router={router} />
         </Provider>
     </React.StrictMode>

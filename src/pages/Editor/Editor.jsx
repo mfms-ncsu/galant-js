@@ -7,15 +7,48 @@ import TabList from "components/Tabs/TabList";
 import algorithms from 'data/algorithms.json';
 import graphs from 'data/graphs.json';
 import * as threadFunctions from 'states/Algorithm/Thread.js';
+import { editorPreferencesAtom } from "states/_atoms/atoms";
 
 /**
  * Returns the monaco editor
  */
 function InnerEditor({ tab, editorType, onChange }) {
+    const [editorPreferences] = useAtom(editorPreferencesAtom);
+    const [monacoApi, setMonacoApi] = useState(null);
+
+    useEffect(() => {
+        if (!monacoApi) return;
+
+        monacoApi.editor.defineTheme("galant-user-theme", {
+            base: "vs",
+            inherit: false,
+            rules: [
+                {
+                    token: "",
+                    foreground: editorPreferences.foreground.replace("#", "")
+                }
+            ],
+            colors: {
+                "editor.foreground": editorPreferences.foreground,
+                "editor.background": editorPreferences.background,
+                "editorCursor.foreground": editorPreferences.foreground,
+                "editorLineNumber.foreground": editorPreferences.foreground,
+                "editorLineNumber.activeForeground": editorPreferences.foreground,
+                "editorGutter.background": editorPreferences.background
+            }
+        });
+
+        monacoApi.editor.setTheme("galant-user-theme");
+    }, [
+        monacoApi,
+        editorPreferences.foreground,
+        editorPreferences.background
+    ]);
     return (
         <MonacoEditor
             value={tab?.content}
             onChange={onChange}
+            onMount={(_editor, monaco) => setMonacoApi(monaco)}
             path={tab?.name}
             language={editorType === "Algorithm" ? "Algorithm-Language" : "markdown"}
             beforeMount={(monaco) => {
@@ -51,6 +84,8 @@ function InnerEditor({ tab, editorType, onChange }) {
             options={{
                 quickSuggestions: true,
                 suggestOnTriggerCharacters: true,
+                fontFamily: editorPreferences.fontFamily,
+                fontSize: editorPreferences.fontSize,
             }}
         />
     );

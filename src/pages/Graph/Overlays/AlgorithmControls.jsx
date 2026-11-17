@@ -1,4 +1,6 @@
+import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 import { useEffect, useState } from "react";
+import shortcuts, { matchesShortcut, shortcutHint } from "config/keyboardShortcuts";
 import { useAtom } from "jotai";
 import { algorithmAtom, algorithmChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_atoms/atoms";
 import AlgorithmInterface from "interfaces/AlgorithmInterface/AlgorithmInterface";
@@ -83,21 +85,28 @@ export default function AlgorithmControls() {
      */
     function debugMode() {
         if (algorithm) {
-            let newAlgorithm = AlgorithmInterface.toggleDebugMode(algorithm);
-            setAlgorithm(newAlgorithm);
+            AlgorithmInterface.toggleDebugMode(algorithm);
+            setAlgorithm(algorithm);
             setDebug(algorithm.debugMode);
+            SpeechInterface.interruptAndSpeak(algorithm.debugMode ? "Debug mode on" : "Debug mode off");
         }
     }
 
     // Function to handle pressing the forward button
     function frontButtonPress() {
-        if (!algorithm || !AlgorithmInterface.canStepForward(algorithm)) return;
+        if (!algorithm || !AlgorithmInterface.canStepForward(algorithm)) {
+            SpeechInterface.interruptAndSpeak("No next step is available.");
+            return;
+        }
         AlgorithmInterface.stepForward(algorithm);
     } 
 
     // Function to handle pressing the backward button
     function backButtonPress() {
-        if (!algorithm || !AlgorithmInterface.canStepBack()) return;
+        if (!algorithm || !AlgorithmInterface.canStepBack()) {
+            SpeechInterface.interruptAndSpeak("Already at the first step.");
+            return;
+        }
         AlgorithmInterface.stepBack(algorithm);
     }
 
@@ -111,12 +120,15 @@ export default function AlgorithmControls() {
 
         // Set the algorithm to null and reset its changeManager
         setAlgorithm(null);
+        SpeechInterface.interruptAndSpeak("Algorithm exited.");
         setAlgorithmChangeManager(null);
         setAlgorithmChangeManager(new ChangeManager());
     }
 
     function restartAlgorithm() {
-        if (!algorithm) return;
+        if (!algorithm) {
+            return;
+        }
         // Remove any prompts the algorithm had up
         setPromptQueue([]);
         AlgorithmInterface.revert();
@@ -126,18 +138,31 @@ export default function AlgorithmControls() {
         setAlgorithmChangeManager(new ChangeManager());
         // Restart the algorithm
         algorithm.start();
+        SpeechInterface.interruptAndSpeak("Algorithm restarted.");
     }
 
     // Effect hook to handle keyboard shortcuts for stepping through the algorithm
     useEffect(() => {
         function handleKeyPress(event) {
-            if (event.target.tagName.toLowerCase() === 'input') return;
-            if ( event.key === 'ArrowLeft' || event.key === 'j' ) backButtonPress();
-            else if ( event.key === 'ArrowRight' || event.key === 'k' ) frontButtonPress();
-            else if (event.key === 'q') terminateAlgorithm();
-            else if (event.key === ';') restartAlgorithm();
-            else if (event.key === 'x') exportGraph();
-            else if (event.key === '1') debugMode();
+            if (!algorithm) {
+                return;
+            }
+            if (matchesShortcut(event, shortcuts.stepBack)) {
+                backButtonPress();
+            } else if (matchesShortcut(event, shortcuts.stepForward)) {
+                frontButtonPress();
+            } else if (matchesShortcut(event, shortcuts.exitAlgorithm)) {
+                terminateAlgorithm();
+            } else if (matchesShortcut(event, shortcuts.restartAlgorithm)) {
+                restartAlgorithm();
+            } else if (matchesShortcut(event, shortcuts.exportGraph)) {
+                exportGraph();
+            } else if (matchesShortcut(event, shortcuts.toggleDebugMode)) {
+                debugMode();
+            } else {
+                return;
+            }
+            event.preventDefault();
         }
 
         document.addEventListener('keydown', handleKeyPress, true)
@@ -153,14 +178,16 @@ export default function AlgorithmControls() {
     return (
         <div className="absolute left-0 bottom-0 w-full p-1 flex flex-row items-center justify-between">
             <div className="flex flex-col items-center bg-white rounded-lg font-semibold text-lg">
-                <p className='text-black whitespace-nowrap' hidden={!debug}>DEBUG MODE (1)</p>
+                <p className='text-black whitespace-nowrap' hidden={!debug}>DEBUG MODE{shortcutHint(shortcuts.toggleDebugMode)}</p>
                 <p id="algorithm-name" className="text-black whitespace-nowrap">{algorithm.name}</p>
                 <div className="flex justify-center items-center space-x-4 mt-1">
                     <PrimaryButton onClick={() => backButtonPress()}>
+                        <span className="sr-only">Previous step</span>
                         <ArrowLeftIcon className="h-5 fill-white stroke-1 stroke-black" />
                     </PrimaryButton>
                     <p className="select-none">Step {algorithmChangeManager.index}</p>
                     <PrimaryButton onClick={() => frontButtonPress()}>
+                        <span className="sr-only">Next step</span>
                         {!algorithm.fetchingSteps ?
                             <ArrowRightIcon className="h-5 fill-white stroke-1 stroke-black"/>
                         :
@@ -171,9 +198,9 @@ export default function AlgorithmControls() {
             </div>
 
             <div className="space-y-1">
-                <PrimaryButton onClick={exportGraph}>Export Graph (x)</PrimaryButton>
-                <ExitButton onClick={restartAlgorithm}>Restart (;)</ExitButton>
-                <ExitButton onClick={terminateAlgorithm}>Exit (q)</ExitButton>
+                <PrimaryButton onClick={exportGraph}>Export Graph{shortcutHint(shortcuts.exportGraph)}</PrimaryButton>
+                <ExitButton onClick={restartAlgorithm}>Restart{shortcutHint(shortcuts.restartAlgorithm)}</ExitButton>
+                <ExitButton onClick={terminateAlgorithm}>Exit{shortcutHint(shortcuts.exitAlgorithm)}</ExitButton>
             </div>
         </div>
     );

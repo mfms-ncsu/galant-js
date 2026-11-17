@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Keep number input arrows visible for Speech Speed */
+.speech-speed-input::-webkit-inner-spin-button,
+.speech-speed-input::-webkit-outer-spin-button {
+    opacity: 1;
+}

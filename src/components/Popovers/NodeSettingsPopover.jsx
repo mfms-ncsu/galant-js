@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import shortcuts, { shortcutHint } from 'config/keyboardShortcuts';
 import { useAtom } from 'jotai';
 import { graphAtom } from 'states/_atoms/atoms';
 import { Popover, Switch } from '@headlessui/react';
@@ -45,27 +46,27 @@ export default function NodeSettingsPopover() {
     
     return (
         <Popover className="relative">
-            <PreferenceButton shortcut="n" callback={toggle} buttonRef={button}>
-                Nodes (n)
+            <PreferenceButton shortcut={shortcuts.openNodeSettings} callback={toggle} buttonRef={button}>
+                Nodes{shortcutHint(shortcuts.openNodeSettings)}
             </PreferenceButton>
 
-            <Popover.Panel unmount={false} className="absolute right-0 z-10 w-64 p-4 pt-2 rounded-xl bg-white shadow-lg pointer-events-auto">
-                <p className='text-lg font-semibold text-center'>Node Settings</p>
+            <Popover.Panel unmount={false} className="absolute right-0 z-10 w-64 p-4 pt-2 rounded-xl bg-white shadow-lg pointer-events-auto dark:bg-gray-800">
+                <p className='text-lg font-semibold text-center text-gray-800 dark:text-gray-100'>Node Settings</p>
 
                 <div className="flex flex-col space-y-2 mt-2">
                     <div className='flex justify-between align-middle'>
-                        <span className='text-gray-700 font-medium'>Display Labels</span>
+                        <span className='text-gray-700 font-medium dark:text-gray-200'>Display Labels</span>
                         <BinarySwitchComponent enabled={graph.showNodeLabels} setEnabled={val => setGraph(GraphInterface.setShowNodeLabels(graph, val))} />
                     </div>
 
                     <div className='flex justify-between align-middle'>
-                        <span className='text-gray-700 font-medium'>Display Weights</span>
+                        <span className='text-gray-700 font-medium dark:text-gray-200'>Display Weights</span>
                         <BinarySwitchComponent enabled={graph.showNodeWeights} setEnabled={val => setGraph(GraphInterface.setShowNodeWeights(graph, val))} />
                     </div>
 
                     <div>
                         <div className='flex justify-between align-middle'>
-                            <span className='text-gray-700 font-medium'>Node Radius</span>
+                            <span className='text-gray-700 font-medium dark:text-gray-200'>Node Radius</span>
                             <span className='text-sm font-semibold text-blue-500'>{graph.nodeSize}</span>
                         </div>
                         <Slider 

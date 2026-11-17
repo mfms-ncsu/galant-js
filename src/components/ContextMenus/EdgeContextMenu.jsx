@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import shortcuts, { matchesShortcut } from "config/keyboardShortcuts";
 import { useAtom } from "jotai";
 import { algorithmAtom, graphAtom, userChangeManagerAtom } from "states/_atoms/atoms";
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
@@ -90,7 +91,10 @@ export default function EdgeContextMenu() {
 
     // Label/Weight is already updated on blur, so enter should just blur to apply changes.
     function onEnterPressed(event) {
-        if (event.key !== 'Enter') return;
+        if (!matchesShortcut(event, shortcuts.finishEdgeEdit)) {
+            return;
+        }
+        event.preventDefault();
         event.target.blur();
     }
 

@@ -1,9 +1,10 @@
 import { getDefaultStore } from "jotai";
-import { algorithmChangeManagerAtom, graphAtom, promptQueueAtom } from "states/_atoms/atoms";
+import { algorithmAtom, algorithmChangeManagerAtom, graphAtom, promptQueueAtom, gskCurrentNodeIdAtom, gskNavigationResetAtom } from "states/_atoms/atoms";
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
 import PromptInterface from "interfaces/PromptInterface/PromptInterface";
 import LayeredGraphInterface from "interfaces/GraphInterface/LayeredGraphInterface";
 import TreeInterface from "interfaces/GraphInterface/TreeInterface";
+import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 
 /**
  * AlgorithmInterface contains functions to check and augment the algorithm.
@@ -63,6 +64,7 @@ function setupTimeout(algorithm) {
     algorithm.timeoutId = setTimeout(() => {
         // Kill the thread
         killThread(algorithm);
+        SpeechInterface.cancelSpeech();
         
         // Create an error
         var err = new Error("Timeout has occurred.");
@@ -101,9 +103,25 @@ function resumeThread(algorithm) {
  * @param algorithm Algorithm on which to operate
  */
 function killThread(algorithm) {
+    clearTimeout(algorithm.timeoutId);
     if (algorithm.worker) {
+        algorithm.worker.onmessage = null;
         algorithm.worker.terminate();
+        algorithm.worker = null;
     }
+    algorithm.completed = true;
+    algorithm.fetchingSteps = false;
+    algorithm.onStepAdded = null;
+}
+
+/**
+ * Stops the current algorithm and its speech.
+ * @author Henry Tavares
+ */
+function stop() {
+    const algorithm = store.get(algorithmAtom);
+    if (algorithm) killThread(algorithm);
+    SpeechInterface.cancelSpeech();
 }
 
 /**
@@ -131,6 +149,7 @@ function canStepForward(algorithm) {
  */
 function stepBack(algorithm) {
     if (!canStepBack()) return;
+    SpeechInterface.interruptAndSpeak("Previous step.");
     let [newGraph, newChangeManager] = GraphInterface.undo(graph, changeManager);
     store.set(graphAtom, newGraph);
     store.set(algorithmChangeManagerAtom, newChangeManager);
@@ -144,6 +163,8 @@ function stepBack(algorithm) {
 function stepForward(algorithm) {
     // Immediately return if the algorithm cannot continue
     if ( ! canStepForward(algorithm) ) return;
+    SpeechInterface.cancelSpeech();
+    SpeechInterface.speakText("Next step.");
 
     // If we are at the end of the list of changes, we need to wake up the thread to generate a new step
     if ( changeManager.index === changeManager.changes.length ) {
@@ -186,9 +207,7 @@ function enterPromptResult(algorithm, promptResult) {
  * This method undoes all changes that the current Algorithm did
  */
 function revert() {
-    const speechSetting = shouldSpeak();
-    AlgorithmInterface.speakText("ending algorithm execution");
-    setSpeech(false) 
+    stop();
     let [newGraph, newChangeManager] = GraphInterface.revert(graph, changeManager);
     setSpeech(speechSetting)
 
@@ -199,26 +218,6 @@ function revert() {
     
     store.set(graphAtom, newGraph);
     store.set(algorithmChangeManagerAtom, newChangeManager);
-}
-
-function toggleSpeech() {
-    if ( shouldSpeak() ) {
-        speakText("turning off speech")
-        setSpeech(false)
-    } else {
-        setSpeech(true)
-        speakText("speech is turned on")
-    }
-}
-
-function speakText(text) {
-    console.log(`-> speakText ${text}`)
-    if ( shouldSpeak() ) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        console.log("ready to speak", text)
-        window.speechSynthesis.speak(utterance);
-        console.log("spoken")
-    }
 }
 
 /**
@@ -248,6 +247,23 @@ function onMessage(algorithm, message) {
             [newGraph, newChangeManager] = GraphInterface.addEdge(graph, changeManager, message.source, message.target);
             updateState(newGraph, newChangeManager);
             break;
+        case "gskNodeSelected":
+            store.set(gskNavigationResetAtom, value => value + 1);
+            store.set(gskCurrentNodeIdAtom, message.nodeId);
+            break;
+        case "description":
+            clearTimeout(algorithm.timeoutId);
+            newQueue = PromptInterface.queuePrompt(
+                promptQueue,
+                { type: 'description', text: message.text },
+                () => {
+                    SpeechInterface.cancelSpeech();
+                    setupTimeout(algorithm);
+                    resumeThread(algorithm);
+                }
+            );
+            store.set(promptQueueAtom, newQueue);
+            break;
         case "prompt":
             clearTimeout(algorithm.timeoutId); // Cancel the timer while the prompt is up
             newQueue = PromptInterface.queuePrompt(
@@ -261,12 +277,19 @@ function onMessage(algorithm, message) {
             store.set(promptQueueAtom, newQueue);
             break;
         case "setBannerText":
-            [newGraph, newChangeManager] = GraphInterface.setBannerText(graph,changeManager, message.text);
+            [newGraph, newChangeManager] = GraphInterface.setBannerText(
+                graph,
+                changeManager,
+                message.text,
+                message.shouldSpeak === true // Record speech only for announce() messages.
+            );
             updateState(newGraph, newChangeManager);
             break;
         case "speak":
             // speak works only in the forward direction
-            speakText(message.text);
+            if (SpeechInterface.spoken()) {
+                SpeechInterface.speakText(message.text);
+            }
             break;
         case "clearBannerText":
             [newGraph, newChangeManager] = GraphInterface.clearBannerText(graph,changeManager);
@@ -380,6 +403,8 @@ function onMessage(algorithm, message) {
             algorithm.completed = true;
             break;
         case "error":
+            killThread(algorithm);
+            SpeechInterface.cancelSpeech();
             newQueue = PromptInterface.queuePrompt(
                 promptQueue,
                 { type: "algorithmError", errorObject: message.error, algorithmCode: algorithm.code },
@@ -403,10 +428,7 @@ const AlgorithmInterface = {
     stepBack,
     stepForward,
     toggleDebugMode,
-    revert,
-    speakText,
-    setSpeech,
-    toggleSpeech,
-    shouldSpeak
+    stop,
+    revert
 };
 export default AlgorithmInterface;

@@ -2,7 +2,7 @@ import produce, { enableMapSet } from "immer";
 import ChangeObject from "states/ChangeManager/ChangeObject";
 import Edge from "states/Graph/GraphElement/Edge";
 import Node from "states/Graph/GraphElement/Node";
-import AlgorithmInterface from "../AlgorithmInterface/AlgorithmInterface";
+import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
 
 /** Enable maps in immer */
 enableMapSet();
@@ -1050,8 +1050,9 @@ function redo(graph, changeManager) {
           case "setBannerText":
             console.log(`redoing setBannerText, text = "${change.current.text}", previous = "${change.previous.text}"`);
             draft.banner.text = change.current.text;
-            // text is spoken conditionally, if speech is set
-            AlgorithmInterface.speakText(`${change.current.text}`)
+            if (change.current.shouldSpeak && SpeechInterface.spoken()) {// Speak announce() messages during redo, but keep display() silent.
+              SpeechInterface.speakText(`${change.current.text}`)
+            }
             break
           default:
             throw new Error(`unrecognized redo action ${change.action}`)
@@ -1073,10 +1074,13 @@ function redo(graph, changeManager) {
 
 function revert(graph, changeManager) {
   // annoying to speak all the undo's
+  let speechFlag = SpeechInterface.spoken();
+  SpeechInterface.setSpeech(false);
   while (changeManager.index > 0) {
     [graph, changeManager] = undo(graph, changeManager);
   }
   // revert to the current speech setting
+  SpeechInterface.setSpeech(speechFlag);
   latestIdNumber = 0
   currentSequenceNumber = 0
   return [graph, changeManager];
@@ -1500,8 +1504,10 @@ function setNodeSize(graph, nodeSize) {
 /**
  * sets the banner text; called via display() in Thread.js
  * creates an appropriate change object
+ *  Also used by announce(); shouldSpeak controls speech during replay.
+ * @param {boolean} [shouldSpeak=false] Whether replay should speak this message.
  */
-function setBannerText(graph, changeManager, text) {
+function setBannerText(graph, changeManager, text, shouldSpeak = false) {
   console.log(`-> setBannerText to "${text}", was "${graph.banner.text}"`);
   verifyGraphChangeManager(graph, changeManager);
 
@@ -1528,7 +1534,8 @@ function setBannerText(graph, changeManager, text) {
         text: graph.banner.text
       },
       {
-        text: text
+        text: text,
+        shouldSpeak: shouldSpeak // Remember whether replay should speak this message.
       }
     ),
   ]);
@@ -1865,7 +1872,10 @@ function undo(graph, changeManager) {
             console.log(`undoing setBannerText, text = ${change.current.text}, previous = ${change.previous.text}`);
             draft.banner.text = change.previous.text;
             // does nothing - have to yield to the thread running the algorithm
-            AlgorithmInterface.speakText(`undoing ${change.current.text}`)
+            // Keep display() silent when undoing a banner change.
+            if (change.current.shouldSpeak && SpeechInterface.spoken()) {
+              SpeechInterface.speakText(`undoing ${change.current.text}`)
+            }
             break
           default:
             throw new Error(`unrecognized undo action ${change.action}`)
@@ -1938,6 +1948,6 @@ const GraphInterface = {
   startRecording,
   toString,
   undo,
-  recordChange,
+  recordChange
 };
 export default GraphInterface;

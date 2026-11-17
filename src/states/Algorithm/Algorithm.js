@@ -1,7 +1,9 @@
 import { getDefaultStore } from "jotai";
-import { graphAtom } from "../_atoms/atoms";
+import { graphAtom, gskModeAtom } from "../_atoms/atoms";
 import AlgorithmInterface from "interfaces/AlgorithmInterface/AlgorithmInterface";
 import GraphInterface from "interfaces/GraphInterface/GraphInterface";
+import SpeechInterface from "interfaces/SpeechInterface/SpeechInterface";
+import { setShortcutMode } from "config/keyboardShortcuts";
 
 /** Get the graph atom outside a React component */
 const store = getDefaultStore(); // Get the store with the atoms to access them outside of React
@@ -41,6 +43,17 @@ export default class Algorithm {
     }
 
     start() {
+        const wasGskEnabled = store.get(gskModeAtom);
+
+        store.set(gskModeAtom, false);
+        setShortcutMode("default");
+
+        if (wasGskEnabled) {
+            SpeechInterface.announceGskState(false);
+        }
+        this.completed = false;
+        this.fetchingSteps = false;
+        this.debugMode = false;
         // Shared array used to pass wake messages and prompt results to the Thread
         this.array = new Int32Array(new SharedArrayBuffer(1024));
         this.array[1] = 0;
@@ -53,8 +66,24 @@ export default class Algorithm {
 
         // Initialize the thread worker
         this.worker = new Worker(new URL("./Thread.js", import.meta.url));
-        let handleMessage = (message) => { AlgorithmInterface.onMessage(this, message.data) };
+        const worker = this.worker;
+        /**
+         * Ignores messages from an old worker.
+         * @author Henry Tavares
+         */
+        let handleMessage = (message) => {
+            // Ignore messages from a worker replaced by restart or exit.
+            if (this.worker === worker) AlgorithmInterface.onMessage(this, message.data);
+        };
         this.worker.onmessage = handleMessage;
+        this.worker.onerror = event => {
+            if (this.worker === worker) {
+                AlgorithmInterface.onMessage(this, {
+                    action: "error",
+                    error: { name: "Algorithm error", message: event.message }
+                });
+            }
+        };
         this.worker.postMessage(["shared", this.array, this.flags]);
         this.worker.postMessage(["graph/algorithm", GraphInterface.toString(graph), graph.isDirected, this.code, graph.name]);
     }

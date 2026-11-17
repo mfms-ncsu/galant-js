@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import shortcuts, { matchesShortcut } from "config/keyboardShortcuts";
 import { useAtom } from "jotai";
 import { algorithmAtom, graphAtom, userChangeManagerAtom } from "states/_atoms/atoms";
 import Cytoscape from "globals/Cytoscape";
@@ -90,7 +91,10 @@ export default function NodeContextMenu() {
 
     // Hide the context menu when enter is pressed
     function onEnterPressed(event) {
-        if (event.key !== 'Enter') return;
+        if (!matchesShortcut(event, shortcuts.finishNodeEdit)) {
+            return;
+        }
+        event.preventDefault();
         event.target.blur();
     }
 
