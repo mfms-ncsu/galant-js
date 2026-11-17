@@ -241,7 +241,7 @@ function terminalNodeDeletion(x, isPredecessor) {
       // delete x and its sibling dummy
       step(() => {
         if ( isPredecessor ) {
-          display(`deleting inorder predecessor node and its dummy sibling`)
+            display(`deleting inorder predecessor with weight ${weight(x)} and its dummy sibling`)
         } else {
           display(`deleting node with weight ${weight(x)} and its dummy sibling`)
         }

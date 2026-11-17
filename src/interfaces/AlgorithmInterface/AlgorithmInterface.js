@@ -27,21 +27,6 @@ store.sub(algorithmChangeManagerAtom, () => { changeManager = store.get(algorith
 store.sub(promptQueueAtom, () => { promptQueue = store.get(promptQueueAtom) });
 
 /**
- * Controls whether text will be spoken
- * @todo allow this value to be controlled by the user
- */
-let spokenText = true;
-
-function setSpeech(toSpeak) {
-  console.log(`-> setSpeech, spokenText = ${spokenText}, toSpeak = ${toSpeak}`)
-  spokenText = toSpeak;
-}
-
-function shouldSpeak() {
-  return spokenText;
-}
-
-/**
  * Updates the state of the graph and changeManager, as long as we are
  * not in a step function. If we are in a step function, then we will
  * update the temporary graph and state instead.
@@ -209,7 +194,6 @@ function enterPromptResult(algorithm, promptResult) {
 function revert() {
     stop();
     let [newGraph, newChangeManager] = GraphInterface.revert(graph, changeManager);
-    setSpeech(speechSetting)
 
     // cause memory to be reclaimed? no such luck
     changeManager = null;

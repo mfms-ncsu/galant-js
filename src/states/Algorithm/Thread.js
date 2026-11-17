@@ -3,7 +3,6 @@ import FileParser from 'interfaces/FileParser/FileParser';
 import ChangeManager from 'states/ChangeManager/ChangeManager';
 import LayeredGraphInterface from 'interfaces/GraphInterface/LayeredGraphInterface';
 import TreeInterface from 'interfaces/GraphInterface/TreeInterface';
-import AlgorithmInterface from '../../interfaces/AlgorithmInterface/AlgorithmInterface';
 
 /**
  * Execution environment for algorithms. This file provides all necessary functions
