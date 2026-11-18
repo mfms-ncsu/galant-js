@@ -79,6 +79,11 @@ export default function GskExplorer() {
             lastAnnouncement.current = null;
         }
 
+        SpeechInterface.speakText("Exploration mode."
+            + " Shift-G to exit."
+            + " Up/down arrows to explore incident edges."
+            + " Right/left arrows to move to other endpoint and back."
+        )
         const nodes = [...graph.nodes.values()]
             .filter(node =>
                 !node.attributes.get("hidden") &&
@@ -138,6 +143,7 @@ export default function GskExplorer() {
     useEffect(() => {
     function onKeyDown(event) {
         if (!gskMode) return;
+        SpeechInterface.cancelSpeech()
         if (matchesShortcut(event, shortcuts.gskStopSpeech)) {
             event.preventDefault();
             SpeechInterface.cancelSpeech();

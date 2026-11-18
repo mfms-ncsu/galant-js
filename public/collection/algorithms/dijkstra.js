@@ -53,9 +53,15 @@ function averageWeight() {
     return count > 0 ? totalWeight / count : 1;
 }
 
+// this should probably be incorporated into Tread.js, maybe with a shorter name
+function instructExplorer() {
+    speak("Shift-G to explore path back to start," +
+    " nodes on path are highlighted")
+}
+
 description("Dijkstra’s algorithm finds the shortest path from a start node to every other node in the network.\n" +
 "Each iteration visits a node that has the shortest known path from the start and considers its unvisited neighbors.\n" +
-"If an edge to a neighbor yields a shorter path from the start, the length of the known path to the neighbor is updated.\n" +
+"If an edge to a neighbor yields a shorter path from the start, the length of the known path to the neighbor is updated - the edge is relaxed.\n" +
 "In the beginning all nodes have path length infinity, except for the start, which has path length zero."
 )
 
@@ -92,8 +98,7 @@ while ( PQsize() > 0 ) {
     const current_node = removeMin()
     step(() => {
         announce(`node ${current_node} is closest to the start`)
-        speak("Shift-G to explore path back to start," +
-    " nodes on path are highlighted")
+        instructExplorer()
     })
     inTree[current_node] = true
     print(current_node)
@@ -122,9 +127,12 @@ while ( PQsize() > 0 ) {
                     color(predecessorEdge[next_node], "yellow")
                     color(edge, "green")
                     setEdgeWidth(edge, 4)
-                    display(`relax ${edge} updated distance of ${next_node} to ${next_dist}`)
+                    announce(`relax ${edge} updated distance of ${next_node} to ${next_dist}`)
+                    instructExplorer()
                 }
                 else {
+                    announce(`encountered ${next_dist} for the first time, distance is ${next_dist}`)
+                    instructExplorer()
                     color(edge, "red")
                 }
                 predecessorEdge[next_node] = edge
