@@ -53,6 +53,12 @@ function averageWeight() {
     return count > 0 ? totalWeight / count : 1;
 }
 
+description("Dijkstra’s algorithm finds the shortest path from a start node to every other node in the network.\n" +
+"Each iteration visits a node that has the shortest known path from the start and considers its unvisited neighbors.\n" +
+"If an edge to a neighbor yields a shorter path from the start, the length of the known path to the neighbor is updated.\n" +
+"In the beginning all nodes have path length infinity, except for the start, which has path length zero."
+)
+
 step(() => {
     clearNodeMarks();
     hideAllNodeWeights();
@@ -76,6 +82,7 @@ step(() => {
     }
 })
 
+speak("In the next step, type name of a start node")
 let start_node = promptNode("Enter starting node:", "invalid node ${start_node}");
 setWeight(start_node, 0)
 showWeight(start_node)
@@ -83,6 +90,11 @@ nodePQ[start_node] = 0
 
 while ( PQsize() > 0 ) {
     const current_node = removeMin()
+    step(() => {
+        announce(`node ${current_node} is closest to the start`)
+        speak("Shift-G to explore path back to start," +
+    " nodes on path are highlighted")
+    })
     inTree[current_node] = true
     print(current_node)
     step(() => {
