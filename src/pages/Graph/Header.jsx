@@ -42,14 +42,13 @@ function openAlgorithmEditor() {
 export default function Header() {
     const [gskMode, setGskMode] = useAtom(gskModeAtom);
 
-    // This should not be needed once we remove GSK mode from user preferences
     // Keep keyboard mode synchronized with the saved setting.
-    // useEffect(() => {
-    //     if (getShortcutMode() === "help") {
-    //         return;
-    //     }
-    //     setShortcutMode(gskMode ? "gsk" : "default");
-    // }, [gskMode]);
+    useEffect(() => {
+        if (getShortcutMode() === "help") {
+            return;
+        }
+        setShortcutMode(gskMode ? "gsk" : "default");
+    }, [gskMode]);
 
     // Shift+G updates the same setting as the popover toggle.
     useEffect(() => {

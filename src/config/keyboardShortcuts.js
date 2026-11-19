@@ -14,15 +14,15 @@ const keyboardShortcuts = {
     helpPreviousSection: { key: "ArrowUp", mode: "help", repeat: true },
     helpNextSection: { key: "ArrowDown", mode: "help", repeat: true },
     helpRepeatSection: { key: " ", mode: "help" },
-    helpIncreaseSpeechSpeed: { key: "ArrowUp", shift: true, mode: "help", repeat: true },
-    helpDecreaseSpeechSpeed: { key: "ArrowDown", shift: true, mode: "help", repeat: true },
+    helpIncreaseSpeechSpeed: { key: "+", shift: true, mode: "help", repeat: true },
+    helpDecreaseSpeechSpeed: { key: "-", shift: true, mode: "help", repeat: true },
     openNodeSettings: { key: "n" },
     openEdgeSettings: { key: "e" },
     openLayoutSettings: null,
     toggleSpeech: { key: "v" },
     toggleGskMode: { key: "g", shift: true },
-    increaseSpeechSpeed: { key: "ArrowUp", repeat: true },
-    decreaseSpeechSpeed: { key: "ArrowDown", repeat: true },
+    increaseSpeechSpeed: { key: "+", shift: true, repeat: true },
+    decreaseSpeechSpeed: { key: "-", repeat: true },
 
     // Animation navigation
     stepBack: { key: "ArrowLeft", repeat: true },
@@ -109,6 +109,9 @@ export function toggleShortcutMode() {
     return activeShortcutMode;
 }
 
+// the !! operator converts an expression to a Boolean
+// seems overkill here -- the relevant values are Boolean to begin with
+// - as far as I know
 function matchesKey(event, shortcut) {
     return event.key?.toLowerCase() === shortcut.key.toLowerCase()
         && !!event.ctrlKey === !!shortcut.ctrl

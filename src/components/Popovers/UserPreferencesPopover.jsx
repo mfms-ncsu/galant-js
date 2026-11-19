@@ -358,7 +358,7 @@ export default function UserPreferencesPopover() {
                                             GSK Mode
                                         </span>
 
-                                        {/* <Switch
+                                        <Switch
                                             checked={gskMode}
                                             onChange={changeGskMode}
                                             className={`${
@@ -371,7 +371,7 @@ export default function UserPreferencesPopover() {
                                                     gskMode ? 'translate-x-6' : 'translate-x-1'
                                                 } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
                                             />
-                                        </Switch> */}
+                                        </Switch>
                                     </div>    
                                 </div>
                             </section>

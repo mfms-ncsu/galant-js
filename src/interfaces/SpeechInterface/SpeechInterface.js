@@ -78,9 +78,13 @@ function announceSpeechState() {
 function announceGskState(enabled) {
     cancelSpeech();
     if (enabled) {
-        speech.speak("GSK mode on");
+        speech.speak("Exploration mode."
+            + " Shift-G to exit."
+            + " Up/down arrows to explore incident edges."
+            + " Right/left arrows to move to other endpoint and back."
+        )
     } else {
-        speech.speak("GSK mode off");
+        speech.speak("Exploration mode off");
     }
 }
 

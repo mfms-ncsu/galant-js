@@ -88,7 +88,7 @@ step(() => {
     }
 })
 
-speak("In the next step, type name of a start node")
+speak("In the next step, type name of a start node.")
 let start_node = promptNode("Enter starting node:", "invalid node ${start_node}");
 setWeight(start_node, 0)
 showWeight(start_node)
@@ -97,7 +97,7 @@ nodePQ[start_node] = 0
 while ( PQsize() > 0 ) {
     const current_node = removeMin()
     step(() => {
-        announce(`node ${current_node} is closest to the start`)
+        announce(`node ${current_node} is closest to the start, distance is ${weight(current_node)}`)
         instructExplorer()
     })
     inTree[current_node] = true
@@ -107,7 +107,7 @@ while ( PQsize() > 0 ) {
         setShape(current_node, "star")
         if ( predecessorEdge[current_node] ) {
             color(predecessorEdge[current_node], "blue")
-            setEdgeWidth(predecessorEdge[current_node], 6)
+            highlight(predecessorEdge[current_node])
             display(`node ${current_node} added
                      with predecessor ${other(current_node, predecessorEdge[current_node])}`)
         }
@@ -131,7 +131,7 @@ while ( PQsize() > 0 ) {
                     instructExplorer()
                 }
                 else {
-                    announce(`encountered ${next_dist} for the first time, distance is ${next_dist}`)
+                    announce(`encountered ${next_node} for the first time, distance is ${next_dist}`)
                     instructExplorer()
                     color(edge, "red")
                 }
