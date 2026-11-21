@@ -295,6 +295,7 @@ function onMessage(algorithm, message) {
             break;
         case "setNodeAttribute":
             [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graph, changeManager, message.nodeId, message.name, message.value);
+            store.set(gskCurrentNodeIdAtom, message.nodeId);
             updateState(newGraph, newChangeManager);
             break;
         case "setNodeAttributeAll":

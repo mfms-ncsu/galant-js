@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+// @todo use getDefaultStore here - much simpler!
+// Actually, the right way to do this may be to have a separate interface for
+// explorer mode, but that's for later
 import { useAtom, useAtomValue } from "jotai";
 import {
     graphAtom,
@@ -79,14 +82,18 @@ export default function GskExplorer() {
             lastAnnouncement.current = null;
         }
 
-        const nodes = [...graph.nodes.values()]
-            .filter(node =>
-                !node.attributes.get("hidden") &&
-                !node.attributes.get("dummy")
-            )
-            .sort((a, b) => a.sequenceNumber - b.sequenceNumber);
+        // const nodes = [...graph.nodes.values()]
+        //     .filter(node =>
+        //         !node.attributes.get("hidden") &&
+        //         !node.attributes.get("dummy")
+        //     )
+        //     .sort((a, b) => a.sequenceNumber - b.sequenceNumber);
 
-        const currentNode = nodes.find(node => node.id === currentNodeId);
+        // const currentNode = nodes.find(node => node.id === currentNodeId);
+
+        // @todo does not currently work, but will once we getDefaultStore
+        const currentNodeId = store.get(gskCurrentNodeIdAtom)
+        let currentNode = graph.nodes.get(currentNodeId)
 
         // Choose a fallback only when the shared cursor is unavailable.
         if (!currentNode && nodes.length > 0) {

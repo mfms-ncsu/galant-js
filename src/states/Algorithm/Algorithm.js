@@ -9,7 +9,6 @@ import { setShortcutMode } from "config/keyboardShortcuts";
 const store = getDefaultStore(); // Get the store with the atoms to access them outside of React
 let graph = store.get(graphAtom); // Get the atom values from the store
 store.sub(graphAtom, () => { graph = store.get(graphAtom) }); // Subscribe to atom changes to update the values here whenever the states update
-store.sub(gskModeAtom, () => { gskMode = store.get(gskModeAtom) }); // ditto for gskModeAtom 
 
 /**
  * Representation of the algorithm loaded into the program. Contains a name and code. Controls a
