@@ -94,7 +94,10 @@ export default function AlgorithmControls() {
 
     // Function to handle pressing the forward button
     function frontButtonPress() {
-        if (!algorithm || !AlgorithmInterface.canStepForward(algorithm)) {
+        if (!algorithm || algorithm.fetchingSteps) {
+            return;
+        }
+        if (!AlgorithmInterface.canStepForward(algorithm)) {
             SpeechInterface.interruptAndSpeak("No next step is available.");
             return;
         }

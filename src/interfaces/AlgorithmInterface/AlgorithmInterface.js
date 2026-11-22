@@ -135,7 +135,7 @@ function canStepForward(algorithm) {
  */
 function stepBack(algorithm) {
     if (!canStepBack()) return;
-    SpeechInterface.interruptAndSpeak("Previous step.");
+    SpeechInterface.cancelSpeech();
     let [newGraph, newChangeManager] = GraphInterface.undo(graph, changeManager);
     store.set(graphAtom, newGraph);
     store.set(algorithmChangeManagerAtom, newChangeManager);
@@ -150,7 +150,6 @@ function stepForward(algorithm) {
     // Immediately return if the algorithm cannot continue
     if ( ! canStepForward(algorithm) ) return;
     SpeechInterface.cancelSpeech();
-    SpeechInterface.speakText("Next step.");
 
     // If we are at the end of the list of changes, we need to wake up the thread to generate a new step
     if ( changeManager.index === changeManager.changes.length ) {

@@ -128,7 +128,7 @@ export function matchesShortcut(event, shortcut) {
     if (!shortcut || event.defaultPrevented || event.isComposing) {
         return false;
     }
-    if (typeof document !== "undefined" && document.querySelector('[data-workflow-dialog]') && shortcut !== keyboardShortcuts.toggleSpeech) {
+    if (typeof document !== "undefined" && document.querySelector('[data-workflow-dialog], [data-preferences-dialog]') && shortcut !== keyboardShortcuts.toggleSpeech) {
         return false;
     }
     // Help and examples keep navigation keys and allow the speech toggle.
