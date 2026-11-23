@@ -134,6 +134,7 @@ function canStepForward(algorithm) {
  */
 function stepBack(algorithm) {
     if (!canStepBack()) return;
+    SpeechInterface.cancelSpeech();
     let [newGraph, newChangeManager] = GraphInterface.undo(graph, changeManager);
     store.set(graphAtom, newGraph);
     store.set(algorithmChangeManagerAtom, newChangeManager);

@@ -89,7 +89,7 @@ step(() => {
 })
 
 speak("In the next step, type name of a start node.")
-let start_node = promptNode("Enter starting node:", "invalid node ${start_node}");
+let start_node = promptNode("Enter starting node:", " is not a valid node");
 setWeight(start_node, 0)
 showWeight(start_node)
 nodePQ[start_node] = 0

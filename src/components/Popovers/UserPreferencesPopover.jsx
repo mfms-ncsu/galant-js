@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import PreferenceButton from "components/Buttons/PreferenceButton";
 import shortcuts, {matchesShortcut} from 'config/keyboardShortcuts';
 import { useAtom } from 'jotai';
 import { Dialog, Switch } from '@headlessui/react';
@@ -245,13 +246,9 @@ export default function UserPreferencesPopover() {
 
     return (
         <>
-           <button
-                type="button"
-                onClick={() => setIsOpen(true)}
-                className="pointer-events-auto block rounded-lg bg-white px-4 py-2 font-medium text-gray-700 shadow hover:bg-gray-100"
-            >
+            <PreferenceButton onClick={() => setIsOpen(true)}>
                 User Preferences
-            </button>
+            </PreferenceButton>
 
             <Dialog
                 open={isOpen}
@@ -259,12 +256,13 @@ export default function UserPreferencesPopover() {
                 className="relative z-50"
             >
                 <div
-                    className="pointer-events-none fixed inset-0 bg-black/40"
+                    className="fixed inset-0 bg-black/40"
                     aria-hidden="true"
                 />
 
-                <div className="pointer-events-none fixed inset-0 flex items-center justify-center overflow-y-auto p-4">
-                    <Dialog.Panel 
+                <div className="fixed inset-0 flex items-center justify-center overflow-y-auto p-4">
+                    <Dialog.Panel
+                        data-preferences-dialog
                         style={{ transform: `translate(${panelPosition.x}px, ${panelPosition.y}px)` }}
                         className="pointer-events-auto flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 dark:text-gray-100">
                         <div 
