@@ -262,7 +262,7 @@ function speak(message) {
         postMessage({ action: "step" });// Begin a step when called outside step()
     }
 
-    postMessage({ action: "speak", text: message });// Ask the main window to speak without changing the banner
+    postMessage({ action: "speak", text: String(message) });// Ask the main window to speak without changing the banner
     waitIfNeeded();// Wait if execution needs to pause
 }
 
@@ -281,18 +281,6 @@ function announce(message) {
     postMessage({ action: "setBannerText", text: message, shouldSpeak: true });// Send the banner text and speech flag to the main window
     postMessage({ action: "speak", text: message });// Speak the message during its first execution
     waitIfNeeded();// Wait if execution needs to pause
-}
-
-/**
- * Speaks without changing the banner.
- * @author Henry Tavares
- */
-function speech(message) {
-    if (stepDepth === 0) {
-        postMessage({ action: "step" });
-    }
-    postMessage({ action: "speak", text: String(message) });
-    waitIfNeeded();
 }
 
 /**
