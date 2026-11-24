@@ -1,7 +1,7 @@
 c A map of North Carolina with edges representing distances between cities
 c Current Algorithm: No Algorithm Running
 
-n Ashville 0 50 
+n Asheville 0 50 
 n Hickory 100 50 
 n Winston-Salem 200 0 
 n Greensboro 276 15 
@@ -10,8 +10,8 @@ n Raleigh 400 50
 n Charlotte 161 104 
 n Fayettville 350 100 
 n Wilmington 500 200 
-e Ashville Hickory 75 
-e Ashville Charlotte 136 
+e Asheville Hickory 75 
+e Asheville Charlotte 136 
 e Hickory Winston-Salem 72 
 e Hickory Charlotte 64 
 e Winston-Salem Charlotte 75 

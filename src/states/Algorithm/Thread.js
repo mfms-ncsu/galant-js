@@ -148,11 +148,11 @@ function prompt(message, error = "") {
  */
 function promptFrom(message, list, error) {
     if (list.length === 0) throw new Error("Cannot prompt when no valid options exist.");
-    if (error === null) error = "Error: Must enter a value from " + list;
 
     let promptResult = prompt(message);
     while (!list.includes(promptResult)) {
-        promptResult = prompt(message, error);
+        if (error === null) error = "Error: Must enter a value from " + list;
+        promptResult = prompt(message, promptResult + error);
     }
     return promptResult;
 }

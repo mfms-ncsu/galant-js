@@ -45,10 +45,10 @@ export default class Algorithm {
     start() {
         const wasGskEnabled = store.get(gskModeAtom);
 
-        store.set(gskModeAtom, false);
         setShortcutMode("default");
 
         if (wasGskEnabled) {
+            store.set(gskModeAtom, false);
             SpeechInterface.announceGskState(false);
         }
         this.completed = false;
