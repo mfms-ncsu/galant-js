@@ -230,10 +230,10 @@ function onMessage(algorithm, message) {
             [newGraph, newChangeManager] = GraphInterface.addEdge(graph, changeManager, message.source, message.target);
             updateState(newGraph, newChangeManager);
             break;
-        case "gskNodeSelected":
-            store.set(gskNavigationResetAtom, value => value + 1);
-            store.set(gskCurrentNodeIdAtom, message.nodeId);
-            break;
+        // case "gskNodeSelected":
+        //     store.set(gskNavigationResetAtom, value => value + 1);
+        //     store.set(gskCurrentNodeIdAtom, message.nodeId);
+        //     break;
         case "description":
             clearTimeout(algorithm.timeoutId);
             newQueue = PromptInterface.queuePrompt(
@@ -297,6 +297,9 @@ function onMessage(algorithm, message) {
         case "setNodeAttribute":
             [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graph, changeManager, message.nodeId, message.name, message.value);
             updateState(newGraph, newChangeManager);
+            // the following line is needed to alert the gskExplorer that something has changed; not clear why
+            store.set(gskNavigationResetAtom, value => value + 1);
+            store.set(gskCurrentNodeIdAtom, message.nodeId);
             break;
         case "setNodeAttributeAll":
             [newGraph, newChangeManager] = GraphInterface.setNodeAttributeAll(graph, changeManager, message.name, message.value);

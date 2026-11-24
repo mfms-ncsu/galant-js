@@ -79,18 +79,11 @@ export default function GskExplorer() {
             lastAnnouncement.current = null;
         }
 
-        const nodes = [...graph.nodes.values()]
-            .filter(node =>
-                !node.attributes.get("hidden") &&
-                !node.attributes.get("dummy")
-            )
-            .sort((a, b) => a.sequenceNumber - b.sequenceNumber);
-
-        const currentNode = nodes.find(node => node.id === currentNodeId);
+        const currentNode = graph.nodes.get(currentNodeId);
 
         // Choose a fallback only when the shared cursor is unavailable.
-        if (!currentNode && nodes.length > 0) {
-            setCurrentNodeId(nodes[0].id);
+        if (!currentNode && graph.nodes.length > 0) {
+            setCurrentNodeId(graph.nodes[0].id);
             return;
         }
 
@@ -138,7 +131,6 @@ export default function GskExplorer() {
     useEffect(() => {
     function onKeyDown(event) {
         if (!gskMode) return;
-        SpeechInterface.cancelSpeech()
         if (matchesShortcut(event, shortcuts.gskStopSpeech)) {
             event.preventDefault();
             SpeechInterface.cancelSpeech();
@@ -150,32 +142,30 @@ export default function GskExplorer() {
             SpeechInterface.cancelSpeech();
 
             let skipped = false;
-
             while (navigationHistory.current.length > 0) {
                 const entry = navigationHistory.current.pop();
                 const previousNode = graph.nodes.get(entry.nodeId);
+                if (
+                    ! previousNode
+                    // || previousNode.attributes.get("hidden") ||
+                    // previousNode.attributes.get("dummy")
+                ) {
+                    skipped = true;
+                    continue;
+                }
 
-            if (
-                !previousNode ||
-                previousNode.attributes.get("hidden") ||
-                previousNode.attributes.get("dummy")
-            ) {
-                skipped = true;
-                continue;
+                if (skipped) {
+                    SpeechInterface.speakText(
+                    "Unavailable nodes were skipped."
+                    );
+                }
+
+                pendingReturn.current = entry;
+                lastAnnouncement.current = null;
+                setConnectionIndex(-1);
+                setCurrentNodeId(entry.nodeId);
+                return;
             }
-
-            if (skipped) {
-                SpeechInterface.speakText(
-                "Unavailable nodes were skipped."
-                );
-            }
-
-            pendingReturn.current = entry;
-            lastAnnouncement.current = null;
-            setConnectionIndex(-1);
-            setCurrentNodeId(entry.nodeId);
-            return;
-        }
 
         SpeechInterface.speakText(
             skipped

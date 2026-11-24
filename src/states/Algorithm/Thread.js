@@ -873,7 +873,6 @@ function promptNode(message, error) {
         throw new Error("Cannot prompt for a node when no valid nodes exist.");
     }
     const nodeId = promptFrom(message, nodes, error);
-    postMessage({ action: "gskNodeSelected", nodeId });
     return nodeId;
 }
 
@@ -891,7 +890,6 @@ function promptNodeFrom(message, nodes) {
         nodes,
         "Node must be from {" + nodes.join(",") + "}"
     );
-    postMessage({ action: "gskNodeSelected", nodeId });
     return nodeId;
 }
 
