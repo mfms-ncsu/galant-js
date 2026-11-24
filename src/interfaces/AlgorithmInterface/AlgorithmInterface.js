@@ -230,11 +230,10 @@ function onMessage(algorithm, message) {
             [newGraph, newChangeManager] = GraphInterface.addEdge(graph, changeManager, message.source, message.target);
             updateState(newGraph, newChangeManager);
             break;
-        // case "gskNodeSelected":
-        //     store.set(gskNavigationResetAtom, value => value + 1);
-        //     store.set(gskCurrentNodeIdAtom, message.nodeId);
-        //     break;
         case "description":
+            // @todo the blind user needs to know to khit return to continue
+            // or make this a special case where right arrow will do the trick
+            // or make right arrow another shortcut for closing a prompt
             clearTimeout(algorithm.timeoutId);
             newQueue = PromptInterface.queuePrompt(
                 promptQueue,
@@ -254,7 +253,7 @@ function onMessage(algorithm, message) {
                 { type: 'input', label: message.content[1] || message.content[0] },
                 (value) => {
                     setupTimeout(algorithm); // Start the timeout timer back up
-                    enterPromptResult(algorithm, value); // Send the enetered value to the thread
+                    enterPromptResult(algorithm, value); // Send the entered value to the thread
                 }
             );
             store.set(promptQueueAtom, newQueue);
@@ -274,6 +273,11 @@ function onMessage(algorithm, message) {
                 SpeechInterface.speakText(message.text);
             }
             break;
+       case "gskNodeSelected":
+            // the following line is needed to alert the gskExplorer that something has changed; not clear why
+           store.set(gskNavigationResetAtom, value => value + 1);
+           store.set(gskCurrentNodeIdAtom, message.nodeId);
+           break;
         case "clearBannerText":
             [newGraph, newChangeManager] = GraphInterface.clearBannerText(graph,changeManager);
             updateState(newGraph, newChangeManager);
@@ -297,9 +301,6 @@ function onMessage(algorithm, message) {
         case "setNodeAttribute":
             [newGraph, newChangeManager] = GraphInterface.setNodeAttribute(graph, changeManager, message.nodeId, message.name, message.value);
             updateState(newGraph, newChangeManager);
-            // the following line is needed to alert the gskExplorer that something has changed; not clear why
-            store.set(gskNavigationResetAtom, value => value + 1);
-            store.set(gskCurrentNodeIdAtom, message.nodeId);
             break;
         case "setNodeAttributeAll":
             [newGraph, newChangeManager] = GraphInterface.setNodeAttributeAll(graph, changeManager, message.name, message.value);

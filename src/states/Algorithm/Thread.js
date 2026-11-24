@@ -3,6 +3,7 @@ import FileParser from 'interfaces/FileParser/FileParser';
 import ChangeManager from 'states/ChangeManager/ChangeManager';
 import LayeredGraphInterface from 'interfaces/GraphInterface/LayeredGraphInterface';
 import TreeInterface from 'interfaces/GraphInterface/TreeInterface';
+import SpeechInterface from 'interfaces/SpeechInterface/SpeechInterface'
 
 /**
  * Execution environment for algorithms. This file provides all necessary functions
@@ -148,11 +149,11 @@ function prompt(message, error = "") {
  */
 function promptFrom(message, list, error) {
     if (list.length === 0) throw new Error("Cannot prompt when no valid options exist.");
+    if (error === null) error = "Error: Must enter a value from " + list;
 
     let promptResult = prompt(message);
     while (!list.includes(promptResult)) {
-        if (error === null) error = "Error: Must enter a value from " + list;
-        promptResult = prompt(message, promptResult + error);
+        promptResult = prompt(message, error);
     }
     return promptResult;
 }
@@ -180,6 +181,7 @@ function setAttribute(id, name, value) {
         // Handle node attribute
         [graph, changeManager] = GraphInterface.setNodeAttribute(graph, changeManager, id, name, value);
         postMessage({ action: "setNodeAttribute", nodeId: id, name: name, value: value });
+        postMessage({ action: "gskNodeSelected", nodeId : id });
     }
     waitIfNeeded();
 }
@@ -250,6 +252,13 @@ function display(message) {
 
     postMessage({ action: "setBannerText", text: message });// Ask the main window to update the banner
     waitIfNeeded();// Wait if execution needs to pause
+}
+
+/**
+ * @returns true iff speech is turned on
+ */
+function speechOn() {
+    return SpeechInterface.spoken()
 }
 
 /**
@@ -873,6 +882,7 @@ function promptNode(message, error) {
         throw new Error("Cannot prompt for a node when no valid nodes exist.");
     }
     const nodeId = promptFrom(message, nodes, error);
+    postMessage({ action: "gskNodeSelected", nodeId });
     return nodeId;
 }
 
@@ -890,6 +900,7 @@ function promptNodeFrom(message, nodes) {
         nodes,
         "Node must be from {" + nodes.join(",") + "}"
     );
+    postMessage({ action: "gskNodeSelected", nodeId });
     return nodeId;
 }
 
@@ -1210,6 +1221,7 @@ export {
     display,
     speak,
     announce,
+    speechOn,
     print,
     setDirected,
     

@@ -24,6 +24,9 @@ function setSpeech(toSpeak) {
     if (!toSpeak) cancelSpeech();
 }
 
+/**
+ * @todo this should have a different name, e.g., speechOn
+ */
 function spoken() {
     return speech.enabled;
 }
@@ -77,6 +80,7 @@ function announceSpeechState() {
  */
 function announceGskState(enabled) {
     cancelSpeech();
+    if ( ! speech.enabled ) return
     if (enabled) {
         speech.speak("Exploration mode."
             + " Shift-G to exit."

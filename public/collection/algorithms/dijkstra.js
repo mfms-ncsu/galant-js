@@ -53,10 +53,14 @@ function averageWeight() {
     return count > 0 ? totalWeight / count : 1;
 }
 
-// this should probably be incorporated into Tread.js, maybe with a shorter name
+// @todo something like this should probably be incorporated into Thread.js,
+//  maybe with a shorter name
+let instructionsGiven = false
 function instructExplorer() {
+    if ( instructionsGiven ) return
     speak("Shift-G to explore path back to start," +
     " nodes on path are highlighted")
+    if ( speechOn() ) instructionsGiven = true
 }
 
 description("Dijkstra’s algorithm finds the shortest path from a start node to every other node in the network.\n" +
@@ -128,11 +132,9 @@ while ( PQsize() > 0 ) {
                     color(edge, "green")
                     setEdgeWidth(edge, 4)
                     announce(`relax ${edge} updated distance of ${next_node} to ${next_dist}`)
-                    instructExplorer()
                 }
                 else {
                     announce(`encountered ${next_node} for the first time, distance is ${next_dist}`)
-                    instructExplorer()
                     color(edge, "red")
                 }
                 predecessorEdge[next_node] = edge
