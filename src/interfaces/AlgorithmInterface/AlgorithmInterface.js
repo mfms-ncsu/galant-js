@@ -231,7 +231,7 @@ function onMessage(algorithm, message) {
             updateState(newGraph, newChangeManager);
             break;
         case "description":
-            // @todo the blind user needs to know to khit return to continue
+            // @todo the blind user needs to know to hit return to continue
             // or make this a special case where right arrow will do the trick
             // or make right arrow another shortcut for closing a prompt
             clearTimeout(algorithm.timeoutId);
